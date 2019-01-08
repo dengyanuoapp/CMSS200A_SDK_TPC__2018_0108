@@ -1,0 +1,681 @@
+C251 COMPILER V4.55,  basal_fmradio                                                        23/05/16  10:42:14  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE basal_fmradio
+OBJECT MODULE PLACED IN .\obj\basal_fmradio.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE basal_fmradio.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) B
+                    -ROWSE ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE(CHECKALARM) DEBUG PRINT(.\lst\basal_fmradio.ls
+                    -t) OBJECT(.\obj\basal_fmradio.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        FM tunner basal module implementation
+    5           *
+    6           *        (c) Copyright Actions Co,Ld.
+    7           *
+    8           *******************************************************************************
+    9           */
+   10          #include "ap_radio.h"
+   11          
+   12          #pragma name(MOD_BS_FMRADIO)
+   13          
+   14          uint16 m_FMStationTab[MAX_STATION_COUNT]; //µçÌ¨ÆµÂÊ¶ÔÕÕ±í(×¢:ÆµÂÊ·¶Î§87M-108M ÒÔKÎª¾«¶È).
+   15          
+   16          static uint8 cmd_fm_mid_findstation(void *param1, void *param2);
+   17          
+   18          /*********************************************************
+   19           *input:  buf---ptr point to buffer which is wait to deal
+   20           *          curfreq----current freq which will be inserted to buffer
+   21           *          totalnum---current total freq num in freq list
+   22           *output: no
+   23           *Description:  insert current freq into freq list
+   24           *note:  freq list from small to large
+   25           **********************************************************
+   26           */
+   27          bool SequenceFreqlist(uint16 *buf, uint16 curfreq, uint8 totalnum)
+   28          {
+   29   1          uint8 i, cur_pos;
+   30   1          uint16 *dealbuf;
+   31   1          int8 j;
+   32   1      
+   33   1          dealbuf = buf;
+   34   1          cur_pos = 0;
+   35   1      
+   36   1          for (i = 0; i < MAX_STATION_COUNT; i++)
+   37   1          {
+   38   2              //dealbuf µÄÊý¾ÝÊÇ´ÓÐ¡µ½´óÅÅÐò
+   39   2      
+   40   2              if (curfreq < (*dealbuf)) //Ð¡Óëµ±Ç°Ö¸ÏòµÄ£¬Ôò°Ñµ±Ç°ÒÔºóµÄÍùºóÒÆ£¬²¢²åÈëµ½µ±Ç°
+   41   2              {
+   42   3                  cur_pos = i;
+   43   3                  if (cur_pos == (MAX_STATION_COUNT - 1)) //Èç¹ûÊÇ×îºóÒ»Ïî£¬Ö±½ÓÌæ»»
+   44   3                  {
+   45   4                      *dealbuf = curfreq;
+   46   4                      g_FMStatus.station = i + 1;
+   47   4                      break;
+   48   4                  }
+   49   3      
+   50   3                  for (j = (MAX_STATION_COUNT - 2); j >= (int8) cur_pos; j--) //´ÓÐ¡µ½´óÅÅÐò£¬²åÈëÖÐ¼ä£¬ÐèÒª°Ñº
+             -óÃæµÄÊý¾ÝÍùºóÒÆÒ»Î»
+   51   3                  {
+   52   4                      *(buf + j + 1) = *(buf + j);
+   53   4                  }
+   54   3                  *dealbuf = curfreq; //²åÈëÔÚÖÐ¼ä
+   55   3                  g_FMStatus.station = i + 1;
+   56   3      
+C251 COMPILER V4.55,  basal_fmradio                                                        23/05/16  10:42:14  PAGE 2   
+
+   57   3                  break;
+   58   3              }
+   59   2              else if (curfreq == (*dealbuf))
+   60   2              {
+   61   3                  return FALSE; //ÓÐÖØ¸´£¬²»¸üÐÂ±í
+   62   3              }
+   63   2              else
+   64   2              {
+   65   3                  if ((*dealbuf == 0) && (i < totalnum)) //¼ì²âµ½×îºóÁË£¬Ö±½Ó²åÈëµ½½áÎ²
+   66   3                  {
+   67   4                      *dealbuf = curfreq;
+   68   4                      g_FMStatus.station = i + 1;
+   69   4                      break;
+   70   4                  }
+   71   3                  dealbuf++;
+   72   3              }
+   73   2          }
+   74   1          return TRUE;
+   75   1      }
+   76          
+   77          /*
+   78           ********************************************************************************
+   79           *             void FM_VolumeSet(uint8 Vol)
+   80           *
+   81           * Description : ÉèÖÃPAÒôÁ¿
+   82           *
+   83           * Arguments   :          ÐèÉèÖÃµÄÒôÁ¿Öµ
+   84           *
+   85           * Returns     :
+   86           *
+   87           * Notes       :
+   88           *
+   89           ********************************************************************************
+   90           */
+   91          void FM_VolumeSet(uint8 Vol)
+   92          {
+   93   1          set_dac_volume(Vol);
+   94   1      }
+   95          
+   96          //°²×°fmÇý¶¯, ½øÐÐÄ£×é³õÊ¼»¯
+   97          uint8 cmd_fm_open(void *param1, void *param2)
+   98          {
+   99   1          //ÐÎ²ÎÈ·ÈÏOK
+  100   1          //param1 ³£Êý£¬ÔÝÊ±Ã»ÓÃµ½µÄ£¬½ö½ö´«µÝ½øÈ¥
+  101   1          uint8 mode = (uint8) param1;
+  102   1          param2 = param2;
+  103   1      
+  104   1          BankSwitch((uint32) FMdrv_mute); //½«³£×¤´úÂëÇÐ»»½øÀ´
+  105   1          return FMdrv_Init(mode);
+  106   1      }
+  107          
+  108          //Ä£×é½øÈëstandby, ²¢Ð¶ÔØfmÇý¶¯
+  109          uint8 cmd_fm_close(void *param1, void *param2)
+  110          {
+  111   1          //ÐÎ²ÎÈ·ÈÏOK
+  112   1          param1 = param1;
+  113   1          param2 = param2;
+  114   1      
+  115   1          BankSwitch((uint32) FMdrv_mute); //½«³£×¤´úÂëÇÐ»»½øÀ´
+  116   1          return FMdrv_Standby();
+  117   1      }
+  118          
+  119          //FM Ó²¼þÏà¹ØÉèÖÃ
+  120          uint8 cmd_fm_hardware(void *param1, void *param2)
+  121          {
+  122   1          //ÐÎ²ÎÈ·ÈÏOK
+C251 COMPILER V4.55,  basal_fmradio                                                        23/05/16  10:42:14  PAGE 3   
+
+  123   1          uint8 onoff = (uint8) param1; //onoff:  1--´ò¿ªFMÊ±    0--¹Ø±ÕFMÊ±
+  124   1          uint8 PA_mode = (uint8) param2; //PA_mode:   1-- Òª²Ù×÷PA    0--²»²Ù×÷PA
+  125   1      
+  126   1          BankSwitch((uint32) FMdrv_mute); //½«³£×¤´úÂëÇÐ»»½øÀ´
+  127   1          return FMdrv_hardware(onoff, PA_mode);
+  128   1      }
+  129          
+  130          //ÉèÖÃµ¥¸öÆµµã²¥·Å
+  131          uint8 cmd_fm_setfreq(void *param1, void *param2)
+  132          {
+  133   1          //ÐÎ²ÎÈ·ÈÏOK
+  134   1          uint8 result;
+  135   1          uint16 Freq = (uint16) param1;
+  136   1          param2 = param2;
+  137   1      
+  138   1          result = FMdrv_setfreq((void *) Freq);
+  139   1      
+  140   1          return result;
+  141   1      }
+  142          
+  143          //FM¾²Òô»ò½â³ý¾²Òô
+  144          uint8 cmd_fm_mute(void *param1, void *param2)
+  145          {
+  146   1          //ÐÎ²ÎÈ·ÈÏOK
+  147   1          FM_MUTE_e mode = (uint8) param1;
+  148   1          param2 = param2;
+  149   1          return FMdrv_mute(mode);
+  150   1      }
+  151          
+  152          //ÉèÖÃ²¨¶Î
+  153          uint8 cmd_fm_setband(void *param1, void *param2)
+  154          {
+  155   1          //ÐÎ²ÎÈ·ÈÏOK
+  156   1          radio_band_e band = (uint8) param1;
+  157   1          param2 = param2;
+  158   1          return FMdrv_setband(band);
+  159   1      }
+  160          
+  161          //ÉèÖÃËÑÌ¨ÃÅÏÞ
+  162          uint8 cmd_fm_setth(void *param1, void *param2)
+  163          {
+  164   1          //ÐÎ²ÎÈ·ÈÏOK
+  165   1          uint8 level = (uint8) param1;
+  166   1          param2 = param2;
+  167   1      
+  168   1          BankSwitch((uint32) FMdrv_mute); //½«³£×¤´úÂëÇÐ»»½øÀ´
+  169   1          return FMdrv_setthrod(level);
+  170   1      }
+  171          
+  172          //ÉèÖÃÈí¼þËÑÌ¨
+  173          uint8 cmd_fm_search(void *param1, void *param2)
+  174          {
+  175   1          //ÐÎ²ÎÈ·ÈÏOK
+  176   1          fm_status_t *sptr = (fm_status_t *) param1;
+  177   1          uint8 SeekDirect = (*(uint8 *) param2);
+  178   1      
+  179   1          return FMdrv_search(sptr->freq, SeekDirect);
+  180   1      }
+  181          
+  182          //Æô¶¯seek (Ó²¼þËÑÌ¨)
+  183          uint8 cmd_fm_seek(void *param1, void *param2)
+  184          {
+  185   1          //ÐÎ²ÎÈ·ÈÏOK
+  186   1          uint16 start = (uint16) param1;
+  187   1          uint16 stop = (uint16) param2;
+  188   1          uint8 step = 1;
+C251 COMPILER V4.55,  basal_fmradio                                                        23/05/16  10:42:14  PAGE 4   
+
+  189   1          return FMdrv_seek(start, stop, step);
+  190   1      }
+  191          
+  192          //»ñÈ¡seek×´Ì¬
+  193          uint8 cmd_fm_getseekflag(void *param1, void *param2)
+  194          {
+  195   1          //ÐÎ²ÎÈ·ÈÏOK
+  196   1          uint8 *flag = param1;
+  197   1          param2 = param2;
+  198   1          return FMdrv_getseekflag(flag);
+  199   1      }
+  200          
+  201          //ÍË³öseek
+  202          uint8 cmd_fm_breakseek(void *param1, void *param2)
+  203          {
+  204   1          //ÐÎ²ÎÈ·ÈÏOK
+  205   1          param1 = param1;
+  206   1          param2 = param2;
+  207   1          return FMdrv_breakseek(); //ÍË³öÓ²¼þËÑÌ¨
+  208   1      }
+  209          
+  210          //»ñÈ¡µ±Ç°ÆµÂÊÖµ
+  211          uint8 cmd_fm_getfreq(void *param1, void *param2)
+  212          {
+  213   1          //ÐÎ²ÎÈ·ÈÏOK
+  214   1          uint8 result;
+  215   1          uint16 *pfreg = param1;
+  216   1          param2 = param2;
+  217   1          result = FMdrv_getfreq(pfreg);
+  218   1          //¸ù¾ÝµçÌ¨ÆµÂÊÕÒµ½µçÌ¨ºÅ
+  219   1          cmd_fm_mid_findstation(NULL, NULL);
+  220   1          return result;
+  221   1      }
+  222          
+  223          //»ñÈ¡µ±Ç°µçÌ¨ÐÅºÅÇ¿¶È
+  224          uint8 cmd_fm_getintensity(void *param1, void *param2)
+  225          {
+  226   1          //ÐÎ²ÎÈ·ÈÏOK
+  227   1          uint8 *pvalue = param1;
+  228   1          param2 = param2;
+  229   1          return FMdrv_getintensity(pvalue);
+  230   1      }
+  231          
+  232          //»ñÈ¡µ±Ç°µçÌ¨×´Ì¬
+  233          uint8 cmd_fm_getstatus(void *param1, void *param2)
+  234          {
+  235   1          //ÐÎ²ÎÈ·ÈÏOK
+  236   1          uint8 result;
+  237   1          fm_status_t *pBuf = param1; //FMStatus_Tab_t ½á¹¹ÌåÀàÐÍÒ²¿ÉÒÔ
+  238   1          param2 = param2;
+  239   1          result = FMdrv_getstatus(pBuf);
+  240   1          //¸ù¾ÝµçÌ¨ÆµÂÊÕÒµ½µçÌ¨ºÅ
+  241   1          cmd_fm_mid_findstation(NULL, NULL);
+  242   1          return result;
+  243   1      }
+  244          
+  245          //²¥·ÅµçÌ¨
+  246          uint8 cmd_fm_mid_play(void *param1, void *param2)
+  247          {
+  248   1          //ÐÎ²ÎÈ·ÈÏOK
+  249   1          uint16 Tempfreq;
+  250   1      
+  251   1          param1 = param1;
+  252   1          param2 = param2;
+  253   1      
+  254   1          //FMcmd(FM_MUTE, SetMUTE,NULL);   //¾²Òô
+C251 COMPILER V4.55,  basal_fmradio                                                        23/05/16  10:42:14  PAGE 5   
+
+  255   1          fmSendCommand(FM_MUTE, SetMUTE, NULL);
+  256   1      
+  257   1          {
+  258   2              Tempfreq = g_FMStatus.freq; //(g_FMStatus.freq << 6) + 0x0010;
+  259   2          }
+  260   1      
+  261   1          FMdrv_setfreq(Tempfreq);
+  262   1      
+  263   1          //Ó¦¸ÃÑÓÊ±Ò»ÏÂ
+  264   1          ap_sleep(1);
+  265   1      
+  266   1          FMdrv_mute(releaseMUTE); //½â³ý¾²Òô
+  267   1      
+  268   1          return 0;
+  269   1      }
+  270          
+  271          //±£´æµ±Ç°µçÌ¨
+  272          uint8 cmd_fm_mid_save(void *param1, void *param2)
+  273          {
+  274   1          //¼´¾É´úÂëÀïµÄ:MC_BACKUP ÃüÁî
+  275   1      
+  276   1          param2 = param2;
+  277   1      
+  278   1      #ifndef PC
+  279   1          memcpy(((FMRADIO_param_t *) param1)->param1, m_FMStationTab, sizeof(m_FMStationTab));
+  280   1          memcpy(((FMRADIO_param_t *) param1)->param2, &g_FMStatus, sizeof(fm_status_t));
+  281   1      #else
+                   memcpy((void *)param1, m_FMStationTab, sizeof(m_FMStationTab));
+                   memcpy((void *)(param1 + 2), &g_FMStatus, sizeof(fm_status_t));
+               #endif
+  285   1          return 0;
+  286   1      }
+  287          
+  288          //±£´æµ±Ç°µçÌ¨¶ÔÓ¦µÄµçÌ¨±íÏîºÅ¡£
+  289          uint8 cmd_fm_mid_savestation(void *param1, void *param2)
+  290          {
+  291   1          //uint8 i,k;
+  292   1          uint8 result = FALSE;
+  293   1          param1 = param1;
+  294   1          param2 = param2;
+  295   1      
+  296   1          if (g_FMStatus.station_count >= MAX_STATION_COUNT)
+  297   1          {
+  298   2              return FALSE;
+  299   2          }
+  300   1      
+  301   1          //°ÑµçÌ¨ÆµÂÊ±£´æµ½µçÌ¨±í£¬Èç¹ûÒÑ¾­´æÔÚ£¬»á·µ»ØÊ§°Ü
+  302   1          g_FMStatus.station_count++;
+  303   1          if (SequenceFreqlist(m_FMStationTab, g_FMStatus.freq, g_FMStatus.station_count) == FALSE)
+  304   1          {
+  305   2              g_FMStatus.station_count--; //Ìí¼ÓÊ§°Ü
+  306   2              return FALSE;
+  307   2          }
+  308   1      
+  309   1          return TRUE;
+  310   1      
+  311   1      }
+  312          
+  313          //²éÕÒµ±Ç°µçÌ¨¶ÔÓ¦µÄµçÌ¨±íÏîºÅ¡£
+  314          //±£´æÔÚ g_FMStatus.station Àï
+  315          uint8 cmd_fm_mid_findstation(void *param1, void *param2)
+  316          {
+  317   1          uint8 i = g_FMStatus.station_count;
+  318   1          param1 = param1;
+  319   1          param2 = param2;
+  320   1          while (i--)
+C251 COMPILER V4.55,  basal_fmradio                                                        23/05/16  10:42:14  PAGE 6   
+
+  321   1          {
+  322   2              if (g_FMStatus.freq == m_FMStationTab[i])
+  323   2              {
+  324   3                  g_FMStatus.station = (i + 1);
+  325   3                  return 0;
+  326   3              }
+  327   2          }
+  328   1          g_FMStatus.station = 0;
+  329   1          return 0;
+  330   1      }
+  331          
+  332          //¸ù¾ÝµçÌ¨±íÏîºÅ¼ÓÔØÆµÂÊ¡£
+  333          uint8 cmd_fm_mid_loadfreq(void *param1, void *param2)
+  334          {
+  335   1          uint8 i = g_FMStatus.station_count;
+  336   1          param1 = param1;
+  337   1          param2 = param2;
+  338   1          if (g_FMStatus.station_count != 0)
+  339   1          {
+  340   2              g_FMStatus.freq = m_FMStationTab[g_FMStatus.station - 1];
+  341   2          }
+  342   1          return 0;
+  343   1      }
+  344          
+  345          //»¹Ô­µ±Ç°µçÌ¨
+  346          uint8 cmd_fm_mid_restore(void *param1, void *param2)
+  347          {
+  348   1          param2 = param2;
+  349   1      
+  350   1      #ifndef PC
+  351   1          memcpy(m_FMStationTab, ((FMRADIO_param_t *) param1)->param1, sizeof(m_FMStationTab));
+  352   1          memcpy(&g_FMStatus, ((FMRADIO_param_t *) param1)->param2, sizeof(fm_status_t));
+  353   1      #else
+                   memcpy(m_FMStationTab, (void *)param1, sizeof(m_FMStationTab));
+                   memcpy(&g_FMStatus, (void *)(param1 + 2), sizeof(fm_status_t));
+               #endif
+  357   1          return 0;
+  358   1      }
+  359          
+  360          //ÇÐ»»ÏÂÒ»¸öµçÌ¨
+  361          uint8 cmd_fm_mid_turn(void *param1, void *param2)
+  362          {
+  363   1          uint8 i;
+  364   1      
+  365   1          //param1 Îª UP »ò DOWN
+  366   1          param2 = param2;
+  367   1      
+  368   1          if (g_FMStatus.station_count >= 1) //ÓÐµçÌ¨
+  369   1          {
+  370   2              if (g_FMStatus.station) //µçÌ¨ÒÑ¾­±£´æÁË
+  371   2              {
+  372   3                  if (param1 == UP)
+  373   3                  {
+  374   4                      g_FMStatus.station++;
+  375   4                      if (g_FMStatus.station > g_FMStatus.station_count)
+  376   4                      {
+  377   5                          g_FMStatus.station = 1;
+  378   5                      }
+  379   4                  }
+  380   3                  else if (param1 == DOWN)
+  381   3                  {
+  382   4                      g_FMStatus.station--;
+  383   4                      if (g_FMStatus.station == 0)
+  384   4                      {
+  385   5                          g_FMStatus.station = g_FMStatus.station_count;
+  386   5                      }
+C251 COMPILER V4.55,  basal_fmradio                                                        23/05/16  10:42:14  PAGE 7   
+
+  387   4                  }
+  388   3              }
+  389   2              else
+  390   2              {
+  391   3                  //µçÌ¨»¹Ã»±£´æ£¬Ó¦¸ÃÏÈÇó³öµçÌ¨ÔÚÄÄ¸öÌ¨ÓëÌ¨Ö®¼ä
+  392   3                  i = g_FMStatus.station_count;
+  393   3                  while (i)
+  394   3                  {
+  395   4                      //µçÌ¨´ÓÐ¡µ½´óÅÅÐòµÄ£¬ÏÈÕÒµ½Ð¡ÓÚ´ËÆµµÀµÄµçÌ¨
+  396   4                      if (g_FMStatus.freq > m_FMStationTab[--i])
+  397   4                      {
+  398   5                          i++;
+  399   5                          break;
+  400   5                      }
+  401   4                  }
+  402   3                  //i == 0 Ê±£¬ÆµÂÊ±ÈÈÎºÎÒ»¸öµçÌ¨»¹µÍ
+  403   3                  //i == g_FMStatus.station_count ,Ôò±ÈÈÎºÎÒ»¸öµçÌ¨»¹¸ß
+  404   3                  //·ñÔòµçÌ¨ÔÚ i Óë i+ 1 Ö®¼ä
+  405   3                  if (param1 == UP)
+  406   3                  {
+  407   4                      if (i == g_FMStatus.station_count)
+  408   4                      {
+  409   5                          g_FMStatus.station = 1;
+  410   5                      }
+  411   4                      else
+  412   4                      {
+  413   5                          g_FMStatus.station = i + 1;
+  414   5                      }
+  415   4                  }
+  416   3                  else if (param1 == DOWN)
+  417   3                  {
+  418   4                      if (i == 0)
+  419   4                      {
+  420   5                          g_FMStatus.station = g_FMStatus.station_count;
+  421   5                      }
+  422   4                      else
+  423   4                      {
+  424   5                          g_FMStatus.station = i;
+  425   5                      }
+  426   4                  }
+  427   3      
+  428   3              }
+  429   2              g_FMStatus.freq = m_FMStationTab[g_FMStatus.station - 1];
+  430   2      
+  431   2              FMdrv_setfreq((void *) g_FMStatus.freq);
+  432   2      
+  433   2              return TRUE;
+  434   2          }
+  435   1      
+  436   1          return FALSE;
+  437   1      }
+  438          
+  439          //É¾³ýµ±Ç°µçÌ¨
+  440          //ÒÔg_FMStatus.station Îª»ù×¼À´É¾µô
+  441          //Èç¹ûg_FMStatus.station ÎªÃ»±£´æ£¬ÔòÒÔ g_FMStatus.freq Îª»ù×¼
+  442          uint8 cmd_fm_mid_delete(void *param1, void *param2)
+  443          {
+  444   1          //¼´¾É´úÂëÀïµÄ:MC_DELONE ÃüÁî
+  445   1      
+  446   1          uint8 k;
+  447   1      
+  448   1          param1 = param1;
+  449   1          param2 = param2;
+  450   1      
+  451   1          if (g_FMStatus.station == 0)
+  452   1          {
+C251 COMPILER V4.55,  basal_fmradio                                                        23/05/16  10:42:14  PAGE 8   
+
+  453   2              cmd_fm_mid_findstation(NULL, NULL); //Èç¹ûµçÌ¨Ã»±£´æ£¬È·ÈÏÊÇ·ñÕæµÄÃ»±£´æ
+  454   2              if (g_FMStatus.station == 0)
+  455   2              {
+  456   3                  return FALSE;
+  457   3              }
+  458   2          }
+  459   1          //m_FMStationTab[g_FMStatus.station-1]=0;
+  460   1          //for (k = g_FMStatus.station; k < (g_FMStatus.station_count + 1); k++)
+  461   1          for (k = g_FMStatus.station; k < (g_FMStatus.station_count); k++)
+  462   1          {
+  463   2              m_FMStationTab[k - 1] = m_FMStationTab[k]; //ÖÐ¼äÐèÒªÉ¾³ý£¬ËùÒÔºóÃæµÄÐèÒªÇ°ÒÆÒ»Î»
+  464   2          }
+  465   1          g_FMStatus.station_count--;
+  466   1          m_FMStationTab[g_FMStatus.station_count] = 0;
+  467   1          g_FMStatus.station = 0;
+  468   1      
+  469   1          return TRUE;
+  470   1      }
+  471          
+  472          //É¾³ýÈ«²¿µçÌ¨
+  473          uint8 cmd_fm_mid_delall(void *param1, void *param2)
+  474          {
+  475   1          //¼´¾É´úÂëÀïµÄ:MC_DELALL ÃüÁî
+  476   1          uint8 i;
+  477   1      
+  478   1          param1 = param1;
+  479   1          param2 = param2;
+  480   1      
+  481   1          for (i = 0; i < MAX_STATION_COUNT; i++)
+  482   1          {
+  483   2              m_FMStationTab[i] = 0;
+  484   2          }
+  485   1          g_FMStatus.station = 0;
+  486   1          g_FMStatus.station_count = 0;
+  487   1      
+  488   1          return 0;
+  489   1      }
+  490          
+  491          //È·¶¨ËùÑ¡³ÇÊÐµÄµÚÒ»¸ö³ÇÊÐµçÌ¨
+  492          uint8 cmd_fm_mid_selcityinit(void *param1, void *param2)
+  493          {
+  494   1          param1 = param1;
+  495   1          param2 = param2;
+  496   1      
+  497   1          return 0;
+  498   1      }
+  499          
+  500          //ÔÚËùÑ¡³ÇÊÐÖÐÉÏÏÂÇÐ»»³ÇÊÐµçÌ¨
+  501          uint8 cmd_fm_mid_cityswitch(void *param1, void *param2)
+  502          {
+  503   1          param1 = param1;
+  504   1          param2 = param2;
+  505   1          return 0;
+  506   1      }
+  507          
+  508          //ÉèÖÃÉùÒô
+  509          uint8 cmd_fm_mid_setvolume(void *param1, void *param2)
+  510          {
+  511   1          uint8 Vol = (uint8) param1;
+  512   1          param2 = param2;
+  513   1      
+  514   1          FM_VolumeSet(Vol);
+  515   1          return 0;
+  516   1      }
+  517          
+  518          //µçÌ¨ÆµÂÊÎ¢µ÷£¬ÒÔ100KHZÎª²½½ø
+C251 COMPILER V4.55,  basal_fmradio                                                        23/05/16  10:42:14  PAGE 9   
+
+  519          uint8 cmd_fm_mid_stepgrid(void *param1, void *param2)
+  520          {
+  521   1          uint16 Tempfreq;
+  522   1      
+  523   1          uint8 dir = (uint8) param1;
+  524   1      
+  525   1          param2 = param2;
+  526   1      
+  527   1          switch (dir)
+  528   1          {
+  529   2          case UP:
+  530   2              if (((g_FMStatus.freq + 1) > USFREQ_MAX) && (g_radio_config.band_mode == Bank_US_Europe))
+  531   2              {
+  532   3                  g_FMStatus.freq = USFREQ_MIN;
+  533   3              }
+  534   2              else if (((g_FMStatus.freq + 1) > JPFREQ_MAX) && (g_radio_config.band_mode == Bank_Japan))
+  535   2              {
+  536   3                  g_FMStatus.freq = JPFREQ_MIN;
+  537   3              }
+  538   2              else
+  539   2              {
+  540   3                  g_FMStatus.freq += 1;
+  541   3              }
+  542   2              break;
+  543   2          case DOWN:
+  544   2              if ((g_FMStatus.freq == USFREQ_MIN) && (g_radio_config.band_mode == Bank_US_Europe))
+  545   2              {
+  546   3                  g_FMStatus.freq = USFREQ_MAX;
+  547   3              }
+  548   2              else if ((g_FMStatus.freq == JPFREQ_MIN) && (g_radio_config.band_mode == Bank_Japan))
+  549   2              {
+  550   3                  g_FMStatus.freq = JPFREQ_MAX;
+  551   3              }
+  552   2              else
+  553   2              {
+  554   3                  g_FMStatus.freq -= 1;
+  555   3              }
+  556   2              break;
+  557   2          default:
+  558   2              break;
+  559   2          }
+  560   1      
+  561   1          Tempfreq = g_FMStatus.freq; //(g_FMStatus.freq << 6) + 0x0010;
+  562   1      
+  563   1          FMdrv_setfreq(Tempfreq);
+  564   1          return TRUE;
+  565   1      }
+  566          
+  567          const pfunc_cmd far fm_cmd_pfunc[CMD_COUNT] =
+  568          {
+  569              /* FM ÖÐ¼ä²ãÃüÁîºê, ²¿·ÖÉæ¼°µ½µ÷ÓÃFMÇý¶¯½Ó¿Ú */
+  570              cmd_fm_open, //°²×°fmÇý¶¯, ½øÐÐÄ£×é³õÊ¼»¯
+  571              cmd_fm_close, //Ä£×é½øÈëstandby, ²¢Ð¶ÔØfmÇý¶¯
+  572              cmd_fm_hardware, //FM Ó²¼þÏà¹ØÉèÖÃ
+  573              cmd_fm_setfreq, //ÉèÖÃµ¥¸öÆµµã²¥·Å
+  574              cmd_fm_mute, //FM¾²Òô»ò½â³ý¾²Òô
+  575              cmd_fm_setband, //ÉèÖÃ²¨¶Î
+  576              cmd_fm_setth, //ÉèÖÃËÑÌ¨ÃÅÏÞ
+  577              cmd_fm_search, //ÉèÖÃÈí¼þËÑÌ¨
+  578              cmd_fm_seek, //Æô¶¯seek (Ó²¼þËÑÌ¨)
+  579              cmd_fm_getseekflag, //»ñÈ¡seek×´Ì¬
+  580              cmd_fm_breakseek, //ÍË³öseek
+  581          
+  582              cmd_fm_getfreq, //»ñÈ¡µ±Ç°ÆµÂÊÖµ
+  583              cmd_fm_getintensity, //»ñÈ¡µ±Ç°µçÌ¨ÐÅºÅÇ¿¶È
+  584              cmd_fm_getstatus, //»ñÈ¡µ±Ç°µçÌ¨×´Ì¬
+C251 COMPILER V4.55,  basal_fmradio                                                        23/05/16  10:42:14  PAGE 10  
+
+  585          
+  586              //ÖÐ¼äÂß¼­²ã:ÓëFMÇý¶¯ÎÞ¹Ø
+  587              cmd_fm_mid_play,
+  588              cmd_fm_mid_save, //±£´æµ±Ç°µçÌ¨
+  589              cmd_fm_mid_savestation,
+  590              cmd_fm_mid_findstation, //²éÕÒµ±Ç°µçÌ¨¶ÔÓ¦µÄµçÌ¨±íÏîºÅ¡£
+  591              cmd_fm_mid_loadfreq, //¸ù¾ÝµçÌ¨±íÏîºÅ¼ÓÔØÆµÂÊ¡£
+  592              cmd_fm_mid_restore, //»¹Ô­µ±Ç°µçÌ¨
+  593              cmd_fm_mid_turn, //»»Ì¨
+  594              cmd_fm_mid_delete, //É¾³ýµ±Ç°µçÌ¨
+  595              cmd_fm_mid_delall, //É¾³ýÈ«²¿µçÌ¨
+  596              cmd_fm_mid_selcityinit, //È·¶¨ËùÑ¡³ÇÊÐµÄµÚÒ»¸ö³ÇÊÐµçÌ¨
+  597              cmd_fm_mid_cityswitch, //ÔÚËùÑ¡³ÇÊÐÖÐÉÏÏÂÇÐ»»³ÇÊÐµçÌ¨
+  598          
+  599              cmd_fm_mid_setvolume, //ÉèÖÃÉùÒô
+  600              cmd_fm_mid_stepgrid
+  601          };
+  602          
+  603          /*
+  604           ********************************************************************************
+  605           *             uint8 FMcmd(uint8 cmd, uint16 param1, void *param2)
+  606           *
+  607           * Description : FMÃüÁî´¦Àí
+  608           *
+  609           * Arguments   :
+  610           *
+  611           * Returns     :
+  612           *
+  613           * Notes       :
+  614           *
+  615           ********************************************************************************
+  616           */
+  617          uint8 fmSendCommand(radio_cmd_e cmd, void *param1, void *param2)
+  618          {
+  619   1          uint8 ret = 0;
+  620   1          if (cmd < CMD_COUNT)
+  621   1          {
+  622   2              ret = (fm_cmd_pfunc[(uint16) cmd]) (param1, param2);
+  623   2          }
+  624   1      
+  625   1          return ret;
+  626   1      }
+  627          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1056     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        80     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =       108     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

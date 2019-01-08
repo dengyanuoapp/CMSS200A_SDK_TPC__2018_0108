@@ -1,0 +1,137 @@
+C251 COMPILER V4.55,  deal_EQTool_save                                                     23/05/16  10:41:42  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE deal_EQTool_save
+OBJECT MODULE PLACED IN .\Obj\deal_EQTool_save.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\common\deal_EQTool_save.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMI
+                    -ZE(9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\deal_EQTool_save.lst) OBJECT(.\Obj\deal_E
+                    -QTool_save.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        ap common lib file, udisk use this file too
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: deal_EQTool_cmd.c,v 1.1.1.1 2006/05/22 03:23:59 selina Exp $
+   10           *******************************************************************************
+   11           */
+   12          
+   13          #include "eqtool.h"
+   14          
+   15          EQ_VM_t far g_eq_vrampara;
+   16          
+   17          //默认EQ音效表
+   18          const uint8 defaultEQ[SUPPORT_EQ_CNT][ONE_EQPARA_BYTE] =
+   19          {
+   20              0, 0, 0, 0, 0, 0, 0, //none
+   21              5, 3, 0, -1, 0, 4, 5, //rock
+   22              3, 0, 0, 0, 0, -1, -2, //Pop
+   23              0, 0, 0, -1, -1, -2, -4, //Classic
+   24              0, 0, 1, 2, 0, 1, 1, //Soft
+   25              3, 0, 0, -1, 0, 2, 4, //Jazz
+   26              5, 2, 0, 0, 0, 0, 0, //Dbb
+   27              0, 0, 0, 0, 0, 0, 0, //user
+   28          };
+   29          
+   30          #pragma name(COM_EQTOOL_SAVE)
+   31          
+   32          uint8 deal_eqsave_check(uint8 *eqbuf)
+   33          {
+   34   1          uint8 eqmode;
+   35   1          utest_eq_info_t eqinfo;
+   36   1          BOOL result;
+   37   1          uint8 ret;
+   38   1          uint8 *ptr;
+   39   1      
+   40   1          ptr = (uint8 *) &eqinfo;
+   41   1          eqmode = *eqbuf; // 1:normal 2:Rock 3:Pop 4:Classic 5:Soft 6:Jazz 7:Dbb 8:自定义
+   42   1          eqbuf++;
+   43   1          memcpy((void *) &eqinfo, eqbuf, sizeof(utest_eq_info_t)); //get 14 bytes eq para
+   44   1      
+   45   1          result = VMRead(&g_eq_vrampara, VM_PCSET_EQ, sizeof(g_eq_vrampara));
+   46   1          if (g_eq_vrampara.magic != EQ_VRAM_MAGIC)
+   47   1          {
+   48   2              //给VRAM赋初始值
+   49   2              g_eq_vrampara.magic = EQ_VRAM_MAGIC;
+   50   2              memcpy(g_eq_vrampara.left_eq_para, defaultEQ[0], ONE_EQPARA_BYTE * SUPPORT_EQ_CNT);
+   51   2              memcpy(g_eq_vrampara.right_eq_para, defaultEQ[0], ONE_EQPARA_BYTE * SUPPORT_EQ_CNT);
+   52   2              VMWrite(&g_eq_vrampara, VM_PCSET_EQ, sizeof(g_eq_vrampara));
+   53   2          }
+   54   1      
+   55   1          if (eqmode <= SUPPORT_EQ_CNT)
+   56   1          {
+   57   2              eqmode--; // 0---7
+C251 COMPILER V4.55,  deal_EQTool_save                                                     23/05/16  10:41:42  PAGE 2   
+
+   58   2              //left
+   59   2              memcpy(&g_eq_vrampara.left_eq_para[ONE_EQPARA_BYTE * eqmode], ptr, ONE_EQPARA_BYTE);
+   60   2              //right
+   61   2              ptr += ONE_EQPARA_BYTE;
+   62   2              memcpy(&g_eq_vrampara.right_eq_para[ONE_EQPARA_BYTE * eqmode], ptr, ONE_EQPARA_BYTE);
+   63   2              //将参数表写入VRAM
+   64   2              VMWrite(&g_eq_vrampara, VM_PCSET_EQ, sizeof(g_eq_vrampara));
+   65   2              ret = 0;
+   66   2          }
+   67   1          else
+   68   1          {
+   69   2              //传递下来的EQ mode不在范围内, 返回status: fail
+   70   2              ret = 2;
+   71   2          }
+   72   1      
+   73   1          if (ret != 0)
+   74   1          {
+   75   2              return ret;
+   76   2          }
+   77   1      
+   78   1          //重新读出，比较
+   79   1          result = VMRead(&g_eq_vrampara, VM_PCSET_EQ, sizeof(g_eq_vrampara));
+   80   1          if (g_eq_vrampara.magic != EQ_VRAM_MAGIC)
+   81   1          {
+   82   2              ret = 2;
+   83   2              return ret;
+   84   2          }
+   85   1          ptr = (uint8 *) &eqinfo;
+   86   1          if (memcmp(&g_eq_vrampara.left_eq_para[ONE_EQPARA_BYTE * eqmode], ptr, ONE_EQPARA_BYTE) != 0)
+   87   1          {
+   88   2              //左声道参数不匹配
+   89   2              ret = 2;
+   90   2              return ret;
+   91   2          }
+   92   1          ptr += ONE_EQPARA_BYTE;
+   93   1          if (memcmp(&g_eq_vrampara.right_eq_para[ONE_EQPARA_BYTE * eqmode], ptr, ONE_EQPARA_BYTE) != 0)
+   94   1          {
+   95   2              //右声道参数不匹配
+   96   2              ret = 2;
+   97   2              return ret;
+   98   2          }
+   99   1          return ret;
+  100   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       426     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =       114     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        56     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

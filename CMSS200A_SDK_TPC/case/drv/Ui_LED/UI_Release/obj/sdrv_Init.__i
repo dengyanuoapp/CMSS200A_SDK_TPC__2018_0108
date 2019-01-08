@@ -1,0 +1,1 @@
+"sdrv_Init.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\UI_Release\list\sdrv_Init.lst) OBJECT(.\UI_Release\obj\sdrv_Init.obj)

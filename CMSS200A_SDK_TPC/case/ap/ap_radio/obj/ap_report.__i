@@ -1,0 +1,1 @@
+"..\common\ap_report.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) OPTIMIZE (9,SPEED) BROWSE ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE (CHECKALARM) DEBUG PRINT(.\lst\ap_report.lst) OBJECT(.\obj\ap_report.obj)

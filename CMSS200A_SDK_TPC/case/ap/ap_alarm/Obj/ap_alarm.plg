@@ -1,0 +1,38 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+D:\gl5115\AS260B\case_260b\ap\ap_alarm\ap_alarm.uv2
+Project File Date:  03/03/2014
+
+<h2>Output:</h2>
+Build target 'alarm'
+User command #1: .\buildapl.bat
+D:\gl5115\AS260B\case_260b\ap\ap_alarm>..\..\..\psp_rel\tools\LinkfileParse.exe ap_alarm.apl ap_alarm.lin ap_alarm.apc 
+第32行编译异常：警告：未定义段结束地址!
+第33行编译异常：警告：未定义段结束地址!
+D:\gl5115\AS260B\case_260b\ap\ap_alarm>pause
+请按任意键继续. . . 
+compiling alarm_main.c...
+compiling alarm_play.c...
+compiling ap_common.c...
+compiling ap_common2.c...
+compiling ap_message.c...
+compiling ap_message2.c...
+linking...
+Program Size: data=10.2 edata+hdata=1177 xdata=0 const=2477 code=23273
+creating hex file from ".\Obj\ap_alarm"...
+User command #1: .\buildap.bat
+D:\gl5115\AS260B\case_260b\ap\ap_alarm>..\..\..\psp_rel\tools\apbuilder.exe -c ap_alarm.apc 
+D:\gl5115\AS260B\case_260b\ap\ap_alarm>copy .\Obj\ap_alarm.map ap_alarm.map 
+已复制         1 个文件。
+D:\gl5115\AS260B\case_260b\ap\ap_alarm>copy .\Obj\ap_alarm.hex ap_alarm.hex 
+已复制         1 个文件。
+D:\gl5115\AS260B\case_260b\ap\ap_alarm>copy .\Obj\ap_alarm ap_alarm 
+已复制         1 个文件。
+D:\gl5115\AS260B\case_260b\ap\ap_alarm>echo ..\..\..\psp_rel\tools\segcheck.exe ap_alarm.map ap_alarm.lin ap_alarm.apc 
+..\..\..\psp_rel\tools\segcheck.exe ap_alarm.map ap_alarm.lin ap_alarm.apc
+D:\gl5115\AS260B\case_260b\ap\ap_alarm>copy alarm.ap ..\..\fwpkg\alarm.ap 
+已复制         1 个文件。
+".\Obj\ap_alarm" - 0 Error(s), 0 Warning(s).

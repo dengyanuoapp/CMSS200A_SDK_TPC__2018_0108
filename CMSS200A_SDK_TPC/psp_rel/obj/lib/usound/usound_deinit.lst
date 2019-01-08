@@ -1,0 +1,170 @@
+C251 COMPILER V4.55,  usound_deinit                                                        13/12/18  14:07:01  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE usound_deinit
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usound\usound_deinit.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usbsound\usound_deinit.c XSMALL FUNCTIONS(REENTRANT) ROM(
+                    -HUGE) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\usound_deinit.lst) OBJECT(..\..\..\obj\lib\usoun
+                    -d\usound_deinit.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              AS260A
+    3           *                            Module: USB Sound
+    4           *                 Copyright(c) 2001-2012 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>            <version >             <desc>
+    9           *      dengtaiping 2012-10-23 16:40     1.0                build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * \file     usound_deinit.c
+   13           * \brief    .
+   14           * \author   dengtaiping
+   15           * \par      GENERAL DESCRIPTION:
+   16           *               usb及Audio模块卸载
+   17           * \par      EXTERNALIZED FUNCTIONS:
+   18           *               这里描述调用到外面的模块
+   19           *
+   20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
+   21           *
+   22           * \version 1.0
+   23           * \date  2012/10/23
+   24           *******************************************************************************/
+   25          #include "usound_intern.h"
+   26          #include "usound_extern.h"
+   27          #pragma name(USC_DEINIT)
+   28          #pragma renamecode(?PR?USC_DEINIT)
+   29          
+   30          /******************************************************************************/
+   31          /*!
+   32           * \par  Description:
+   33           *     ADC、DAC deinit.
+   34           * \param[in]    none.
+   35           * \param[out]   none.
+   36           * \return       none
+   37          
+   38           * \ingroup      module name
+   39           * \par          exmaple code
+   40           * \code
+   41           *               list example code in here
+   42           * \endcode
+   43           *******************************************************************************/
+   44          static void ADC_DAC_deinit(void)
+   45          {
+   46   1          uint8 sfr_temp = SFR_BANK;
+   47   1          SFR_BANK = BANK_DAC_ADC; //disable asrc
+   48   1          DAC_CH1_SRFT_CTL0 &= 0xfe;
+   49   1          DAC_CH0_SRFT_CTL0 &= 0xfe;
+   50   1          ADC_SRFT_CTL0 &= 0xfe;
+   51   1      
+   52   1          SFR_BANK = BANK_CMU_RMU;
+   53   1          MRCR3 &= 0xfe;
+   54   1      
+   55   1          SFR_BANK = BANK_DMA_USB1; //stop dma
+   56   1          DMAnCTL0 &= 0xfc;
+   57   1          SFR_BANK = BANK_DMA_USB2;
+C251 COMPILER V4.55,  usound_deinit                                                        13/12/18  14:07:01  PAGE 2   
+
+   58   1          DMAnCTL0 &= 0xfc;
+   59   1      
+   60   1          SFR_BANK = BANK_AUIP; //diable fifo
+   61   1          PA_VOLUME = 0x06; //pa_volume_bak;
+   62   1          DAC_CH1_FIFO_CTL0 &= 0xfe;
+   63   1          ADC_FIFOCTL0 &= 0xfb;
+   64   1          DAC_ANALOG0 |= 0x01;
+   65   1      
+   66   1          //SFR_BANK = BANK_CMU_RMU;
+   67   1          //AUDIO_PLL_CTL &= 0xfe; //disable AUDIO_PLL
+   68   1      }
+   69          
+   70          /******************************************************************************/
+   71          /*!
+   72           * \par  Description:
+   73           *     usb exit .
+   74           * \param[in]    none.
+   75           * \param[out]   none.
+   76           * \return       none
+   77          
+   78           * \ingroup      module name
+   79           * \par          exmaple code
+   80           * \code
+   81           *               list example code in here
+   82           * \endcode
+   83           *******************************************************************************/
+   84          void usound_exit(void)
+   85          {
+   86   1          uint8 sfr_temp = SFR_BANK;
+   87   1          IE0 &= 0x7f;
+   88   1          AIE &= 0xba;
+   89   1      
+   90   1          ADC_DAC_deinit();
+   91   1          SFR_BANK = BANK_USB;
+   92   1          USBEIRQ = 0xc0;
+   93   1          Usbirq_hcusbirq = 0xff;
+   94   1          Usbien_hcusbien = 0x00;
+   95   1          Ep03tokirq = 0xff;
+   96   1          Ep03tokien = 0x00;
+   97   1      
+   98   1          SFR_BANK = BANK_CMU_RMU;
+   99   1          MEMCLKSELCTL1 &= 0x70;//link pcmram、fir_rds_ram、uram to cpu_clock
+  100   1          MemBankCtl |= muram_addr;
+  101   1      
+  102   1          SFR_BANK = BANK_USB;
+  103   1          /* software disconnect bit.  */
+  104   1          UsbCTRL_STUS |= 0x40;
+  105   1          /* disable software Vbus.  */
+  106   1          IDVBUSCTRL = 0x08;
+  107   1          BKDOOR = BKDOOR & 0x7f;
+  108   1          IE0 |= 0x80;
+  109   1      
+  110   1          SFR_BANK = BANK_CMU_RMU;
+  111   1          MRCR2 = MRCR2 | 0x04; //reset usb module before
+  112   1          mdelay(1);
+  113   1          MRCR2 = MRCR2 | 0x08; //reset usb module
+  114   1          SFR_BANK = BANK_USB;
+  115   1          while ((USBSTATUS & 0x01) == 0x01)
+  116   1          {
+  117   2              ; /*do nothing*/
+  118   2          }
+  119   1          USB_PHYCTRL |= 0xc0; //phy disable
+  120   1          DPDMCTRL = 0x10; // 恢复uhost检测
+  121   1          MULTI_USED &= (~0x80); //disable UVDD
+  122   1      
+  123   1          SFR_BANK = BANK_CMU_RMU;
+C251 COMPILER V4.55,  usound_deinit                                                        13/12/18  14:07:01  PAGE 3   
+
+  124   1          CLKENCTL1 &= (~0x40); //disable usb clock
+  125   1          IRQ_Release(usb_isr, IRQ_USB);
+  126   1      //#ifdef _USB_RECORD_
+  127   1          IRQ_Release(dma_adc_isr, IRQ_DMA1);
+  128   1      //#endif
+  129   1          IRQ_Release(dma_dac_isr, IRQ_DMA0);
+  130   1          return;
+  131   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       187     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

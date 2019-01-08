@@ -1,0 +1,16 @@
+hexfile=.\Obj\ap_main.hex
+mask=0x0
+hextype=intel
+mapfile=.\Obj\ap_main.map
+apfile=.\main.ap
+entry=main
+seg_text=API30,?PR?COM_MSG
+seg_text=?C_INITEDATA
+seg_text=?C_C51STARTUP
+seg_data=?ED?COM_COM,?ED?AP_MAIN,?ED?KCFG_M
+seg_bank=?PR?AP_EXEC_LOOP,?HC?AP_EXEC_LOOP,?PR?KCFG_M
+seg_bank=?PR?AP_MAIN,?FD?AP_MAIN,?HC?AP_MAIN
+seg_bank=?PR?AP_CLOCK,?HC?AP_CLOCK,?HC?AP_CLOCK_1,?PR?AP_CLOCK_1
+seg_bank=?PR?COM_MSG2,?HC?COM_MSG2
+seg_bank=?HC?COM_COM2,?PR?COM_COM2
+seg_bank=?PR?COM_COM

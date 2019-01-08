@@ -1,0 +1,226 @@
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:30  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE main
+OBJECT MODULE PLACED IN .\Obj\main.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE main.c XTINY FUNCTIONS(REENTRANT) ROM(MEDIUM) OPTIMIZE(9,SPEED) BROWSE OR
+                    -DER INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\main.lst) OBJECT(.\Obj\main.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        system setting ap of AS211A
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: main.c,v 1.2 2010/03/29 10:48:01 Mars Exp $
+   10           *******************************************************************************
+   11           */
+   12          #include "cfg.h"
+   13          #include "key.h"
+   14          
+   15          #pragma name(CFG_MAIN)
+   16          
+   17          /************************Õ∑–≈œ¢∂®“Â**************************************/
+   18          
+   19          //const char   CfgMagic[4]={"CFG"};
+   20          //const uint8  TotallItem = 5;
+   21          //const char   ReservHead1[11];
+   22          #define CFG_ITEM_MAX   6
+   23          #pragma userclass(nconst = CFG_HEAD)
+   24          const file_cfg_head_t FileHead =
+   25          {
+   26              "CFG", CFG_ITEM_MAX,
+   27              { 0xfe, 0xff, 0x00 }
+   28          };
+   29          
+   30          const cfg_item_t CfgItem[CFG_ITEM_MAX] =
+   31          {
+   32              { (uint32) (&ParaHead), "Parameters", "≤Œ ˝…Ë÷√" },
+   33              { (uint32) (&KeyCfg), "Key-press", "∞¥º¸" },
+   34              { (uint32) (&APCfg), "Application", "”¶”√≥Ã–Ú" },
+   35              { (uint32) (&LanguageCfg), "language", "”Ô—‘" },
+   36              { (uint32) (&FileCfg), "File-exchange", "ÃÊªªŒƒº˛" },
+   37              { (uint32) (&FuncCfg), "Functions", "π¶ƒ‹≈‰÷√" }
+   38          };
+   39          const char ReservHead2[0x200 - CFG_ITEM_MAX * 0x20 - 0x10];
+   40          
+   41          #pragma userclass(nconst = CFG_PARA)
+   42          
+   43          /******************≤Œ ˝…Ë÷√********************************************/
+   44          
+   45          #define PARA_VALUE_TOTAL    6
+   46          #define PARA_STRING_TOTAL   2
+   47          
+   48          const paraset_head_t ParaHead =
+   49          { (uint32) ValueSet, PARA_VALUE_TOTAL, (uint32) (&StringSet), PARA_STRING_TOTAL, "" };
+   50          
+   51          const value_t ValueSet[PARA_VALUE_TOTAL] =
+   52          {
+   53              { SLEEPTIME_VALUE, SLEEPTIME_MAX, SLEEPTIME_MIN, SLEEPTIME_STEP, "", "sleep time", "πÿª˙ ±º‰(∑÷÷”)" }
+             -,
+   54              { VOLUME_VALUE, VOLUME_MAX, VOLUME_MIN, VOLUME_STEP, "", "volume set", "“Ù¡øµ»º∂" },
+   55              { DEFVOLUME_VALUE, DEFVOLUME_MAX, DEFVOLUME_MIN, DEFVOLUME_STEP, "", "vol default", "ƒ¨»œ“Ù¡ø" },
+   56              { RECGAIN_VALUE, RECGAIN_MAX, RECGAIN_MIN, RECGAIN_STEP, "", "Record gain", "¬º“Ù‘ˆ“Ê" },
+   57              { RECTIME_VALUE, RECTIME_MAX, RECTIME_MIN, RECTIME_STEP, "", "Record time", "¬º“Ù ±º‰(–° ±)" },
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:30  PAGE 2   
+
+   58              { NOR_RECTIME_VALUE, NOR_RECTIME_MAX, NOR_RECTIME_MIN, NOR_RECTIME_STEP, "", "Nor Record time", "Nor¬
+             -º“Ù ±º‰(√Î)" }
+   59          
+   60          };
+   61          
+   62          const string_t StringSet[PARA_STRING_TOTAL] =
+   63          {
+   64              { "AS260B_V0001", "Device Version", "…Ë±∏∞Ê±æ" },
+   65              { "2013/11/18", "Firmware Date", "πÃº˛»’∆⁄" }
+   66          };
+   67          
+   68          #pragma userclass(nconst = CFG_KEY)
+   69          
+   70          /********************∞¥º¸…Ë÷√**********************************************/
+   71          //const uint8 KeyTotal = 5;
+   72          //const uint8 TotalItem = 11;
+   73          //const char  KeyReserv[14];
+   74          //const uint8 keyValue[16]
+   75          
+   76          #if 0
+               const key_cfg_t KeyCfg =
+               {
+                   16, 16, "",
+                   {
+                       Msg_KeyPlayPause, Msg_KeyVolSub, Msg_KeyVolAdd, Msg_KeyNext,
+                       Msg_KeyLast, Msg_KeyNum3, Msg_KeyNum6, Msg_KeyNum9,
+                       Msg_KeyLast, Msg_KeyVolAdd, Msg_KeyVolSub, Msg_KeyNum0,
+                       Msg_KeyNum1, Msg_KeyNum4, Msg_KeyNum7, Msg_KeyNext
+                   }
+               };
+               #else
+   88          const key_cfg_t KeyCfg =
+   89          {
+   90              3, 3, "",
+   91              {
+   92                  Msg_KeyPlayPause, Msg_KeyVolSub, Msg_KeyVolAdd
+   93              }
+   94          };
+   95          #endif
+   96          
+   97          const key_infor_t KeyInfor[16] =
+   98          {
+   99              { Msg_KeyFolderAdd, 0, "FOLDERADD" },
+  100              { Msg_KeyFolderSub, 0, "FOLDERSUB" },
+  101              { Msg_KeyClock, 0, "CLOCK" },
+  102              { Msg_KeyCaraOk, 0, "CARAOK" },
+  103              { Msg_KeyPlayPause, 1, "PLAY/PAUSE" }, //PLAYº¸≤ªø…≈‰÷√
+  104              { Msg_KeyLast, 0, "PREV" },
+  105              { Msg_KeyREC, 0, "REC/AB" },
+  106              { Msg_Keyautosleep, 0, "AUTOSLEEP" },
+  107              { Msg_KeyMenu, 0, "MENU" },
+  108              { Msg_KeyNext, 0, "NEXT" },
+  109              { Msg_KeyVolAdd, 0, "VOL+" },
+  110              { Msg_KeyVolSub, 0, "VOL-" },
+  111              { Msg_KeyMute, 0, "MUTE" },
+  112              { Msg_KeyVol, 0, "VOL" },
+  113              { Msg_KeyEQ, 0, "EQ" },
+  114              { Msg_KeyLoop, 0, "LOOP" }
+  115          };
+  116          
+  117          #pragma userclass(nconst = CFG_AP)
+  118          
+  119          /********************AP ≈‰÷√*****************************/
+  120          //const uint8 TotalAP = 7;
+  121          //const uint8 AvtiveAP = 1;
+  122          //const char  Reserv[14];
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:30  PAGE 3   
+
+  123          
+  124          const ap_cfg_head_t APCfg =
+  125          { MAX_AP_NUM, 1, "" };
+  126          
+  127          const ap_infor_t APTable[MAX_AP_NUM] =
+  128          {
+  129              { RESULT_MUSIC, 1, "Music", "“Ù¿÷" },
+  130              { RESULT_RADIO, 1, "Radio", " ’“Ùª˙" },
+  131              { RESULT_LINEIN, 1, "Line-in", "“Ù∆µ ‰»Î" },
+  132              { RESULT_CLOCK, 1, "Clock", " ±÷”" }
+  133          };
+  134          
+  135          #pragma userclass(nconst = CFG_LAN)
+  136          /******************”Ô—‘…Ë÷√*****************************************/
+  137          const lang_infor_t LanguageCfg =
+  138          {
+  139              0, 0,
+  140              {
+  141                  LAN_ID_SCHINESE, LAN_ID_ENGLISH, LAN_ID_TCHINESE, LAN_ID_JAPANESE, LAN_ID_KOREAN, LAN_ID_FRENCH, 
+             -LAN_ID_GERMANY,
+  142                  LAN_ID_ITALIAN, LAN_ID_DUTCH, LAN_ID_PORTUGUESE, LAN_ID_SPANISH, LAN_ID_SWEDISH, LAN_ID_CZECHISH,
+  143                  LAN_ID_DENISH, LAN_ID_POLAND, LAN_ID_RUSSIAN, LAN_ID_TURKISH, LAN_ID_HEBREW, LAN_ID_THAI, LAN_ID_
+             -HUNGARIAN,
+  144                  LAN_ID_ROMANIAN, LAN_ID_RABBINIC, LAN_ID_INDONESIAN, LAN_ID_GREEK, LAN_ID_SLOVAKIAN, LAN_ID_FINNI
+             -SH,
+  145                  LAN_ID_CROATIA, LANGUAGETOTAL
+  146              }
+  147          };
+  148          
+  149          /*************Œƒº˛ÃÊªª******************/
+  150          #pragma userclass(nconst = CFG_FILE_EX)
+  151          //const uint8 FileTotal = 10;
+  152          //const char  FileExReserv[15];
+  153          #define CFG_AP_MAX  14
+  154          const file_ex_t FileCfg =
+  155          { CFG_AP_MAX, "" };
+  156          
+  157          const char FileName[CFG_AP_MAX][16] =
+  158          {
+  159              "music.ap", "record.ap", "radio.ap", "main.ap", "ap_rec_p.ap", "udisk.ap", "usbsound.ap", "standby.ap
+             -", "linein.ap", "alarm.ap",  "ky_hard.drv",
+  160              "drv_ui.drv", "alarm.mp3", "welcome.bin"
+  161          };
+  162          
+  163          /*π¶ƒ‹≈‰÷√œÓ*/
+  164          #pragma userclass(nconst = CFG_FUNC)
+  165          #define FUNC_ITEM_MAX   4
+  166          
+  167          const func_cfg_t FuncCfg =
+  168          { FUNC_ITEM_MAX, "" };
+  169          
+  170          const func_item_t FuncItem[FUNC_ITEM_MAX] =
+  171          {
+  172              { 0, "", "Support KeyTone", "÷ß≥÷∞¥º¸“Ù" },
+  173              { 0, "", "Support WAV", "÷ß≥÷ WAV ¬º“Ù" },
+  174              { 1, "", "Support TTS", "÷ß≥÷”Ô“Ù≤•±®" },
+  175              { 0, "", "Support NorRec", "÷ß≥÷Nor¬º“Ù" }
+  176          };
+  177          
+  178          const char FW_TYPE = 1;
+  179          
+  180          #pragma userclass(nconst = default)
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:30  PAGE 4   
+
+  ecode size           =    ------     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =      1889     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

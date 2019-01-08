@@ -1,0 +1,791 @@
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE deal_key_message
+OBJECT MODULE PLACED IN .\obj\deal_key_message.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE deal_key_message.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED
+                    -) BROWSE ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE(CHECKALARM) DEBUG PRINT(.\lst\deal_key_mess
+                    -age.lst) OBJECT(.\obj\deal_key_message.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        main ap of sdk 3.0
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *       History Record:
+    9           *
+   10           *******************************************************************************
+   11           */
+   12          #include "ap_radio.h"
+   13          
+   14          #pragma name(DEAL_KEY_MSG)
+   15          
+   16          int16 deal_key_msg(void)
+   17          {
+   18   1          int16 result = 0;
+   19   1          uint8 key;
+   20   1          key = ap_get_message();
+   21   1          switch (key)
+   22   1          {
+   23   2          case AP_MSG_RTC:
+   24   2              break;
+   25   2      
+   26   2          case AP_MSG_WAIT_TIMEOUT:
+   27   2              result = deal_timeout_msg();
+   28   2              break;
+   29   2      
+   30   2          case AP_KEY_PLAY | AP_KEY_UP: //play按键作返回处理
+   31   2              result = deal_play_key();
+   32   2              break;
+   33   2      
+   34   2          case AP_KEY_MODE | AP_KEY_UP: //AP切换热键
+   35   2              result = deal_mode_key();
+   36   2              break;
+   37   2      
+   38   2          case AP_KEY_MUTE | AP_KEY_UP: //mute设置
+   39   2              mute_flag = !mute_flag;
+   40   2              if (!mute_flag)
+   41   2              {
+   42   3                  fmSendCommand(FM_MUTE, releaseMUTE, NULL);
+   43   3              }
+   44   2              else
+   45   2              {
+   46   3                  fmSendCommand(FM_MUTE, SetMUTE, NULL);
+   47   3              }
+   48   2              need_draw = TRUE;
+   49   2              break;
+   50   2      
+   51   2          case AP_KEY_NEXT | AP_KEY_UP:
+   52   2              result = deal_next_prev_key(AP_KEY_NEXT);
+   53   2              break;
+   54   2      
+   55   2          case AP_KEY_PREV | AP_KEY_UP:
+   56   2              result = deal_next_prev_key(AP_KEY_PREV);
+   57   2              break;
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 2   
+
+   58   2      
+   59   2          case AP_KEY_NEXT | AP_KEY_LONG:
+   60   2              result = deal_next_prev_longkey(AP_KEY_NEXT);
+   61   2              break;
+   62   2      
+   63   2          case AP_KEY_PREV | AP_KEY_LONG:
+   64   2              result = deal_next_prev_longkey(AP_KEY_PREV);
+   65   2              break;
+   66   2      
+   67   2          case AP_KEY_VOL | AP_KEY_UP: //调节音量
+   68   2              result = deal_radio_vol_msg(NULL);
+   69   2              break;
+   70   2      
+   71   2          case AP_KEY_VOLADD | AP_KEY_UP:
+   72   2          case AP_KEY_VOLADD | AP_KEY_LONG:
+   73   2              result = deal_radio_vol_msg(Key_Next);
+   74   2              break;
+   75   2      
+   76   2          case AP_KEY_VOLSUB | AP_KEY_UP:
+   77   2          case AP_KEY_VOLSUB | AP_KEY_LONG:
+   78   2              result = deal_radio_vol_msg(Key_Prev);
+   79   2              break;
+   80   2      
+   81   2          case AP_KEY_MODE | AP_KEY_LONG:
+   82   2              longkey_flag = 1;
+   83   2              deal_long_mode_key();
+   84   2              break;
+   85   2      
+   86   2          case AP_KEY_CLOCK | AP_KEY_UP: //设置当前时间
+   87   2              result = set_clock_ui(1);
+   88   2              if (result != 0)
+   89   2              {
+   90   3                  return result;
+   91   3              }
+   92   2              result = 0;
+   93   2              SetCurUI_Type(FMFreq_UI);
+   94   2              break;
+   95   2      
+   96   2          case AP_MSG_LINEIN_IN:
+   97   2              result = RESULT_LINEIN;
+   98   2              break;
+   99   2      
+  100   2          case AP_KEY_CHANSUB | AP_KEY_UP:
+  101   2          case AP_KEY_CHANSUB | AP_KEY_LONG:
+  102   2              deal_chan_msg(AP_KEY_PREV);
+  103   2              break;
+  104   2      
+  105   2          case AP_KEY_EQ | AP_KEY_UP:
+  106   2              result = deal_eq_msg(Key_None);
+  107   2              break;
+  108   2          case AP_KEY_CHANADD | AP_KEY_UP:
+  109   2          case AP_KEY_CHANADD | AP_KEY_LONG:
+  110   2              deal_chan_msg(AP_KEY_NEXT);
+  111   2              break;
+  112   2      #ifdef AP_RADIO_REPORT_EN
+                   case AP_KEY_VOL | AP_KEY_LONG:
+                   case AP_KEY_CLOCK | AP_KEY_LONG:
+                       longkey_flag = 1;
+                       fmSendCommand(FM_MUTE, SetMUTE, NULL);
+                       exit_fmin_channel();
+                       if(key == (AP_KEY_VOL | AP_KEY_LONG))
+                       {
+                           result = report_frequency(&g_FMStatus, report_buf);
+                       }
+                       else
+                       {
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 3   
+
+                           result = report_time_info(0, TRUE);
+                       }
+                       init_fmin_channel();
+                       if(result != 0)
+                       {
+                           return result;
+                       }
+                       if (g_comval.volume != 0)
+                       {
+                           fmSendCommand(FM_MUTE, releaseMUTE, NULL); //解除静音
+                       }
+                       fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
+                       break;
+               #endif
+  138   2          case AP_KEY_AUTOSLEEP | AP_KEY_UP:
+  139   2              set_autosleep_time(Key_None);
+  140   2              break;
+  141   2      
+  142   2          default: //热键处理
+  143   2              if ((key >= (AP_KEY_NUM0 | AP_KEY_UP)) && (key <= (AP_KEY_NUM9 | AP_KEY_UP)))
+  144   2              {
+  145   3                  deal_digital_key(key);
+  146   3              }
+  147   2              else
+  148   2              {
+  149   3                  result = ap_handle_hotkey(key);
+  150   3              }
+  151   2              break;
+  152   2          }
+  153   1          return result;
+  154   1      }
+  155          
+  156          /********************************************************************************
+  157           * Description : 处理mode键
+  158           *
+  159           * Arguments  :
+  160           *
+  161           * Returns     :
+  162           *            无
+  163           * Notes       :
+  164           *
+  165           ********************************************************************************/
+  166          uint8 deal_mode_key(void)
+  167          {
+  168   1          if (CurUI_Type != FMFreq_UI)
+  169   1          {
+  170   2              if (CurUI_Type == FMInputFreq_UI)
+  171   2              {
+  172   3                  deal_with_input_freq();
+  173   3              }
+  174   2              SetCurUI_Type(FMFreq_UI);
+  175   2              return NULL;
+  176   2          }
+  177   1          return RESULT_MAIN;
+  178   1      }
+  179          
+  180          /********************************************************************************
+  181           * Description : 处理长按mode键
+  182           *
+  183           * Arguments  :
+  184           *
+  185           * Returns     :
+  186           *            无
+  187           * Notes       :
+  188           *
+  189           ********************************************************************************/
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 4   
+
+  190          uint8 deal_long_mode_key(void)
+  191          {
+  192   1          if ((CurUI_Type != FMFreq_UI) && (CurUI_Type != FMChannel_UI))
+  193   1          {
+  194   2              return NULL;
+  195   2          }
+  196   1          if (g_radio_config.band_mode == Bank_Japan)
+  197   1          {
+  198   2              g_radio_config.band_mode = Bank_US_Europe;
+  199   2              radio_param.param1 = g_radio_config.fmstation_us;
+  200   2      
+  201   2              memcpy(&FMStatusJP, &g_FMStatus, sizeof(g_FMStatus)); //备份jp频道数据
+  202   2              memcpy(&g_FMStatus, &FMStatusUS, sizeof(g_FMStatus)); //加载us频道数据
+  203   2          }
+  204   1          else if (g_radio_config.band_mode == Bank_US_Europe)
+  205   1          {
+  206   2              g_radio_config.band_mode = Bank_Japan;
+  207   2              radio_param.param1 = g_radio_config.fmstation_jp;
+  208   2      
+  209   2              memcpy(&FMStatusUS, &g_FMStatus, sizeof(fm_status_t)); //备份us频道数据
+  210   2              memcpy(&g_FMStatus, &FMStatusJP, sizeof(fm_status_t)); //加载js频道数据
+  211   2          }
+  212   1      
+  213   1          fmSendCommand(FM_MUTE, SetMUTE, NULL); //设置静音
+  214   1          fmSendCommand(FM_MID_PLAY, NULL, NULL); //播放电台
+  215   1          fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
+  216   1      
+  217   1          need_draw = TRUE;
+  218   1          return NULL;
+  219   1      }
+  220          
+  221          /********************************************************************************
+  222           * Description : 处理chan + 和 - 键
+  223           *
+  224           * Arguments  :
+  225           *
+  226           * Returns     :
+  227           *            无
+  228           * Notes       :
+  229           *
+  230           ********************************************************************************/
+  231          uint8 deal_chan_msg(uint8 key)
+  232          {
+  233   1          if (CurUI_Type != FMFreq_UI)
+  234   1          {
+  235   2              //SetCurUI_Type(FMFreq_UI);
+  236   2              return 0;
+  237   2          }
+  238   1          else if (key == NULL)
+  239   1          {
+  240   2              key = AP_KEY_NEXT;
+  241   2          }
+  242   1      
+  243   1          if (key == AP_KEY_NEXT)
+  244   1          {
+  245   2              g_FMStatus.freq += 1;
+  246   2              if ((g_FMStatus.freq >= USFREQ_MAX) && (g_radio_config.band_mode == Bank_US_Europe))
+  247   2              {
+  248   3                  g_FMStatus.freq = USFREQ_MIN;
+  249   3              }
+  250   2              else if ((g_FMStatus.freq >= JPFREQ_MAX) && (g_radio_config.band_mode == Bank_Japan))
+  251   2              {
+  252   3                  g_FMStatus.freq = JPFREQ_MIN;
+  253   3              }
+  254   2          }
+  255   1          else
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 5   
+
+  256   1          {
+  257   2              g_FMStatus.freq -= 1;
+  258   2              if ((g_FMStatus.freq <= USFREQ_MIN) && (g_radio_config.band_mode == Bank_US_Europe))
+  259   2              {
+  260   3                  g_FMStatus.freq = USFREQ_MAX;
+  261   3              }
+  262   2              else if ((g_FMStatus.freq <= JPFREQ_MIN) && (g_radio_config.band_mode == Bank_Japan))
+  263   2              {
+  264   3                  g_FMStatus.freq = JPFREQ_MAX;
+  265   3              }
+  266   2          }
+  267   1          //mute FM 模块，避免切BANK造成干扰
+  268   1          fmSendCommand(FM_MUTE, SetMUTE, NULL);
+  269   1      
+  270   1          fmSendCommand(FM_SETFREQ, (void *) g_FMStatus.freq, NULL);
+  271   1          //release mute
+  272   1          if (g_comval.volume != 0)
+  273   1          {
+  274   2              fmSendCommand(FM_MUTE, releaseMUTE, NULL); //解除静音
+  275   2          }
+  276   1          fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
+  277   1          fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
+  278   1      
+  279   1          fmSendCommand(FM_MID_SAVE, &radio_param, NULL);
+  280   1      
+  281   1          need_draw = TRUE;
+  282   1          return NULL;
+  283   1      }
+  284          
+  285          /********************************************************************************
+  286           * Description : 处理音量键
+  287           *
+  288           * Arguments  :
+  289           *
+  290           * Returns     :
+  291           *            无
+  292           * Notes       :
+  293           *
+  294           ********************************************************************************/
+  295          uint8 deal_radio_vol_msg(uint8 key)
+  296          {
+  297   1          //自动搜台和手动搜台不响应音量按键
+  298   1          if ((CurUI_Type == FMAutoSearch_UI) || (CurUI_Type == FMManualSearch_UI))
+  299   1          {
+  300   2              return NULL;
+  301   2          }
+  302   1          if((key == Key_Next) && (g_comval.volume == 0))
+  303   1          {
+  304   2              fmSendCommand(FM_MUTE, releaseMUTE, NULL); //解除静?
+  305   2          }
+  306   1          return deal_vol_msg(key, FMFreq_UI);
+  307   1      #if 0
+                   if (CurUI_Type != Volume_UI)
+                   {
+                       SetCurUI_Type(Volume_UI);
+                       return 0;
+                   }
+                   else if (key == NULL)
+                   {
+                       SetCurUI_Type(FMFreq_UI);
+                       return 0;
+                   }
+               
+                   if (mute_flag)
+                   {
+                       mute_flag = FALSE;
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 6   
+
+                       volume_callback(g_comval.volume);
+                   }
+               
+                   if (key == AP_KEY_NEXT)
+                   {
+                       if (g_comval.volume < g_comval.VolumeMax)
+                       {
+                           g_comval.volume++;
+                       }
+                   }
+                   else
+                   {
+                       if (g_comval.volume > 0)
+                       {
+                           g_comval.volume--;
+                       }
+                   }
+                   volume_callback(g_comval.volume);
+               
+                   need_draw = TRUE;
+                   return NULL;
+               #endif
+  344   1      }
+  345          /********************************************************************************
+  346           * Description : 处理输入的频率
+  347           *
+  348           * Arguments  :
+  349           *
+  350           * Returns     :
+  351           *            无
+  352           * Notes       :
+  353           *
+  354           ********************************************************************************/
+  355          uint8 deal_with_input_freq(void)
+  356          {
+  357   1          uint16 freq;
+  358   1          freq = DigitalBuf[3] + DigitalBuf[2] * 10 + DigitalBuf[1] * 100 + DigitalBuf[0] * 1000;
+  359   1          if (check_freq_valid(freq))
+  360   1          {
+  361   2              g_FMStatus.freq = freq;
+  362   2              //mute FM 模块，避免切BANK造成干扰
+  363   2              fmSendCommand(FM_MUTE, SetMUTE, NULL);
+  364   2      
+  365   2              fmSendCommand(FM_SETFREQ, (void *) g_FMStatus.freq, NULL);
+  366   2              //release mute
+  367   2              if (g_comval.volume != 0)
+  368   2              {
+  369   3                  fmSendCommand(FM_MUTE, releaseMUTE, NULL); //解除静音
+  370   3              }
+  371   2              fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
+  372   2              fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
+  373   2      
+  374   2              fmSendCommand(FM_MID_SAVE, &radio_param, NULL);
+  375   2      
+  376   2              return 1;
+  377   2          }
+  378   1          return 0;
+  379   1      }
+  380          /********************************************************************************
+  381           * Description : 检查频率值是否是有效值
+  382           *
+  383           * Arguments  :
+  384           *
+  385           * Returns     :
+  386           *
+  387           * Notes       :
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 7   
+
+  388           *
+  389           ********************************************************************************/
+  390          uint8 check_freq_valid(uint16 freq)
+  391          {
+  392   1          if (g_radio_config.band_mode == Bank_US_Europe)
+  393   1          {
+  394   2              if ((freq <= USFREQ_MAX) && (freq >= USFREQ_MIN))
+  395   2                  return TRUE;
+  396   2          }
+  397   1          else if (g_radio_config.band_mode == Bank_Japan)
+  398   1          {
+  399   2              if ((freq <= JPFREQ_MAX) && (freq >= JPFREQ_MIN))
+  400   2                  return TRUE;
+  401   2          }
+  402   1          return FALSE;
+  403   1      }
+  404          /********************************************************************************
+  405           * Description : 处理超时消息
+  406           *
+  407           * Arguments  :
+  408           *
+  409           * Returns     :
+  410           *            无
+  411           * Notes       :
+  412           *
+  413           ********************************************************************************/
+  414          uint8 deal_timeout_msg(void)
+  415          {
+  416   1          //自动搜台和手动搜台不响应超时消息
+  417   1          if ((CurUI_Type == FMAutoSearch_UI) || (CurUI_Type == FMManualSearch_UI))
+  418   1          {
+  419   2              return NULL;
+  420   2          }
+  421   1          if (CurUI_Type != FMFreq_UI)
+  422   1          {
+  423   2              if (CurUI_Type == FMInputFreq_UI)
+  424   2              {
+  425   3                  deal_with_input_freq();
+  426   3              }
+  427   2              SetCurUI_Type(FMFreq_UI);
+  428   2          }
+  429   1          return NULL;
+  430   1      }
+  431          /********************************************************************************
+  432           * Description : 处理play按键，自动搜台和非自动搜台之间切换
+  433           *
+  434           * Arguments  :
+  435           *
+  436           * Returns     :
+  437           *            无
+  438           * Notes       :
+  439           *
+  440           ********************************************************************************/
+  441          uint8 deal_play_key(void)
+  442          {
+  443   1          uint8 result;
+  444   1      
+  445   1          if (CurUI_Type == FMFreq_UI)
+  446   1          {
+  447   2              fmSendCommand(FM_MUTE, SetMUTE, NULL);
+  448   2      
+  449   2              result = AutoSearchHandle(SEARCH_NEXT);
+  450   2              if ((result != RESULT_NULL) && (result != RESULT_IGNORE) && (result != RESULT_RECORD))
+  451   2              {
+  452   3                  return result;
+  453   3              }
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 8   
+
+  454   2      
+  455   2              if (g_comval.volume != 0)
+  456   2              {
+  457   3                  fmSendCommand(FM_MUTE, releaseMUTE, NULL); //解除静音
+  458   3              }
+  459   2              fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
+  460   2              fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
+  461   2      
+  462   2              if (g_FMStatus.station)
+  463   2              {
+  464   3                  SetCurUI_Type(FMChannel_UI);
+  465   3              }
+  466   2              else
+  467   2              {
+  468   3                  SetCurUI_Type(FMFreq_UI);
+  469   3              }
+  470   2          }
+  471   1          else
+  472   1          {
+  473   2              SetCurUI_Type(FMFreq_UI);
+  474   2          }
+  475   1      
+  476   1          return result;
+  477   1      }
+  478          
+  479          /********************************************************************************
+  480           * Description : 处理prev和next键
+  481           *
+  482           * Arguments  :
+  483           *
+  484           * Returns     :
+  485           *            无
+  486           * Notes       :
+  487           *
+  488           ********************************************************************************/
+  489          uint8 deal_next_prev_key(uint8 key)
+  490          {
+  491   1          uint8 direct;
+  492   1      
+  493   1          switch (CurUI_Type)
+  494   1          {
+  495   2          case FMFreq_UI:
+  496   2          case FMChannel_UI:
+  497   2              if (key == AP_KEY_PREV)
+  498   2              {
+  499   3                  direct = DOWN;
+  500   3              }
+  501   2              else
+  502   2              {
+  503   3                  direct = UP;
+  504   3              }
+  505   2              fmSendCommand(FM_MUTE, SetMUTE, NULL);
+  506   2      
+  507   2              fmSendCommand(FM_MID_TURN, (void *) direct, NULL);
+  508   2              fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
+  509   2              if (g_comval.volume != 0)
+  510   2              {
+  511   3                  fmSendCommand(FM_MUTE, releaseMUTE, NULL);
+  512   3              }
+  513   2              fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
+  514   2              SetCurUI_Type(FMChannel_UI);
+  515   2              break;
+  516   2      
+  517   2          case Volume_UI:
+  518   2              deal_radio_vol_msg(key);
+  519   2              break;
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 9   
+
+  520   2      
+  521   2          case FMInputFreq_UI:
+  522   2              break;
+  523   2      
+  524   2          default:
+  525   2              break;
+  526   2          }
+  527   1          return NULL;
+  528   1      }
+  529          
+  530          /********************************************************************************
+  531           * Description : 处理prev和next长按键
+  532           *
+  533           * Arguments  :
+  534           *
+  535           * Returns     :
+  536           *            无
+  537           * Notes       :
+  538           *
+  539           ********************************************************************************/
+  540          uint8 deal_next_prev_longkey(uint8 key)
+  541          {
+  542   1          uint8 direct;
+  543   1          uint8 result;
+  544   1      
+  545   1          switch (CurUI_Type)
+  546   1          {
+  547   2          case FMFreq_UI:
+  548   2          case FMChannel_UI:
+  549   2              if (key == AP_KEY_PREV)
+  550   2              {
+  551   3                  direct = SEARCH_LAST;
+  552   3              }
+  553   2              else
+  554   2              {
+  555   3                  direct = SEARCH_NEXT;
+  556   3              }
+  557   2              fmSendCommand(FM_MUTE, SetMUTE, NULL);
+  558   2              result = SearchHandle(direct);
+  559   2              if ((result != RESULT_NULL) && (result != RESULT_IGNORE) && (result != RESULT_RECORD))
+  560   2              {
+  561   3                  return result;
+  562   3              }
+  563   2              if (g_comval.volume != 0)
+  564   2              {
+  565   3                  fmSendCommand(FM_MUTE, releaseMUTE, NULL); //解除静音
+  566   3              }
+  567   2              fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
+  568   2              fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
+  569   2      
+  570   2              if (g_FMStatus.station)
+  571   2              {
+  572   3                  SetCurUI_Type(FMChannel_UI);
+  573   3              }
+  574   2              else
+  575   2              {
+  576   3                  SetCurUI_Type(FMFreq_UI);
+  577   3              }
+  578   2              return result;
+  579   2              break;
+  580   2      
+  581   2          case Volume_UI:
+  582   2              deal_radio_vol_msg(key);
+  583   2              break;
+  584   2      
+  585   2          case FMInputFreq_UI:
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 10  
+
+  586   2              break;
+  587   2      
+  588   2          default:
+  589   2              break;
+  590   2          }
+  591   1          return NULL;
+  592   1      }
+  593          /********************************************************************************
+  594           * Description : 处理数字按键
+  595           *
+  596           * Arguments  :
+  597           *
+  598           * Returns     :
+  599           *            无
+  600           * Notes       :
+  601           *
+  602           ********************************************************************************/
+  603          uint8 deal_digital_key(uint8 key)
+  604          {
+  605   1          uint8 key_val;
+  606   1          uint8 i;
+  607   1          if ((DigitalCount >= 4) || (DigitalCount == 0))
+  608   1          {
+  609   2              SetCurUI_Type(FMInputFreq_UI);
+  610   2              memset(DigitalBuf, 0x0, 4);
+  611   2          }
+  612   1          key_val = (key & ~AP_KEY_UP) - AP_KEY_NUM0;//将数字按键消息转换成数字
+  613   1          for (i = 0; i < 3; i++)
+  614   1          {
+  615   2              DigitalBuf[i] = DigitalBuf[i + 1];
+  616   2          }
+  617   1          DigitalBuf[3] = key_val;
+  618   1          DigitalCount++;
+  619   1          need_draw = TRUE;
+  620   1          return NULL;
+  621   1      }
+  622          
+  623          /*
+  624           ********************************************************************************
+  625           *             void    volume_callback(uint16 Vol)
+  626           *
+  627           * Description : 音量设置的CALLBACK函数
+  628           *
+  629           * Arguments   :    当前需设置的音量值
+  630           *
+  631           * Returns     :
+  632           *
+  633           * Notes       :
+  634           *
+  635           ********************************************************************************
+  636           */
+  637          /*void volume_callback(uint16 Vol)
+  638           {
+  639           //实时改变音量的值
+  640           g_comval.vol_display = (uint8) Vol;
+  641           if (g_comval.VolumeMax != 0)
+  642           {
+  643           g_comval.volume = g_comval.vol_display * SOFTVOL_MAX / g_comval.VolumeMax;
+  644           }
+  645           fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
+  646           if (g_comval.volume == 0)
+  647           {
+  648           fmSendCommand(FM_MUTE, SetMUTE, NULL);
+  649           }
+  650           else
+  651           {
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 11  
+
+  652           fmSendCommand(FM_MUTE, releaseMUTE, NULL);
+  653           }
+  654           }*/
+  655          #if 0
+               /*
+                ********************************************************************************
+                *             void DealFadeIn(uint8 Volume)
+                *
+                * Description : 音量淡入处理函数
+                *
+                * Arguments   :    当前音量
+                *
+                * Returns     :
+                *
+                * Notes       :
+                *
+                ********************************************************************************
+                */
+               void DealFadeIn(uint8 Volume)
+               {
+                   uint8 i, j;
+                   uint16 nop = 0;
+                   for (i = 0; i <= Volume; i++)
+                   {
+                       for (j = 0; j < 100; j++)
+                       {
+                           nop++;
+                       }
+                       SetPAVolume(i);
+                   }
+                   ClearWatchDog();
+               }
+               /*
+                ********************************************************************************
+                *             void delay1(void)
+                *
+                * Description : 延时函数
+                *
+                * Arguments   :
+                *
+                * Returns     :
+                *
+                * Notes       :
+                *
+                ********************************************************************************
+                */
+               void delay1(void)
+               {
+                   uint16 i;
+                   for (i = 0; i < 1000; i++)
+                   {
+                       ; //淡出时短暂延时
+                   }
+               
+               }
+               /*
+                ********************************************************************************
+                *             void DealFadeInOut(void)
+                *
+                * Description : 退出FM时，淡出处理函数
+                *
+                * Arguments   :
+                *
+                * Returns     :
+                *
+                * Notes       :
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:42:07  PAGE 12  
+
+                *
+                ********************************************************************************
+                */
+               void DealFadeInOut(void)
+               {
+                   uint8 vol_cnt;
+                   vol_cnt = g_comval.volume;
+                   while (vol_cnt > 0)
+                   {
+                       fmSendCommand(FM_MID_SETVOLUME, (void *) vol_cnt, NULL);
+                       fmSendCommand(FM_MUTE, releaseMUTE, NULL);
+                       vol_cnt--;
+                       delay1();
+                   }
+               
+               }
+               #endif
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1799     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,148 @@
+C251 COMPILER V4.55,  Hdrv_HardDeal                                                        23/07/16  20:31:14  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE Hdrv_HardDeal
+OBJECT MODULE PLACED IN .\UI_Release\obj\Hdrv_HardDeal.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE Hdrv_HardDeal.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) BROWSE INCDIR(..\..
+                    -\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\UI_Release\list\Hdrv_HardDeal.lst) OBJECT(.\UI_Release\obj\Hdrv_HardDeal.obj
+                    -) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************
+    3           *                       ACTOS
+    4           *                  UI Init function
+    5           *
+    6           *                (c) Copyright 2002-2008, Actions Co,Ld.
+    7           *                        All Right Reserved
+    8           *
+    9           * File   : Hdrv_HardDeal.c
+   10           * By     : fiona
+   11           * Version: 1> v1.00     first version     2010/10/12  14:00
+   12           * Description: support unicode font
+   13           ********************************************************************************
+   14           */
+   15          #include "drv_led.h"
+   16          
+   17          #pragma name(HARD_DEAL)
+   18          ////********************************************************/
+   19          ///*    void Hdrv_DataSend(uint8 addr,uint8 val)
+   20          //** FUNCTION:     Hdrv_DataSend
+   21          //**
+   22          //** Description:  send data to lcd
+   23          //**
+   24          //**  input:
+   25          //**     addr : data register addr
+   26          //**     val  : which will be send to lcd
+   27          //**
+   28          //**  output
+   29          //**     none
+   30          //**********************************************************/
+   31          void Hdrv_DataSend(uint8 addr, uint8 val, uint8 distype)
+   32          {
+   33   1          uint8 sfr_bak;
+   34   1          sfr_bak = SFR_BANK;
+   35   1          SFR_BANK = BANK_LCD;
+   36   1          //send data to led data register
+   37   1          switch (addr)
+   38   1          {
+   39   2          case 0:
+   40   2              if (distype != 0)
+   41   2              {
+   42   3                  //LCD_DATA0 |= val;
+   43   3                  LCD_DATA0 = val;
+   44   3              }
+   45   2              else
+   46   2              {
+   47   3                  LCD_DATA0 &= val;
+   48   3              }
+   49   2              break;
+   50   2          case 1:
+   51   2              if (distype != 0)
+   52   2              {
+   53   3                  //LCD_DATA1 |= val;
+   54   3                  LCD_DATA1 = val;
+   55   3              }
+   56   2              else
+   57   2              {
+C251 COMPILER V4.55,  Hdrv_HardDeal                                                        23/07/16  20:31:14  PAGE 2   
+
+   58   3                  LCD_DATA1 &= val;
+   59   3              }
+   60   2              break;
+   61   2          case 2:
+   62   2              if (distype != 0)
+   63   2              {
+   64   3                  //LCD_DATA2 |= val;
+   65   3                  LCD_DATA2 |= val;
+   66   3              }
+   67   2              else
+   68   2              {
+   69   3                  LCD_DATA2 &= val;
+   70   3              }
+   71   2              break;
+   72   2          case 3:
+   73   2              if (distype != 0)
+   74   2              {
+   75   3                  //LCD_DATA3 |= val;
+   76   3                  LCD_DATA3 = val;
+   77   3              }
+   78   2              else
+   79   2              {
+   80   3                  LCD_DATA3 &= val;
+   81   3              }
+   82   2              break;
+   83   2          case 4:
+   84   2              if (distype != 0)
+   85   2              {
+   86   3                  LCD_DATA4 = val;
+   87   3                  //LCD_DATA4 = val;
+   88   3              }
+   89   2              else
+   90   2              {
+   91   3                  LCD_DATA4 &= val;
+   92   3              }
+   93   2              break;
+   94   2          default:
+   95   2              break;
+   96   2          }
+   97   1          //wait for data trans end
+   98   1          LCD_MODE |= 0x08;
+   99   1          //while ((LCD_MODE & 0x08) != 0)
+  100   1          while (1)
+  101   1          {
+  102   2              if ((LCD_MODE & 0x08) == 0)
+  103   2              {
+  104   3                  break;
+  105   3              }
+  106   2          }
+  107   1          SFR_BANK = sfr_bak;
+  108   1      }
+  109          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       112     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+C251 COMPILER V4.55,  Hdrv_HardDeal                                                        23/07/16  20:31:14  PAGE 3   
+
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

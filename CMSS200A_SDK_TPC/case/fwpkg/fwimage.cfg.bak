@@ -1,0 +1,236 @@
+//************************************************************************************
+//              firmware image 文件脚本
+//              copyright actions.
+//
+//              by jiancailiu 2009/10/20
+//***********
+//* 规则   *
+//***********
+//*             从CVS上下下来后，请将此文件的名称改为FW.DAT
+//*             文件名只支持8.3，大小写都可以
+//***********
+//* 关键字 *
+//***********
+//*             PID/VID    制造商，设备号                       大小写都可以
+//*             SETPATH    指定其后的所有的文件所在的目录，可以使用多次，大小写都可以
+//*             HWSC/FWSC  系统硬件/软件扫描模块                大小写都可以
+//*             ADFUS      ADFU SERVER                          大小写都可以
+//*             FWSC       系统逻辑空间文件                     大小写都可以
+//*             FWIM       存放到sd中的文件名                   大小写都可以
+//*                     （为了方便系统的UPLOAD,需要在SD中存放ADFUS.BIN和任意一款FWSC*.BIN）
+//*             //         注释
+//************************************************************************************
+
+//***********************************
+//系统配置
+VID=0x10D6;
+PID=0x1101;
+
+MTPVID=0x10D6;
+MTPPID=0x2200;
+
+VER=0x0310;              //PSP VERSION 
+
+CALLBACK = 0x0;
+
+//***********************************
+
+INF_FIRMWARE_COPY=1;    //该值表示FIRMWARE的备份个数，只能为1或2；
+
+//***********************************
+//非DRM版本的容量信息
+INF_SD_CAP=0x3000000;   //该值大小必须是3的整数倍
+INF_VM_CAP=0x400000;    //该容量必须是2MB的整数倍
+INF_MI_CAP=0x000000;
+INF_UI_CAP=0x002000;
+
+INF_LCDWIDTH=160;     
+INF_LCDHEIGHT=128;
+
+
+//打印屏蔽配置项
+//PRINT_DISABLE=0; //0:支持打印; 1:屏蔽打印
+
+INF_UDISK_LABEL="USB DISK AA"; //最大11字符
+
+INF_MTP_LABEL="MTP DISK";   //最大128字符
+
+INF_FILE_HIDE=0;            //0: 不隐藏，非0：隐藏
+
+//***********************************
+//INF_VER=3.0.00
+//usb information
+//attribute information
+INF_USB_VENDOR_8="ACTIONS";
+INF_USB_PRODUCTID_16="HS USB FlashDisk";
+INF_USB_PRODUCTVER_4="2.00";
+
+INF_DEVICE_PRODUCER_32="";
+//INF_DEVICE_NAME_32="Mutimedia Player";
+INF_DEVICE_NAME_32="CMA200_TC01_JC6";	// Firmware Version
+
+//***********************************
+//最大32字符
+INF_MTPMFTINFO="Actions Semiconductor Co., Ltd.";
+//最大32字符
+INF_MTPPRODUCTINFO="Actions Mtp Device 000001";
+//最大16字符
+INF_MTPPRODUCTVER="V1.00.3333";
+
+//***********************************
+//default setting information
+//对比度选择0~15
+INF_DISPLAYCONTRAST=7;
+//背景灯亮时间,默认值为0ah=5秒
+INF_LIGHTTIME=0;
+//STANDBY定时
+INF_STANDBYTIME=0;
+//SLEEP定时
+INF_SLEEPTIME=0;
+//界面语言, 简体:0,繁体:1, 英文:2
+INF_LANGID=0;
+//复读模式
+INF_REPLAYMODE=0;
+//联机模式
+INF_ONLINEMODE=0;
+//是否支持微软MTP：1,支持；0:不支持
+INF_MS_MTP_SUPPORT=1;
+////是否使用外部RTC,0:不使用，1:使用
+INF_USE_EXTERNAL_RTC=0;
+//是否支持Audible应用: 1,支持；0:不支持
+INF_AUDIBLE_SUPPORT=1;
+//Indicate whether return a serial number of the USB mass storage device to PC, 0:no; 1:unified sn; 2:random sn;
+//When set this option to 2, it will return a new serial number to PC after every firmware upgrade.
+INF_UDISK_SN_SP=1;
+
+INF_FLASH_CAP_INFO=0;  //0: 实际容量，1:分档容量
+//SPI_STG_CAP是设置nor 固件区的大小，包括MBREC，BREC，LFI和VRAM区，单位为扇区
+SPI_STG_CAP=0x2000;
+//SPI_FS_CAP是设置nor 系统区（主要用于存储录音数据）的大小，单位为扇区；
+//使用这部分时得确保SPI_STG_CAP+SPI_FS_CAP的大小不会超过nor 的实际容量。
+//例如：4M的nor,总容量应该是0x2000(扇区)，如果固件区为2M（SPI_STG_CAP=0x1000）,则SPI_FS_CAP最大只能是0x1000(2M)
+SPI_FS_CAP=0x0;
+//ADFU升级完自动重启的时间（单位为秒）
+ADFU_PROBATCH_RESTART=1;  //0:不重启；1：0.7s；2：1.4s；3：2.8s；4：5.6s;5:11.2S 其他：22.5S
+//***********************************
+
+
+SETPATH=".\";
+
+//#include "..\..\psp_rel\bin_original\AFI.cfg"
+
+SETPATH=".\";
+//FWIM="CPASCI.UF";
+
+
+//FWIM="CP936.UF";
+//FWIM="CP936.L";
+//FWIM="CP936.U";
+
+//FWIM="CP950.UF";
+//FWIM="CP950.L";
+//FWIM="CP950.U";
+//
+//FWIM="CP932.UF";
+//FWIM="CP932.L";
+//FWIM="CP932.U";
+//
+//
+//FWIM="CP949.UF";
+//FWIM="CP949.L";
+//FWIM="CP949.U";
+//
+//FWIM="CP874.UF";
+//FWIM="CP874.L";
+//FWIM="CP874.U";
+
+//FWIM="CP1250.UF";
+//FWIM="CP1250.L";
+//FWIM="CP1250.U";
+
+//FWIM="CP1251.UF";
+//FWIM="CP1251.L";
+//FWIM="CP1251.U";
+
+//FWIM="CP1252.UF";
+//FWIM="CP1252.L";
+//FWIM="CP1252.U";
+
+//FWIM="CP1253.UF";
+//FWIM="CP1253.L";
+//FWIM="CP1253.U";
+
+
+//FWIM="CP1254.UF";
+//FWIM="CP1254.L";
+//FWIM="CP1254.U";
+
+//FWIM="CP1255.UF";
+//FWIM="CP1255.L";
+//FWIM="CP1255.U";
+
+//FWIM="CP1256.UF";
+//FWIM="CP1256.L";
+//FWIM="CP1256.U";
+
+//FWIM="CP1257.UF";
+//FWIM="CP1257.L";
+//FWIM="CP1257.U";
+
+////FWIM="ASCII.BIN";
+////FWIM="FONT_GB.$$$";
+////FWIM="FONT_B5.$$$";
+//FWIM="FTBL_GB.$$$";
+//FWIM="FTBL_B5.$$$";
+//FWIM="MP3DEC.DSP";
+//FWIM="MP3ENC.DSP";
+//FWIM="AACDEC.DSP";
+//FWIM="AUDDEC.DSP";
+//FWIM="AAXDEC.DSP";
+//
+////***********************************
+//
+//RCSL="RCSL7565.BIN",0x0200,8;
+//RCSE="RCSE7565.BIN",0x0200,8;
+//EPFW="EfuseProg.fw",1;
+PLOG="welcome.bin";
+//WELD="welcome.res";
+////***********************************
+FWIM="DRV_UART.DRV";
+FWIM="KY_HARD.DRV";
+//FWIM="DRV_UI.DRV";
+FWIM="FWCFG.BIN";
+////for resource
+//FWIM="UI30.RES";
+//FWIM="LOGO.RES";
+//
+////for ap
+FWIM="main.AP";
+//FWIM="music.ap";
+//FWIM="alarm.ap";
+//FWIM="alarm.mp3";	 
+FWIM="usbdisk.ap";
+//FWIM="standby.ap";
+//FWIM="record.ap";
+//FWIM="usbtest.ap";
+//FWIM="linein.ap";
+FWIM="usbsound.ap";
+//FWIM="radio.ap";
+//FWIM="ap_rec_p.ap";  
+FWIM="u_data1.bin";
+FWIM="u_data2.bin";
+
+////***********************************
+
+//for firmware modify
+//FWIM="FMCFG.ini";
+//FWIM="FMCFGACT.ini";
+//FWIM="DelTable.ini";
+
+
+//FWIM="ascii.lib";
+//FWIM="BOXGAME.BIN";
+//FATIMG="fat64m.img";
+
+SETPATH=".\..\..\psp_rel\bin";
+//FWIM="Mp3Dec.DSP";

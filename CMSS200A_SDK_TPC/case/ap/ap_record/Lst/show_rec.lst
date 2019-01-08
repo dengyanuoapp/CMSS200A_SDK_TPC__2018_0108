@@ -1,0 +1,606 @@
+C251 COMPILER V4.55,  show_rec                                                             23/05/16  10:42:20  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE show_rec
+OBJECT MODULE PLACED IN .\Obj\show_rec.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE show_rec.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED
+                    -) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\show_rec.lst) OBJECT(.\Obj\show_rec.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        voice recorder main program.
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: show_rec.c,v 1.12 2009/10/12 03:44:16 dengyulin Exp $
+   10           *******************************************************************************
+   11           */
+   12          #include "actos.h"
+   13          #include "basal.h"
+   14          #include "enhanced.h"
+   15          #include "ap_common.h"
+   16          #include "ap_record.h"
+   17          #include "ap_report.h"
+   18          
+   19          #pragma name(AP_REC)
+   20          
+   21          uint8 deal_recoding_status(void);
+   22          
+   23          /*
+   24           ********************************************************************************
+   25           * Description : 录音UI  界面显示
+   26           *
+   27           * Arguments   : NULL
+   28           *
+   29           * Returns     :  NULL
+   30           *
+   31           * Notes       :
+   32           *
+   33           ********************************************************************************
+   34           */
+   35          void ui_draw(void)
+   36          {
+   37   1          if (rec_status != rec_start)
+   38   1          {
+   39   2              LEDDisplay(LED_PLAY, 0xff, 0);
+   40   2              LEDDisplay(LED_PAUSE, 0xff, 1);
+   41   2          }
+   42   1          else
+   43   1          {
+   44   2              LEDDisplay(LED_PAUSE, 0xff, 0);
+   45   2              LEDDisplay(LED_PLAY, 0xff, 1);
+   46   2          }
+   47   1          /*  显示录音目标存储介质*/
+   48   1          if (g_record_vars.location.disk == g_disk_char[1])
+   49   1          {
+   50   2              LEDDisplay(LED_USB, 0xff, 0);
+   51   2              LEDDisplay(LED_SD, 0xff, 1);
+   52   2          }
+   53   1          else
+   54   1          {
+   55   2              LEDDisplay(LED_SD, 0xff, 0);
+   56   2              LEDDisplay(LED_USB, 0xff, 1);
+   57   2          }
+   58   1          switch (CurUI_Type)
+C251 COMPILER V4.55,  show_rec                                                             23/05/16  10:42:20  PAGE 2   
+
+   59   1          {
+   60   2          case (uint8) RecStop_UI:
+   61   2              memset(g_now_time, 0x0, 0x04);
+   62   2              LEDPuts(NUMBER1, g_now_time, 1);
+   63   2              break;
+   64   2      
+   65   2          case (uint8) RecOn_UI:
+   66   2          case (uint8) RecPause_UI:
+   67   2              time_draw(1);
+   68   2              break;
+   69   2          default:
+   70   2              break;
+   71   2          }
+   72   1      }
+   73          
+   74          /*
+   75           ********************************************************************************
+   76           * Description : 显示当前的录音时间
+   77           *
+   78           * Arguments   : mode   刷新模式  0--只刷当前时间   1--刷当前时间和剩余可录时间
+   79           *
+   80           * Returns     :  NULL
+   81           *
+   82           * Notes       :
+   83           *
+   84           ********************************************************************************
+   85           */
+   86          uint8 time_draw(uint8 mode)
+   87          {
+   88   1          uint32 nowtime_l; /* 获取当前的时间的32位变量 */
+   89   1          time_t nowtime_s; /* 获取当前的时间的结构 */
+   90   1      
+   91   1          /* 显示当前录音的时间 */
+   92   1          recSendCommand(MC_GETTIME, (void *) &nowtime_s);
+   93   1          g_rec_time.hour = nowtime_s.hour;
+   94   1          g_rec_time.minute = nowtime_s.minute;
+   95   1          g_rec_time.second = nowtime_s.second;
+   96   1      
+   97   1          nowtime_l = (uint32) nowtime_s.hour * 3600 + nowtime_s.minute * 60 + nowtime_s.second;
+   98   1          if (nowtime_l >= total_sec)
+   99   1          {
+  100   2              stop_rec(1);
+  101   2              show_err_msg();
+  102   2              return RESULT_MAIN;
+  103   2          }
+  104   1          //    itoa_3(nowtime_s.hour, &g_now_time[0])//macro qac
+  105   1          //    g_now_time[3] = ':';
+  106   1          itoa_2(nowtime_s.minute, &g_now_time[4]);//macro qac
+  107   1          //    g_now_time[6] = ':';
+  108   1          itoa_2(nowtime_s.second, &g_now_time[6]);//macro qac
+  109   1          LEDPuts(NUMBER1, &g_now_time[4], mode);
+  110   1          LEDDisplay(LED_COL, 0xff, 1);
+  111   1          return NULL;
+  112   1      }
+  113          //切换录音状态
+  114          uint8 change_rec_status(void)
+  115          {
+  116   1          uint8 retval = NULL;
+  117   1          if (need_change_rec_status == 0)
+  118   1          {
+  119   2              return NULL;
+  120   2          }
+  121   1          need_change_rec_status = 0;
+  122   1          if (rec_status == rec_start)
+  123   1          {
+  124   2              rec_status = rec_pause;
+C251 COMPILER V4.55,  show_rec                                                             23/05/16  10:42:20  PAGE 3   
+
+  125   2              recSendCommand(MC_GETTIME, (void *) &g_rec_time); //取现在时间
+  126   2              recSendCommand(MC_PAUSE, 0);
+  127   2              SetCurUI_Type(RecPause_UI);
+  128   2      
+  129   2          }
+  130   1          else if (rec_status == rec_pause)
+  131   1          {
+  132   2              rec_status = rec_start;
+  133   2              recSendCommand(MC_RECORD, 0);
+  134   2              SetCurUI_Type(RecOn_UI);
+  135   2          }
+  136   1          else
+  137   1          {
+  138   2              rec_status = rec_start;
+  139   2              retval = rec_init();
+  140   2          }
+  141   1          return retval;
+  142   1      }
+  143          void deal_play_msg(void)
+  144          {
+  145   1          if (CurUI_Type == STANDBY_UI)
+  146   1          {
+  147   2              SetCurUI_Type(RecStop_UI);
+  148   2              return;
+  149   2          }
+  150   1          if (CurUI_Type == RecOn_UI)
+  151   1          {
+  152   2              SetCurUI_Type(RecPause_UI);
+  153   2          }
+  154   1          else
+  155   1          {
+  156   2              SetCurUI_Type(RecOn_UI);
+  157   2          }
+  158   1          need_change_rec_status = TRUE;
+  159   1      }
+  160          //停止录音，并保存文件
+  161          void stop_rec(uint8 get_status)
+  162          {
+  163   1          uint16 i = 0;
+  164   1          if (rec_status == rec_stop)
+  165   1          {
+  166   2              return;
+  167   2          }
+  168   1          if (rec_status == rec_pause)
+  169   1          {
+  170   2              recSendCommand(MC_RECORD, 0);
+  171   2          }
+  172   1          recSendCommand(MC_STOP, 0);
+  173   1          if (get_status == 1)
+  174   1          {
+  175   2              while (1)
+  176   2              {
+  177   3      
+  178   3                  i++;
+  179   3                  recSendCommand(MC_GETSTATUS, (void *) &rec_stat);
+  180   3                  //当录音停止后，只有等到接受到的消息为stop时，才能调用close，否则文件保存不成功
+  181   3                  if ((rec_stat.status == RECORDING_STOP) || (i >= 2000))
+  182   3                  {
+  183   4                      break;
+  184   4                  }
+  185   3                  if (deal_recoding_status() != NULL)
+  186   3                  {
+  187   4                      break;
+  188   4                  }
+  189   3              }
+  190   2          }
+C251 COMPILER V4.55,  show_rec                                                             23/05/16  10:42:20  PAGE 4   
+
+  191   1          recSendCommand(MC_CLOSE, 0); //关闭录音
+  192   1          rec_status = rec_stop;
+  193   1          if (g_record_vars.rec_type == RECORD_FILE_TYPE_MP2)
+  194   1          {
+  195   2              g_record_vars.mp2_num++;
+  196   2          }
+  197   1          else
+  198   1          {
+  199   2              g_record_vars.wav_num++;
+  200   2          }
+  201   1      }
+  202          uint8 deal_mode_msg(void)
+  203          {
+  204   1          if (rec_status == rec_stop)
+  205   1          {
+  206   2              if (g_record_vars.location.disk == g_disk_char[1])
+  207   2              {
+  208   3                  if (USBH_Check_Udisk())
+  209   3                  {
+  210   4                      g_record_vars.location.disk = g_disk_char[0];
+  211   4                  }
+  212   3                  else
+  213   3                  {
+  214   4                      return 1;
+  215   4                  }
+  216   3      
+  217   3              }
+  218   2              else
+  219   2              {
+  220   3                  if (DRV_DetectUD(1) == 0x20)
+  221   3                  {
+  222   4                      g_record_vars.location.disk = g_disk_char[1];
+  223   4                  }
+  224   3                  else
+  225   3                  {
+  226   4                      return 1;
+  227   4                  }
+  228   3      
+  229   3              }
+  230   2              if (CheckStoreOK() == 0)
+  231   2              {
+  232   3                  return RESULT_MAIN;
+  233   3              }
+  234   2              //              need_change_rec_status=TRUE;
+  235   2              SetCurUI_Type(RecStop_UI);
+  236   2              return NULL;
+  237   2          }
+  238   1          else
+  239   1          {
+  240   2              stop_rec(1);
+  241   2              SetCurUI_Type(RecStop_UI);
+  242   2          }
+  243   1          return NULL;
+  244   1      }
+  245          
+  246          uint8 deal_recoding_status(void)
+  247          {
+  248   1          uint8 retval = NULL;
+  249   1          retWavrProceed_e mc_result = WRITE_NONE;
+  250   1          if (rec_status != rec_start)
+  251   1          {
+  252   2              return NULL;
+  253   2          }
+  254   1          mc_result = wavrProceed();
+  255   1          if (mc_result == WRITE_ONE) //已写一个page
+  256   1          {
+C251 COMPILER V4.55,  show_rec                                                             23/05/16  10:42:20  PAGE 5   
+
+  257   2              g_file_size++;
+  258   2              g_free_space--;
+  259   2              if (g_free_space == 1)
+  260   2              {
+  261   3                  stop_rec(1);
+  262   3                  show_err_msg();
+  263   3                  retval = deal_mode_msg();
+  264   3                  if (retval != 0)
+  265   3      
+  266   3                  {
+  267   4                      retval = RESULT_MAIN;
+  268   4                  }
+  269   3              }
+  270   2          }
+  271   1          else if (mc_result == WRITE_WRONG) //致命错误
+  272   1          {
+  273   2              while (ap_get_message() != NULL)
+  274   2              {
+  275   3                  ;//qac
+  276   3              }
+  277   2              stop_rec(0);
+  278   2              show_err_msg();
+  279   2              retval = deal_mode_msg();
+  280   2              if (retval != 0)
+  281   2      
+  282   2              {
+  283   3                  retval = RESULT_MAIN;
+  284   3              }
+  285   2          }
+  286   1          else
+  287   1          {
+  288   2      
+  289   2          }
+  290   1          return retval;
+  291   1      }
+  292          
+  293          /*
+  294           ********************************************************************************
+  295           * Description : 录音界面显示
+  296           *
+  297           * Arguments   : NULL
+  298           *
+  299           * Returns     : 结果消息或0
+  300           RESULT_USER_STOP    //用户按键结束
+  301           *
+  302           * Notes       :
+  303           *
+  304           ********************************************************************************
+  305           */
+  306          
+  307          uint8 show_rec(void)
+  308          {
+  309   1          uint8 key;
+  310   1          uint8 result = NULL; //result for return
+  311   1          retWavrProceed_e mc_result = WRITE_NONE;
+  312   1      
+  313   1          g_rec_time.hour = 0;
+  314   1          g_rec_time.minute = 0;
+  315   1          g_rec_time.second = 0;
+  316   1          SetCurUI_Type(RecOn_UI);
+  317   1          rec_status = rec_stop;
+  318   1          need_draw = TRUE;
+  319   1          need_change_rec_status = TRUE;
+  320   1          review_disk = TRUE;
+  321   1          if(g_record_vars.rec_source == AP_MICIN)
+  322   1          {
+C251 COMPILER V4.55,  show_rec                                                             23/05/16  10:42:20  PAGE 6   
+
+  323   2              EnableAIN(AD_MIC);
+  324   2              SetAINGain(0, g_record_vars.rec_InputGain);
+  325   2          }
+  326   1          else
+  327   1          {
+  328   2              EnableAIN(AD_FM);
+  329   2              SetAINGain(g_record_vars.rec_InputGain / 2, 0 );
+  330   2          }
+  331   1          while (1)
+  332   1          {
+  333   2              result = change_rec_status();
+  334   2              if (result != NULL)
+  335   2              {
+  336   3                  return result;
+  337   3              }
+  338   2              if (need_draw)
+  339   2              {
+  340   3                  ui_draw();
+  341   3                  need_draw = FALSE;
+  342   3              }
+  343   2              key = ap_get_message();
+  344   2              switch (key)
+  345   2              {
+  346   3              case AP_MSG_RTC:
+  347   3              case AP_MSG_WAIT_TIMEOUT:
+  348   3                  if (rec_status == rec_pause)
+  349   3                  {
+  350   4                      show_what = !show_what;
+  351   4                      time_draw(show_what);
+  352   4                      break;
+  353   4                  }
+  354   3                  if (rec_status == rec_start)
+  355   3                  {
+  356   4                      recSendCommand(MC_GETSTATUS, (void *) &rec_stat); //add by lei
+  357   4                      if (rec_stat.status > 0xf0)
+  358   4                      {
+  359   5                          recSendCommand(MC_STOP, 0);
+  360   5                          return 0;
+  361   5                      }
+  362   4                      result = time_draw(1);
+  363   4                  }
+  364   3                  break;
+  365   3              case AP_KEY_PLAY | AP_KEY_UP:
+  366   3                  deal_play_msg();
+  367   3                  break;
+  368   3      
+  369   3              case AP_KEY_MODE | AP_KEY_UP:
+  370   3                  result = RESULT_MAIN;
+  371   3                  break;
+  372   3              case AP_KEY_MODE | AP_KEY_LONG:
+  373   3                  longkey_flag = 1;
+  374   3                  result = deal_mode_msg();
+  375   3                  if (result != RESULT_MAIN)
+  376   3                  {
+  377   4                      result = NULL;
+  378   4                  }
+  379   3                  break;
+  380   3              case AP_KEY_CLOCK | AP_KEY_UP:
+  381   3                  if (rec_status == rec_stop)
+  382   3                  {
+  383   4                      result = set_clock_ui(1);
+  384   4                      if (result != 0)
+  385   4                      {
+  386   5                          return result;
+  387   5                      }
+  388   4      #if defined(RECORD_AP)
+C251 COMPILER V4.55,  show_rec                                                             23/05/16  10:42:20  PAGE 7   
+
+                               //处理TTS播报时卡或u盘拔出没有及时处理的情况
+                               if(result == AP_MSG_SD_OUT || result == AP_MSG_UH_OUT)
+                               {
+                                   result = deal_mode_msg();
+                               }
+               #endif
+  395   4                      SetCurUI_Type(RecStop_UI);
+  396   4                  }
+  397   3                  break;
+  398   3              case AP_KEY_CLOCK | AP_KEY_LONG:
+  399   3      #if defined(RECORD_AP)
+                           longkey_flag = 1;
+                           if (rec_status == rec_stop)
+                           {
+                               result = deal_clock_report();
+                           }
+               #endif
+  406   3                  break;
+  407   3              case AP_KEY_AUTOSLEEP | AP_KEY_UP:
+  408   3                  if (rec_status == rec_stop)
+  409   3                  {
+  410   4                      set_autosleep_time(Key_None);
+  411   4                  }
+  412   3                  break;
+  413   3              case AP_MSG_SD_OUT:
+  414   3                  if (g_record_vars.location.disk == g_disk_char[1])
+  415   3                  {
+  416   4                      rec_status = rec_start;
+  417   4                      stop_rec(0);
+  418   4                      show_err_msg();
+  419   4                      result = deal_mode_msg();
+  420   4                  }
+  421   3                  break;
+  422   3              case AP_MSG_UH_OUT:
+  423   3                  if (g_record_vars.location.disk == g_disk_char[0])
+  424   3                  {
+  425   4                      rec_status = rec_start;
+  426   4                      stop_rec(0);
+  427   4                      show_err_msg();
+  428   4                      result = deal_mode_msg();
+  429   4                  }
+  430   3                  break;
+  431   3              case AP_MSG_SD_IN:
+  432   3                  if (rec_status != rec_start)
+  433   3                  {
+  434   4                      result = RESULT_MUSIC_CPLAY;
+  435   4                  }
+  436   3                  break;
+  437   3              case AP_MSG_UH_IN:
+  438   3                  if (rec_status != rec_start)
+  439   3                  {
+  440   4                      result = RESULT_MUSIC_UPLAY;
+  441   4                  }
+  442   3                  break;
+  443   3              case AP_MSG_LINEIN_IN:
+  444   3                  if (rec_status != rec_start)
+  445   3                  {
+  446   4                      result = RESULT_LINEIN;
+  447   4                  }
+  448   3                  break;
+  449   3              case AP_KEY_REC | AP_KEY_UP:
+  450   3              case AP_KEY_REC | AP_KEY_LONG:
+  451   3                  if (rec_status == rec_stop)
+  452   3                  {
+  453   4                      result = ap_handle_hotkey(key);
+  454   4                  }
+C251 COMPILER V4.55,  show_rec                                                             23/05/16  10:42:20  PAGE 8   
+
+  455   3                  break;
+  456   3              default:
+  457   3                  result = ap_handle_hotkey(key);
+  458   3                  break;
+  459   3              }//switch
+  460   2              if (result != NULL)
+  461   2              {
+  462   3                  stop_rec(1);
+  463   3                  break;
+  464   3              }
+  465   2              result = deal_recoding_status();
+  466   2              if (result != NULL)
+  467   2              {
+  468   3                  break;
+  469   3              }
+  470   2          }//while(1)
+  471   1      
+  472   1          return result;
+  473   1      }
+  474          #if defined(RECORD_AP)
+               uint8 deal_report_result(uint8 retval)
+               {
+                   if(retval == RESULT_MAIN)
+                   {
+                       return RESULT_MAIN;
+                   }
+                   else if(retval == RESULT_SD_OUT)
+                   {
+                       //原先录音到卡中，播报时拔出卡
+                       if (g_record_vars.location.disk == g_disk_char[1])
+                       {
+                           if(deal_mode_msg() != NULL)
+                           {
+                               return RESULT_MAIN;
+                           }
+                       }
+                       return NULL;
+                   }
+                   else if(retval == RESULT_UHOST_OUT)
+                   {
+                       //原先录音到U盘中，播报时拔出u盘
+                       if (g_record_vars.location.disk == g_disk_char[0])
+                       {
+                           if(deal_mode_msg() != NULL)
+                           {
+                               return RESULT_MAIN;
+                           }
+                       }
+                       return NULL;
+                   }
+               #if 0
+                   else if(retval == AP_MSG_UH_IN)
+                   {
+                       //原先录音到U盘中，播报时拔出u盘再插上u盘
+                       if (g_record_vars.location.disk == g_disk_char[0])
+                       {
+                           if (USBH_Check_Udisk())
+                           {
+                               if (CheckStoreOK() == 0)
+                               {
+                                   return RESULT_MAIN;
+                               }
+                               SetCurUI_Type(RecStop_UI);
+                           }
+                           else if(deal_mode_msg() != NULL)
+                           {
+C251 COMPILER V4.55,  show_rec                                                             23/05/16  10:42:20  PAGE 9   
+
+                               return RESULT_MAIN;
+                           }
+                       }
+                   }
+                   else if(retval == AP_MSG_SD_IN)
+                   {
+                       //原先录音到卡盘中，播报时拔出卡再插上卡
+                       if (g_record_vars.location.disk == g_disk_char[1])
+                       {
+                           if (DRV_DetectUD(1) == 0x20)
+                           {
+                               if (CheckStoreOK() == 0)
+                               {
+                                   return RESULT_MAIN;
+                               }
+                               SetCurUI_Type(RecStop_UI);
+                           }
+                           else if(deal_mode_msg() != NULL)
+                           {
+                               return RESULT_MAIN;
+                           }
+                       }
+                   }
+               #endif
+                   return retval;
+               }
+               uint8 deal_clock_report(void)
+               {
+                   uint8 retval;
+                   disable_adda();
+                   retval = report_time_info(g_record_vars.location.disk, FALSE);
+                   enable_adda();
+                   return deal_report_result(retval);
+               }
+               #endif
+  556          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1369     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

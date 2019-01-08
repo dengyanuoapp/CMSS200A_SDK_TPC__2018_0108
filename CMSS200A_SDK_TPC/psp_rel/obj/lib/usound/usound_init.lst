@@ -1,0 +1,526 @@
+C251 COMPILER V4.55,  usound_init                                                          13/12/18  14:07:01  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE usound_init
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usound\usound_init.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usbsound\usound_init.c XSMALL FUNCTIONS(REENTRANT) ROM(HU
+                    -GE) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\usound_init.lst) OBJECT(..\..\..\obj\lib\usound\us
+                    -ound_init.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              AS260A
+    3           *                            Module: USB Sound
+    4           *                 Copyright(c) 2001-2012 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>            <version >             <desc>
+    9           *      dengtaiping 2012-10-23 16:40     1.0                build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * \file     usound_init.c
+   13           * \brief    .
+   14           * \author   dengtaiping
+   15           * \par      GENERAL DESCRIPTION:
+   16           *               usb、AUDIO等模块初始化
+   17           * \par      EXTERNALIZED FUNCTIONS:
+   18           *               这里描述调用到外面的模块
+   19           *
+   20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
+   21           *
+   22           * \version 1.0
+   23           * \date  2012/10/23
+   24           *******************************************************************************/
+   25          #include "usound_intern.h"
+   26          #include "usound_extern.h"
+   27          #include "gl5115_bit.h"
+   28          
+   29          #define USE_DAC_CH0
+   30          #define USE_ADC_LEFT_CHANNEL
+   31          
+   32          #pragma name(USC_INIT)
+   33          #pragma renamecode(?PR?USC_INIT)
+   34          
+   35          void clear_fir_rds_ram(void)
+   36          {
+   37   1          uint8  i;
+   38   1          uint8  SFR_BANK_bak;
+   39   1          uint8* pFirRdsRamL = (uint8*)0x9640;
+   40   1          uint8* pFirRdsRamH = (uint8*)0x9740;
+   41   1          uint8* tempH = pFirRdsRamH;
+   42   1          uint8* ptempL = pFirRdsRamL;
+   43   1      
+   44   1          SFR_BANK_bak = SFR_BANK;
+   45   1          SFR_BANK = BANK_CMU_RMU;
+   46   1          // enable fir_rds_ram clock
+   47   1          MEMCLKENCTL0_FIR_RDS_RAMClkEn = 1;
+   48   1          // set fir_rds_ram clock to cpu
+   49   1          MEMCLKSELCTL1 &= (~0xc);
+   50   1          for (i=0; i<0xc0; i++) {
+   51   2              *pFirRdsRamL++ = *pFirRdsRamH++ = 0;
+   52   2          }
+   53   1      
+   54   1          // select fir_rds_ram as asrc clock
+   55   1          MEMCLKSELCTL1 = (MEMCLKSELCTL1&(~0xc))|0x4;
+   56   1          SFR_BANK = SFR_BANK_bak;
+   57   1      }
+C251 COMPILER V4.55,  usound_init                                                          13/12/18  14:07:01  PAGE 2   
+
+   58          
+   59          void clear_fir_cs_ram(void)
+   60          {
+   61   1          uint16 i;
+   62   1          uint8  SFR_BANK_bak;
+   63   1          uint8* pFirCsRamL = (uint8*)0x4700;
+   64   1          uint8* pFirCsRamM = (uint8*)0x4f00;
+   65   1          uint8* pFirCsRamH = (uint8*)0x5700;
+   66   1          SFR_BANK_bak = SFR_BANK;
+   67   1          SFR_BANK = BANK_CMU_RMU;
+   68   1          // enable fir_cs_ram clock
+   69   1          MEMCLKENCTL0_FIR_CS_RAMClkEn = 1;
+   70   1          // set fir_rds_ram clock to cpu
+   71   1          MEMCLKSELCTL0 &= 0xcf;
+   72   1          for(i=0;i<0x100;i++) {
+   73   2              *pFirCsRamL++ = *pFirCsRamM++ = *pFirCsRamH++ =0;
+   74   2          }
+   75   1          // set fir_cs_ram clock to asrc
+   76   1          MEMCLKSELCTL0 |= 0x10;
+   77   1          SFR_BANK = SFR_BANK_bak;
+   78   1      }
+   79          
+   80          void src(uint8 SrcType)
+   81          {
+   82   1          uint32 i = 0;
+   83   1          uint8 SFR_BANK_bak;
+   84   1      
+   85   1          SFR_BANK_bak = SFR_BANK;
+   86   1          SFR_BANK = BANK_CMU_RMU;
+   87   1          // reset asrc controller
+   88   1          MRCR3_ASRCReset = 0;
+   89   1          // enable asrc controller clock
+   90   1          CLKENCTL2_ASRCCLKEN = 1;
+   91   1      #if 1 //#ifdef USE_PLL
+   92   1          ADC_DAC_CLK_CTL_ASRCCLKSEL = 1;
+   93   1      #else
+                   ADC_DAC_CLK_CTL_ASRCCLKSEL = 0;
+               #endif
+   96   1           
+   97   1          SFR_BANK = 0x13;
+   98   1          // disable DAC Channel 0 SR Fine Tune
+   99   1          DAC_CH0_SRFT_CTL0_DA0SRFTEN = 0;
+  100   1          // disable DAC Channel 1 SR Fine Tune
+  101   1          DAC_CH1_SRFT_CTL0_DA1SRFTEN = 0;
+  102   1          // config asrc mode : half empty/ half full is from auip pcmram
+  103   1          DAC_CH0_SRFT_CTL0 &= (~0x18);
+  104   1          //DAC_CH1_SRFT_CTL1 &= (~0x18);
+  105   1          DAC_CH1_SRFT_CTL0 &= (~0x18);
+  106   1      #ifdef USE_DAC_CH0
+  107   1          clear_fir_rds_ram();
+  108   1          DAC_CH0_SR_CTL = (DAC_CH0_SR_CTL&0xf8)|SrcType;
+  109   1      
+  110   1          //DAC_CH0_SRFT_CTL1 = 0x24; //48M配置不会断音
+  111   1          //DAC_CH0_SRFT_CTL2 = 0x00;
+  112   1          DAC_CH0_SRFT_CTL1 = 0x20;  //52M配置不会断音
+  113   1          DAC_CH0_SRFT_CTL2 = 0x00;
+  114   1         
+  115   1          DAC_CH0_SRFT_CTL3 = 0x20;
+  116   1          DAC_CH0_SRFT_CTL4 = 0x80;
+  117   1          DAC_CH0_SR_GAIN = 0x9b;//0xab; //+0db gain // +6dB gain
+  118   1              // enable DAC Channel 0 SR Fine Tune
+  119   1          DAC_CH0_SRFT_CTL0_DA0SRFTEN = 1;
+  120   1      #else
+                   clear_fir_cs_ram();
+                   DAC_CH1_SR_CTL = (DAC_CH1_SR_CTL&0xf8)|SrcType;
+                   DAC_CH1_SRFT_CTL1 = 0x1f;
+C251 COMPILER V4.55,  usound_init                                                          13/12/18  14:07:01  PAGE 3   
+
+                   DAC_CH1_SRFT_CTL2 = 0x80;
+                   DAC_CH1_SRFT_CTL3 = 0x20;
+                   DAC_CH1_SRFT_CTL4 = 0x80;
+                   DAC_CH1_SR_GAIN = 0xab; // +6dB gain
+                   // enable DAC Channel 1 SR Fine Tune
+                   DAC_CH1_SRFT_CTL0_DA1SRFTEN = 1;
+               #endif
+  131   1      
+  132   1          SFR_BANK = BANK_CMU_RMU;
+  133   1          // enable asrc module
+  134   1          MRCR3_ASRCReset = 1;
+  135   1          SFR_BANK = SFR_BANK_bak;
+  136   1      }
+  137          
+  138          void set_dac_samplerate(uint8 nSampleRateIndex)
+  139          {
+  140   1          switch(nSampleRateIndex)
+  141   1          {   
+  142   2      //        case SAMPLE_48K:
+  143   2              case SAMPLE_96K:
+  144   2                  src(K_SRC_1_2);
+  145   2                  break;
+  146   2              default:
+  147   2                  break;
+  148   2          }
+  149   1      }
+  150          
+  151          /******************************************************************************/
+  152          /*!
+  153           * \par  Description:
+  154           *     ADC、DAC init.
+  155           * \param[in]    none.
+  156           * \param[out]   none.
+  157           * \return       none
+  158          
+  159           * \ingroup      module name
+  160           * \par          exmaple code
+  161           * \code
+  162           *               list example code in here
+  163           * \endcode
+  164           *******************************************************************************/
+  165          void ADC_DAC_init(void)
+  166          {
+  167   1          uint8 sfr_temp = SFR_BANK;
+  168   1      
+  169   1              //vcc set to 3.1v
+  170   1              SFR_BANK = BANK_PMU;
+  171   1              VOUT_CTL &= ~(0x07<<4);
+  172   1              VOUT_CTL |= 0x05<<4;
+  173   1      
+  174   1          SFR_BANK = BANK_CMU_RMU;
+  175   1          MCU_PLL_CTL = 0xad;//0xaf;//0xac;//0xad;//0xae;//0xaf;
+  176   1      
+  177   1          CLKENCTL0 |= 0x30;  // enable DAC & ADC clock
+  178   1              //CLKENCTL2 = 0x0;
+  179   1          //CLKENCTL2 |= 0x20; //enable dma clock
+  180   1          MRCR2 &= 0x0f;
+  181   1          MRCR2 |= 0x30;      // set DAC & ADC to normal mode
+  182   1          MRCR3 &= 0xfe; //reset ASRC
+  183   1      
+  184   1          ADC_DAC_CLK_CTL &= 0x88;
+  185   1          if(SAMPLE_48K == gud_param.record_sample_rate)
+  186   1          {
+  187   2              ADC_DAC_CLK_CTL |= 0x10;//0x12;//0x10; //48k //0x40; //16k
+  188   2              g_record_packet_size = 96;
+  189   2          }
+C251 COMPILER V4.55,  usound_init                                                          13/12/18  14:07:01  PAGE 4   
+
+  190   1          else
+  191   1          {
+  192   2              ADC_DAC_CLK_CTL |= 0x40; //48k //0x40; //16k
+  193   2              g_record_packet_size = 32;
+  194   2          }
+  195   1          
+  196   1          AUDIO_PLL_CTL &= 0xb0;
+  197   1          if (gud_param.play_sample_rate == SAMPLE_44K1)
+  198   1          {
+  199   2             AUDIO_PLL_CTL |= 0x05; //0x0d; //44.4k or 48k download
+  200   2          }
+  201   1          else
+  202   1          {
+  203   2             AUDIO_PLL_CTL |= 0x0d;//0x0d;//0x09; //0x0d; //44.4k or 48k download
+  204   2          }
+  205   1          AUDIO_PLL_CTL |= 0x01;
+  206   1      
+  207   1          SFR_BANK = BANK_AUIP;
+  208   1      
+  209   1          DAC_VOLUME0 = 0x9b;
+  210   1          DAC_VOLUME1 = 0x9b;
+  211   1      
+  212   1      #ifdef USE_DAC_CH0
+  213   1          //DAC_CH0_FIFO_CTL0 &= 0xee; //to dac
+  214   1          //DAC_CH0_FIFO_CTL0 &= (~0xe);
+  215   1          DAC_CH0_FIFO_CTL0 &= 0xe0;
+  216   1          DAC_CH0_FIFO_CTL0 |= 0x06; //from dma
+  217   1          DAC_CH0_FIFO_CTL1 |= 0x04; //enable drq
+  218   1      #else
+                   DAC_CH1_FIFO_CTL0 &= 0xee; //to dac
+                   DAC_CH1_FIFO_CTL0 &= (~0xe);
+                   DAC_CH1_FIFO_CTL0 |= 0x06; //from dma
+                   DAC_CH1_FIFO_CTL1 |= 0x04; //enable drq
+               #endif
+  224   1      
+  225   1          //init adc
+  226   1          AINOP_CTL = (AINOP_CTL & 0xf8) | 0x01; //aux and mic
+  227   1          ADC_GAIN0 &= 0xe7; //ain0op disable
+  228   1          ADC_GAIN1 |= 0x30;
+  229   1          AINOP_CTL &= 0xf7; //ain op1 gain boost disable
+  230   1          ADC_GAIN0 = (ADC_GAIN0 & 0xf8) | 0x02; //set ain op0 gain 0db
+  231   1          ADC_GAIN1 = (ADC_GAIN1 & 0xf0) | 0x02; //0x07; //set ain op1 gain 0db
+  232   1          ADC_GAIN1 &= 0x3f; //disable mic mix left to right and right to left
+  233   1              ADC_GAIN1 |= 0x80;
+  234   1          AINOP_CTL &= 0xcf;//0xe7; //disable op0 and op1 zero-cross detect enable
+  235   1      
+  236   1          ADC_CTL0 = 0x00;
+  237   1          ADC_CTL0 |= 0x03;
+  238   1          AINOP_CTL |= 0xc0; //0xc8; //only disable OP1GB bit
+  239   1      
+  240   1          ADC_FIFOCTL1 = 0x10;
+  241   1          ADC_FIFOCTL0 = 0x48;
+  242   1          ADC_FIFOCTL0 |= 0x04;
+  243   1      
+  244   1      #ifdef __USE_ADC_SRFT__
+                   SFR_BANK = BANK_DAC_ADC;
+                   ADC_SRFT_CTL0 |= 0x08;
+                   ADC_SRFT_CTL1 = 0x20; //+/- 0.4%
+                   ADC_SRFT_CTL2 = 0x20;
+                   ADC_SRFT_CTL3 = 0x1f;
+                   ADC_SRFT_CTL4 = 0xdf;
+               
+                   SFR_BANK = BANK_CMU_RMU; //enable aa_ram cs_ram clock
+                   MEMCLKENCTL0 |= 0x30;
+                   MEMCLKSELCTL0 &= 0xf3;
+               
+C251 COMPILER V4.55,  usound_init                                                          13/12/18  14:07:01  PAGE 5   
+
+                   for (i = 0; i < 0x40; i++) //init aa_ram
+                   {
+                       *((uint8 *) (0x9600 + i)) = 0;
+                       *((uint8 *) (0x9700 + i)) = 0;
+                       *((uint8 *) (0x9800 + i)) = 0;
+                   }
+                   MEMCLKSELCTL0 |= 0x04;
+               
+                   SFR_BANK = BANK_DAC_ADC;
+                   ADC_SRFT_CTL0 = (ADC_SRFT_CTL0 & 0xf9) | 0x02;
+                   ADC_SRFT_CTL0 |= 0x01;
+               
+                   for (i = 0; i < 0xff; i++)
+                   {
+                       ;
+                   }
+               
+                   SFR_BANK = BANK_CMU_RMU;
+                   MRCR3 |= 0x01;
+               #endif
+  276   1      
+  277   1          SFR_BANK = BANK_AUIP;
+  278   1          I2S_CTL1 = 0x00;
+  279   1          DAC_ANALOG0 |= 0x10;
+  280   1          PA_APCTL |= 0x02;
+  281   1          DAC_ANALOG0 &= 0xf7;
+  282   1          DDV_CTL0 |= 0x10;    //全能直驱
+  283   1      //      DDV_CTL0 = 0xf7;
+  284   1          pa_volume_bak = PA_VOLUME;
+  285   1          PA_VOLUME = 0x06;
+  286   1          // dac l&r enable, dac not mute
+  287   1          DAC_ANALOG0 |= 0xc1;
+  288   1          // OSR 32X
+  289   1          DAC_CTL &= 0x3f;
+  290   1          // disable Zero Cross Detection
+  291   1          DAC_CH0_FIFO_CTL0 &= 0x2f;
+  292   1      #ifdef USE_DAC_CH0
+  293   1          // dac en, dac if en, dac ch0 mix en
+  294   1          DAC_CTL |= 0x13;
+  295   1          // en dac fifo
+  296   1          DAC_CH0_FIFO_CTL0 |= 0x01;
+  297   1      #else
+                   // dac en, dac if en, dac ch1 mix en
+                   DAC_CTL |= 0x23;
+                   // en dac fifo
+                   DAC_CH1_FIFO_CTL0 |= 0x01;
+               #endif
+  303   1      
+  304   1          set_dac_samplerate(gud_param.play_sample_rate);
+  305   1      
+  306   1          SFR_BANK = sfr_temp;
+  307   1      }
+  308          
+  309          /*
+  310           ********************************************************************************
+  311           *                           OTG_PHY_Setting
+  312           * Description : USB PHY设置
+  313           * Arguments   : d: address; e: value.
+  314           * Returns     : none
+  315           * Notes       : FPGA version, Just for GL6005 PHY setting.
+  316           ********************************************************************************
+  317           */
+  318          
+  319          /*
+  320          OTG_PHY_Setting(0xe7, 0x0b);
+  321          OTG_PHY_Setting(0xe7, 0x1f);
+C251 COMPILER V4.55,  usound_init                                                          13/12/18  14:07:01  PAGE 6   
+
+  322          OTG_PHY_Setting(0xe0, 0xa3);
+  323          OTG_PHY_Setting(0xe3, 0x9b);
+  324          
+  325          
+  326          
+  327          
+  328          void OTG_PHY_Setting(unsigned char addr, unsigned char value)
+  329          {
+  330              unsigned char tmp;
+  331          
+  332              VDSTAT = value; //set Value
+  333          
+  334              tmp = addr;
+  335              VDCTRL = tmp & 0x0f; //set low addr
+  336              usdelay(5);
+  337              // mdelay(1);
+  338              VDCTRL = tmp | 0x10;
+  339              usdelay(5);
+  340              // mdelay(1);
+  341          
+  342              tmp = (addr >> 4);
+  343              VDCTRL = tmp & 0x0f; //set high addr
+  344              usdelay(5);
+  345              // mdelay(1);
+  346              VDCTRL = tmp | 0x10;
+  347              usdelay(5);
+  348              // mdelay(1);
+  349          
+  350          }*/
+  351          
+  352          void OTG_PHY_Setting(unsigned char addr, unsigned char value)
+  353          {
+  354   1          unsigned char tmp;
+  355   1      
+  356   1          VDSTAT = value; //set Value
+  357   1      
+  358   1          tmp = addr;
+  359   1          VDCTRL = tmp & 0x0f; //set low addr
+  360   1          VDCTRL = tmp | 0x10;
+  361   1      
+  362   1          tmp = (addr >> 4);
+  363   1          VDCTRL = tmp & 0x0f; //set high addr
+  364   1          VDCTRL = tmp | 0x10;
+  365   1      }
+  366          
+  367          /******************************************************************************/
+  368          /*!
+  369           * \par  Description:
+  370           *     usb module deinit.
+  371           * \param[in]    none.
+  372           * \param[out]   none.
+  373           * \return       1:sucess, 0:fail
+  374          
+  375           * \ingroup      module name
+  376           * \par          exmaple code
+  377           * \code
+  378           *               list example code in here
+  379           * \endcode
+  380           *******************************************************************************/
+  381          uint8 usound_init(usound_param *pud_param)
+  382          {
+  383   1          uint8 ret_var;
+  384   1          uint8 sfr_temp = SFR_BANK;
+  385   1      
+  386   1          SFR_BANK = BANK_CMU_RMU;
+  387   1          MRCR2 &= 0xf3;
+C251 COMPILER V4.55,  usound_init                                                          13/12/18  14:07:01  PAGE 7   
+
+  388   1          muram_addr = MemBankCtl & 0x08; //save MURAM_ADDR
+  389   1          MemBankCtl |= 0x08;
+  390   1          MEMCLKENCTL0 |= 0xcb;//0x8b; //enable pcmram、fir_rds_ram、uram 、fir_mpx_ram clock
+  391   1          MEMCLKSELCTL0 &= 0x3c; //0xfc; //link fir_mpx_ram to cpu clock
+  392   1          MEMCLKSELCTL1 &= 0x70;
+  393   1          MEMCLKSELCTL1 |= 0x87;//0x80;//0x03;//0x84;//0x87;//0x8c;//link fir_rds_ram、uram to uram_clock,  lin
+             -k pcmram to cpu clock
+  394   1          CLKENCTL1 |= 0x40; //enable usb clock
+  395   1          CLKENCTL2 |= 0x20; //enable dma clock
+  396   1      
+  397   1          MRCR2 = MRCR2 | 0x01; //reset DMA
+  398   1          MRCR2 = MRCR2 | 0x04; //reset usb module
+  399   1          mdelay(1);
+  400   1      
+  401   1          SFR_BANK = BANK_USB;
+  402   1          USB_Efuse_Ref &= 0xbf; //usb operation mode
+  403   1          USB_PHYCTRL &= 0x3f;
+  404   1          mdelay(1);
+  405   1      
+  406   1          SFR_BANK = BANK_PMU;
+  407   1          MULTI_USED |= 0x80; //enable UVDD
+  408   1      
+  409   1          SFR_BANK = BANK_USB;
+  410   1          DPDMCTRL |= 0x1f; //enable status detect and 500k pullup
+  411   1          mdelay(1);
+  412   1          IDVBUSCTRL = 0x1f;
+  413   1      
+  414   1          SFR_BANK = BANK_CMU_RMU;
+  415   1          MRCR2 = MRCR2 | 0x08; //reset usb module
+  416   1      
+  417   1          SFR_BANK = BANK_USB;
+  418   1          while (0x01 == (USBSTATUS & 0x01))
+  419   1          {
+  420   2              ; /*do nothing*/
+  421   2          }
+  422   1          BKDOOR = BKDOOR | 0x80;
+  423   1      
+  424   1          IE0 &= 0x7f;
+  425   1          if ((DPDMCTRL & 0x40) != 0x00)
+  426   1          {
+  427   2              /* enable USB INT */
+  428   2              AIE = AIE | 0x01;
+  429   2      
+  430   2              //phy set
+  431   2              OTG_PHY_Setting(0xe7, 0x0b);
+  432   2              OTG_PHY_Setting(0xe7, 0x1f);
+  433   2              OTG_PHY_Setting(0xe0, 0xa3);
+  434   2              
+  435   2             /* OTG_PHY_Setting(0xe7, 0x4b);
+  436   2              OTG_PHY_Setting(0xe7, 0x5f);
+  437   2              OTG_PHY_Setting(0xe0, 0xb3);
+  438   2              
+  439   2              OTG_PHY_Setting(0xe3, 0x9b);
+  440   2              printh(0x8899);*/
+  441   2              mdelay(1);
+  442   2      
+  443   2              /* Enable USB setup, connect/disconnect interrupt.  */
+  444   2              Usbirq_hcusbirq = 0xff;
+  445   2              Usbien_hcusbien = 0x81;
+  446   2      
+  447   2              Ep03tokirq = 0xa4;
+  448   2              Ep03tokien = 0xa4; //Enable IN1?OUT2?IN3 TOKEN
+  449   2              //Ep03tokien = 0x24;  //endpoint 3 ???????????
+  450   2      
+  451   2              /* Enable USB external Interrupt request.  */
+  452   2              USBEIRQ = 0x80;
+C251 COMPILER V4.55,  usound_init                                                          13/12/18  14:07:01  PAGE 8   
+
+  453   2              USBEIRQ = 0x08;
+  454   2      
+  455   2              UsbCTRL_STUS = 0; //usb connection
+  456   2              ret_var = 1;
+  457   2          }
+  458   1          else
+  459   1          {
+  460   2              ret_var = 0;
+  461   2          }
+  462   1      
+  463   1          memcpy(&gud_param,pud_param,sizeof(gud_param));
+  464   1          descriptor_init(pud_param);
+  465   1          ADC_DAC_init();
+  466   1          usb_isr = IRQ_Intercept((uint32) usound_isr, IRQ_USB);
+  467   1      //#ifdef _USB_RECORD_
+  468   1          dma_adc_isr = IRQ_Intercept((uint32) dma_adc_half_isr, IRQ_DMA1);
+  469   1      //#endif
+  470   1          dma_dac_isr = IRQ_Intercept((uint32) dma_dac_half_isr, IRQ_DMA0);
+  471   1          AIE |= 0x44;
+  472   1          IE0 = IE0 | (uint8) 0x80;
+  473   1          SFR_BANK = sfr_temp;
+  474   1              vol_change_flag=0;
+  475   1          return ret_var;
+  476   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       759     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

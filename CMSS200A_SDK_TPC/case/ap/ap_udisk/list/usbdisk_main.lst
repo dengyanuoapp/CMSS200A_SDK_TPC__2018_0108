@@ -1,0 +1,210 @@
+C251 COMPILER V4.55,  usbdisk_main                                                         13/12/18  16:28:49  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE usbdisk_main
+OBJECT MODULE PLACED IN .\obj\usbdisk_main.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE usbdisk_main.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BR
+                    -OWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 ORDER DEFINE(UDISK_AP) DEBUG PRINT(.\list\usbdisk_main.lst) OBJECT(.\obj\
+                    -usbdisk_main.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              AS211A
+    3           *                            Module: USB MAIN
+    4           *                 Copyright(c) 2001-2010 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *      wanghaijing 2010-3-10         1.0                build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * \file     usbdisk.c
+   13           * \brief
+   14           * \author   wanghaijing
+   15           * \par      GENERAL DESCRIPTION:
+   16           *               ÕâÀï¶ÔÎÄ¼þ½øÐÐÃèÊö
+   17           * \par      EXTERNALIZED FUNCTIONS:
+   18           *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+   19           *
+   20           *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
+   21           *
+   22           * \version 1.0
+   23           * \date  2010-3-10
+   24           *******************************************************************************/
+   25          
+   26          #include "Udisk.h"
+   27          
+   28          #pragma name(AP_MAIN)
+   29          
+   30          uint8 DisplayIndi, UdiskStatus, IRUSBExit;
+   31          uint8 MenuKeyPress;
+   32          uint8 IsCardOut;
+   33          //uint8 ChargeCheckCounter;
+   34          //uint8 gRtcCounter;
+   35          uint8 HoldDispState;
+   36          uint8 reckeypress;
+   37          res_infor_t res_infor[5];
+   38          const uint8 usb_str[] =
+   39          { "USB" };
+   40          int16 main(void)
+   41          {
+   42   1          uint8 para = 0x01;
+   43   1          uint8 dispIndibak = 0xff;
+   44   1          DisplayIndi = 0x00;
+   45   1          IRUSBExit = 0;
+   46   1          /*AP³õÊ¼»¯*/
+   47   1          if (!UDiskInitAll(para))
+   48   1          {
+   49   2              //ÌáÇ°°ÎÏßÍË³ö
+   50   2              UdiskStatus = 0x40;
+   51   2              return UdiskExitAll();
+   52   2          }
+   53   1          while (1)
+   54   1          {
+   55   2              ClearWatchDog();
+   56   2              /*deal message */
+   57   2              MsgManager(DisplayIndi);
+C251 COMPILER V4.55,  usbdisk_main                                                         13/12/18  16:28:49  PAGE 2   
+
+   58   2              if (IsCardOut == 1)
+   59   2              {
+   60   3                  UDiskPullCardOut();
+   61   3                  IsCardOut = 0;
+   62   3              }
+   63   2      
+   64   2              //µ÷ÓÃ×´Ì¬»úÖ´ÐÐÃüÁî
+   65   2              UDiskHandle();
+   66   2              //»ñÈ¡USB×´Ì¬
+   67   2              //0:¿ÕÏÐ  10h:ÉÏ´«  20h:ÏÂ´«  30h:µ¯³öÒªÇóÍË³ö  40h:°ÎÏßÒªÇóÍË³ö  50h:ÇÐ»»µ½ÈÍ¼þÉý¼¶Ó¦ÓÃ
+   68   2              //60h:·ÖÇø´¦Àí×´Ì¬  70h:³ö´íÒªÇóÍË³ö  80h:½øÈëSuspend×´Ì¬  90h:ÍË³öSuspend×´Ì¬
+   69   2              UdiskStatus = UDiskGetStatus();
+   70   2              if ((DisplayIndi == 0xff) && (UdiskStatus != 0x80))
+   71   2              {
+   72   3                  //StandbyScreen(1);
+   73   3              }
+   74   2              if ((UdiskStatus == 0x30) || (UdiskStatus == 0x40) || (UdiskStatus == 0x50) || (UdiskStatus == 0x
+             -70))
+   75   2              {
+   76   3                  break;
+   77   3              }
+   78   2      
+   79   2              switch (UdiskStatus)
+   80   2              {
+   81   3              case 0: //¿ÕÏÐ
+   82   3                  if (DisplayIndi != 0x00)
+   83   3                  {
+   84   4                      DisplayIndi = 0x00;
+   85   4                  }
+   86   3      #ifdef  BACKLIGHTCTL
+                           if(KeyMsg == 1)
+                           {
+                               Scrcounter = 0;
+                               KeyMsg = 0;
+                               LightOnOff(1);
+                           }
+               #endif
+   94   3                  break;
+   95   3      
+   96   3              case 0x10: //ÉÏ´«
+   97   3                  if (DisplayIndi != 0x01)
+   98   3                  {
+   99   4                      DisplayIndi = 0x01;
+  100   4                  }
+  101   3                  break;
+  102   3      
+  103   3              case 0x11://ÏÔÊ¾Commu
+  104   3              case 0x21://ÏÔÊ¾DownLoad
+  105   3              case 0x31://ÏÔÊ¾UpLoad
+  106   3              case 0x41://ÏÔÊ¾Succ
+  107   3              case 0x61://ÏÔÊ¾Succ£¬ÍË³ö
+  108   3                  DisplayIndi = UdiskStatus >> 4;
+  109   3                  if (UdiskStatus == 0x61)
+  110   3                  {
+  111   4                      DisplayIndi -= 1;
+  112   4                  }
+  113   3                  DisplayIndi += 0x10;
+  114   3                  if (dispIndibak != DisplayIndi)
+  115   3                  {
+  116   4                      dispIndibak = DisplayIndi;
+  117   4                  }
+  118   3                  break;
+  119   3      
+  120   3              case 0x51: //ÇÐ»»µ½adfu
+  121   3                  //¹Ø¼üÅÌºÍRTCÖÐ¶Ï
+  122   3                  IE0 = IE0 & 0xf7;
+C251 COMPILER V4.55,  usbdisk_main                                                         13/12/18  16:28:49  PAGE 3   
+
+  123   3                  DisplayIndi = 0x10;
+  124   3                  //±£Ö¤Ö»ÏÔÊ¾Ò»´Î
+  125   3                  if (dispIndibak != DisplayIndi)
+  126   3                  {
+  127   4                      dispIndibak = DisplayIndi;
+  128   4                  }
+  129   3                  break;
+  130   3      
+  131   3              case 0x20: //ÏÂ´«
+  132   3                  if (DisplayIndi != 0x02)
+  133   3                  {
+  134   4                      DisplayIndi = 0x02;
+  135   4                      Display(DisplayIndi);
+  136   4                  }
+  137   3                  break;
+  138   3      
+  139   3              case 0x80: //½øÈësuspend
+  140   3                  DisplayIndi = 0xff;
+  141   3                  break;
+  142   3      
+  143   3              case 0x90: //ÍË³öSuspend×´Ì¬
+  144   3                  //StandbyScreen(1);
+  145   3                  //SetContrast(g_comval.DisplayContrast);
+  146   3                  break;
+  147   3      
+  148   3              default:
+  149   3                  break;
+  150   3              }
+  151   2              if (((MenuKeyPress == 1) && (UdiskStatus == 0)) || (UdiskStatus == 0x90) || (IRUSBExit == 1))// ¶
+             -ÔÓ¦ºìÍâÒ£¿ØÉÏÃæµÄPower¼ü
+  152   2              {
+  153   3                  longkey_flag = 1;
+  154   3                  break;
+  155   3              }
+  156   2              else
+  157   2              {
+  158   3                  MenuKeyPress = 0;
+  159   3              }
+  160   2          }/*end of while loop*/
+  161   1      
+  162   1      #ifdef  BACKLIGHTCTL
+                   LightOnOff(1);
+               #endif
+  165   1      
+  166   1          return UdiskExitAll();
+  167   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       336     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        72     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =         4     ------
+End of Module Information.
+
+C251 COMPILER V4.55,  usbdisk_main                                                         13/12/18  16:28:49  PAGE 4   
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

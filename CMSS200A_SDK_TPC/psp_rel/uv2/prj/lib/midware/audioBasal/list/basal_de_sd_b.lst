@@ -1,0 +1,247 @@
+C251 COMPILER V4.55,  basal_de_sd_b                                                        13/12/18  16:27:23  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE basal_de_sd_b
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\basal\basal_de_sd_b.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\audioBasal\basal_de_sd_b.c XSMALL FUNCTIONS
+                    -(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) INCDIR(..\..\..\..\..\inc) DEBUG PRINT(.\list\basal_de_sd_b.lst) OBJECT(..\..\..
+                    -\..\obj\lib\basal\basal_de_sd_b.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              USDK 5102
+    3           *                            Module: POWER MANAGER
+    4           *                 Copyright(c) 2001-2009 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *      wuyueqian     2009-9-07 9:42     1.0             build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * file
+   13           * brief
+   14           * Author   wuyueqian
+   15           * par
+   16           *
+   17           *      Copyright(c) 2001-2007 Actions Semiconductor, All Rights Reserved.
+   18           *
+   19           * version 1.0
+   20           * date  2008/6/12
+   21           *******************************************************************************/
+   22          #include "basal.h"
+   23          #include "decC.h"
+   24          
+   25          #ifdef PC
+               extern void decAudioIntSub(void);
+               extern void decDMAIntSub(void);
+               extern void decTimerIntSub(void);
+               #endif
+   30          
+   31          #pragma name(MW_BS_AD_CMD1_SD)
+   32          
+   33          #define DECODE_BUFFER_ADDRESS_NORMAL 0x0d80//0x1800
+   34          #define WRONG_DECODE_FILE_TYPE 0xf0
+   35          
+   36          
+   37          extern SD_FILE *m_deSd_Fp;
+   38          extern Open_param_t *m_deSdOpenparam;//参数表地址
+   39          
+   40          //extern uint32 deSdBpointerSave;
+   41          extern uint32 deSdBreakPointSave;
+   42          //extern decBreakPointInfor_t m_SdbreakPointInfo;
+   43          //extern uint32 deSdApointerSave;
+   44          extern uint32 deSdFilepages;
+   45          //extern BYTE m_Sdbackupmode;
+   46          extern play_status_t Sdplay_status;
+   47          //extern bool m_deSdABok_sav;
+   48          extern BYTE *m_deSdDataBuffer;
+   49          extern uint32 m_deSdOldDspIntAddrSav;
+   50          extern uint32 m_deSdOldDmaIntAddrSav;
+   51          extern time_t m_SdTotaltimelength;
+   52          extern uint8 m_deSdcTimer_Sav;
+   53          
+   54          bool SdLoadCommand(BYTE music_type, void *param);
+   55          bool SdStopCommand(void *param);
+   56          bool SdPlayCommand(void *param);
+   57          bool SdCaltimeCommand(void *param);
+C251 COMPILER V4.55,  basal_de_sd_b                                                        13/12/18  16:27:23  PAGE 2   
+
+   58          bool SdRestoreCommand(void);
+   59          bool SdBackupCommand(void);
+   60          //bool APointPlayCommand(void);
+   61          
+   62          #ifndef PC
+   63          //#pragma ROM(large)
+   64          extern uint8 m_deSdRead_Data(uchar readFileDirection, DWORD position);
+   65          //#pragma ROM(huge)
+   66          #else
+               extern uint8 m_deSdRead_Data(uchar readFileDirection, DWORD position);
+               #endif
+   69          
+   70          #pragma renamecode(MW_BS_AD_CMD1_SD)
+   71          
+   72          /*************************************************************************
+   73           * SdLoadCommand 初始化codec用的全局变量g_decInitPara，
+   74           * 包括codec的buffer、dma中断的hook函数、歌曲文件的第一帧数据地址等等
+   75           ****************************************************************************/
+   76          bool SdLoadCommand(BYTE music_type, void *param)
+   77          {
+   78   1          //    BankSwitch(BYTE2_OF(m_deSdRead_Data));
+   79   1          //    BankSwitch(BYTE2_OF(decAudioIntSub));
+   80   1      
+   81   1          m_deSdDataBuffer = (BYTE *) DECODE_BUFFER_ADDRESS_NORMAL;
+   82   1      
+   83   1          g_decReadFilePara.ReadFileHandleHook = (DWORD) m_deSdRead_Data;
+   84   1          g_decReadFilePara.ReadFileBuffAddr = (DWORD) (m_deSdDataBuffer);
+   85   1          g_decControlInfor.SongType = music_type;
+   86   1      
+   87   1          if (m_deSdOpenparam != NULL)
+   88   1          {
+   89   2              g_decSongInfor.FileHDRLen = m_deSdOpenparam->musicframeoffset;
+   90   2              memcpy(&m_SdTotaltimelength, &(m_deSdOpenparam->musictotaltime), sizeof(time_t));
+   91   2          }
+   92   1          else
+   93   1          {
+   94   2              g_decSongInfor.FileHDRLen = 512;
+   95   2          }
+   96   1          Sdplay_status.speed = 0x00;
+   97   1      
+   98   1      
+   99   1          Sdplay_status.status = PLAYING_STOP;
+  100   1      
+  101   1          m_SdTotaltimelength.second = 0;
+  102   1          m_SdTotaltimelength.minute = 0;
+  103   1          m_SdTotaltimelength.hour = 0;
+  104   1      
+  105   1          if (m_deSdOpenparam != NULL)
+  106   1          {
+  107   2              m_deSd_Fp = SD_FOpen(m_deSdOpenparam->filename, FS_OPEN_NORMAL);
+  108   2          }
+  109   1          else
+  110   1          {
+  111   2              m_deSd_Fp = SD_FOpen((uint8 *) param, FS_OPEN_NORMAL);
+  112   2          }
+  113   1          if (m_deSd_Fp == NULL)
+  114   1          {
+  115   2              Sdplay_status.status = PLAYING_ERROR;
+  116   2              return FALSE;
+  117   2          }
+  118   1          {
+  119   2              /* uint32 EndPageLen;//最后一个PAGE的字节数
+  120   2               EndPageLen = (uint32)FS_GetUnalignedLen(m_deSd_Fp);//取最后一个PAGE的BYTE数
+  121   2               deSdFilepages = (uint32)FS_GetFileLen(m_deSd_Fp);
+  122   2               g_decReadFilePara.FileLen = (((uint32)deSdFilepages)<<9); //* 512;
+  123   2      
+C251 COMPILER V4.55,  basal_de_sd_b                                                        13/12/18  16:27:23  PAGE 3   
+
+  124   2               //处理文件尾不是整PAGE的数据,一页一页传送
+  125   2               if (EndPageLen != 0)
+  126   2               {
+  127   2                   g_decReadFilePara.FileLen = g_decReadFilePara.FileLen - 512 + EndPageLen;
+  128   2               }               */
+  129   2          }
+  130   1          g_decReadFilePara.FileLen = m_deSd_Fp->endaddr - m_deSd_Fp->startaddr;
+  131   1          deSdFilepages = (g_decReadFilePara.FileLen) >> 9;
+  132   1          if (g_decReadFilePara.FileLen == 0)
+  133   1          {
+  134   2              Sdplay_status.status = PLAYING_ERROR;
+  135   2              return FALSE;
+  136   2          }
+  137   1          return TRUE;
+  138   1      
+  139   1      }
+  140          
+  141          /*************************************************************************
+  142           * SdStopCommand 停止播放
+  143           *1 g_decReadFilePara.ReadFilePages在dma hook中被赋值 = deSdBreakPointSave
+  144           ****************************************************************************/
+  145          
+  146          bool SdStopCommand(void *param)
+  147          {
+  148   1          param = param;
+  149   1          while (!decExit())
+  150   1          {
+  151   2              ; //qac
+  152   2          }
+  153   1          TM_KillTimer(m_deSdcTimer_Sav);
+  154   1          IRQ_Release(m_deSdOldDspIntAddrSav, IRQ_DSP);
+  155   1          IRQ_Release(m_deSdOldDmaIntAddrSav, IRQ_DMA2);
+  156   1      
+  157   1          Sdplay_status.status = PLAYING_STOP;
+  158   1          return TRUE;
+  159   1      }
+  160          
+  161          /*************************************************************************
+  162           * SdPlayCommand 播放
+  163           *
+  164           ****************************************************************************/
+  165          bool SdPlayCommand(void *param)
+  166          {
+  167   1          if (Sdplay_status.status == PLAYING_ERROR)
+  168   1          {
+  169   2              return FALSE;
+  170   2          }
+  171   1          if (Sdplay_status.status == PLAYING_PAUSE)
+  172   1          {
+  173   2              decContinue();
+  174   2              Sdplay_status.status = PLAYING_PLAYING;
+  175   2              return TRUE;
+  176   2          }
+  177   1      
+  178   1          Sdplay_status.status = PLAYING_PLAYING;//默认为播放状态
+  179   1          if ((uint8) param == Nor_Break_open)
+  180   1          {
+  181   2              SdRestoreCommand();
+  182   2              if (deSdBreakPointSave < deSdFilepages)
+  183   2              {
+  184   3                  g_decControlInfor.PlayMode = PLAY_MODE_BREAK;
+  185   3              }
+  186   2              SD_FSeek( m_deSd_Fp, 0, 0);
+  187   2          }
+  188   1          else
+  189   1          {
+C251 COMPILER V4.55,  basal_de_sd_b                                                        13/12/18  16:27:23  PAGE 4   
+
+  190   2              //要从头开始放
+  191   2              g_decControlInfor.PlayMode = PLAY_MODE_NORMAL;
+  192   2              SD_FSeek(m_deSd_Fp, 0, 0);
+  193   2          }
+  194   1          if (m_deSdOpenparam == NULL)
+  195   1          {
+  196   2              g_decControlInfor.PlayMode = PLAY_MODE_AB;//若参数表地址为空则表示为跟读对比播放
+  197   2          }
+  198   1      
+  199   1          decInit();
+  200   1          m_deSdOldDspIntAddrSav = IRQ_Intercept((uint32) decAudioIntSub, IRQ_DSP);
+  201   1          m_deSdOldDmaIntAddrSav = IRQ_Intercept((uint32) decDMAIntSub, IRQ_DMA2);
+  202   1          m_deSdcTimer_Sav = TM_SetTimer((uint32) decTimerIntSub, 2);
+  203   1          decstart();
+  204   1          return TRUE;
+  205   1      }
+  206          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       460     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

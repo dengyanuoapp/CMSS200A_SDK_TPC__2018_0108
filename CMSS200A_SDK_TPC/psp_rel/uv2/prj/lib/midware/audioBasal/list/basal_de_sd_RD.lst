@@ -1,0 +1,158 @@
+C251 COMPILER V4.55,  basal_de_sd_RD                                                       13/12/18  16:27:24  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE basal_de_sd_RD
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\basal\basal_de_sd_RD.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\audioBasal\basal_de_sd_RD.c XSMALL FUNCTION
+                    -S(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) INCDIR(..\..\..\..\..\inc) DEBUG PRINT(.\list\basal_de_sd_RD.lst) OBJECT(..\..\
+                    -..\..\obj\lib\basal\basal_de_sd_RD.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              USDK 5102
+    3           *                            Module: POWER MANAGER
+    4           *                 Copyright(c) 2001-2009 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *    wuyueqian     2009-9-07 9:42     1.0             build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * file
+   13           * brief
+   14           * Author   wuyueqian
+   15           * par
+   16           *
+   17           *      Copyright(c) 2001-2007 Actions Semiconductor, All Rights Reserved.
+   18           *
+   19           * version 1.0
+   20           * date  2008/6/12
+   21           *******************************************************************************/
+   22          
+   23          #include <basal.h>
+   24          #include <decC.h>
+   25          
+   26          #pragma name(MW_BS_AD_CMDR_SD)
+   27          
+   28          
+   29          SD_FILE *m_deSd_Fp;
+   30          Open_param_t *m_deSdOpenparam;
+   31          //uint32 deSdApointerSave;
+   32          //uint32 deSdBpointerSave;
+   33          uint32 deSdBreakPointSave; //当前文件断点的地址保存，一个扇区为单位，m_read_date更新
+   34          //decBreakPointInfor_t m_SdbreakPointInfo;//只保存一次断点信息，例如A点
+   35          uint32 deSdFilepages;//当前播放文件总页数
+   36          //BYTE m_Sdbackupmode;
+   37          play_status_t Sdplay_status;
+   38          BYTE *m_deSdDataBuffer; //[512];//解码时用的BUFFER
+   39          uint32 m_deSdOldDspIntAddrSav;//保存旧的INT地址
+   40          uint32 m_deSdOldDmaIntAddrSav;
+   41          uint8 m_deSdcTimer_Sav;
+   42          time_t m_SdTotaltimelength;
+   43          //bool m_deSdABok_sav;
+   44          
+   45          #define READ_SECTOR_BYTE_NUMBER 512
+   46          #define MOVE_BACKWARD_ONE_PAGE_FLAG  0x22
+   47          #define MOVE_FORWARD_ONE_PAGE_FLAG 0x11
+   48          #define RANDOM_CHOOSE_ONE_PAGE_FLAG 0x33
+   49          
+   50          #define ONE_PAGE_BITNUM 9
+   51          
+   52          #ifndef PC
+   53          #pragma ROM(large)
+   54          //void GetSDErrorTYPE(void);
+   55          #pragma ROM(huge)
+   56          #else
+               //void GetSDErrorTYPE(void);
+C251 COMPILER V4.55,  basal_de_sd_RD                                                       13/12/18  16:27:24  PAGE 2   
+
+               //decBreakPointInfor_t g_decBreakPointInfor;
+               #endif
+   60          
+   61          #pragma renamecode(MW_BS_AD_CMDR_SD)
+   62          
+   63          #pragma ROM(huge)
+   64          uint8 m_deSdRead_Data(uchar readFileDirection, uint32 position)
+   65          {
+   66   1          bool result = TRUE;
+   67   1          int16 readLen = 0;
+   68   1          uint32 posPage = 0;
+   69   1          uint32 posDistance = 0;
+   70   1          uint32 decurpos;
+   71   1          ClearWatchDog();
+   72   1          position = position;
+   73   1      
+   74   1          //断点记录的是解码过的信息
+   75   1          if ((Sdplay_status.status == PLAYING_REACH_END) || (Sdplay_status.status == PLAYING_ERROR) ||
+   76   1                  (Sdplay_status.status == PLAYING_REACH_HEAD))
+   77   1          {
+   78   2              return 0xff;
+   79   2          }
+   80   1      
+   81   1          decurpos = (uint32)(SD_FTell(m_deSd_Fp) - m_deSd_Fp->startaddr); //- 1;
+   82   1          deSdBreakPointSave = (decurpos >> 9);
+   83   1      
+   84   1          if (deSdBreakPointSave >= deSdFilepages)
+   85   1          {
+   86   2              Sdplay_status.status = PLAYING_REACH_END;
+   87   2              return 0xff;
+   88   2          }
+   89   1      
+   90   1          if (MOVE_BACKWARD_ONE_PAGE_FLAG == readFileDirection)
+   91   1          {
+   92   2              result = SD_FSeek(m_deSd_Fp, SEEK_CUR, -512);
+   93   2          }
+   94   1          else if (RANDOM_CHOOSE_ONE_PAGE_FLAG == readFileDirection)
+   95   1          {
+   96   2              //result = SD_FSeek(m_deSd_Fp, SEEK_SET, (int32)position);
+   97   2          }
+   98   1          else
+   99   1          {
+  100   2          }
+  101   1          if (FALSE == result)
+  102   1          {
+  103   2              return FALSE;
+  104   2          }
+  105   1      
+  106   1          readLen = SD_FRead(m_deSd_Fp, m_deSdDataBuffer, 512);
+  107   1      
+  108   1          deSdBreakPointSave = (uint32)(SD_FTell(m_deSd_Fp));
+  109   1          g_decReadFilePara.ReadFileCurAddr = deSdBreakPointSave - m_deSd_Fp->startaddr - 0x200;
+  110   1          if (readLen == 0)
+  111   1          {
+  112   2              return FALSE;
+  113   2          }
+  114   1          return TRUE;
+  115   1      }
+  116          
+  117          #ifndef PC
+  118          #pragma ROM(huge)
+  119          #endif
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+C251 COMPILER V4.55,  basal_de_sd_RD                                                       13/12/18  16:27:24  PAGE 3   
+
+  ecode size           =       205     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        41     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

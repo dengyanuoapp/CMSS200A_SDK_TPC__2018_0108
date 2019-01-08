@@ -1,0 +1,396 @@
+C251 COMPILER V4.55,  enhance_userlist                                                     13/12/18  16:27:40  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE enhance_userlist
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\enhanced\enhance_userlist.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\enhanced\fsel\enhance_userlist.c XSMALL INT
+                    -R2 FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) ORDER INCDIR(..\..\..\..\..\inc) DEFINE(_ACTIVE_USERPL,_ACTIVE_SHUFF
+                    -LE,_ACTIVE_DIRL) DEBUG PRINT(..\..\..\..\obj\lib\enhanced\enhance_userlist.lst) OBJECT(..\..\..\..\obj\lib\enhanced\enha
+                    -nce_userlist.obj) 
+
+stmt  level    source
+
+    1          #include <actos.h>
+    2          #include <enhanced.h>
+    3          #include <stringH.h>
+    4          #include <sysdef.h>
+    5          #include <rand.h>
+    6          
+    7          #pragma name(MO_EH_USERPL)
+    8          uint8 User_ItemTotal;
+    9          uint8 User_ItemCur;
+   10          uint8 User_FirstOffset;
+   11          uint8 User_LastOffset;
+   12          uint8 User_fileoffset;
+   13          uint16 vm1_addr;
+   14          
+   15          extern char MW_User_buffer[512];
+   16          extern uint8  fselError;    // store error id;
+   17          extern uint8  fselMode;    //Mode of select, Sequence, repeat one ...
+   18          extern uint16 fselRandCount;
+   19          extern uint8 fselSetLocationC(file_location_t *location);
+   20          extern uint16 shuffle_next_file(void);
+   21          extern uint16 shuffle_prev_file(void);
+   22          extern bool init_shuffle(uint16 num_total);
+   23          
+   24          #pragma renamecode(MO_EH_USERPL)
+   25          BOOL GetFilebyItem(uint8 *filename, uint16 ItemNum);
+   26          
+   27          static BOOL Read_PL(uint8 offset)
+   28          {
+   29   1          VMRead(MW_User_buffer, vm1_addr + offset / ONE_SEC_FILE * 0x200, 0x200);
+   30   1          return TRUE;
+   31   1      }
+   32          
+   33          
+   34          bool fselGetLocationPL(file_location_t  *location)
+   35          {
+   36   1          //User_fileoffset = 0;
+   37   1          location->PL_Cur = User_ItemCur;
+   38   1          if(Read_PL(User_fileoffset))
+   39   1          {
+   40   2              if(MW_User_buffer[(User_fileoffset % ONE_SEC_FILE)*USER_PLAYLIST_SIZE] == 1)
+   41   2              {
+   42   3                  memcpy(location, MW_User_buffer + (User_fileoffset % ONE_SEC_FILE)*USER_PLAYLIST_SIZE + 1, 38
+             -);
+   43   3                  return TRUE;
+   44   3              }
+   45   2              else
+   46   2              {
+   47   3                  return FALSE;
+   48   3              }
+   49   2          }
+   50   1          else
+   51   1          {
+   52   2              return FALSE;
+   53   2          }
+   54   1      }
+   55          uint8 fselSetLocationPL(file_location_t  *location)
+C251 COMPILER V4.55,  enhance_userlist                                                     13/12/18  16:27:40  PAGE 2   
+
+   56          {
+   57   1          uint8 *dir_buf;
+   58   1          //    handle fp_list;
+   59   1          if(FS_CD(":") == FALSE)
+   60   1          {
+   61   2              return FALSE;
+   62   2          }
+   63   1          dir_buf = (uint8 *)(((uint32)location) + ITEM_LOCATION_SIZE + (EXFAT_INFO_OFFSET - LAST_OFFSET));
+   64   1          FS_SetCurDir_layer(dir_buf);
+   65   1          //if(location->path[0] != ':')
+   66   1          {
+   67   2              if (!FS_SetCurDir(location->ClusterNo))
+   68   2              {
+   69   3                  fselError = FSEL_ERR_SETDIR;                             //Ä¿Â¼²»´æÔÚ
+   70   3                  return FALSE;
+   71   3              }
+   72   2              if (FALSE == FS_SetCurDirEntry(location->DirEntry))
+   73   2              {
+   74   3                  fselError = FSEL_ERR_SETDIR;
+   75   3                  return FALSE;
+   76   3              }
+   77   2      
+   78   2          }
+   79   1          return TRUE;
+   80   1      
+   81   1      }
+   82          bool UserPL_next(char *filename)
+   83          {
+   84   1          uint8 temp;
+   85   1          uint16 temp1;
+   86   1          file_location_t  *tempt;
+   87   1          int result = FALSE;
+   88   1          switch(fselMode)
+   89   1          {
+   90   2          case FSEL_ALL_REPEATONE:  //current file
+   91   2              if(Read_PL(User_fileoffset))
+   92   2              {
+   93   3                  temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+   94   3                  tempt = (file_location_t *)(MW_User_buffer + temp1 + 1);
+   95   3                  if(fselSetLocationPL(tempt))
+   96   3                  {
+   97   4                      memcpy(filename, tempt->filename, 12);
+   98   4                      result = TRUE;
+   99   4                  }
+  100   3              }
+  101   2              break;
+  102   2      
+  103   2          case FSEL_ALL_RANDOM:  //random file in current class
+  104   2              temp1 = shuffle_next_file();
+  105   2              if(temp1 == 0)
+  106   2              {
+  107   3                  init_shuffle(User_ItemTotal);
+  108   3              }
+  109   2              else
+  110   2              {
+  111   3                  result = GetFilebyItem(filename, (uint8)temp1);
+  112   3              }
+  113   2              break;
+  114   2      
+  115   2          case FSEL_DIR_SEQUENCE:
+  116   2          case FSEL_DIR_INTRO:
+  117   2          case FSEL_ALL_SEQUENCE:     //all file sequence select the next file                  if(User_ItemCur
+             -< User_ItemTotal)
+  118   2              if(User_ItemCur < User_ItemTotal)
+  119   2              {
+  120   3                  User_ItemCur++;
+C251 COMPILER V4.55,  enhance_userlist                                                     13/12/18  16:27:40  PAGE 3   
+
+  121   3              }
+  122   2              else
+  123   2              {
+  124   3                  result = FALSE;
+  125   3                  break;
+  126   3              }
+  127   2              if(Read_PL(User_fileoffset))
+  128   2              {
+  129   3                  temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+  130   3                  //memcpy(&temp,temp+MW_User_buffer+NEXT_OFFSET,1);
+  131   3                  temp = *(temp1 + MW_User_buffer + NEXT_OFFSET);
+  132   3                  if((temp / ONE_SEC_FILE) != (User_fileoffset / ONE_SEC_FILE))
+  133   3                  {
+  134   4                      Read_PL(temp);
+  135   4                  }
+  136   3                  User_fileoffset = temp;
+  137   3                  temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+  138   3                  tempt = (file_location_t *)(MW_User_buffer + temp1 + 1);
+  139   3                  if(fselSetLocationPL(tempt))
+  140   3                  {
+  141   4                      memcpy(filename, tempt->filename, 12);
+  142   4                      result = TRUE;
+  143   4                  }
+  144   3      
+  145   3              }
+  146   2              break;
+  147   2      
+  148   2      
+  149   2      
+  150   2      
+  151   2          case FSEL_ALL_REPEATALL:
+  152   2          case FSEL_DIR_REPEATALL:  // in the same class get the file
+  153   2              if(User_ItemCur < User_ItemTotal)
+  154   2              {
+  155   3                  User_ItemCur++;
+  156   3                  if(!Read_PL(User_fileoffset))
+  157   3                  {
+  158   4                      break;
+  159   4                  }
+  160   3                  temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+  161   3                  memcpy(&temp, temp1 + MW_User_buffer + NEXT_OFFSET, 1);
+  162   3                  if((temp / ONE_SEC_FILE) != (User_fileoffset / ONE_SEC_FILE))
+  163   3                  {
+  164   4                      Read_PL(temp);
+  165   4                  }
+  166   3              }
+  167   2              else
+  168   2              {
+  169   3                  User_ItemCur = 1;
+  170   3                  temp = User_FirstOffset;
+  171   3                  Read_PL(temp);
+  172   3              }
+  173   2              User_fileoffset = temp;
+  174   2              temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+  175   2              tempt = (file_location_t *)(MW_User_buffer + temp1 + 1);
+  176   2              if(fselSetLocationPL(tempt))
+  177   2              {
+  178   3                  memcpy(filename, tempt->filename, 12);
+  179   3                  result = TRUE;
+  180   3              }
+  181   2      
+  182   2      
+  183   2              break;
+  184   2      
+  185   2      
+  186   2          default:
+C251 COMPILER V4.55,  enhance_userlist                                                     13/12/18  16:27:40  PAGE 4   
+
+  187   2              return FALSE;
+  188   2          }
+  189   1          return result;
+  190   1      
+  191   1      }
+  192          
+  193          
+  194          bool UserPL_prev(char *filename)
+  195          {
+  196   1          uint8 temp;
+  197   1          uint16 temp1;
+  198   1          file_location_t  *tempt;
+  199   1          int result = FALSE;
+  200   1          switch(fselMode)
+  201   1          {
+  202   2          case FSEL_ALL_REPEATONE:  //current file
+  203   2              if(Read_PL(User_fileoffset))
+  204   2              {
+  205   3                  temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+  206   3                  tempt = (file_location_t *)(MW_User_buffer + temp1 + 1);
+  207   3                  if(fselSetLocationPL(tempt))
+  208   3                  {
+  209   4                      memcpy(filename, tempt->filename, 12);
+  210   4                      result = TRUE;
+  211   4                  }
+  212   3              }
+  213   2      
+  214   2              break;
+  215   2      
+  216   2          case FSEL_ALL_RANDOM:  //random file in current class
+  217   2              temp1 = shuffle_prev_file();
+  218   2              if(temp1 == 0)
+  219   2              {
+  220   3                  init_shuffle(User_ItemTotal);
+  221   3              }
+  222   2              else
+  223   2              {
+  224   3                  result = GetFilebyItem(filename, (uint8)temp1);
+  225   3              }
+  226   2              break;
+  227   2      
+  228   2          case FSEL_DIR_SEQUENCE:
+  229   2          case FSEL_DIR_INTRO:
+  230   2          case FSEL_ALL_SEQUENCE:     //all file sequence select the next file                  if(User_ItemCur
+             -< User_ItemTotal)
+  231   2              if(User_ItemCur > 1)
+  232   2              {
+  233   3                  User_ItemCur--;
+  234   3              }
+  235   2      
+  236   2              else
+  237   2              {
+  238   3                  result = FALSE;
+  239   3                  break;
+  240   3              }
+  241   2              if(Read_PL(User_fileoffset))
+  242   2              {
+  243   3                  temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+  244   3                  memcpy(&temp, temp1 + MW_User_buffer + LAST_OFFSET, 1);
+  245   3                  if((temp / ONE_SEC_FILE) != (User_fileoffset / ONE_SEC_FILE))
+  246   3                  {
+  247   4                      Read_PL(temp);
+  248   4                  }
+  249   3                  User_fileoffset = temp;
+  250   3                  temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+  251   3                  tempt = (file_location_t *)(MW_User_buffer + temp1 + 1);
+C251 COMPILER V4.55,  enhance_userlist                                                     13/12/18  16:27:40  PAGE 5   
+
+  252   3                  if(fselSetLocationPL(tempt))
+  253   3                  {
+  254   4                      memcpy(filename, tempt->filename, 12);
+  255   4                      result = TRUE;
+  256   4                  }
+  257   3              }
+  258   2              break;
+  259   2      
+  260   2          case FSEL_ALL_REPEATALL:
+  261   2          case FSEL_DIR_REPEATALL:  // in the same class get the file
+  262   2              if(User_ItemCur > 1)
+  263   2              {
+  264   3                  User_ItemCur--;
+  265   3                  if(!Read_PL(User_fileoffset))
+  266   3                  {
+  267   4                      break;
+  268   4                  }
+  269   3      
+  270   3                  temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+  271   3                  memcpy(&temp, temp1 + MW_User_buffer + LAST_OFFSET, 1);
+  272   3                  if((temp / ONE_SEC_FILE) != (User_fileoffset / ONE_SEC_FILE))
+  273   3                  {
+  274   4                      Read_PL(temp);
+  275   4                  }
+  276   3              }
+  277   2              else
+  278   2              {
+  279   3                  User_ItemCur = User_ItemTotal;
+  280   3                  temp = User_LastOffset;
+  281   3                  Read_PL(temp);
+  282   3              }
+  283   2              User_fileoffset = temp;
+  284   2              temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+  285   2              tempt = (file_location_t *)(MW_User_buffer + temp1 + 1);
+  286   2              if(fselSetLocationPL(tempt))
+  287   2              {
+  288   3                  memcpy(filename, tempt->filename, 12);
+  289   3                  result = TRUE;
+  290   3              }
+  291   2              break;
+  292   2      
+  293   2          default:
+  294   2              return FALSE;
+  295   2          }
+  296   1          return result ;
+  297   1      }
+  298          
+  299          bool GetFilebyItem(uint8 *filename, uint16 ItemNum)
+  300          {
+  301   1          uint8 temp;
+  302   1          uint16 temp1;
+  303   1          uint8 num;
+  304   1          file_location_t  *tempt;
+  305   1          if(ItemNum == 0xffff || ItemNum == 0)
+  306   1          {
+  307   2              User_ItemCur = 1;
+  308   2              User_fileoffset = User_FirstOffset;
+  309   2          }
+  310   1          else
+  311   1          {
+  312   2              if(ItemNum > User_ItemTotal)
+  313   2              {
+  314   3                  return FALSE;
+  315   3              }
+  316   2      
+  317   2              num = 1;
+C251 COMPILER V4.55,  enhance_userlist                                                     13/12/18  16:27:40  PAGE 6   
+
+  318   2              User_fileoffset = User_FirstOffset;
+  319   2              Read_PL(User_fileoffset);
+  320   2              while(num != ItemNum)
+  321   2              {
+  322   3                  temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+  323   3                  memcpy(&temp, temp1 + MW_User_buffer + NEXT_OFFSET, 1);
+  324   3                  if((temp / ONE_SEC_FILE) != (User_fileoffset / ONE_SEC_FILE))
+  325   3                  {
+  326   4                      Read_PL(temp);
+  327   4                  }
+  328   3                  User_fileoffset = temp;
+  329   3                  num++;
+  330   3              }
+  331   2          }
+  332   1          if(Read_PL(User_fileoffset))
+  333   1          {
+  334   2      
+  335   2              temp1 = (User_fileoffset % ONE_SEC_FILE) * USER_PLAYLIST_SIZE;
+  336   2              tempt = (file_location_t *)(MW_User_buffer + temp1 + 1);
+  337   2              if(fselSetLocationPL(tempt))
+  338   2              {
+  339   3                  User_ItemCur = ItemNum;
+  340   3                  memcpy(filename, tempt->filename, 12);
+  341   3                  return TRUE;
+  342   3              }
+  343   2      
+  344   2          }
+  345   1          User_ItemCur = ItemNum;
+  346   1          return TRUE;
+  347   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1795     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =         7     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =         2     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

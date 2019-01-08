@@ -1,0 +1,32 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+D:\Raymond_Work\AS260B\case_260b\drv\Ui_LED\drv_led.uv2
+Project File Date:  03/03/2014
+
+<h2>Output:</h2>
+Build target 'ui_led'
+User command #1: .\buildlin.bat
+第53行编译异常：警告：未定义段结束地址!
+compiling Hdrv_HardDeal.c...
+compiling Hdrv_HardInit.c...
+compiling Sdrv_ClrScreen.c...
+compiling sdrv_Init.c...
+compiling Sdrv_LEDDisplay.c...
+linking...
+Program Size: data=0.0 edata+hdata=64 xdata=0 const=46 code=828
+creating hex file from ".\UI_Release\obj\drv_ui"...
+User command #1: .\builddrv.bat
+D:\Raymond_Work\AS260B\case_260b\drv\Ui_LED>copy .\UI_Release\obj\drv_ui.map drv_ui.map 
+已复制         1 个文件。
+D:\Raymond_Work\AS260B\case_260b\drv\Ui_LED>copy .\UI_Release\obj\drv_ui drv_ui 
+已复制         1 个文件。
+D:\Raymond_Work\AS260B\case_260b\drv\Ui_LED>..\..\..\psp_rel\tools\builddriver51 .\UI_Release\obj\drv_ui.hex  .\drv_led.drvl .\UI_Release\obj 
+D:\Raymond_Work\AS260B\case_260b\drv\Ui_LED>copy .\UI_Release\obj\drv_ui.drv  ..\..\fwpkg\ 
+已复制         1 个文件。
+D:\Raymond_Work\AS260B\case_260b\drv\Ui_LED>IF {} == {} goto nocopy 
+D:\Raymond_Work\AS260B\case_260b\drv\Ui_LED>echo build end  
+build end 
+".\UI_Release\obj\drv_ui" - 0 Error(s), 0 Warning(s).

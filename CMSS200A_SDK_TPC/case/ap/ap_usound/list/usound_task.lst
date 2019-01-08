@@ -1,0 +1,1070 @@
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE usound_task
+OBJECT MODULE PLACED IN .\obj\usound_task.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE usound_task.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BRO
+                    -WSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 ORDER DEFINE(USOUND_AP) DEBUG PRINT(.\list\usound_task.lst) OBJECT(.\obj\u
+                    -sound_task.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************
+    3           *                       ACTOS
+    4           *                      usbsound
+    5           *
+    6           *                (c) Copyright 2002-2009, Actions Co,Ld.
+    7           *                        All Right Reserved
+    8           *
+    9           * File   : usound_tast.c
+   10           * By     : wanghaijing
+   11           * Version: v1.00     first version    2011-1-28 15:55  by wanghaijing
+   12           ********************************************************************************
+   13           */
+   14          #include "usound.h"
+   15          
+   16          #pragma name(AP_TASK)
+   17          extern uint8 g_PAOpenFlag;
+   18          extern uint8 usb_state;
+   19          
+   20          #pragma renamecode(?PR?AP_TASK)
+   21          
+   22          #define  NUMWIDTH      22
+   23          #define  TXTPOSTY      58
+   24          
+   25          SD_FILE *res_fp;
+   26          region_t res_region;
+   27          uint8 ui_auto_select = FALSE; //是否自动确认
+   28          uint32 pic_entry_offset;
+   29          uint32 string_entry_offset;
+   30          uint8 p_device_name[] = "USND";
+   31          uint8 g_light_time = 0; //关背光时间,0.5秒为单位
+   32          uint8 g_light_mode = 0; //关亮度模式，0：变暗，1：变黑
+   33          uint8 g_contrast_num = 0; //对比度
+   34          uint16 g_sleep_time = 0; //睡眠时间,0.5秒为单位
+   35          uint16 g_standby_time = 0; //自动关机时间,0.5秒为单位
+   36          uint16 g_rtc_counter = 0; //rtc 消息计数
+   37          uint8 g_light_flag = TRUE;//背景灯开关标志
+   38          uint8 g_charge_counter = 0; //检测充电状态的计数器，插上USB就开始检测第一次
+   39          uint16 g_low_counter = 0;//报低电计数器
+   40          uint16 key_count = 0; //当前按键消息发生的次数
+   41          uint8 key_value = Msg_KeyNull; //当前按键的值
+   42          uint16 lowPower_counter = 0;//低电发生次数
+   43          uint8 file_name[12]; //存放文件短名数字
+   44          uint8 cur_value = 0; //当前的电池电量值，主要用于充电显示
+   45          uint8 batvalue[5] =
+   46          { 0x5c, 0x5f, 0x64, 0x69, 0x6e };
+   47          uint8 double_key_flag = 0;
+   48          uint8 double_key_count = 0;
+   49          
+   50          uint8 long_key_flag = 0;
+   51          uint8 push_flag = 0;
+   52          uint8 FF_Play_mode=0;
+   53          uint8 headphone_in_flag = TRUE;
+   54          extern uint8 key_timer_id;
+   55          extern int16 prepare_urec(void);
+   56          uint8 ap_get_message_core(uint8 key);
+   57          uint8 deal_usound_vol_msg(uint8 key);
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 2   
+
+   58          uint8 check_headphone_in(void);
+   59          void ignore_start_key(void);
+   60          uint8 check_headphone_status(void);
+   61          uint8 check_vbus(void);
+   62          void enable_pmos(void);
+   63          
+   64          void key_timer_count(void)
+   65          {
+   66   1              if (double_key_flag != 0)
+   67   1              {
+   68   2                      double_key_count++;
+   69   2              //printh(double_key_count);
+   70   2                      if (double_key_count > 15)
+   71   2                      {
+   72   3                              if (double_key_flag == 2)
+   73   3                              {
+   74   4                                      //prints("\n two");
+   75   4                                      printh(0x292);
+   76   4                                      usound_key_msg(0x10);   
+   77   4                                      //usound_key_msg(0x03);
+   78   4                              }
+   79   3                              else if (double_key_flag == 3)
+   80   3                              {
+   81   4                                      /*prints("\n three");
+   82   4                                      usound_key_msg(0x20);*/
+   83   4                                  printh(0x3223);
+   84   4                                      usound_key_msg(0x20);   
+   85   4                                      //usound_key_msg(0x05);
+   86   4                              }
+   87   3                              else
+   88   3                              {
+   89   4                                      //prints("\n one");
+   90   4                      printh(0xc11);
+   91   4                                      usound_key_msg(0x08);
+   92   4                                      //usound_key_msg(0x04);
+   93   4                              }               
+   94   3                              double_key_flag = 0;
+   95   3                              key_value=0xff;
+   96   3                      }
+   97   2              }
+   98   1              else
+   99   1              {       
+  100   2                      double_key_count = 0;
+  101   2              }
+  102   1      }
+  103          
+  104          uint8 check_headphone_in(void)
+  105          {
+  106   1              uint8 lradc1_val;
+  107   1              uint8 sfr_bak;
+  108   1              uint8 ret = 0;
+  109   1              uint8 mode;
+  110   1              return 0;       // circuit board is wrong, can't detect earphone;
+  111   1              
+  112   1              sfr_bak = SFR_BANK;
+  113   1              SFR_BANK = BANK_GPIO;
+  114   1              if ((GPIOADAT & (1<<5)) == 0x20)
+  115   1              {
+  116   2                      mode = 1;
+  117   2              }
+  118   1              else
+  119   1              {
+  120   2                      mode = 0;
+  121   2              }
+  122   1              
+  123   1              SFR_BANK = BANK_PMU;
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 3   
+
+  124   1              lradc1_val = LRADC1_DATA;
+  125   1              if (mode)
+  126   1              {
+  127   2                      if (lradc1_val > 0x1A)
+  128   2                      {//     headphone in
+  129   3                              ret = 0;
+  130   3                      }
+  131   2                      
+  132   2                      if (lradc1_val < 0x04)
+  133   2                      {//     headphone out
+  134   3                              ret = 1;
+  135   3                      }
+  136   2              }
+  137   1              else
+  138   1              {
+  139   2                      if (lradc1_val > 0x1A)
+  140   2                      {//     headphone out
+  141   3                              ret = 1;
+  142   3                      }
+  143   2                      
+  144   2                      if (lradc1_val < 0x04)
+  145   2                      {//     headphone in
+  146   3                              ret = 0;
+  147   3                      }
+  148   2              }
+  149   1              SFR_BANK = sfr_bak;
+  150   1              
+  151   1              return ret;
+  152   1      }
+  153          
+  154          uint8 check_headphone_status(void)
+  155          {
+  156   1              if (headphone_in_flag == FALSE)
+  157   1              {
+  158   2                      if (check_headphone_in() == 0)
+  159   2                      {//     headphone in                            
+  160   3                              if(key_timer_id != 0xFF)
+  161   3                              {
+  162   4                                      TM_KillTimer(key_timer_id);
+  163   4                                      key_timer_id = 0xFF;
+  164   4                              }
+  165   3                              ignore_start_key();
+  166   3                              key_timer_id = TM_SetTimer((uint32) key_timer_count, 4);
+  167   3                              headphone_in_flag = TRUE;
+  168   3                              return 1;
+  169   3                      }
+  170   2              }
+  171   1              else
+  172   1              {
+  173   2                      if(key_timer_id == 0xFF)
+  174   2                      {
+  175   3                              key_timer_id = TM_SetTimer((uint32) key_timer_count, 4);
+  176   3                      }
+  177   2      
+  178   2                      if (check_headphone_in() != 0)
+  179   2                      {//     headphone out
+  180   3                              headphone_in_flag = FALSE;
+  181   3                              if(key_timer_id != 0xFF)
+  182   3                              {
+  183   4                                      TM_KillTimer(key_timer_id);
+  184   4                                      key_timer_id = 0xFF;
+  185   4                              }
+  186   3      
+  187   3                              return 1;
+  188   3                      }
+  189   2              }
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 4   
+
+  190   1              return 0;
+  191   1      }
+  192          
+  193          int16 Usound_loop(void)
+  194          {
+  195   1          uint8 key_v = 0;
+  196   1          uint8 key = 0;
+  197   1          int16 retval;
+  198   1          BOOL Audioloop = 1;
+  199   1      
+  200   1          //初始化不使能USOUND录音
+  201   1          urec_en = FALSE;
+  202   1          memset(file_name, 0xff, 12);
+  203   1          while (Audioloop != 0)
+  204   1          {
+  205   2              ClearWatchDog();
+  206   2      
+  207   2              if (0x00 != (usb_state & 0x04)) //拔线处理
+  208   2              {
+  209   3                  Audioloop = FALSE;
+  210   3                  retval = RESULT_MAIN;
+  211   3                  continue;
+  212   3              }
+  213   2                      if(vol_change_flag==1)
+  214   2                      {
+  215   3                              vol_change_flag=0;                 
+  216   3                      change_vol(cur_vol_index);  
+  217   3                      }
+  218   2      
+  219   2                      /* check headphone status */
+  220   2                      check_headphone_status();
+  221   2      
+  222   2                      /* skip key if headphone not detected */
+  223   2                      if(headphone_in_flag==TRUE)
+  224   2                      {
+  225   3                              key_v = ap_get_message();
+  226   3                      }
+  227   2                      else
+  228   2                      {
+  229   3                              GetSysMsg();
+  230   3                              key_v=NULL;
+  231   3                      }
+  232   2                      
+  233   2              switch (key_v)
+  234   2              {
+  235   3                  /* mode键作为usound录音使能键 */
+  236   3                      case AP_MSG_WAIT_TIMEOUT:
+  237   3                              if (key != 0)
+  238   3                  {
+  239   4                      key = 0;
+  240   4                      need_draw = TRUE;
+  241   4                  }
+  242   3                              break;
+  243   3              case AP_KEY_MODE | AP_KEY_UP:
+  244   3                  //打开USOUND录音
+  245   3                  key = 0;
+  246   3                  //LEDClearScreen();
+  247   3                  //LEDPuts(NUMBER1, p_device_name, 1);
+  248   3                  //LEDDisplay(LED_PLAY, 0xff, 1);
+  249   3                  retval = prepare_urec();
+  250   3                  if (retval == 0)
+  251   3                  {
+  252   4                      retval = usound_rec();
+  253   4                      mp3rSendCommand(MC_CLOSE, 0);
+  254   4                      if (retval == RESULT_MAIN)
+  255   4                      {
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 5   
+
+  256   5                          retval = RESULT_NULL;
+  257   5                          Audioloop = 0;
+  258   5                          break;
+  259   5                      }
+  260   4                  }
+  261   3                  //urec_en = 0;
+  262   3                  need_draw = TRUE;
+  263   3                  break;
+  264   3      
+  265   3                  /* 长按mode返回main AP */
+  266   3              case AP_KEY_MODE | AP_KEY_LONG:
+  267   3                  longkey_flag = 1;
+  268   3                  Audioloop = 0;
+  269   3                  retval = RESULT_NULL;
+  270   3                  break;
+  271   3      
+  272   3              case AP_KEY_PLAY | AP_KEY_LONG:                 
+  273   3                              if (push_flag == 0)
+  274   3                              { 
+  275   4                                      if(FF_Play_mode==1)
+  276   4                                      {
+  277   5                                      //      prints("\n FF KEY LONG");
+  278   5                                              usound_key_msg(0x40);   
+  279   5                                      }
+  280   4                                      else if(FF_Play_mode==2)
+  281   4                                      {
+  282   5                                      //      prints("\n FB KEY LONG");
+  283   5                                              usound_key_msg(0x80);   
+  284   5                                      }
+  285   4                                      else
+  286   4                                      {
+  287   5                                      //      prints("\n MUTE KEY LONG");
+  288   5                                      //      usound_key_msg(0x04);
+  289   5                                      }                               
+  290   4                                      push_flag=1;
+  291   4                              }                       
+  292   3                              break;
+  293   3              case AP_KEY_PLAY | AP_KEY_UP:
+  294   3                              if(FF_Play_mode!=0)
+  295   3                              {       
+  296   4                                      if(FF_Play_mode == 1)
+  297   4                                      {
+  298   5                                      //      prints("\n FF KEY UP");
+  299   5                                              usound_key_msg(0x40);
+  300   5                                      }
+  301   4                                      else if(FF_Play_mode == 2)
+  302   4                                      {
+  303   5                                      //      prints("\n FB KEY UP");
+  304   5                                              usound_key_msg(0x80);
+  305   5                                      }else
+  306   4                                      {
+  307   5                                      //      prints("\n MUTE KEY UP");                               
+  308   5                                      }
+  309   4                                      FF_Play_mode=0;
+  310   4                                      break;
+  311   4                              }
+  312   3                  if (key != 0)
+  313   3                  {
+  314   4                      key = 0;
+  315   4                      need_draw = TRUE;
+  316   4                  }
+  317   3                  else
+  318   3                  {
+  319   4                  //    usound_key_msg(0x08);
+  320   4                  }
+  321   3                  break;
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 6   
+
+  322   3                              
+  323   3              case AP_KEY_NEXT | AP_KEY_UP:
+  324   3                  usound_key_msg(0x10);
+  325   3                  break;
+  326   3      
+  327   3              case AP_KEY_PREV | AP_KEY_UP:
+  328   3                  usound_key_msg(0x20);
+  329   3                  break;
+  330   3      
+  331   3              case AP_KEY_VOLADD | AP_KEY_UP:
+  332   3                      //case AP_KEY_VOLADD | AP_KEY_LONG:
+  333   3                  key = 1;
+  334   3                  deal_usound_vol_msg(key);
+  335   3                  break;
+  336   3              case AP_KEY_VOLSUB | AP_KEY_UP:
+  337   3                      //case AP_KEY_VOLSUB | AP_KEY_LONG:
+  338   3                  key = 2;
+  339   3                  deal_usound_vol_msg(key);
+  340   3                  break;
+  341   3              case AP_KEY_VOL | AP_KEY_UP:
+  342   3                  deal_usound_vol_msg(0);
+  343   3                  break;
+  344   3      
+  345   3      #ifdef FUN_SWITCH_KEY
+  346   3              case AP_KEY_FUNCTION | AP_KEY_UP: //Mode键，UHost\Card\FM\USB音箱 按下循环切换
+  347   3                  Audioloop = 0;
+  348   3                  retval = RESULT_USBUDISK_PLAY;
+  349   3                  break;
+  350   3      #endif
+  351   3      
+  352   3                  //case AP_MSG_CHARGING:
+  353   3                  // ui_show_batt(GetBattery());
+  354   3                  //break;
+  355   3      
+  356   3                  /*
+  357   3                   case AP_KEY_FUNCTION | AP_KEY_UP:
+  358   3                   MYDUMP("P",0);
+  359   3                   Audioloop = 0;
+  360   3                   g_result = RESULT_MUSIC_PLAY;
+  361   3                   break;
+  362   3                   */
+  363   3              default:
+  364   3                  break;
+  365   3              }
+  366   2          }
+  367   1          return retval;
+  368   1      }
+  369          
+  370          void volume_callback(int16 Vol)
+  371          {
+  372   1      
+  373   1          //实时改变音量的值
+  374   1          g_comval.volume = Vol; // (uint8) Vol * SOFTVOL_MAX / g_comval.VolumeMax;
+  375   1          OutPutVolume(g_comval.volume);
+  376   1      }
+  377          /********************************************************************************
+  378           * Description : 处理音量键
+  379           *
+  380           * Arguments  :
+  381           *
+  382           * Returns     :
+  383           *            无
+  384           * Notes       :
+  385           *
+  386           ********************************************************************************/
+  387          uint8 deal_usound_vol_msg(uint8 key)
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 7   
+
+  388          {
+  389   1          if (key == Key_Next)
+  390   1          {
+  391   2                      usound_key_msg(0x01);
+  392   2                      #if 0
+                       if (g_comval.volume < g_comval.VolumeMax)
+                       {
+                           g_comval.volume++;
+                                       usound_key_msg(0x01);
+                       }
+                               #endif
+  399   2          }
+  400   1          else if (key == Key_Prev)
+  401   1          {
+  402   2                      usound_key_msg(0x02);
+  403   2                      #if 0
+                       if (g_comval.volume > 0)
+                       {
+                           g_comval.volume--;
+                                       usound_key_msg(0x02);
+                       }
+                               #endif
+  410   2          }
+  411   1          //volume_callback(g_comval.volume);
+  412   1          need_draw = TRUE;
+  413   1          return NULL;
+  414   1      }
+  415          
+  416          /*
+  417           ********************************************************************************
+  418           * Description : 处理系统消息, 返回按键消息, 同时负责开/关背光
+  419           ap_get_message_core() 的入口
+  420           *
+  421           * Arguments   :
+  422           *
+  423           * Returns     : 返回ap能够识别的消息, 如果没有系统消息, 返回 AP_KEY_NULL
+  424           *
+  425           * Notes       :
+  426           ********************************************************************************
+  427           */
+  428          
+  429          uint8 ap_get_message(void)
+  430          {
+  431   1          uint8 key;
+  432   1      
+  433   1      #ifdef Msg_CTC2HZ
+  434   1          do
+  435   1          {
+  436   2              key = GetSysMsg();
+  437   2              ClearWatchDog();
+  438   2          }
+  439   1          while(key == MSG_RTC2HZ);
+  440   1          if(key == Msg_HalfSecond)
+  441   1          {
+  442   2              key = MSG_RTC2HZ;
+  443   2          }
+  444   1      #else
+                   key = GetSysMsg();
+               #endif
+  447   1          if (key == Msg_KeyNull)
+  448   1          {
+  449   2              return AP_KEY_NULL;
+  450   2          }
+  451   1          else
+  452   1          {
+  453   2                      key = ap_get_message_core(key);
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 8   
+
+  454   2              return key;
+  455   2          }
+  456   1      }
+  457          
+  458          //
+  459          #if 0
+               void slider_atoi4(uint8 *str, int16 count)
+               {
+                   int16 tmp, level;
+               
+                   if (count < 0)
+                   {
+                       *str = '-';
+                       count = 0 - count;
+                       str++;
+                   }
+               
+                   if (count >= 1000)
+                   {
+                       level = 4;
+                   }
+                   else if (count >= 100)
+                   {
+                       level = 3;
+                   }
+                   else if (count >= 10)
+                   {
+                       level = 2;
+                   }
+                   else
+                   {
+                       level = 1;
+                   }
+                   if (level >= 4)
+                   {
+                       tmp = (count / 1000) % 10;
+                       *str = (uint8) (tmp + '0');
+                       str++;
+                   }
+                   if (level >= 3)
+                   {
+                       tmp = (count / 100) % 10;
+                       *str = (uint8) (tmp + '0');
+                       str++;
+                   }
+                   if (level >= 2)
+                   {
+                       tmp = (count / 10) % 10;
+                       *str = (uint8) (tmp + '0');
+                       str++;
+                   }
+                   tmp = count % 10;
+                   *str = (uint8) (tmp + '0');
+                   *(str + 1) = '\0';
+               }
+               #endif
+  510          
+  511          /*
+  512           ********************************************************************************
+  513           * Description : 处理热键消息, 返回结果消息
+  514           *
+  515           * Arguments   : key, 按键消息
+  516           *
+  517           * Returns     : 如果有可识别的热键消息,  返回结果消息
+  518           如果没有可识别的热键消息,  返回0
+  519           *
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 9   
+
+  520           * Notes       :
+  521           *
+  522           ********************************************************************************
+  523           */
+  524          #if 0
+               uint8 ap_handle_hotkey_core(uint8 key)
+               {
+                   /* if (usbplugflag == AP_MSG_USB_PLUGIN_FLAG)
+                    {
+                    return RESULT_UDISK;
+                    }*/
+                   switch (key)
+                   {
+                   case AP_KEY_PLAY | AP_KEY_LONG: //长按play发standby
+                   case AP_MSG_STANDBY: //自动关机                                                              
+                   case AP_MSG_FORCE_STANDBY: //使用上两个会报label duplicate
+                               long_key_flag=0;
+                               break;
+                       return RESULT_STANDBY;
+               
+                   case AP_KEY_MODE | AP_KEY_LONG: //长按menu进入main
+                       return RESULT_MAIN;
+               
+                   case RESULT_AUTO_BACK:
+                       return RESULT_AUTO_BACK;
+               
+                   case AP_KEY_AB | AP_KEY_UP: //进入录音
+                       return RESULT_RECORD;
+                   case AP_MSG_SD_OUT:
+                       //ui_show_CardOut();
+                       return RESULT_SD_OUT;
+                   case AP_MSG_LOWBAT:
+                       //                      ui_show_lowbat();
+                       return RESULT_REDRAW;
+               
+                       /*case AP_MSG_LOCK: //locked
+                        if (ui_run_realtime == TRUE) //实时模式不显示lock
+                        {
+                        return 0;
+                        }
+                        else
+                        {
+                        ui_show_lock(1); //这里不处理热键,防止嵌套
+                        return RESULT_REDRAW;
+                        }*/
+               #ifdef CHECKALARM
+                   case AP_MSG_ALARM:
+                       return RESULT_ALARM;
+                   case AP_MSG_FM:
+                       return RESULT_ALARMFM;
+               #endif
+               #ifndef LINEIN_AP
+                   case AP_MSG_LINEIN:
+                       return RESULT_LINEIN;
+               #endif
+                   default:
+                       //here just drop the key
+                       return 0;
+                   }
+               }
+               
+               /*
+                ********************************************************************************
+                * Description : 处理热键消息, 返回结果消息
+                ap_handle_hotkey_core() 的入口
+                *
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 10  
+
+                * Arguments   : key, 按键消息
+                *
+                * Returns     : 如果有可识别的热键消息,  返回结果消息
+                如果没有可识别的热键消息,  返回0
+                *
+                * Notes       :
+                *
+                ********************************************************************************
+                */
+               uint8 ap_handle_hotkey(uint8 key)
+               {
+                   if (key == AP_KEY_NULL)
+                   {
+                       return 0;
+                   }
+                   else
+                   {
+                       return ap_handle_hotkey_core(key);
+                   }
+               }
+               #endif
+  607          
+  608          //
+  609          void Lightmodeset(bool OnOff)
+  610          {
+  611   1          OnOff = OnOff;
+  612   1          //StandbyScreen(OnOff);
+  613   1      }
+  614          /********************************************************************************
+  615           * Description : 获取充电器的状态
+  616           *
+  617           * Arguments  :
+  618           *
+  619           *
+  620           * Returns     :dpdm_status=0X80为充电器
+  621           *            无
+  622           * Notes       :
+  623           *
+  624           ********************************************************************************/
+  625          uint8 GetDC5VStatus(void)
+  626          {
+  627   1          uint8 sfr_bak;
+  628   1          uint8 dpdm_status;
+  629   1          sfr_bak = SFR_BANK;
+  630   1          SFR_BANK = BANK_PMU;
+  631   1          //dpdm_status = (uint8 ) (SYSTEM_VOL & 0x80);
+  632   1          SFR_BANK = sfr_bak;
+  633   1          return dpdm_status;
+  634   1      }
+  635          /*
+  636           ********************************************************************************
+  637           * Description : 处理系统消息, 返回按键消息, 同时负责开/关背光
+  638           *
+  639           * Arguments   : key, 系统消息
+  640           *
+  641           * Returns     : 返回ap能够识别的消息, 如果没有系统消息, 返回 AP_KEY_NULL
+  642           *
+  643           * Notes       :
+  644          
+  645           * 按键时序:
+  646           *  0.....1.2....1.5........... (s)
+  647           *  key    long   hold    up    (>1.2s)
+  648           *  key  up            (<1.2s)
+  649           *
+  650           * key rate: 0.3s
+  651           *
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 11  
+
+  652           ********************************************************************************
+  653           */
+  654          uint8 ap_get_message_core(uint8 key)
+  655          {
+  656   1          //    static WORD key_count=0;      //当前按键消息发生的次数
+  657   1          //    static uint8 key_value = Msg_KeyNull;   //当前按键的值
+  658   1      #ifdef EAR_PROTECT
+                   bool counter_flag = FALSE;
+               #endif
+  661   1          //    uint8 sfr_bak;
+  662   1          uint8 sysOnOff = 0;
+  663   1          /*按键消息和上次的一样时的处理*/
+  664   1          if (key == key_value)
+  665   1          {
+  666   2              /*背光没开时，等抬起键开背光，忽略按键*/
+  667   2              g_rtc_counter = 0;
+  668   2              key_count++;
+  669   2              if (!g_light_flag)
+  670   2              {
+  671   3                  key_count = 0;
+  672   3                  return NULL;
+  673   3              }
+  674   2                      if(key_count>=2)
+  675   2                      {
+  676   3                              if(((double_key_flag==1)||(double_key_flag==2))&&(key == AP_KEY_PLAY))
+  677   3                  {                   
+  678   4                                      FF_Play_mode=double_key_flag;
+  679   4                                      double_key_flag=0;
+  680   4                                      long_key_flag = 1;
+  681   4                                      key = (uint8) (key | AP_KEY_LONG); //》1.2s,发Key hold消息 
+  682   4                              //      prints("\n FF_Play");
+  683   4                                      return key;
+  684   4                  }
+  685   3                      }
+  686   2              /*按住按键时，320ms发送一次相同按键消息*/
+  687   2                      if (key_count >= 4)
+  688   2              {
+  689   3                  key = (uint8) (key | AP_KEY_LONG); //》1.2s,发Key hold消息           
+  690   3                              long_key_flag = 1;
+  691   3              }
+  692   2              else
+  693   2              {
+  694   3      
+  695   3              }
+  696   2              return key;
+  697   2          }
+  698   1      
+  699   1          switch (key)
+  700   1          {
+  701   2          case Msg_KeyShortUp:
+  702   2              key_count = 0;
+  703   2              g_rtc_counter = 0;
+  704   2                      if (long_key_flag != 0)
+  705   2                      {                       
+  706   3                              long_key_flag = 0;
+  707   3                              push_flag = 0;
+  708   3                              key_value=0xff;
+  709   3                              if(FF_Play_mode!=0)
+  710   3                              {
+  711   4                              //      prints("\n ap_Play");
+  712   4                                      return (AP_KEY_PLAY | AP_KEY_UP);
+  713   4                              }
+  714   3                              else
+  715   3                              {
+  716   4                                      return NULL;
+  717   4                              }
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 12  
+
+  718   3                              
+  719   3                      }
+  720   2                      
+  721   2              /*key_value的置需改变*/
+  722   2                      if (key_value == AP_KEY_PLAY)
+  723   2                      {
+  724   3                              if (double_key_flag == 0)
+  725   3                              {
+  726   4                                      double_key_count = 0;
+  727   4                              }
+  728   3                              double_key_flag++;
+  729   3                              if (double_key_flag > 3)
+  730   3                              {
+  731   4                                      double_key_flag = 0;
+  732   4                              }
+  733   3                              else
+  734   3                              {
+  735   4                                  key_value=0xff;
+  736   4                                      return NULL;
+  737   4                              }
+  738   3                      }
+  739   2              key = key_value | AP_KEY_UP;
+  740   2              key_value = key;
+  741   2              if (!g_light_flag)
+  742   2              {
+  743   3                  Lightmodeset(TRUE);//开背光
+  744   3                  g_light_flag = TRUE;
+  745   3                  /*输出按键音*/
+  746   3                  //Open_KeyTone(g_comval.KeyTone);
+  747   3                  return NULL;
+  748   3              }
+  749   2              break;
+  750   2      
+  751   2          case MSG_RTC2HZ:
+  752   2              g_rtc_counter++;
+  753   2      #ifdef EAR_PROTECT
+                       if(g_EarProtect_flag == 1)
+                       {
+                           counter_flag = ear_protect_callback();
+                           if(counter_flag == TRUE)
+                           {
+                               g_decrease_time++;
+                           }
+                           else
+                           {
+                               g_decrease_time = 0;
+                           }
+               
+                           g_half_hour_counter++;
+                           g_autoswitch_counter++;
+                       }
+               #endif
+  770   2      
+  771   2              
+  772   2      
+  773   2              /*2HZ计时无操作返回*/
+  774   2              if ((g_rtc_counter % 16) == 0)
+  775   2              {
+  776   3                  return AP_MSG_WAIT_TIMEOUT;
+  777   3              }
+  778   2      
+  779   2              /*AP处理的2HZ消息*/
+  780   2              if (key == MSG_RTC2HZ)
+  781   2              {
+  782   3      #ifdef CHECKALARM        //在AP工程里定义
+                           if (alarmtimerflag == 1)
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 13  
+
+                           {
+                               if (g_comval.g_alarm.curAlarmType == ALARAMType)
+                               {
+                                   if (g_comval.g_alarm.FMRadioEnable)
+                                   {
+                                       //RSetAlarmTimer(g_alarm.FMRadioTime,FMType);
+                                       g_comval.g_alarm.curAlarmType = FMType;
+                                       TM_SetAlarmTime(&g_comval.g_alarm.FMRadioTime);
+                                       VMWrite(&g_comval, VM_SYSTEM);
+                                   }
+                                   key = CheckAlarmMsg();
+                                   if(key == NULL)
+                                   {
+                                       key = AP_MSG_RTC;
+                                   }
+                                   else
+                                   {
+                                       key = AP_MSG_ALARM;
+                                       Lightmodeset(TRUE);//开关背光（TRUE: 开, FALSE:关）
+                                   }
+                               }
+                               else
+                               {
+                                   if (g_comval.g_alarm.curAlarmType == FMType)
+                                   {
+                                       if (g_comval.g_alarm.AlarmEnable)
+                                       {
+                                           g_comval.g_alarm.curAlarmType = ALARAMType;
+                                           TM_SetAlarmTime(&g_comval.g_alarm.FMRadioTime);
+                                           VMWrite(&g_comval, VM_SYSTEM);
+                                       }
+                                       key = AP_MSG_FM;
+                                       Lightmodeset(TRUE);//开关背光（TRUE: 开, FALSE:关）
+                                   }
+                                   else
+                                   {
+               
+                                       key = AP_MSG_RTC;
+                                   }
+                               }
+                           }
+                           else
+                           {
+                               if ((GetDC5VStatus() == 0) && (GetBattery() <= 0x5c))
+                               {
+                                   g_low_counter ++;
+                                   if(g_low_counter > 600)
+                                   {
+                                       g_low_counter = 0;
+                                       key = AP_MSG_LOWBAT;
+                                   }
+                                   else
+                                   {
+                                       key = AP_MSG_RTC;
+                                   }
+                               }
+                               else
+                               {
+                                   g_low_counter = 0;
+                                   key = AP_MSG_RTC;
+                               }
+                           }
+               #else
+  847   3                  g_low_counter = 0;
+  848   3                  key = AP_MSG_RTC;
+  849   3      #endif
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 14  
+
+  850   3              }
+  851   2      
+  852   2              /*充电检测2HZ计时，每30s监测一次充电状态*/
+  853   2              if (GetDC5VStatus() == 0x80)
+  854   2              {
+  855   3                  if (g_charge_counter == 60)
+  856   3                  {
+  857   4                      //if((GetBattery() <= 0x76)&&(sKY_ChargeSet(0) != 0x0))
+  858   4                      //{
+  859   4                      //      sKY_ChargeSet(1);
+  860   4                      //}
+  861   4                      //sKY_ChargeGetandSet();
+  862   4                      KY_GetChargeStatus();
+  863   4                      g_charge_counter = 0;
+  864   4                  }
+  865   3                  else
+  866   3                  {
+  867   4                      g_charge_counter++;
+  868   4                  }
+  869   3              }
+  870   2              /*
+  871   2               #ifndef LINEIN_AP
+  872   2               if(CheckLineIn())
+  873   2               {
+  874   2               key = AP_MSG_LINEIN;
+  875   2               }
+  876   2               #endif */
+  877   2              break;
+  878   2      
+  879   2      #if 0
+                   case MSG_LOW_POWER:
+                       /*系统低电消息处理为强制关机*/
+                       lowPower_counter++;
+                       if (lowPower_counter >= 3)
+                       {
+                           if(GetDC5VStatus() == 0x80)
+                           {
+                               lowPower_counter = 0;
+                               key = NULL;
+                           }
+                           else
+                           {
+                               key = AP_MSG_FORCE_STANDBY;
+                           }
+                       }
+                       else
+                       {
+                           key = NULL;
+                       }
+                       break;
+               #endif
+  901   2      
+  902   2          case Msg_KeyUnHold:
+  903   2              key = AP_KEY_NULL;
+  904   2              break;
+  905   2      
+  906   2          case MSG_SD_IN:/*插卡状态*/
+  907   2              key = AP_MSG_SD_IN;
+  908   2              if (!g_light_flag)
+  909   2              {
+  910   3                  Lightmodeset(TRUE);//开背光
+  911   3                  g_light_flag = TRUE;
+  912   3                  g_rtc_counter = 0;
+  913   3              }
+  914   2              break;
+  915   2      
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 15  
+
+  916   2      #if 0
+                   case MSG_UH_IN:
+                       if(!g_light_flag)
+                       {
+                           Lightmodeset(TRUE);//开背光
+                           g_light_flag = TRUE;
+                           g_rtc_counter = 0;
+                       }
+                       key = AP_MSG_UH_IN;
+                       break;
+               
+                   case MSG_UH_OUT:
+                       if(!g_light_flag)
+                       {
+                           Lightmodeset(TRUE);//开背光
+                           g_light_flag = TRUE;
+                           g_rtc_counter = 0;
+                       }
+                       key = AP_MSG_UH_OUT;
+                       break;
+               #endif
+  937   2      
+  938   2          case MSG_SD_OUT:/*拨卡状态*/
+  939   2              key = AP_MSG_SD_OUT;
+  940   2              break;  
+  941   2          default: /*新按键处理*/
+  942   2              g_rtc_counter = 0;
+  943   2              key_count = 1;
+  944   2              key_value = key;
+  945   2              if (!g_light_flag)
+  946   2              {
+  947   3                  /*如背灯没开，不处理消息*/
+  948   3                  key_count = 0;
+  949   3                  //g_rtc_counter = 0;
+  950   3                  //return NULL;
+  951   3              }
+  952   2      
+  953   2              //        Open_KeyTone(g_comval.KeyTone);
+  954   2          } /*end of switch*/
+  955   1      
+  956   1          return key;
+  957   1      }
+  958          
+  959          void ignore_start_key(void)
+  960          {
+  961   1              uint16 count=0;
+  962   1              double_key_flag=0;
+  963   1              while(1)
+  964   1              {
+  965   2                      GetSysMsg();
+  966   2                      TM_DelayMS(10);
+  967   2                      count++;
+  968   2                      if(count>150)
+  969   2                      {
+  970   3                              break;
+  971   3                      }
+  972   2              }
+  973   1      
+  974   1              double_key_flag=0;      
+  975   1      }
+  976          
+  977          uint8 check_vbus(void)
+  978          {
+  979   1              uint8 sfr_bak;
+  980   1              uint8 ret = 0;
+  981   1      
+C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 16  
+
+  982   1              sfr_bak = SFR_BANK;
+  983   1              SFR_BANK = BANK_GPIO;
+  984   1      
+  985   1              if (GPIOADAT & (1<<5))
+  986   1              {
+  987   2                      ret = 1;
+  988   2              }
+  989   1              
+  990   1              SFR_BANK = sfr_bak;
+  991   1              return ret; 
+  992   1      }
+  993          
+  994          void enable_pmos(void)
+  995          {
+  996   1              uint8 sfr_bak;
+  997   1      
+  998   1              sfr_bak = SFR_BANK;
+  999   1              SFR_BANK = BANK_GPIO;
+ 1000   1      
+ 1001   1              GPIOADAT &= ~(1<<6);
+ 1002   1      
+ 1003   1              SFR_BANK = sfr_bak;
+ 1004   1      }
+ 1005          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1213     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        64     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =       124     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

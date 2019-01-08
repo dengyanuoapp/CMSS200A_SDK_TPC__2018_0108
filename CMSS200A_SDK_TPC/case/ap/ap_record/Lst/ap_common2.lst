@@ -1,0 +1,334 @@
+C251 COMPILER V4.55,  ap_common2                                                           23/05/16  10:42:22  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE ap_common2
+OBJECT MODULE PLACED IN .\Obj\ap_common2.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\common\ap_common2.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTI
+                    -MIZE(9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\ap_common2.lst) OBJECT(.\Obj\ap_common2
+                    -.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        ap common lib file, part 2
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: ap_common2.c,v 1.1.1.1 2006/05/22 03:23:59 selina Exp $
+   10           *******************************************************************************
+   11           */
+   12          
+   13          #include "ap_common.h"
+   14          #pragma name(COM_COM2)
+   15          //音量等级对应表，修改该表时请同步修改ap_usound中的
+   16          //usound_main.c 音量等级对应表
+   17          const uint8 dac_vol[MAX_VOl_NUM] =
+   18          {
+   19              0x00, 0x23, 0x36, 0x40,
+   20              0x47, 0x50, 0x54, 0x57,
+   21              0x5a, 0x60, 0x64, 0x67,
+   22              0x6a, 0x70, 0x72, 0x74,
+   23              0x76, 0x77, 0x79, 0x7a,
+   24              0x7b, 0x80, 0x81, 0x82,
+   25              0x83, 0x84, 0x86, 0x87,
+   26              0x88, 0x89, 0x8a, 0x8b,
+   27              0x90, 0x91, 0x92, 0x93,
+   28              0x94, 0x95, 0x96, 0x97,
+   29              0x98
+   30          };
+   31          void show_volume_ui(void)
+   32          {
+   33   1          memset(temp_buffer, 0xff, 0x04);
+   34   1          itoa2(g_comval.volume, temp_buffer);
+   35   1          LEDPuts(NUMBER2, temp_buffer, 1);
+   36   1      }
+   37          
+   38          /*
+   39           ********************************************************************************
+   40           * Description : 初始化消息处理
+   41           *
+   42           * Arguments   : comval, 系统设定值, =null 表示只初始化内部计数器
+   43           *
+   44           * Returns     :
+   45           *
+   46           * Notes       :
+   47           *
+   48           ********************************************************************************
+   49           */
+   50          void set_autosleep_time(uint8 key)
+   51          {
+   52   1          uint8 str_buf[4];
+   53   1          uint8 tmp_val;
+   54   1          memset(str_buf, 0xff, 0x04);
+   55   1          if (key == Key_None)
+   56   1          {
+   57   2              if (CurUI_Type != STANDBY_UI)
+C251 COMPILER V4.55,  ap_common2                                                           23/05/16  10:42:22  PAGE 2   
+
+   58   2              {
+   59   3                  SetCurUI_Type(STANDBY_UI);
+   60   3                  LEDClearScreen();
+   61   3                  if (g_comval.SleepTime < 100)
+   62   3                  {
+   63   4                      itoa2(g_comval.SleepTime, str_buf);
+   64   4                  }
+   65   3                  else
+   66   3                  {
+   67   4                      itoa3(g_comval.SleepTime, str_buf);
+   68   4                  }
+   69   3                  LEDPuts(NUMBER2, str_buf, 1);
+   70   3                  need_draw = FALSE;
+   71   3                  return;
+   72   3              }
+   73   2              else
+   74   2              {
+   75   3                  key = Key_Next;
+   76   3              }
+   77   2          }
+   78   1          tmp_val = g_comval.SleepTime / 10;
+   79   1          if (key == Key_Next)
+   80   1          {
+   81   2              if (tmp_val < 12)
+   82   2              {
+   83   3                  tmp_val++;
+   84   3              }
+   85   2              else
+   86   2              {
+   87   3                  tmp_val = 0;
+   88   3              }
+   89   2          }
+   90   1          else
+   91   1          {
+   92   2              if (tmp_val > 0)
+   93   2              {
+   94   3                  tmp_val--;
+   95   3              }
+   96   2              else
+   97   2              {
+   98   3                  tmp_val = 12;
+   99   3              }
+  100   2          }
+  101   1          g_comval.SleepTime = tmp_val * 10;
+  102   1          if (g_comval.SleepTime < 100)
+  103   1          {
+  104   2              itoa2(g_comval.SleepTime, str_buf);
+  105   2          }
+  106   1          else
+  107   1          {
+  108   2              itoa3(g_comval.SleepTime, str_buf);
+  109   2          }
+  110   1          LEDPuts(NUMBER2, str_buf, 1);
+  111   1          need_draw = FALSE;
+  112   1          g_standby_time = 0;
+  113   1      }
+  114          /*
+  115           ********************************************************************************
+  116           * Description : 睡眠指定的时间
+  117           *
+  118           * Arguments   : half_sec, 时间, 0.5秒为单位
+  119           *
+  120           * Returns     : 如果指定的时间内没有其他消息产生, 返回0
+  121           如果指定的时间内有其他消息产生, 返回该消息
+  122           * Notes       : 如果指定的时间内有其他消息产生, 睡眠的时间将< 指定的时间
+  123           *
+C251 COMPILER V4.55,  ap_common2                                                           23/05/16  10:42:22  PAGE 3   
+
+  124           ********************************************************************************
+  125           */
+  126          
+  127          uint8 ap_sleep(uint16 half_sec)
+  128          {
+  129   1          uint8 n = 0; //rtc counter
+  130   1          uint8 key, result;
+  131   1      
+  132   1          while (1)
+  133   1          {
+  134   2              key = ap_get_message();
+  135   2              //sleep 时不管timeout
+  136   2              if ((key == AP_MSG_RTC) || (key == AP_MSG_CHARGING) || (key == AP_MSG_WAIT_TIMEOUT))
+  137   2              {
+  138   3                  n++;
+  139   3                  if (n >= (uint8) half_sec)
+  140   3                  {
+  141   4                      result = 0;
+  142   4                      break;
+  143   4                  }
+  144   3              }//lock 只有up, 没有long/hold
+  145   2              else if (key == AP_KEY_NULL)
+  146   2              {
+  147   3                  continue;
+  148   3              }
+  149   2              else
+  150   2              {
+  151   3                  result = ap_handle_hotkey_core(key);
+  152   3                  break;
+  153   3              }
+  154   2          }
+  155   1          return result;
+  156   1      }
+  157          uint8 read_ap_comval(void)
+  158          {
+  159   1          BOOL result;
+  160   1          result = VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval));
+  161   1          if (g_comval.magic != MAGIC_COMVAL)
+  162   1          {
+  163   2              memset(&g_comval, 0x0, sizeof(g_comval));
+  164   2              g_comval.magic = MAGIC_COMVAL;
+  165   2              g_comval.ap_result = RESULT_MUSIC;
+  166   2      
+  167   2              g_comval.VolumeMax = 40;
+  168   2              g_comval.VolumeDef = 35;
+  169   2              if (g_comval.VolumeDef > g_comval.VolumeMax)
+  170   2              {
+  171   3                  g_comval.VolumeDef = g_comval.VolumeMax;
+  172   3              }
+  173   2              g_comval.vol_display = 32;
+  174   2              g_comval.volume = g_comval.vol_display; // (g_comval.vol_display * SOFTVOL_MAX) / g_comval.Volume
+             -Max;
+  175   2              g_comval.RecordGain = 6;
+  176   2              g_comval.RecordTime_max = 10;
+  177   2              g_comval.eq_type = none;
+  178   2              result = VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval));
+  179   2          }
+  180   1          return result;
+  181   1      }
+  182          void set_poweroff_HCL(void)
+  183          {
+  184   1      #if 0
+                   uint8 sfr_bak;
+                   sfr_bak = SFR_BANK;
+                   SFR_BANK = BANK_RTC;
+                   RTC_CTL0 &= 0xe0;
+C251 COMPILER V4.55,  ap_common2                                                           23/05/16  10:42:22  PAGE 4   
+
+                   RTCRUPD = 0xa5;
+                   TM_DelayMS(1);
+                   while(RTCRUPD != 0x5a);
+                   SFR_BANK = sfr_bak;
+               #endif
+  194   1      }
+  195          
+  196          /********************************************************************************
+  197           * Description : 处理音量键
+  198           *
+  199           * Arguments  :
+  200           *
+  201           * Returns     :
+  202           *            无
+  203           * Notes       :
+  204           *
+  205           ********************************************************************************/
+  206          uint8 deal_vol_msg(uint8 key, uint8 UI_Type)
+  207          {
+  208   1          if (key == Key_None)
+  209   1          {
+  210   2              if (CurUI_Type != Volume_UI)
+  211   2              {
+  212   3                  LEDClearScreen();
+  213   3                  SetCurUI_Type(Volume_UI);
+  214   3                  show_volume_ui();
+  215   3                  need_draw = FALSE;
+  216   3                  return NULL;
+  217   3              }
+  218   2              else
+  219   2              {
+  220   3                  SetCurUI_Type(UI_Type);
+  221   3              }
+  222   2          }
+  223   1          else
+  224   1          {
+  225   2              if (CurUI_Type != Volume_UI)
+  226   2              {
+  227   3                  LEDClearScreen();
+  228   3                  SetCurUI_Type(Volume_UI);
+  229   3              }
+  230   2              if (key == Key_Next)
+  231   2              {
+  232   3                  if (g_comval.volume < g_comval.VolumeMax)
+  233   3                  {
+  234   4                      g_comval.volume++;
+  235   4                  }
+  236   3              }
+  237   2              else
+  238   2              {
+  239   3                  if (g_comval.volume > 0)
+  240   3                  {
+  241   4                      g_comval.volume--;
+  242   4                  }
+  243   3              }
+  244   2              set_dac_volume(g_comval.volume);
+  245   2              show_volume_ui();
+  246   2              need_draw = FALSE;
+  247   2          }
+  248   1          return NULL;
+  249   1      }
+  250          uint8 get_dac_real_vol(uint8 cur_vol)
+  251          {
+  252   1          return dac_vol[cur_vol];
+  253   1      }
+  254          void dac_mute_onoff(uint8 on_off)
+C251 COMPILER V4.55,  ap_common2                                                           23/05/16  10:42:22  PAGE 5   
+
+  255          {
+  256   1          uint8 sfr_bak;
+  257   1          sfr_bak = SFR_BANK;
+  258   1          SFR_BANK = BANK_AUIP;
+  259   1          if(on_off != 0)
+  260   1          {
+  261   2              DAC_ANALOG0 |= 0x01; //dismute,connect
+  262   2          }
+  263   1          else
+  264   1          {
+  265   2              DAC_ANALOG0 &= 0xfe; //mute dac
+  266   2          }
+  267   1          SFR_BANK = sfr_bak;
+  268   1      }
+  269          /********************************************************************************
+  270           * Description : 设置pa音量
+  271           *
+  272           * Arguments  :
+  273           *
+  274           * Returns     :
+  275           *            无
+  276           * Notes       :
+  277           *
+  278           ********************************************************************************/
+  279          void set_dac_volume(uint8 cur_vol)
+  280          {
+  281   1          uint8 real_val;
+  282   1          real_val = dac_vol[cur_vol];
+  283   1          SetPAVolume_LR(real_val, real_val);
+  284   1          if((mute_flag == 1) && (real_val != 0))
+  285   1          {
+  286   2              return;
+  287   2          }
+  288   1          dac_mute_onoff(real_val);
+  289   1      }
+  290          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       694     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        41     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,545 @@
+C251 COMPILER V4.55,  enhanced_tag1                                                        13/12/18  16:27:42  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE enhanced_tag1
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\enhanced\enhanced_tag1.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\enhanced\id3\enhanced_tag1.c XSMALL INTR2 F
+                    -UNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) INCDIR(..\..\..\..\..\inc) DEBUG PRINT(..\..\..\..\obj\lib\enhanced\enha
+                    -nced_tag1.lst) OBJECT(..\..\..\..\obj\lib\enhanced\enhanced_tag1.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        enhanced module impletementation
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           * File   : enhanced_tag2.c
+   10           * By     : ouyuping
+   11           * Version: v1.00     first version     3/23/2009
+   12           *******************************************************************************
+   13           */
+   14          
+   15          #include <actos.h>
+   16          #include <enhanced.h>
+   17          #include <stringH.h>
+   18          //#include "debug.h"
+   19          
+   20          #pragma name(MW_EH_ID31)
+   21          
+   22          #pragma renamecode(MW_EH_ID31)
+   23          
+   24          #define ID3_COUNT 3 //需要查找的FrameID数(包括标题，作者，专辑)
+   25          /*
+   26           *********************************************************
+   27           1) "RTENC"         :编码者      2) "TRCK"        :音轨
+   28           3) "TPE1"          :演唱者      4) "TIT2"        :标题
+   29           5) "TALB"          :专辑        6) "TYER"        :年代
+   30           7) "TMED"          :媒体类型    8) "TCOM"        :作曲家
+   31           9) "COMM"          :注释       10) "CON"         :流派
+   32           11) "TOPE"          :原创者     12) "TCOP"        :版权
+   33           13) "WXXX"          :URL
+   34           *********************************************************
+   35           */
+   36          
+   37          typedef struct
+   38          {
+   39              char Header[3];/*必须为"ID3"否则认为标签不存在*/
+   40              BYTE Ver;/*版本号;ID3V2.3就记录03,ID3V2.4就记录04*/
+   41              BYTE Revision;/*副版本号;此版本记录为00*/
+   42              char Flag;/*存放标志的字节，这个版本只定义了三位*/
+   43              char Size[4];/*标签大小，包括标签头的10个字节和所有的标签帧的大小*/
+   44          } ID3_10_header;//ID3V2.*标签头(前10byte)
+   45          
+   46          typedef struct
+   47          {
+   48              BYTE bytes_of_header;//不同ID3版本Frame Header所占字节数
+   49              BYTE bytes_of_title;//不同ID3版本Frame Header中FrameID所占字节数
+   50              BYTE bytes_of_framesize;//不同ID3版本Frame Header中帧长所占字节数
+   51              char *id3table;//不同ID3版本对应的需要查找的FrameID Table
+   52              BYTE id3tablesize;//对应FrameID Table的尺寸
+   53          } ID3_Version_Info;//
+   54          
+   55          typedef struct
+   56          {
+   57              char FrameID[4]; /*用四个字符标识一个帧，说明其内容，稍后有常用的标识对照表*/
+C251 COMPILER V4.55,  enhanced_tag1                                                        13/12/18  16:27:42  PAGE 2   
+
+   58              char Size[4]; /*帧内容的大小，不包括帧头，不得小于1*/
+   59              char Flags[2];/*存放标志，只定义了6位*/
+   60              //char encodetype;//frame  编码类别
+   61          } ID3_2_3_HEADER;
+   62          
+   63          typedef struct
+   64          {
+   65              char FrameID[3]; /*用四个字符标识一个帧，说明其内容*/
+   66              char Size[3]; /*帧内容的大小，不包括帧头，不得小于1*/
+   67              //    char encodetype; //frame  编码类别
+   68          } ID3_2_2_HEADER;
+   69          
+   70          typedef struct
+   71          {
+   72              uchar savelen; // FrameID保存的最长长度
+   73              char *saveaddr; // FrameID保存地址
+   74          } ID3SaveItem;
+   75          
+   76          extern char *TempBuf;
+   77          uint8 karaoke_flag;
+   78          uint8 actrec_flag;
+   79          const char ID3TitleTable_v2_3[] = "TIT2TPE1TALB";// ID3V2.3需要查找的FrameID Table
+   80          const char ID3TitleTable_v2_2[] = "TT2TP1TAL"; // ID3V2.2需要查找的FrameID Table
+   81          
+   82          const char COMM_NAME[] = "COMM";
+   83          const char k123_name[] = "k123";
+   84          const char a123_name[] = "A123";
+   85          const ID3_Version_Info ID3ver[2] =
+   86          {
+   87              {
+   88                  sizeof(ID3_2_3_HEADER),
+   89                  4,//size of ID3_2_3_HEADER's FrameID
+   90                  4,//size of ID3_2_3_HEADER's Size
+   91                  (char *) ID3TitleTable_v2_3,
+   92                  sizeof(ID3TitleTable_v2_3)
+   93              },
+   94              {
+   95                  sizeof(ID3_2_2_HEADER),
+   96                  3,//size of ID3_2_2_HEADER's FrameID
+   97                  3,//size of ID3_2_2_HEADER's Size
+   98                  (char *) ID3TitleTable_v2_2,
+   99                  sizeof(ID3TitleTable_v2_2)
+  100              }
+  101          };
+  102          ID3SaveItem *pId3Save;//FrameID存储位置
+  103          ID3Info_t *pID3InfoStart;//ap层提供的存储结构
+  104          ID3_10_header far id3h;
+  105          int far bufindex;//当前TempBuf未处理字符的索引
+  106          int far findcount;//成功查找到的FrameID数
+  107          dword far filepos;//当前文件的精确指针
+  108          static dword far framepos;//当前Frame的地址
+  109          static dword far framesize;//当前Frame的size(不包括编码类型位)
+  110          HANDLE far TagHandle;
+  111          BYTE far AvailFlag[ID3_COUNT];//有效FrameID查找登记表
+  112          BYTE far curversion;//当前ID3版本
+  113          char *TempBuf; //read file buffer
+  114          
+  115          /********************************************************************************
+  116           * Description : 检查是否是有效的待查找frameID(title)
+  117           *
+  118           * Arguments  :
+  119           *             pid3header : Frame Header 其头四个字节是frameId，检测它是否 我们所要找的id
+  120           要的ID是  ID3TitleTable_v2_3[] = "TIT2TPE1TALB"，每个四个字节bytes_of_title
+  121           AvailFlag[0]对应着"TIT2"
+  122           * Returns     :
+  123           *            TRUE: 有效,
+C251 COMPILER V4.55,  enhanced_tag1                                                        13/12/18  16:27:42  PAGE 3   
+
+  124           *            FALSE: 无效.
+  125           * Notes       :
+  126           *
+  127           ********************************************************************************/
+  128          
+  129          void Check_Comm_Item(char *pid3header);
+  130          
+  131          BOOL IsAvailFrameID(char *pid3header)
+  132          {
+  133   1          int i = 0, j = 0, index;
+  134   1      
+  135   1          ClearWatchDog();
+  136   1          while ((i < ID3ver[curversion].id3tablesize) && (j < ID3ver[curversion].bytes_of_title))
+  137   1          {
+  138   2              if (pid3header[j] == ID3ver[curversion].id3table[i])
+  139   2              {
+  140   3                  j++;
+  141   3              }
+  142   2              else
+  143   2              {
+  144   3                  j = 0;
+  145   3              }
+  146   2              i++;
+  147   2          }
+  148   1      
+  149   1          //没找到我们所要的ID
+  150   1          if ((j < ID3ver[curversion].bytes_of_title) || ((i % ID3ver[curversion].bytes_of_title) != 0))
+  151   1          {
+  152   2              return 0;
+  153   2          }
+  154   1      
+  155   1          index = (i / ID3ver[curversion].bytes_of_title) - 1;
+  156   1          if (AvailFlag[index] == 1)//之前已经有了，还出现一条，不记录
+  157   1          {
+  158   2              return 0;
+  159   2          }
+  160   1      
+  161   1          AvailFlag[index] = 1;//记录找到的标签
+  162   1      
+  163   1          pId3Save = (ID3SaveItem *) pID3InfoStart + index; //设置将要保存的地址
+  164   1      
+  165   1          return TRUE;
+  166   1      }
+  167          
+  168          /********************************************************************************
+  169           * Description : 处理Frame Header，计算Frame size
+  170           *
+  171           * Arguments  :
+  172           *             pid3header : Frame Header
+  173           * Returns     :
+  174           *            TRUE: 成功,
+  175           *            FALSE: 失败.
+  176           * Notes       :
+  177           *
+  178           ********************************************************************************/
+  179          
+  180          BOOL GetFrameSize(char *pid3header)
+  181          {
+  182   1          int i = 0;
+  183   1          uint8 *pfrmsaddr = (uint8 *)(pid3header + ID3ver[curversion].bytes_of_title);
+  184   1          dword size = 0;
+  185   1      
+  186   1          if(id3h.Ver == 4)   //ID3v2.4
+  187   1          {
+  188   2              while(i < 4)
+  189   2              {
+C251 COMPILER V4.55,  enhanced_tag1                                                        13/12/18  16:27:42  PAGE 4   
+
+  190   3                  size <<= 7;
+  191   3                  size |= (dword)(pfrmsaddr[i] & 0x7f);
+  192   3                  i++;
+  193   3              }
+  194   2          }
+  195   1          else
+  196   1          {
+  197   2              while (i < ID3ver[curversion].bytes_of_framesize)
+  198   2              {
+  199   3                  size <<= 8;
+  200   3                  size += (dword) pfrmsaddr[i];
+  201   3                  i++;
+  202   3              }
+  203   2          }
+  204   1          framesize = size;
+  205   1          return TRUE;
+  206   1      }
+  207          
+  208          /********************************************************************************
+  209           * Description : 精确文件读取初始化
+  210           *
+  211           * Arguments  :
+  212           *
+  213           * Returns     :
+  214           *            TRUE: 成功,
+  215           *            FALSE: 失败.
+  216           * Notes       :
+  217           *
+  218           ********************************************************************************/
+  219          
+  220          bool FI_FInit(void)
+  221          {
+  222   1          bufindex = 0;
+  223   1          filepos = 0;
+  224   1      
+  225   1          FS_FRead(TempBuf, 1, TagHandle); //读一PAGE数据
+  226   1          return TRUE;
+  227   1      }
+  228          
+  229          /********************************************************************************
+  230           * Description : 精确文件读取SEEK
+  231           *
+  232           * Arguments  :
+  233           *             fpos:从文件头seek的字节偏移量
+  234           * Returns     :
+  235           *            TRUE: 成功,
+  236           *            FALSE: 失败.
+  237           * Notes       :
+  238           *
+  239           ********************************************************************************/
+  240          
+  241          BOOL FI_FSeek(dword fpos)
+  242          {
+  243   1          BOOL result;
+  244   1          int32 fpagepos = (int32)(fpos >> 9);
+  245   1          int32 curpagepos = (int32)(filepos >> 9);
+  246   1      
+  247   1          filepos = fpos;
+  248   1          bufindex = (int16)(fpos & 0x1ff);
+  249   1      
+  250   1          if (fpagepos != curpagepos)
+  251   1          {
+  252   2              result = FS_FSeek(fpagepos, 0, TagHandle);
+  253   2              if (result == 0)
+  254   2              {
+  255   3                  return FALSE;
+C251 COMPILER V4.55,  enhanced_tag1                                                        13/12/18  16:27:42  PAGE 5   
+
+  256   3              }
+  257   2      
+  258   2              result = FS_FRead(TempBuf, 1, TagHandle);
+  259   2              if (result == 0)
+  260   2              {
+  261   3                  return FALSE;
+  262   3              }
+  263   2          }
+  264   1      
+  265   1          return TRUE;
+  266   1      }
+  267          
+  268          /********************************************************************************
+  269           * Description : 精确文件读取READ
+  270           *
+  271           * Arguments  :
+  272           *             databuf:读取文件数据的buf
+  273           *             length:读取的长度，字节为单位
+  274           * Returns     :
+  275           *            TRUE: 成功,
+  276           *            FALSE: 失败.
+  277           * Notes       :
+  278           *
+  279           ********************************************************************************/
+  280          
+  281          BOOL FI_FRead(char *databuf, int length)
+  282          {
+  283   1          int i = 0;
+  284   1          BOOL result;
+  285   1      
+  286   1          //一个一个字节复制，可以进行优化
+  287   1          ClearWatchDog();
+  288   1          while ((bufindex < 512) && (i < length))
+  289   1          {
+  290   2              databuf[i] = TempBuf[bufindex];
+  291   2              i++;
+  292   2              bufindex++;
+  293   2              if (bufindex == 512)
+  294   2              {
+  295   3                  //            result = FS_FSeek(1, 1, TagHandle); //当前位置先后偏移一页 512byte
+  296   3                  //            if (result == 0)
+  297   3                  //            {
+  298   3                  //                return FALSE;
+  299   3                  //            }
+  300   3      
+  301   3                  result = FS_FRead(TempBuf, 1, TagHandle);
+  302   3                  if (result == 0)
+  303   3                  {
+  304   4                      return FALSE;
+  305   4                  }
+  306   3      
+  307   3                  bufindex = 0;
+  308   3              }
+  309   2          }
+  310   1      
+  311   1          filepos += (uint32)length;
+  312   1          return TRUE;
+  313   1      }
+  314          
+  315          /********************************************************************************
+  316           * Description : 保存当前Frame
+  317           *
+  318           * Arguments  :
+  319           *             len: Frame的有效长度  pId3Save->savelen是30，之前已经设置了的
+  320           * Returns     :
+  321           *
+C251 COMPILER V4.55,  enhanced_tag1                                                        13/12/18  16:27:42  PAGE 6   
+
+  322           * Notes       :
+  323           *
+  324           ********************************************************************************/
+  325          
+  326          void SaveTagInfo(dword len)
+  327          {
+  328   1          dword readlen = len;
+  329   1          if (readlen == 0) //may be is 0
+  330   1          {
+  331   2              pId3Save->saveaddr[0] = '\0';
+  332   2              return;
+  333   2          }
+  334   1          FI_FRead(pId3Save->saveaddr, 1);
+  335   1          if (((pId3Save->saveaddr[0]) == 0) || ((pId3Save->saveaddr[0]) == 1))
+  336   1          {
+  337   2              if ((readlen - 1) > (pId3Save->savelen - 2))
+  338   2              {
+  339   3                  readlen = pId3Save->savelen - 2;
+  340   3              }
+  341   2              else
+  342   2              {
+  343   3                  readlen -= 1;//framesize include the encodetype
+  344   3              }
+  345   2              FI_FRead(pId3Save->saveaddr, (int16)readlen);
+  346   2              //pId3Save->saveaddr[readlen] = '\0';
+  347   2              //pId3Save->saveaddr[readlen + 1] = '\0';
+  348   2          }
+  349   1          else   //no encode type
+  350   1          {
+  351   2              if ((readlen) > (pId3Save->savelen - 2))
+  352   2              {
+  353   3                  readlen = pId3Save->savelen - 2;
+  354   3              }
+  355   2              FI_FRead(pId3Save->saveaddr + 1, ((int16)(readlen - 1)));
+  356   2          }
+  357   1          pId3Save->saveaddr[readlen] = '\0';
+  358   1          pId3Save->saveaddr[readlen + 1] = '\0';
+  359   1      }
+  360          
+  361          /********************************************************************************
+  362           * Description : Frame解析
+  363           *
+  364           * Arguments  :
+  365           *
+  366           * Returns     :
+  367           *            Frame的整长
+  368           * Notes       :
+  369           *
+  370           ********************************************************************************/
+  371          
+  372          dword ParseFrame(void)
+  373          {
+  374   1          char id3header[12];
+  375   1      
+  376   1          //获取一个头到id3header
+  377   1          FI_FRead(id3header, ID3ver[curversion].bytes_of_header);
+  378   1          if ((id3header[0] == 0) && (id3header[1] == 0) && (id3header[2] == 0))
+  379   1          {
+  380   2              return 0;
+  381   2          }
+  382   1      
+  383   1          //处理一个头，获得该信息帧的长度
+  384   1          GetFrameSize(id3header);
+  385   1      
+  386   1          if (FALSE != IsAvailFrameID(id3header))
+  387   1          {
+C251 COMPILER V4.55,  enhanced_tag1                                                        13/12/18  16:27:42  PAGE 7   
+
+  388   2              SaveTagInfo(framesize);  //framesize include the encode type
+  389   2              findcount++;
+  390   2          }
+  391   1          else
+  392   1          {
+  393   2              Check_Comm_Item(id3header);
+  394   2          }
+  395   1          return framesize + ID3ver[curversion].bytes_of_header; //帧长加帧头长
+  396   1      }
+  397          
+  398          /********************************************************************************
+  399           * Description : 读取V2版本ID3 Tag
+  400           *
+  401           * Arguments  :
+  402           *             TagFileHandle:待处理文件句柄
+  403           *             pID3Info:ID3 Tag保存结构体指针
+  404           * Returns     :
+  405           *            TRUE: 成功,
+  406           *            FALSE: 失败.
+  407           * Notes       :
+  408           *
+  409           ********************************************************************************/
+  410          
+  411          BOOL FetchID3_V2info(handle TagFileHandle, ID3Info_t *pID3Info)
+  412          {
+  413   1          dword ID3Size;
+  414   1          dword whole_framesize;
+  415   1      
+  416   1          TagHandle = TagFileHandle;
+  417   1          pID3InfoStart = pID3Info;//信息隐藏，pID3Info是传进来的参数，而pID3InfoStart等同，但其在TAG模块中是全
+             -局访问的
+  418   1      
+  419   1          findcount = 0;
+  420   1          memset(AvailFlag, 0, sizeof(AvailFlag));
+  421   1          curversion = 0;//默认ID3v2.3版本
+  422   1      
+  423   1          ClearWatchDog();
+  424   1      
+  425   1          FI_FInit();//读取512byte到 TempBuf
+  426   1          FI_FRead((char *) &id3h, sizeof(id3h));
+  427   1      
+  428   1          if ((id3h.Header[0] != 'I') || (id3h.Header[1] != 'D') || (id3h.Header[2] != '3'))
+  429   1          {
+  430   2              return FALSE;
+  431   2          }
+  432   1      
+  433   1          if (id3h.Ver < 3)
+  434   1          {
+  435   2              curversion = 1;//ID3v2.2版本
+  436   2          }
+  437   1      
+  438   1          //ID3Size是整个ID3V2的长度
+  439   1          ID3Size = ((dword) (id3h.Size[0] & 0x7F) << 21) + ((dword) (id3h.Size[1] & 0x7F) << 14) + ((dword) (i
+             -d3h.Size[2]
+  440   1                    & 0x7F) << 7) + (dword) (id3h.Size[3] & 0x7F) + sizeof(id3h);
+  441   1      
+  442   1          framepos = sizeof(id3h);
+  443   1      
+  444   1          while ((framepos < ID3Size) && (findcount < ID3_COUNT))
+  445   1          {
+  446   2              ClearWatchDog();
+  447   2      
+  448   2              //whole_framesize一帧的长度
+  449   2              whole_framesize = ParseFrame();
+  450   2              if (whole_framesize == 0) //deal with the padding byte
+  451   2              {
+C251 COMPILER V4.55,  enhanced_tag1                                                        13/12/18  16:27:42  PAGE 8   
+
+  452   3                  break;
+  453   3              }
+  454   2              framepos += whole_framesize;
+  455   2      
+  456   2              //SaveTagInfo 里使用的len(最大是30)不一定是frameSize ，因此要重新对齐
+  457   2              if (!FI_FSeek(framepos))
+  458   2              {
+  459   3                  break;
+  460   3              }
+  461   2          }
+  462   1      
+  463   1          if (findcount > 0)
+  464   1          {
+  465   2              return TRUE;
+  466   2          }
+  467   1          return FALSE;
+  468   1      }
+  469          
+  470          
+  471          void Check_Comm_Item(char *pid3header)
+  472          {
+  473   1          int i;
+  474   1          char tmpbuf[9];
+  475   1          for(i = 0; i < 4; i++)
+  476   1          {
+  477   2              if(pid3header[i] != COMM_NAME[i])
+  478   2              {
+  479   3                  return;
+  480   3              }
+  481   2          }
+  482   1      
+  483   1          FI_FRead(tmpbuf, 9);
+  484   1          if(!memcmp(&tmpbuf[5], k123_name, 4))
+  485   1          {
+  486   2              //karaoke_flag |= 0x2;
+  487   2              karaoke_flag = 0x2;
+  488   2          }
+  489   1          else if(!memcmp(&tmpbuf[5], a123_name, 4))
+  490   1          {
+  491   2              //karaoke_flag |= 0x2;
+  492   2              actrec_flag = 0x1;
+  493   2          }
+  494   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1753     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        14     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =        32     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        54     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

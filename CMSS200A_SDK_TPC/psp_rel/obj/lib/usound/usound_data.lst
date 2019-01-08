@@ -1,0 +1,527 @@
+C251 COMPILER V4.55,  usound_data                                                          13/12/18  14:07:01  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE usound_data
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usound\usound_data.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usbsound\usound_data.c XSMALL FUNCTIONS(REENTRANT) ROM(HU
+                    -GE) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\usound_data.lst) OBJECT(..\..\..\obj\lib\usound\us
+                    -ound_data.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              AS260A
+    3           *                            Module: USB Sound
+    4           *                 Copyright(c) 2001-2012 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>            <version >             <desc>
+    9           *      dengtaiping 2012-10-23 16:40     1.0                build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * \file     usound_data.c
+   13           * \brief    .
+   14           * \author   dengtaiping
+   15           * \par      GENERAL DESCRIPTION:
+   16           *               定义全局变量
+   17           * \par      EXTERNALIZED FUNCTIONS:
+   18           *               这里描述调用到外面的模块
+   19           *
+   20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
+   21           *
+   22           * \version 1.0
+   23           * \date  2012/10/23
+   24           *******************************************************************************/
+   25          #include "usound_setup.h"
+   26          #include "usound_extern.h"
+   27          
+   28          #pragma userclass(near=USD_RDATA)
+   29          #pragma ROM(HUGE)
+   30          //uint8 pa_mute = 0;
+   31          uint8 usb_state = 0, play_mute_ch0 = 0, record_mute_ch0 = 0;
+   32          uint8 cur_selector = 0;
+   33          device_requests_t setup_data;
+   34          uint16 volume_value = 0, play_vol_ch0 = 0x6000, record_vol_ch0 = 0x4000; /*, current_volume_ch1 = 0, curr
+             -ent_volume_ch2 = 0*/
+   35          uint32 current_sample = 0;
+   36          uint8 is_key_msg = 0x00;
+   37          uint32 wr_play_buff_ptr = 0;
+   38          int16 play_data_count = 0;
+   39          uint32 rd_record_buff_ptr = 0;
+   40          int16 record_data_count = 0;
+   41          uint32 usb_isr = 0;
+   42          uint32 dma_adc_isr = 0;
+   43          uint32 dma_dac_isr = 0;
+   44          uint8 g_PAOpenFlag = 0;
+   45          uint8 start_play_flag = 0;
+   46          uint8 start_record_flag = 0;
+   47          uint8 muram_addr = 0;
+   48          uint8 hid_send_flag = 0;
+   49          uint8 hid_report = 0;
+   50          uint8 mcu_pll_ctl_bak = 0;
+   51          uint8 cpuclkctl_bak = 0;
+   52          uint8 pa_volume_bak = 0;
+   53          uint8 cur_vol_index;
+   54          uint8 vol_change_flag;
+   55          uint8 g_record_packet_size = 32; //默认是16K 采样率上传的:16x2
+   56          usound_param gud_param = {0};
+C251 COMPILER V4.55,  usound_data                                                          13/12/18  14:07:01  PAGE 2   
+
+   57          
+   58          uint8 sample_rate_arr[4][3] = 
+   59          {
+   60              {0x80, 0x3E, 0x00},       //16K
+   61              {0x44, 0xAC, 0x00},       //44.1K
+   62              {0x80, 0xBB, 0x00},       //48K
+   63              {0x00, 0x77, 0x01},      //96k
+   64          };
+   65          
+   66          uint8 ReportDescriptor[0x21] =
+   67          {
+   68              0x05, 0x0c, //USAGE_PAGE (Consumer)
+   69              0x09, 0x01, //USAGE (Consumer Control)
+   70              0xa1, 0x01, //COLLECTION (Application)
+   71              0x15, 0x00, //Logical Minimum (0x00)
+   72              0x25, 0x01, //Logical Maximum (0x01)
+   73              0x09, 0xe9, //USAGE (Volume Up)
+   74              0x09, 0xea, //USAGE (Volume Down)
+   75              0x09, 0xe2, //USAGE (Mute)
+   76              0x09, 0xcd, //USAGE (Play/Pause)
+   77              0x09, 0xb5, //USAGE (Scan Next Track)
+   78              0x09, 0xb6, //USAGE (Scan Previous Track)
+   79              0x09, 0xb3, //USAGE (Fast Forward)
+   80              0x09, 0xb4, //USAGE (Rewind)
+   81              0x75, 0x01, //Report Size (0x01)
+   82              0x95, 0x08, //Report Count (0x08),报告的个数为8，即总共有8个bits
+   83              0x81, 0x42, //Input (Data,Variable,Absolute,No Wrap,Linear,Preferred State,Null state)
+   84              0xc0, //END_COLLECTION
+   85          };
+   86          
+   87          device_descriptor_t Device_Descriptor =
+   88          {
+   89              sizeof(device_descriptor_t), //size of descriptor
+   90              DEVICE, //descriptor type
+   91              0x0001, //USB release version 2.0
+   92              0x00, //class code
+   93              0x00, //sub-class code
+   94              0x00, //protocol code
+   95              0x40, //max packet size = 64byte
+   96          #if 0
+                   0xd610, //vendor ID
+               #else
+   99                  0x0020, //vendor ID
+  100          #endif
+  101              0x00dd, //product ID
+  102              0x1611, //Firmware release number, DDMM
+  103              0x01, //index of string descriptor of manufacturer
+  104              0x02, //index of string descriptor of product
+  105              0x03, //index of string descriptor of serial number
+  106              0x01, //number of possible configuration
+  107          };
+  108          
+  109          //-----------------------------------------------------------
+  110          //start of Configuration
+  111          //-----------------------------------------------------------
+  112          device_audio_configuration_t All_Descriptors_of_Configuration =
+  113          {
+  114          
+  115              /*device_config_descriptor_t Configuration_Descriptor =*/
+  116              {
+  117                  sizeof(device_config_descriptor_t), //size of descriptor
+  118                  CONFIG, //descriptor type
+  119                  sizeof(device_audio_configuration_t) << 8, //total length
+  120          #ifdef _USB_RECORD_
+  121                  0x04, //number of interface = 3,for audio class
+  122          #else
+C251 COMPILER V4.55,  usound_data                                                          13/12/18  14:07:01  PAGE 3   
+
+                               0x03,
+               #endif
+  125                  0x01, //configuration value
+  126                  0x00, //configuration string index
+  127                  0x80,//0xC0, //attribute (bus powered, remote wakeup disable)
+  128                  0x32,//0x96, //max power (500mA),96h(300mA)
+  129              },
+  130          
+  131              /*usb_interface_descriptor_t Interface0_Descriptor =*/
+  132              {
+  133                  sizeof(usb_interface_descriptor_t), //size of descriptor
+  134                  INTERFACE, //descriptor type
+  135                  0x00, //interface number,
+  136                  0x00, //alternative setting
+  137                  0x00, //number of endpoint
+  138                  0x01, //interface class code, Audio Interface class.
+  139                  0x01, //interface sub-class code, AUDIOCONTROL Subclass.
+  140                  0x00, //interface protocol code, doesn't use any class-specific protocols.
+  141                  0x00, //interface string index, doesn't have a string descriptor describing this iInterface.
+  142              },
+  143          
+  144              /*Audio_Class_Head_t Audio_Class_Head =*/
+  145              {
+  146                  sizeof(Audio_Class_Head_t), 
+  147                  0x24, //descriptor type, CS_INTERFACE .
+  148                  0x01, //HEADER descriptor subtype.
+  149                  0x0001, //Audio Device compliant to the USB Audio specification version 1.00.
+  150          #ifdef _USB_RECORD_
+  151                  (sizeof(Audio_Class_Head_t) + (sizeof(Audio_Class_Input_t) * 2) + (sizeof(Audio_Class_Output_t) *
+             - 2)
+  152                  + sizeof(Audio_Class_Selector_t) + sizeof(Audio_Class_Feature1_t)
+  153                  + sizeof(Audio_Class_Feature2_t)) << 8, //total length.
+  154                  0x02, //The number of AudioStreaming and MIDIStreaming interfaces in the Audio Interface Collecti
+             -on to which this AudioControl interface belongs.
+  155                  0x01, //interface number of first AudioStreaming or MIDIStreaming interface in the collection.
+  156                  0x02, //interface number of second AudioStreaming or MIDIStreaming interface in the collection.
+  157          #else
+                               (sizeof(Audio_Class_Head_t) + sizeof(Audio_Class_Input_t) + sizeof(Audio_Class_Output_t)
+                       + sizeof(Audio_Class_Feature1_t)) << 8,  //total length.
+                       0x01, //The number of AudioStreaming and MIDIStreaming interfaces in the Audio Interface Collecti
+             -on to which this AudioControl interface belongs.
+                       0x01, //interface number of first AudioStreaming or MIDIStreaming interface in the collection.
+                       //0x02, //interface number of second AudioStreaming or MIDIStreaming interface in the collection.
+               #endif
+  164              },
+  165          
+  166              /*Audio_Class_Input_t Audio_Class_Input1 =*/
+  167              {
+  168                  sizeof(Audio_Class_Input_t), 
+  169                  0x24, //descriptor type, CS_INTERFACE .
+  170                  0x02, //INPUT_TERMINAL  descriptor subtype.
+  171                  0x01, //Terminal ID.
+  172                  0x0101, //Terminal Type. USB streaming
+  173                  0x00, //This Input Terminal has no association.
+  174                  0x02, //This Terminal's output audio channel cluster has 2 logical output channels.
+  175                  0x0300, //Channel Config bitmap.
+  176                  0x00, //Channel Name.
+  177                  0x00, //Terminal name.
+  178              },
+  179          #ifdef _USB_RECORD_
+  180              /*Audio_Class_Input_t Audio_Class_Input2 =*/
+  181              {
+  182                  sizeof(Audio_Class_Input_t), 0x24, //descriptor type, CS_INTERFACE .
+  183                  0x02, //INPUT_TERMINAL  descriptor subtype.
+  184                  0x02, //Terminal ID.
+  185                  0x0102, //Terminal Type.Microphone
+C251 COMPILER V4.55,  usound_data                                                          13/12/18  14:07:01  PAGE 4   
+
+  186                  0x00, //This Input Terminal has no association.
+  187                  0x01, //This Terminal's output audio channel cluster has 2 logical output channels.
+  188                  0x0100, //Channel Config bitmap.
+  189                  0x00, //Channel Name.
+  190                  0x00, //Terminal name.
+  191              },
+  192          #endif
+  193              /*Audio_Class_Output_t Audio_Class_Output1 =*/
+  194              {
+  195                  sizeof(Audio_Class_Output_t), 
+  196                  0x24, //descriptor type, CS_INTERFACE .
+  197                  0x03, //OUTPUT_TERMINAL  descriptor subtype.
+  198                  0x06, //Terminal ID.
+  199                  0x0103, //Terminal Type.Speaker
+  200                  0x00, //This Output Terminal has no association.
+  201                  0x09, //ID of the Unit or Terminal to which this Terminal is connected.
+  202                  0x00, //Terminal name.
+  203              },
+  204          #ifdef _USB_RECORD_
+  205              /*Audio_Class_Output_t Audio_Class_Output2 =*/
+  206              {
+  207                  sizeof(Audio_Class_Output_t), 0x24, //descriptor type, CS_INTERFACE .
+  208                  0x03, //OUTPUT_TERMINAL  descriptor subtype.
+  209                  0x07, //Terminal ID.
+  210                  0x0101, //Terminal Type. USB streaming
+  211                  0x00, //This Output Terminal has no association.
+  212                  SELECTOR_UNIT_ID, //ID of the Unit or Terminal to which this Terminal is connected.
+  213                  0x00, //Terminal name.
+  214              },
+  215              
+  216              /*Audio_Class_Seclector_t Audio_Class_Selector =*/
+  217              {
+  218                  sizeof(Audio_Class_Selector_t), 0x24, //CS_INTERFACE descriptor type.
+  219                  0x05, //SELECTOR_UNIT descriptor subtype.
+  220                  SELECTOR_UNIT_ID, //SelectorID
+  221                  0x01, //Number of Input Pins of this Unit:p
+  222                  0x0a, //bSourceID
+  223                  0X00, //index of a string descriptor,describing the select unit
+  224              },
+  225          #endif
+  226              /*Audio_Class_Feature1_t Audio_Class_Feature1 =*/
+  227              {
+  228                  sizeof(Audio_Class_Feature1_t), 
+  229                  0x24, //descriptor type, CS_INTERFACE .
+  230                  0x06, //FEATURE_UNIT descriptor subtype.
+  231                  FEATURE_UNIT_ID1, //Unit ID.
+  232                  0x01, //ID of the Unit or Terminal to which this Feature Unit is connected.
+  233                  0x01, //Size in bytes of an element of the bmaControls() array.
+  234                  0x03, //bmaControls(0), bitmap of master channel 0.
+  235                  0x00, //bmaControls(1), bitmap of master channel 1.
+  236                  0x00, //bmaControls(2), bitmap of master channel 2.
+  237                  0x00, //Feature name.
+  238              },
+  239          #ifdef _USB_RECORD_
+  240              /*Audio_Class_Feature2_t Audio_Class_Feature2 =*/
+  241              {
+  242                  sizeof(Audio_Class_Feature2_t), 0x24, //descriptor type, CS_INTERFACE .
+  243                  0x06, //FEATURE_UNIT descriptor subtype.
+  244                  FEATURE_UNIT_ID2, //Unit ID.
+  245                  0x02, //ID of the Unit or Terminal to which this Feature Unit is connected.
+  246                  0x01, //Size in bytes of an element of the bmaControls() array.
+  247                  0x03, //bmaControls(0), bitmap of master channel 0.
+  248                  0x00, //bmaControls(1), bitmap of master channel 1.
+  249                  0x00, //Feature name.
+  250              },
+  251          #endif
+C251 COMPILER V4.55,  usound_data                                                          13/12/18  14:07:01  PAGE 5   
+
+  252              /*Standard_AS_Interface_Descriptor_t Interface1_Setting0 =*/
+  253              {
+  254                  sizeof(Standard_AS_Interface_Descriptor_t), //size of descriptor
+  255                  INTERFACE, //descriptor type
+  256                  0x01, //interface value
+  257                  0x00, //alternative setting
+  258                  0x00, //number of endpoint
+  259                  0x01, //interface class code, Audio Interface class.
+  260                  0x02, //interface sub-class code, AUDIOSTREAMING Subclass.
+  261                  0x00, //interface protocol code, doesn't use any class-specific protocols.
+  262                  0x00, //interface string index, doesn't have a string descriptor describing this iInterface.
+  263              },
+  264          
+  265              /*Standard_AS_Interface_Descriptor_t Interface1_Setting1 =*/
+  266              {
+  267                  sizeof(Standard_AS_Interface_Descriptor_t), //size of descriptor
+  268                  INTERFACE, //descriptor type
+  269                  0x01, //interface value
+  270                  0x01, //alternative setting
+  271                  0x01, //number of endpoint
+  272                  0x01, //interface class code, Audio Interface class.
+  273                  0x02, //interface sub-class code, AUDIOSTREAMING Subclass.
+  274                  0x00, //interface protocol code, doesn't use any class-specific protocols.
+  275                  0x00, //interface string index, doesn't have a string descriptor describing this iInterface.
+  276              },
+  277          
+  278              /*ClassSpecific_AS_Interface_Descriptor_t Audio_Class_General_Setting1 =*/
+  279              {
+  280                  sizeof(ClassSpecific_AS_Interface_Descriptor_t), //size of descriptor
+  281                  0x24, //descriptor type, CS_INTERFACE .
+  282                  0x01, //AS_GENERAL descriptor subtype.
+  283                  0x01, //The Terminal ID of the Terminal to which the endpoint of this interface is connected.
+  284                  0x01, //Delay introduced by the data path. Expressed in number of frames.
+  285                  0x0100, //Format Tag, PCM.
+  286              },
+  287          
+  288              /*Format_Type_Descriptor_t Audio_Class_Format_Setting1 =*/
+  289              {
+  290                  sizeof(Format_Type_Descriptor_t), 0x24, //descriptor type, CS_INTERFACE .
+  291                  0x02, //FORMAT_TYPE descriptor subtype.
+  292                  0x01, //FormatType, FORMAT_TYPE .
+  293                  0x02, //bNrChannels, Indicates the number of physical channels in the audio data stream.
+  294          #ifdef BIT_RESOLUTION_16
+                       0x02, //bSubframeSize, The number of bytes occupied by one audio subframe. Can be 1, 2, 3 or 4.
+                       0x10, //bBitResolution, The number of effectively used bits from the available bits in an audio s
+             -ubframe.
+               #endif
+  298          #ifdef BIT_RESOLUTION_24
+  299                  0x03, //bSubframeSize, The number of bytes occupied by one audio subframe. Can be 1, 2, 3 or 4.
+  300                  0x18, //bBitResolution, The number of effectively used bits from the available bits in an audio s
+             -ubframe.
+  301          #endif
+  302                  0x01, //bSamFreqType, Indicates how the sampling frequency can be programmed.
+  303                  //{ 0x80, 0xbb, 0x00, }, //22.05K, Sampling frequency 1 in Hz for this isochronous data endpoint.
+  304                  //{0x40, 0x1F, 0x00,},       //8K
+  305                  //{0xE0, 0x2E, 0x00,},       //12K
+  306                  //{0x80, 0x3E, 0x00,},       //16K
+  307                  //{0xC0, 0x5D, 0x00,},       //24K
+  308                  //{0x00, 0x7D, 0x00,},       //32K
+  309                  //{0x44, 0xAC, 0x00,},       //44.1K
+  310                  //{0x80, 0xBB, 0x00,},       //48K
+  311                  {0x00, 0x00, 0x00,}, 
+  312              },
+  313          
+  314              /*Standard_Endpiont_Descriptor_t Endpoint_Descriptor_Setting1 =*/
+  315              {
+C251 COMPILER V4.55,  usound_data                                                          13/12/18  14:07:01  PAGE 6   
+
+  316                  sizeof(Standard_Endpiont_Descriptor_t), //size of descriptor
+  317                  ENDPOINT, //descriptor type
+  318                  0x02, //endpoint address (out endpoint addressed at 2)
+  319                  0x09, //endpoint type (ISOCHRONOUS, adaptive)
+  320                  ISO_OUT_MAX_PACKET_SIZE << 8, //max packet size (192 bytes)
+  321                  0x01, //The polling interval value is every 1 Frames.
+  322                  0x00, /* unused.  */
+  323                  0x00, /* unused.  */
+  324              },
+  325          
+  326              /*ClassSpecific_Endpiont_Descriptor_t Audio_Data_Endpoint_Setting1 =*/
+  327              {
+  328                  sizeof(ClassSpecific_Endpiont_Descriptor_t), //size of descriptor
+  329                  0x25, //descriptor type, CS_ENDPOINT
+  330                  0x01, //descriptor subtype
+  331                  0x01, //bmAttributes, sampling frequency control, no pitch control.
+  332                  0x01, //bLockDelayUnits,
+  333                  0x0100, //wLockDelay
+  334              },
+  335          #ifdef _USB_RECORD_
+  336              /*Standard_AS_Interface_Descriptor_t Interface2_Setting0 =*/
+  337              {
+  338                  sizeof(Standard_AS_Interface_Descriptor_t), //size of descriptor
+  339                  INTERFACE, //descriptor type
+  340                  0x02, //interface value
+  341                  0x00, //alternative setting
+  342                  0x00, //number of endpoint
+  343                  0x01, //interface class code, Audio Interface class.
+  344                  0x02, //interface sub-class code, AUDIOSTREAMING Subclass.
+  345                  0x00, //interface protocol code, doesn't use any class-specific protocols.
+  346                  0x00, //interface string index, doesn't have a string descriptor describing this iInterface.
+  347              },
+  348          
+  349              /*Standard_AS_Interface_Descriptor_t Interface2_Setting1 =*/
+  350              {
+  351                  sizeof(Standard_AS_Interface_Descriptor_t), //size of descriptor
+  352                  INTERFACE, //descriptor type
+  353                  0x02, //interface value
+  354                  0x01, //alternative setting
+  355                  0x01, //number of endpoint
+  356                  0x01, //interface class code, Audio Interface class.
+  357                  0x02, //interface sub-class code, AUDIOSTREAMING Subclass.
+  358                  0x00, //interface protocol code, doesn't use any class-specific protocols.
+  359                  0x00, //interface string index, doesn't have a string descriptor describing this iInterface.
+  360              },
+  361          
+  362              /*ClassSpecific_AS_Interface_Descriptor_t Audio_Class_General_Setting2 =*/
+  363              {
+  364                  sizeof(ClassSpecific_AS_Interface_Descriptor_t), //size of descriptor
+  365                  0x24, //descriptor type, CS_INTERFACE .
+  366                  0x01, //AS_GENERAL descriptor subtype.
+  367                  0x07, //The Terminal ID of the Terminal to which the endpoint of this interface is connected.
+  368                  0x01, //Delay introduced by the data path. Expressed in number of frames.
+  369                  0x0100, //Format Tag, PCM.
+  370              },
+  371          
+  372               /*Format_Type_Descriptor_t Audio_Class_Format_Setting2 =*/
+  373              {
+  374                  sizeof(Format_Type_Descriptor_t), 0x24, //descriptor type, CS_INTERFACE .
+  375                  0x02, //FORMAT_TYPE descriptor subtype.
+  376                  0x01, //FormatType, FORMAT_TYPE .
+  377                  0x01, //bNrChannels, Indicates the number of physical channels in the audio data stream.
+  378                  0x02, //bSubframeSize, The number of bytes occupied by one audio subframe. Can be 1, 2, 3 or 4.
+  379                  0x10, //bBitResolution, The number of effectively used bits from the available bits in an audio s
+             -ubframe.
+  380                  0x01, //bSamFreqType, Indicates how the sampling frequency can be programmed.
+C251 COMPILER V4.55,  usound_data                                                          13/12/18  14:07:01  PAGE 7   
+
+  381                          {0x00, 0x00, 0x00,},    
+  382              },
+  383          
+  384              /*Standard_Endpiont_Descriptor_t Endpoint_Descriptor_Setting2 =*/
+  385              {
+  386                  sizeof(Standard_Endpiont_Descriptor_t), //size of descriptor
+  387                  ENDPOINT, //descriptor type
+  388                  0x81, //endpoint address (in endpoint addressed at 1)
+  389                  0x05, //endpoint type (ISOCHRONOUS)
+  390                  ISO_IN_MAX_PACKET_SIZE << 8, 0x01, //The polling interval value is every 1 Frames.
+  391                  0x00, /* unused.  */
+  392                  0x00, /* unused.  */
+  393              },
+  394          
+  395              /*ClassSpecific_Endpiont_Descriptor_t Audio_Data_Endpoint_Setting2 =*/
+  396              {
+  397                  sizeof(ClassSpecific_Endpiont_Descriptor_t), //size of descriptor
+  398                  0x25, //descriptor type, CS_ENDPOINT
+  399                  0x01, //descriptor subtype
+  400                  0x00, //bmAttributes, sampling frequency control, no pitch control.
+  401                  0x00, //bLockDelayUnits,
+  402                  0x0000, //wLockDelay
+  403              },
+  404          #endif
+  405              /*Standard_AS_Interface_Descriptor_t Interface3_Setting0 =*/
+  406              {
+  407                  sizeof(Standard_AS_Interface_Descriptor_t), //size of descriptor
+  408                  INTERFACE, //descriptor type
+  409                  0x03, //interface value
+  410                  0x00, //alternative setting
+  411                  0x01, //number of endpoint
+  412                  0x03, //HID Interface Class
+  413                  0x00, //
+  414                  0x00, //interface protocol code, doesn't use any class-specific protocols.
+  415                  0x00, //interface string index, doesn't have a string descriptor describing this iInterface.
+  416              },
+  417          
+  418              /*Standard_HID_Descriptor_t HID_Descriptor_Setting0 =*/
+  419              {
+  420                  sizeof(Standard_Endpiont_Descriptor_t), //size of descriptor
+  421                  0x21, //descriptor type
+  422                  0x0001, //bcdHID
+  423                  0x00, //bCountryCode
+  424                  0x01, //bNumDescriptors
+  425                  0x22, //bDescriptorType
+  426                  0x2100, //wDescriptorLength
+  427              },
+  428          
+  429              /*Standard_Endpiont_Descriptor1_t Endpiont_Descriptor_Setting3 =*/
+  430              {
+  431                  sizeof(Standard_Endpiont_Descriptor1_t), //size of descriptor
+  432                  ENDPOINT, //descriptor type
+  433                  0x83, //bEndpointAddress:-> Direction: IN - EndpointID: 3
+  434                  0x03, //bmAttributes:-> Interrupt Transfer Type
+  435                  0x0400, //wMaxPacketSize
+  436                  0x20, //bInterval
+  437              },
+  438          
+  439          };
+  440          //-----------------------------------------------------------
+  441          //end of Configuration
+  442          //-----------------------------------------------------------
+  443          
+  444          string_language_id_t language_string =
+  445          {
+  446              0x04, /* length*/
+C251 COMPILER V4.55,  usound_data                                                          13/12/18  14:07:01  PAGE 8   
+
+  447              0x03, /* Second Byte of this descriptor.  */
+  448              0x0904, /* LANGID code array, US english,0x409 */
+  449          };
+  450          
+  451          string_product_t device_name_string =
+  452          {
+  453              0x22, 0x03, 'E',  'a',  'r',  'P',  'o',  'd',  's',  '_',  'T',  'C',  '0',  
+  454                  '1',  '_',  'J',  'C',  'D',  0x00, 0x00,       0x00, 0x00, 0x00, 0x00, 
+  455                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+  456          };
+  457          
+  458          string_manufacturer_t manufacure_string =
+  459          {       
+  460                  0x12, 0x03, 'C',  '&',  'T', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+  461                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+  462          };
+  463          
+  464          serialnum_descriptor_t SerialNumber =
+  465          {
+  466              0x22, 0x03, 'U',  '2',  'd',  'c',  '0',  'z',  '7',  'w',  's',  '5', 
+  467                  '3',  'a',  '7',  '9',  'r',  'n',  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+  468                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  469          };
+  470          
+  471          #pragma userclass(near=default)
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =    ------     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =       440     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =       570     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

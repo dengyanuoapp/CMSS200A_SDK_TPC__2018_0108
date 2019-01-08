@@ -1,0 +1,59 @@
+A251 MACRO ASSEMBLER  showLogoFuncs                                                         14/02/17 16:06:34 PAGE     1
+
+
+MACRO ASSEMBLER A251 V4.52b
+OBJECT MODULE PLACED IN .\obj\showLogoFuncs.obj
+ASSEMBLER INVOKED BY: E:\Keil\C251\BIN\A251.EXE showLogoFuncs.A51 MODSRC INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DF(DE
+                      MO_EFUSE=0) DF(DEMO_ADFU=0) SET(XSMALL,ROMHUGE) DEBUG PRINT(.\lst\showLogoFuncs.lst) OBJECT(.\obj\showLogoFuncs.obj) EP
+
+LOC    OBJ             LINE     SOURCE
+
+                          1     
+                          2     
+                          3     
+                          4     
+                          5     
+                          6     
+                          7     public  sAdfuEnter??
+                          8     
+                          9     
+                         10     ;------------------------------------------------------------------------------
+                         11     ; Put segment and variable declarations here.
+                         12     ;------------------------------------------------------------------------------ 
+------                   13     CODEDISPSTART   SEGMENT  ECODE   
+                         14     
+------                   15             rseg    CODEDISPSTART
+                         16                     
+000000                   17     sAdfuEnter??:
+000000 8A000000   F      18             EJMP    0xFF9C5C                   
+000004 8000       F      19                 JMP $   
+000006 AA                20             ERET 
+                         21     ;----------------------------delay subroutine------------------------------
+                         22     
+                         23     
+                         24     
+                         25     
+                         26     
+                         27     
+                         28     
+                         29     
+                         30     
+                         31     
+                         32     
+                         33     end
+A251 MACRO ASSEMBLER  showLogoFuncs                                                         14/02/17 16:06:34 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E     ATTRIBUTES
+
+CODEDISPSTART. . .  EC SEG   000007H       REL=UNIT, ALN=BYTE
+SADFUENTER?? . . .  EC ADDR  0000H     R   SEG=CODEDISPSTART
+
+
+REGISTER BANK(S) USED: 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S).

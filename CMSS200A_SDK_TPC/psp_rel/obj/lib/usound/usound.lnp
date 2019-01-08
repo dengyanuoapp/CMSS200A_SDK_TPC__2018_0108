@@ -1,0 +1,11 @@
+"..\..\..\obj\lib\usound\usound_trans.obj",
+"..\..\..\obj\lib\usound\usound_comm.obj",
+"..\..\..\obj\lib\usound\usound_data.obj",
+"..\..\..\obj\lib\usound\usound_deinit.obj",
+"..\..\..\obj\lib\usound\usound_init.obj",
+"..\..\..\obj\lib\usound\usound_irq.obj",
+"..\..\..\obj\lib\usound\usound_setup.obj" 
+TO "..\..\..\obj\lib\usound\usound" 
+PRINT("..\..\..\obj\lib\usound\usound.map") CASE 
+CLASSES (EDATA (0x0-0x41F), 
+HDATA (0x0-0x41F)) 

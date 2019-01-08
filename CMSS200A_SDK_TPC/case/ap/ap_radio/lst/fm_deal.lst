@@ -1,0 +1,158 @@
+C251 COMPILER V4.55,  fm_deal                                                              23/05/16  10:42:07  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE fm_deal
+OBJECT MODULE PLACED IN .\obj\fm_deal.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE fm_deal.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BROWSE 
+                    -ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE(CHECKALARM) DEBUG PRINT(.\lst\fm_deal.lst) OBJECT(.\
+                    -obj\fm_deal.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        main ap of sdk 3.0
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *       History Record:
+    9           *
+   10           *******************************************************************************
+   11           */
+   12          #include "ap_radio.h"
+   13          
+   14          #pragma name(FM_DEAL)
+   15          
+   16          uint16 FMdeal(uint16 RunFMStatues)
+   17          {
+   18   1          uint16 result = 0;
+   19   1          uint8 key;
+   20   1          uint8 count = 0;
+   21   1          uint8 modekeystore = NULL;
+   22   1          bool BandSwitch = TRUE, FirstWait = TRUE;
+   23   1          RunFMStatues = RunFMStatues;
+   24   1          //clear the message pool
+   25   1          while (ap_get_message() != AP_KEY_NULL)
+   26   1          {
+   27   2              ; //清空消息池
+   28   2          }
+   29   1      
+   30   1          while (1)
+   31   1          {
+   32   2              if (BandSwitch == TRUE) //初始化，重画 BandSwitch
+   33   2              {
+   34   3                  result = drawBandSwitch(); //绘制 波段转换开关
+   35   3                  if (result != 0)
+   36   3                  {
+   37   4                      return result;
+   38   4                  }
+   39   3                  BandSwitch = FALSE;
+   40   3                  FirstWait = TRUE;
+   41   3              }
+   42   2              if (need_draw == TRUE) //屏幕重画
+   43   2              {
+   44   3                  need_draw = FALSE;
+   45   3                  RefreshMainScreen();
+   46   3              }
+   47   2              if (FirstWait == TRUE)
+   48   2              {
+   49   3                  FirstWait = FALSE;
+   50   3                  //ap_sleep(3);        //初次进入AP等待1.5S释放MUTE(静音)
+   51   3                  fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL); //设置声音大小
+   52   3                  fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL); //获取状态
+   53   3                  if (g_comval.volume != 0)
+   54   3                  {
+   55   4                      fmSendCommand(FM_MUTE, releaseMUTE, NULL); //fmSendCommand(MC_MUTE, releaseMUTE);
+   56   4                  }
+   57   3                  if (RunFMStatues == ALARM_TO_FM)
+C251 COMPILER V4.55,  fm_deal                                                              23/05/16  10:42:07  PAGE 2   
+
+   58   3                  {
+   59   4                      VMWrite(&g_radio_config, VM_AP_RADIO, sizeof(radio_config_t));
+   60   4                      return RESULT_FMREC_START;
+   61   4                  }
+   62   3              }
+   63   2      
+   64   2              deal_pc_eqsrs(0);
+   65   2      
+   66   2              result = deal_key_msg();
+   67   2              if (result)
+   68   2              {
+   69   3                  return result;
+   70   3              }
+   71   2          }
+   72   1          return key; //不会运行到这里
+   73   1      }
+   74          
+   75          //绘制 波段转换开关
+   76          uint16 drawBandSwitch(void)
+   77          {
+   78   1          uint8 sfr_bak;
+   79   1      
+   80   1          if (g_radio_config.band_mode == Bank_US_Europe) //FM 波段模式 ，如果为普通频段
+   81   1          {
+   82   2              radio_param.param1 = g_radio_config.fmstation_us; //US Tab
+   83   2          }
+   84   1          else
+   85   1          {
+   86   2              radio_param.param1 = g_radio_config.fmstation_jp; //JP Tab
+   87   2          }
+   88   1      
+   89   1          (fm_status_t *) radio_param.param2 = &g_radio_config.FMStatus;//当前播放的电台信息
+   90   1      
+   91   1          fmSendCommand(FM_MID_RESTORE, &radio_param, NULL); //恢复
+   92   1      
+   93   1          fmSendCommand(FM_MID_SETVOLUME, 0, NULL); //设置声音为0
+   94   1      
+   95   1          if (!fmSendCommand(FM_OPEN, SEARCHLEVEL, NULL)) //如果打开失败，硬件错误提示
+   96   1          {
+   97   2              LEDClearScreen();
+   98   2              /* ERR */
+   99   2              LEDDisplay(NUMBER1, NUM_E, 1);
+  100   2              LEDDisplay(NUMBER2, NUM_R, 1);
+  101   2              LEDDisplay(NUMBER3, NUM_R, 1);
+  102   2              ap_sleep(3);
+  103   2              fmSendCommand(FM_MID_SETVOLUME,  (void *) g_comval.volume, NULL);
+  104   2              return RESULT_MAIN; //返回主菜单
+  105   2          }
+  106   1      
+  107   1          fmSendCommand(FM_MUTE, SetMUTE, NULL); //设置静音
+  108   1      
+  109   1          fmSendCommand(FM_MID_PLAY, NULL, NULL); //播放电台
+  110   1      
+  111   1          init_fmin_channel();
+  112   1      
+  113   1          sfr_bak = SFR_BANK;
+  114   1          SFR_BANK = 0x13;
+  115   1          I2S_CTL1 = 0;
+  116   1          SFR_BANK = sfr_bak;
+  117   1      
+  118   1          return 0;
+  119   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+C251 COMPILER V4.55,  fm_deal                                                              23/05/16  10:42:07  PAGE 3   
+
+  ecode size           =       423     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

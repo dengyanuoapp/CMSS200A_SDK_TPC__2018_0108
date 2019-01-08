@@ -1,0 +1,67 @@
+C251 COMPILER V4.55,  basal_de_d                                                           13/12/18  16:27:20  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE basal_de_d
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\basal\basal_de_d.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\audioBasal\basal_de_d.c XSMALL FUNCTIONS(RE
+                    -ENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) INCDIR(..\..\..\..\..\inc) DEBUG PRINT(.\basal_de_d.lst) OBJECT(..\..\..\..\obj\lib
+                    -\basal\basal_de_d.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              USDK 5102
+    3           *                            Module: POWER MANAGER
+    4           *                 Copyright(c) 2001-2009 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *    wuyueqian     2009-9-07 9:42     1.0             build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * file
+   13           * brief
+   14           * Author   wuyueqian
+   15           * par
+   16           *
+   17           *      Copyright(c) 2001-2007 Actions Semiconductor, All Rights Reserved.
+   18           *
+   19           * version 1.0
+   20           * date  2008/6/12
+   21           *******************************************************************************/
+   22          #include <basal.h>
+   23          #include <decC.h>
+   24          
+   25          #pragma name(MW_BS_AD_CMD3)
+   26          
+   27          #pragma renamecode(MW_BS_AD_CMD3)
+   28          
+   29          void reserve_function1(void)
+   30          {
+   31   1      
+   32   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =         1     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

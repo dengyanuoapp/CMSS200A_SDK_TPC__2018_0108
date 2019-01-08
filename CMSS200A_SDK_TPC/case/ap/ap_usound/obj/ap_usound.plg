@@ -1,0 +1,36 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_usound\ap_sound.uv2
+Project File Date:  06/02/2016
+
+<h2>Output:</h2>
+Build target 'usound-src'
+User command #1: .\buildapl.bat
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_usound>..\..\..\psp_rel\tools\LinkfileParse.exe ap_usound.apl ap_usound.lin ap_usound.apc 
+第30行编译异常：警告：未定义段结束地址!
+第31行编译异常：警告：未定义段结束地址!
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_usound>pause
+请按任意键继续. . . 
+compiling usound_main.c...
+compiling usound_task.c...
+compiling usound_rec.c...
+compiling show_pause.c...
+linking...
+Program Size: data=9.4 edata+hdata=851 xdata=0 const=879 code=10955
+creating hex file from ".\obj\ap_usound"...
+User command #1: .\buildap.bat
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_usound>..\..\..\psp_rel\tools\apbuilder.exe -c ap_usound.apc 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_usound>copy .\obj\ap_usound.hex ap_usound.hex 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_usound>copy .\obj\ap_usound.map ap_usound.map 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_usound>copy .\obj\ap_usound ap_usound 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_usound>echo ..\..\..\psp_rel\tools\segcheck.exe ap_usound.map ap_usound.lin ap_usound.apc 
+..\..\..\psp_rel\tools\segcheck.exe ap_usound.map ap_usound.lin ap_usound.apc
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_usound>copy usbsound.ap ..\..\fwpkg\usbsound.ap 
+已复制         1 个文件。
+".\obj\ap_usound" - 0 Error(s), 0 Warning(s).

@@ -1,0 +1,653 @@
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE main
+OBJECT MODULE PLACED IN .\Obj\main.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE main.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BROWSE INC
+                    -DIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\main.lst) OBJECT(.\Obj\main.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        main ap of sdk 3.0
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: main.c,v 1.2 2006/06/26 01:13:37 tangwh Exp $
+   10           *******************************************************************************
+   11           */
+   12          #include "actos.h"
+   13          #include "ap_common.h"
+   14          #include "display.h"
+   15          #include "uhdrv.h"
+   16          #include "AlarmDef.h"
+   17          #include "ap_main.h"
+   18          #include "key.h"
+   19          
+   20          #pragma name(AP_MAIN)
+   21          
+   22          vm_cfg_t g_modifyval;
+   23          
+   24          uint8 ap_id[MAX_AP_NUM];
+   25          bool with_fm = FALSE; //存在fm模块
+   26          uint32 item_offset[8];
+   27          uint8 far sd_read_buf[512];
+   28          const uint8 FwcfgName[] = "FWCFG.BIN";
+   29          
+   30          #ifdef MAIN_AP
+               char report_buf[16]; //存诸播报数据的buffer
+               info_report_t info =
+               {   report_buf, 0, TRUE};
+               #endif
+   35          
+   36          uint8 check_gpioa6(void);
+   37          uint8 test_uart(void);
+   38          uint8 test_dpdm(void);
+   39          
+   40          /*
+   41           *******************************************************************************
+   42           * Description : 初始化Modify设置变量
+   43           *
+   44           * Arguments   :   ap_result,存放 AP结果消息的数组指针
+   45           *
+   46           * Returns     :   NONE
+   47           *
+   48           * Notes       :
+   49           *
+   50           *******************************************************************************
+   51           */
+   52          void ReadModifyInfor(void)
+   53          {
+   54   1          uint8 i, j = 0;
+   55   1      
+   56   1          VMRead(&g_modifyval, VM_AP_FWCFG, sizeof(vm_cfg_t));
+   57   1      
+   58   1          if (g_modifyval.Magic != MAGIC_CFG)
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 2   
+
+   59   1          {
+   60   2              //read modify information from FWCFG.BIN
+   61   2              SD_FILE *fwcfgfp;
+   62   2              fwcfgfp = SD_FOpen(FwcfgName, MODE_READ);
+   63   2              /*读取配置文件头信息*/
+   64   2              SD_FRead(fwcfgfp, sd_read_buf, sizeof(sd_read_buf)); //读取配置文件头信息
+   65   2      
+   66   2              //item_offset[0] --- parameters set item offset
+   67   2              //item_offset[1] ---  key config item offset
+   68   2              //item_offset[2] --- ap config item offset
+   69   2              //item_offset[3] --- language config item offset
+   70   2              //item_offset[4] --- file exchange config item offset, not used here
+   71   2              //item_offset[5] --- function config item offset
+   72   2              for (i = 0; i < 6; i++)
+   73   2              {
+   74   3                  item_offset[i] = *(uint32 *) (sd_read_buf + 16 + i * SIZE_ONE_ITEM);
+   75   3              }
+   76   2      
+   77   2              SD_FSeek(fwcfgfp, SEEK_SET, item_offset[0]); //读取参数类头信息
+   78   2              SD_FRead(fwcfgfp, sd_read_buf, 512); //读取数值设置类信息
+   79   2      
+   80   2              //获取固件版本信息偏移位置
+   81   2              item_offset[6] = *(uint32 *) (sd_read_buf + 5);
+   82   2              /*读取数值类参数信息*/
+   83   2              memcpy(&g_modifyval.SleepTime, &sd_read_buf[SIZE_PARA_HEAD], sizeof(value_set_t));
+   84   2              memcpy(&g_modifyval.Volume, &sd_read_buf[SIZE_PARA_HEAD + SIZE_PARA_ONEITEM], sizeof(value_set_t)
+             -);
+   85   2              memcpy(&g_modifyval.VolDefault, &sd_read_buf[SIZE_PARA_HEAD + 2 * SIZE_PARA_ONEITEM], sizeof(valu
+             -e_set_t));
+   86   2              memcpy(&g_modifyval.RecordGain, &sd_read_buf[SIZE_PARA_HEAD + 3 * SIZE_PARA_ONEITEM], sizeof(valu
+             -e_set_t));
+   87   2              memcpy(&g_modifyval.RecordTimeMax, &sd_read_buf[SIZE_PARA_HEAD + 4 * SIZE_PARA_ONEITEM], sizeof(v
+             -alue_set_t));
+   88   2              memcpy(&g_modifyval.Nor_RecordTimeMax, &sd_read_buf[SIZE_PARA_HEAD + 5 * SIZE_PARA_ONEITEM], size
+             -of(value_set_t));
+   89   2              //        memcpy(&g_modifyval.RecordGain, &sd_read_buf[SIZE_PARA_HEAD + 4 * SIZE_PARA_ONEITEM], s
+             -izeof(value_set_t));
+   90   2      
+   91   2              /*读取按键配置信息*/
+   92   2              SD_FSeek(fwcfgfp, SEEK_SET, item_offset[1]);
+   93   2              SD_FRead(fwcfgfp, sd_read_buf, sizeof(key_cfg_t));
+   94   2      
+   95   2      #if 0
+                       g_modifyval.KeyInfor.Total = ((key_cfg_t *) (sd_read_buf))->TotalKey;
+                       memcpy(g_modifyval.KeyInfor.Table, ((key_cfg_t *) (sd_read_buf))->KeyValue, 16);
+               #else
+   99   2                      g_modifyval.KeyInfor.Total = 3;
+  100   2                      g_modifyval.KeyInfor.Table[0] = Msg_KeyPlayPause;
+  101   2                      if (KEY_VOLSUB_TH < KEY_VOLADD_TH)
+  102   2                      {
+  103   3                              g_modifyval.KeyInfor.Table[1] = Msg_KeyVolSub;
+  104   3                              g_modifyval.KeyInfor.Table[2] = Msg_KeyVolAdd;
+  105   3                      }
+  106   2                      else
+  107   2                      {
+  108   3                              g_modifyval.KeyInfor.Table[1] = Msg_KeyVolAdd;
+  109   3                              g_modifyval.KeyInfor.Table[2] = Msg_KeyVolSub;
+  110   3                      }
+  111   2      #endif
+  112   2      
+  113   2              //      g_modifyval.Supper_clock= ((func_item_t *) (&sd_read_buf[SIZE_FUNC_HEAD + 3 * sizeof(func_item
+             -_t)]))->State;
+  114   2              //       g_modifyval.TTS_Report= ((func_item_t *) (&sd_read_buf[SIZE_FUNC_HEAD + 4 * sizeof(func_item_
+             -t)]))->State;
+  115   2      
+  116   2              /*读取ap配置类信息*/
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 3   
+
+  117   2              SD_FSeek(fwcfgfp, SEEK_SET, item_offset[2]);
+  118   2              SD_FRead(fwcfgfp, sd_read_buf, 512);
+  119   2              for (i = 0, j = 0; i < sd_read_buf[0]; i++)
+  120   2              {
+  121   3                  if (((ap_infor_t *) (&sd_read_buf[SIZE_APCFG_HEAD + SIZE_APINFOR_ITEM * i]))->Status != 0)
+  122   3                  {
+  123   4                      //有效AP
+  124   4                      g_modifyval.ApInfor.Table[j]
+  125   4                          = ((ap_infor_t *) (&sd_read_buf[SIZE_APCFG_HEAD + SIZE_APINFOR_ITEM * i]))->Index;
+  126   4                      j++;
+  127   4                      /*找出Active 的序号*/
+  128   4                      if (j == sd_read_buf[1])
+  129   4                      {
+  130   5                          g_modifyval.ApInfor.Active = j;
+  131   5                      }
+  132   4      
+  133   4                  }
+  134   3              }
+  135   2              g_modifyval.ApInfor.Total = j;
+  136   2      
+  137   2              /*读取语言配置信息*/
+  138   2              //       SD_FSeek(fwcfgfp, SEEK_SET, item_offset[3]);
+  139   2              //        SD_FRead(fwcfgfp, sd_read_buf, sizeof(lan_set_t));
+  140   2              //        memcpy(&g_modifyval.LanInfor, sd_read_buf, sizeof(lan_set_t));
+  141   2      
+  142   2              /*读取功能配置信息*/
+  143   2              SD_FSeek(fwcfgfp, SEEK_SET, item_offset[5]);
+  144   2              SD_FRead(fwcfgfp, sd_read_buf, 512);
+  145   2              g_modifyval.KeyToneFlag = ((func_item_t *) (&sd_read_buf[SIZE_FUNC_HEAD]))->State;
+  146   2              g_modifyval.Support_WAV = ((func_item_t *) (&sd_read_buf[SIZE_FUNC_HEAD + 1 * sizeof(func_item_t)
+             -]))->State;
+  147   2              g_modifyval.TTS_Report = ((func_item_t *) (&sd_read_buf[SIZE_FUNC_HEAD + 2 * sizeof(func_item_t)]
+             -))->State;
+  148   2              g_modifyval.Support_NorRec = ((func_item_t *) (&sd_read_buf[SIZE_FUNC_HEAD + 3 * sizeof(func_item
+             -_t)]))->State;
+  149   2              g_modifyval.Magic = MAGIC_CFG;
+  150   2              SD_FClose(fwcfgfp);
+  151   2      
+  152   2              VMWrite(&g_modifyval, VM_AP_FWCFG, sizeof(vm_cfg_t));
+  153   2      
+  154   2          }
+  155   1          memcpy(sKY_GetKeyTabAddress(), g_modifyval.KeyInfor.Table, g_modifyval.KeyInfor.Total);
+  156   1          memcpy(ap_id, g_modifyval.ApInfor.Table, g_modifyval.ApInfor.Total);
+  157   1          ClearWatchDog();
+  158   1      }
+  159          
+  160          /*
+  161           ********************************************************************************
+  162           * Description : 初始化系统设置变量
+  163           *
+  164           * Arguments   :
+  165           *
+  166           * Returns     :
+  167           *
+  168           * Notes       :
+  169           *
+  170           ********************************************************************************
+  171           */
+  172          void read_var(void)
+  173          {
+  174   1          BOOL result;
+  175   1      
+  176   1          result = VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval));
+  177   1          if (g_comval.magic != MAGIC_COMVAL)
+  178   1          {
+  179   2              memset(&g_comval, 0x0, sizeof(g_comval));
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 4   
+
+  180   2              g_comval.magic = MAGIC_COMVAL;
+  181   2              g_comval.ap_result = ap_id[0];
+  182   2              g_comval.SleepTime = g_modifyval.SleepTime.DefValue;
+  183   2      
+  184   2              g_comval.VolumeMax = g_modifyval.Volume.DefValue;
+  185   2              g_comval.VolumeDef = g_modifyval.VolDefault.DefValue;
+  186   2              if (g_comval.VolumeDef > g_comval.VolumeMax)
+  187   2              {
+  188   3                  g_comval.VolumeDef = g_comval.VolumeMax;
+  189   3              }
+  190   2              g_comval.vol_display = g_comval.VolumeDef;
+  191   2              g_comval.volume = g_comval.VolumeDef; // (g_comval.vol_display * SOFTVOL_MAX) / g_comval.VolumeMa
+             -x;
+  192   2      
+  193   2              g_comval.FMBuildInFlag = g_modifyval.FMBuildInFlag;
+  194   2              g_comval.RecordGain = g_modifyval.RecordGain.DefValue;
+  195   2              g_comval.RecordTime_max = g_modifyval.RecordTimeMax.DefValue;
+  196   2              g_comval.Nor_RecordTime_max = g_modifyval.Nor_RecordTimeMax.DefValue;
+  197   2              g_comval.SuppTTS = g_modifyval.TTS_Report;
+  198   2              g_comval.SuppNorRec = g_modifyval.Support_NorRec;
+  199   2              g_comval.eq_type = none;
+  200   2              g_comval.SuppKeyTone = g_modifyval.KeyToneFlag;
+  201   2              g_comval.RecordType = g_modifyval.Support_WAV;
+  202   2      
+  203   2              g_comval.g_alarm.AlarmEnable = FALSE;
+  204   2              g_comval.g_alarm.volume = 35;
+  205   2              g_comval.g_alarm.alarmTime.hour = 12; //闹钟时
+  206   2              g_comval.g_alarm.alarmTime.minute = 0; //闹钟分
+  207   2              g_comval.g_alarm.alarmTime.second = 0;//闹钟分
+  208   2              g_comval.g_alarm.alarmDate.month = 1; //闹钟月
+  209   2              g_comval.g_alarm.alarmDate.day = 1; //闹钟日
+  210   2              g_comval.g_alarm.alarmDate.year = 2013; //闹钟年
+  211   2              g_comval.g_alarm.location.disk = 'U';
+  212   2              strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //使用内部alarm文件
+  213   2              result = VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval));
+  214   2          }
+  215   1      }
+  216          /*
+  217           ********************************************************************************
+  218           * Description : pa电源GPIO按键初始化
+  219           *
+  220           * Arguments   :
+  221           *
+  222           * Returns     :
+  223           *
+  224           * Notes       :
+  225           *
+  226           ********************************************************************************
+  227           */
+  228          
+  229          void init_pa_ctl_gpio(void)
+  230          {
+  231   1          uint8 sfr_bak;
+  232   1          sfr_bak = SFR_BANK;
+  233   1          SFR_BANK = BANK_GPIO;
+  234   1          //使能pa 电源开关GPIO 口
+  235   1          PA_POWER_GPIO_OUTPUT |= (1 << PA_POWER_GPIO_NUM);
+  236   1          //将GPIOE2,3,4,5切换成GPIO口功能，以防默认为I2S是对FM的干扰
+  237   1          GPIOEINEN |= 0x3c;
+  238   1          SFR_BANK = sfr_bak;
+  239   1      }
+  240          /*
+  241           ********************************************************************************
+  242           * Description : 关闭EJTAG
+  243           *
+  244           * Arguments   :
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 5   
+
+  245           *
+  246           * Returns     :
+  247           *
+  248           * Notes       :由于I2C使用的GPIO口与EJTAG复用，所以两者只能选其一
+  249           *
+  250           ********************************************************************************
+  251           */
+  252          
+  253          void disable_ejtag(uint8 flag)
+  254          {
+  255   1          uint8 sfr_bak;
+  256   1          if (flag == 0)
+  257   1          {
+  258   2              return;
+  259   2          }
+  260   1          sfr_bak = SFR_BANK;
+  261   1          SFR_BANK = BANK_GPIO;
+  262   1          MFP_CTL2 &= 0xfe;//disable ejtag
+  263   1          //for test
+  264   1          GPIOCOUTEN |= 0x08;
+  265   1          GPIOCDAT &= 0xf7;
+  266   1          SFR_BANK = sfr_bak;
+  267   1          TM_DelayMS(100);
+  268   1      }
+  269          
+  270          /*
+  271           ********************************************************************************
+  272           * Description : 主函数
+  273           *
+  274           * Arguments   :
+  275           *
+  276           * Returns     : 结果消息或0
+  277           *
+  278           * Notes       :
+  279           *
+  280           ********************************************************************************
+  281           */
+  282          
+  283          int16 main(int16 param)
+  284          {
+  285   1          int16 result;
+  286   1              uint8 test_uart_flag = FALSE;
+  287   1              uint8 test_dpdm_flag = FALSE;
+  288   1              param = param;
+  289   1      
+  290   1          SetPLL(PLL_48MHZ);
+  291   1          SetVDD(VDDSET_1_6V);
+  292   1          ClearWatchDog();
+  293   1      
+  294   1              test_dpdm_flag = test_dpdm();
+  295   1              
+  296   1              if (test_dpdm_flag)
+  297   1              {
+  298   2                      test_uart_flag = test_uart();
+  299   2              }
+  300   1      
+  301   1              //if(check_gpioa6()==1)
+  302   1              /*{
+  303   1                      if (!DRV_Install("DRV_UART.DRV", 0))
+  304   1                  {
+  305   1                      while (1)
+  306   1                      {
+  307   1                          ;
+  308   1                      }
+  309   1                  }
+  310   1              }       */
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 6   
+
+  311   1      
+  312   1              if (!DRV_Install("KY_HARD.DRV", 0))
+  313   1          {
+  314   2              while (1)
+  315   2              {
+  316   3                  ;
+  317   3              }
+  318   2          }
+  319   1              
+  320   1      //    init_pa_ctl_gpio();
+  321   1          //使能Pa之前先将外部pa电源disable，防止开机时出现papa电流声
+  322   1      //    switch_pa_power(0);
+  323   1          //读取系统配置
+  324   1          ReadModifyInfor();
+  325   1          read_var();
+  326   1      
+  327   1          result = start_init(TRUE);
+  328   1      
+  329   1              if (test_uart_flag && test_dpdm_flag)
+  330   1              {// drive earphone
+  331   2                      while(1)
+  332   2                      {
+  333   3                              ClearWatchDog();
+  334   3                              KY_Beep(1);
+  335   3                      }
+  336   2              }
+  337   1              
+  338   1          //如果是长按onoff开机的话，需要将longkey_flag置起来，
+  339   1          //以便过滤play键消息，以防再次进入standby
+  340   1          if(get_onoff_key_status() != 0)
+  341   1          {
+  342   2              longkey_flag = 1;
+  343   2          }
+  344   1      
+  345   1      
+  346   1          while (1)
+  347   1          {
+  348   2              ClearWatchDog();
+  349   2              result = AP_Loop_Exec(result);
+  350   2          }//while(1)
+  351   1          //never run here
+  352   1      }
+  353          
+  354          /*打开PA开关*/
+  355          void  OpenPA(uint8 volume)
+  356          {
+  357   1      
+  358   1          pa_t paattr;
+  359   1          //g_PAOpenFlag = TRUE;//标志PA已打开
+  360   1      
+  361   1      
+  362   1          paattr.pa_in.dacin = 0;
+  363   1          paattr.pa_in.fmin = 0;
+  364   1          paattr.pa_in.linein = 0;
+  365   1          paattr.pa_in.micin = 0;
+  366   1          paattr.volume = (int8) get_dac_real_vol(volume);
+  367   1          paattr.reserve[0] = (int8) get_dac_real_vol(volume);
+  368   1      #if 0
+                   //非直驱
+                   EnablePA(&paattr);
+               #else
+  372   1          //直驱
+  373   1          EnablePADDV(&paattr);
+  374   1      #endif
+  375   1      }
+  376          /*打开DAC开关*/
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 7   
+
+  377          void  OpenDAC(void)
+  378          {
+  379   1          dac_t dacattr;
+  380   1          dacattr.dacselect = 0;
+  381   1          dacattr.rate = 22;
+  382   1          EnableDAC(&dacattr);
+  383   1      }
+  384          
+  385          /********************************************************************************
+  386           * Description :开机获取闹钟标记
+  387           *
+  388           * Arguments  :
+  389           *
+  390           * Returns     :
+  391           *            无
+  392           * Notes       :
+  393          
+  394           *
+  395           ********************************************************************************/
+  396          uint8 check_alarm_msg(void)
+  397          {
+  398   1          uint8 sfr_bak;
+  399   1          uint8 alarm_flag = 0;
+  400   1          uint8 alarm_pending;
+  401   1          sfr_bak = SFR_BANK;
+  402   1          SFR_BANK = BANK_RTC;
+  403   1          alarm_pending = RTC_CTL0 & 0x40;//检测闹钟pending位是否置起来
+  404   1          SFR_BANK = sfr_bak;
+  405   1          if (alarm_pending == 0)
+  406   1          {
+  407   2              return alarm_flag;
+  408   2          }
+  409   1          //检测闹钟消息
+  410   1          if (alarmtimerflag == 1)
+  411   1          {
+  412   2              alarmtimerflag = 0;
+  413   2              if (g_comval.g_alarm.AlarmEnable != 0)
+  414   2              {
+  415   3                  SFR_BANK = BANK_RTC;
+  416   3                  RTC_CTL0 = RTC_CTL0 | 0x01;//将闹钟标志清除
+  417   3                  SFR_BANK = sfr_bak;
+  418   3                  alarm_flag = 1;
+  419   3              }
+  420   2          }
+  421   1          return alarm_flag;
+  422   1      }
+  423          /********************************************************************************
+  424           * Description :检测硬开关是否处于关闭状态
+  425           *
+  426           * Arguments  :
+  427           *
+  428           * Returns     :
+  429           *            无
+  430           * Notes       :不管小机不知以何种方式唤醒了，当检测到硬开关处于关闭状态时，
+  431           *                都直接进入standby状态，以保证硬开关的统一性
+  432           *
+  433           *
+  434           ********************************************************************************/
+  435          
+  436          uint8 check_hardswitch_status(uint8 result)
+  437          {
+  438   1          uint8 retval = NULL, sfr_bak, onoff_status;
+  439   1          retval = result;
+  440   1          sfr_bak = SFR_BANK;
+  441   1          SFR_BANK = BANK_PMU;
+  442   1          onoff_status = SYSTEM_ONOFF & 0x10;
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 8   
+
+  443   1          SFR_BANK = sfr_bak;
+  444   1          if(onoff_status != 0)
+  445   1          {
+  446   2              retval = RESULT_STANDBY;
+  447   2          }
+  448   1          return retval;
+  449   1      }
+  450          /********************************************************************************
+  451           * Description :开机启动运行到ap以后的初始化
+  452           *
+  453           * Arguments  :
+  454           *
+  455           * Returns     :
+  456           *            无
+  457           * Notes       :主要是打开pa,dac,开机检测闹钟消息，USB线是否存在等情况
+  458           *
+  459           *
+  460           *
+  461           ********************************************************************************/
+  462          
+  463          uint8 start_init(uint8 first_init)
+  464          {
+  465   1          uint8 result;
+  466   1      #if 0   // not check usb status, because the status is wrong when charging.
+                   uint8 retval;
+                   {
+                       retval = GetUsbCableStatus();
+                       //1)如果检测到USB线，则先进udisk
+                       //2)如果没有接usb线，则进入上一次进入standby时ap
+                       if ((retval & 0x40) == 0x40)
+                       {
+                           result = RESULT_USBAUDIO_PLAY;
+                       }
+                       else
+                       {
+                           result = RESULT_LINEIN;// g_comval.ap_result;
+                       }
+                   }
+               #else
+  482   1              result = RESULT_USBAUDIO_PLAY;
+  483   1      #endif
+  484   1          if(first_init == TRUE)
+  485   1          {
+  486   2              OpenDAC();
+  487   2              power_on_flag = 0;
+  488   2              linein_status = 0;
+  489   2              usb_on_flag = 0;
+  490   2              memset(&tmp_time, 0xFF, sizeof(time_t));
+  491   2          //    OpenPA(g_comval.volume); //有按键音，开PA
+  492   2              set_dac_volume(g_comval.volume);
+  493   2          }
+  494   1      
+  495   1          close_usb_phyctrol();
+  496   1      
+  497   1          return result;
+  498   1      }
+  499          
+  500          uint8 check_gpioa6(void)
+  501          {
+  502   1              uint8 sfr_bak;
+  503   1              uint16 check_count;
+  504   1              sfr_bak = SFR_BANK;
+  505   1              SFR_BANK = BANK_GPIO;
+  506   1              //init gpioa6
+  507   1              GPIOAPUEN |= 1<<6; 
+  508   1              GPIOAOUTEN |= 1<<6;
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 9   
+
+  509   1              GPIOAINEN |= 1<<6;
+  510   1              GPIOADAT |= 1<<6;
+  511   1              while((GPIOADAT & (1<<6)) == 0x40)
+  512   1              {
+  513   2                      TM_DelayMS(1);
+  514   2                      check_count++;
+  515   2                      if (check_count > 1000)
+  516   2                      {
+  517   3                              GPIOAOUTEN &= ~(1<<6);
+  518   3                              SFR_BANK =sfr_bak;
+  519   3                              return 0;
+  520   3                      }
+  521   2              }       
+  522   1              GPIOAOUTEN &= ~(1<<6);
+  523   1              SFR_BANK =sfr_bak;
+  524   1              return 1;
+  525   1      }
+  526          
+  527          uint8 test_uart(void)
+  528          {
+  529   1              uint8 sfr_bak;
+  530   1              uint8 ret = FALSE;
+  531   1              
+  532   1              sfr_bak = SFR_BANK;
+  533   1              
+  534   1              SFR_BANK = BANK_GPIO;
+  535   1              GPIOCOUTEN |= 0x10;
+  536   1              GPIOCINEN  |= 0x08;
+  537   1          GPIOCDAT   |= 0x10;
+  538   1              if (GPIOCDAT & 0x08)
+  539   1              {
+  540   2                      GPIOCDAT &= ~0x10;
+  541   2                      if ((GPIOCDAT & 0x08) == 0x00)
+  542   2                      {
+  543   3                              ret = TRUE;
+  544   3                      }
+  545   2              }
+  546   1              SFR_BANK = sfr_bak;
+  547   1      
+  548   1              return ret;
+  549   1      }
+  550          
+  551          uint8 test_dpdm(void)
+  552          {
+  553   1          uint8 sfr_bak, dpdm_status;
+  554   1          uint8 usb_status;
+  555   1              uint8 ret = FALSE;
+  556   1              
+  557   1          sfr_bak = SFR_BANK;
+  558   1          SFR_BANK = BANK_USB;
+  559   1          dpdm_status = DPDMCTRL;
+  560   1      
+  561   1          DPDMCTRL = 0x1f;
+  562   1          usb_status = 0x80;
+  563   1          while(usb_status--)
+  564   1          {
+  565   2              ;
+  566   2          }
+  567   1      
+  568   1          if((USBSTATUS & 0x18) != 0x18)
+  569   1          {
+  570   2                      usb_status = 0xff;
+  571   2              while(usb_status--)
+  572   2              {
+  573   3                  ; 
+  574   3              }
+C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 10  
+
+  575   2              if((USBSTATUS & 0x18) == 0x18)
+  576   2              {
+  577   3                  ret = TRUE;
+  578   3              }     
+  579   2              }
+  580   1          else
+  581   1          {
+  582   2              ret = TRUE;
+  583   2          }
+  584   1              
+  585   1          DPDMCTRL = dpdm_status;
+  586   1          SFR_BANK = sfr_bak;
+  587   1          return ret;
+  588   1      }
+  589          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1671     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =       232     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =       512     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        37     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

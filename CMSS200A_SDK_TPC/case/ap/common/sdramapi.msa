@@ -1,0 +1,71 @@
+ /*
+********************************************************************************
+*                       ACTOS
+*                     BankAApi
+*
+*                (c) Copyright 2002-2003, Actions Co,Ld.
+*                        All Right Reserved
+*
+* File   : BankAApi.msa
+* By     : Gongee
+* Version: 1> v1.00     first version     date
+********************************************************************************
+*/
+#include "sdram_drv.h"
+
+        module  SdrInit
+        public  SdrInit
+        rseg    API30
+SdrInit:
+        ld  hl,    API_SdrInit
+        jp     RSTBankAPI
+        endmod
+        
+        module  SdrRExit
+        public  SdrRExit
+        rseg    API30
+SdrRExit:
+        ld  hl,    API_SdrRExit
+        jp     RSTBankAPI
+        endmod
+        
+        module  SdrGetCap
+        public  SdrGetCap
+        rseg    API30
+SdrGetCap:
+        ld  hl,    API_SdrGetCap
+        jp     RSTBankAPI
+        endmod
+        
+        module  SdrSectorRead
+        public  SdrSectorRead
+        rseg    API30
+SdrSectorRead:
+        ld  hl,    API_SdrSectorRead
+        jp     RSTBankAPI
+        endmod
+        
+        module  SdrSectorWrite
+        public  SdrSectorWrite
+        rseg    API30
+SdrSectorWrite:
+        ld  hl,    API_SdrSectorWrite
+        jp     RSTBankAPI
+        endmod
+        
+        module  SdrRead
+        public  SdrRead
+        rseg    API30
+SdrRead:
+        ld  a,    API_SdrRead
+        jp     SDRAMAPI
+        endmod
+
+        module  SdrWrite
+        public  SdrWrite
+        rseg    API30
+SdrWrite:
+        ld  a,    API_SdrWrite
+        jp     SDRAMAPI  
+        
+        end 

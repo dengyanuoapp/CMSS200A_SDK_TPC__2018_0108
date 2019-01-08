@@ -1,0 +1,1 @@
+"..\..\..\libsrc\usb\UDiskData.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usb\UDiskData.lst) OBJECT(..\..\..\obj\lib\usb\UDiskData.obj)

@@ -1,0 +1,44 @@
+### uVision2 Project, (C) Keil Software
+### Do not modify !
+
+ cExt (*.c)
+ aExt (*.s*; *.src; *.a*)
+ oExt (*.obj)
+ lExt (*.lib)
+ tExt (*.txt; *.h; *.inc)
+ pExt (*.plm)
+ CppX (*.cpp)
+ DaveTm { 0,0,0,0,0,0,0,0 }
+
+Target (basal), 0x0001 // Tools: 'MCS-251'
+GRPOPT 1,(MO_BS_EN),0,0,0
+GRPOPT 2,(include),0,0,0
+GRPOPT 3,(BASAL_MAP),0,0,0
+
+OPTFFF 1,1,1,0,0,0,0,0,<..\..\..\..\..\libsrc\midware\audioBasal\basal_en_urec.c><basal_en_urec.c> 
+OPTFFF 2,2,5,0,0,0,0,0,<..\..\..\..\..\inc\codec.h><codec.h> 
+OPTFFF 2,3,5,0,0,0,0,0,<..\..\..\..\..\inc\basal.h><basal.h> 
+OPTFFF 2,4,5,0,0,0,0,0,<..\..\..\..\..\inc\decC.h><decC.h> 
+OPTFFF 2,5,5,0,0,0,0,0,<..\..\..\..\..\inc\encC.h><encC.h> 
+OPTFFF 2,6,5,0,0,0,0,0,<..\..\..\..\..\inc\time.h><time.h> 
+OPTFFF 2,7,5,0,0,0,0,0,<..\..\..\..\..\inc\mmcmd.h><mmcmd.h> 
+OPTFFF 2,8,5,0,0,0,0,0,<..\..\..\..\..\inc\midware_BS_EH.h><midware_BS_EH.h> 
+
+
+TARGOPT 1, (basal)
+ CLK251=16000000
+  OPTTT 0,1,1,0
+  OPTHX 1,65535,0,0,0
+  OPTLX 120,65,8,<.\>
+  OPTOX 16
+  OPTLT 1,1,1,0,1,1,0,1,0,0,0,0
+  OPTXL 1,1,1,1,1,1,1,0,0
+  OPTFL 0,0,1
+  OPTAX 0
+  OPTDL (S251.DLL)(-Flip251)(DP51.DLL)(-p251S)(S251.DLL)()(TP51.DLL)(-p251S)
+  OPTDBG 48125,-1,()()()()()()()()()() ()()()()
+  OPTDF 0x0
+  OPTLE <>
+  OPTLC <>
+EndOpt
+

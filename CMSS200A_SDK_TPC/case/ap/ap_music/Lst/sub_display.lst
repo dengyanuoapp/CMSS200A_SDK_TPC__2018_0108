@@ -1,0 +1,202 @@
+C251 COMPILER V4.55,  sub_display                                                          23/05/16  10:41:53  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE sub_display
+OBJECT MODULE PLACED IN .\Obj\sub_display.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE sub_display.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SP
+                    -EED) BROWSE INCDIR(..\..\inc;..\..\..\psp_rel\inc) I4 DEBUG PRINT(.\Lst\sub_display.lst) OBJECT(.\Obj\sub_display.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ******************************************************************************
+    3           *                               AS211A
+    4           *                            Module: music
+    5           *                 Copyright(c) 2002-2010 Actions Semiconductor,
+    6           *                            All Rights Reserved.
+    7           *
+    8           * Descripton: display module of music
+    9           *
+   10           * History:
+   11           *      <author>    <time>           <version >             <desc>
+   12           *       xusong    2010-07-15 15:00     1.0             build this file
+   13           ******************************************************************************
+   14           */
+   15          #include "ap_music.h"
+   16          #pragma name(AP_SUB_DIS)
+   17          const uint8 eq_str[eq_max][3] =
+   18          { "E1", "E2", "E3", "E4", "E5", "E6", "E7" , "E8"};
+   19          const uint8 repeat_str[4][4] =
+   20          { "ALL", "ONE", "RAN", "FOL" };
+   21          const uint8 repeat_val1[MAX_REPEAT_MODE] =
+   22          { FSEL_ALL_REPEATALL, FSEL_ALL_REPEATONE, FSEL_ALL_RANDOM, FSEL_DIR_REPEATALL };
+   23          
+   24          void show_disk_icon(uint8 on_off)
+   25          {
+   26   1          if (CurUselocation.disk == disk_char[1])
+   27   1          {
+   28   2              LEDDisplay(LED_USB, 0xff, 0);
+   29   2              LEDDisplay(LED_SD, 0xff, on_off);
+   30   2          }
+   31   1          else
+   32   1          {
+   33   2              LEDDisplay(LED_SD, 0xff, 0);
+   34   2              LEDDisplay(LED_USB, 0xff, on_off);
+   35   2          }
+   36   1      }
+   37          void show_status_icon(uint8 on_off)
+   38          {
+   39   1          if (PlayStatus >= PlaySta)
+   40   1          {
+   41   2              LEDDisplay(LED_PAUSE, 0xff, 0);
+   42   2              LEDDisplay(LED_PLAY, 0xff, on_off);
+   43   2          }
+   44   1          else
+   45   1          {
+   46   2              LEDDisplay(LED_PLAY, 0xff, 0);
+   47   2              LEDDisplay(LED_PAUSE, 0xff, on_off);
+   48   2          }
+   49   1      }
+   50          void show_col_icon(uint8 on_off)
+   51          {
+   52   1          LEDDisplay(LED_COL, 0xff, on_off);
+   53   1      }
+   54          void show_play_ui(void)
+   55          {
+   56   1          show_disk_icon(1);
+   57   1          show_status_icon(1);
+   58   1          show_col_icon(1);
+C251 COMPILER V4.55,  sub_display                                                          23/05/16  10:41:53  PAGE 2   
+
+   59   1          ShowNowTime();
+   60   1      }
+   61          void show_fileno_ui(void)
+   62          {
+   63   1          LEDClearScreen();
+   64   1          show_disk_icon(1);
+   65   1          itoa4(g_musicsequence, temp_buffer);
+   66   1          LEDPuts(NUMBER1, temp_buffer, 1);
+   67   1          show_count = 0;
+   68   1      }
+   69          void show_dirno_ui(void)
+   70          {
+   71   1          show_disk_icon(1);
+   72   1          itoa4(dir_no, temp_buffer);
+   73   1          LEDPuts(NUMBER1, temp_buffer, 1);
+   74   1          show_count = 0;
+   75   1      }
+   76          #if 0
+               void show_volume_ui(void)
+               {
+                   memset(temp_buffer, 0xff, 0x04);
+                   itoa2(g_comval.volume, temp_buffer);
+                   LEDPuts(NUMBER2, temp_buffer, 1);
+               }
+               #endif
+   84          void show_eq_ui(void)
+   85          {
+   86   1          memset(temp_buffer, 0xff, 0x04);
+   87   1          memcpy(temp_buffer, &eq_str[g_comval.eq_type], 0x02);
+   88   1          LEDPuts(NUMBER2, temp_buffer, 1);
+   89   1      }
+   90          void show_repeat_ui(void)
+   91          {
+   92   1          uint8 repeat_mode;
+   93   1          uint8 i;
+   94   1          memset(temp_buffer, 0xff, 0x04);
+   95   1          for (i = 0; i < 4; i++)
+   96   1          {
+   97   2              if (g_music_vars.repeat_mode == repeat_val1[i])
+   98   2              {
+   99   3                  repeat_mode = i;
+  100   3                  break;
+  101   3              }
+  102   2          }
+  103   1          if (i >= MAX_REPEAT_MODE)
+  104   1          {
+  105   2              repeat_mode = 0;
+  106   2          }
+  107   1          memcpy(temp_buffer, &repeat_str[repeat_mode], 0x03);
+  108   1          LEDPuts(NUMBER2, temp_buffer, 1);
+  109   1      }
+  110          void show_digital_ui(void)
+  111          {
+  112   1          uint8 tmp_buf[4];
+  113   1          memset(tmp_buf, 0x0, 0x04);
+  114   1          memcpy(&tmp_buf[4 - DigitalCount], DigitalBuf, DigitalCount);
+  115   1          LEDPuts(NUMBER1, tmp_buf, 1);
+  116   1      }
+  117          /*
+  118           ********************************************************************************
+  119           *           void RefreshMainScreen( void )
+  120           *
+  121           * Description : 主显示的刷新函数,只有有需要时,才调用此函数
+  122           *
+  123           * Arguments   : void
+  124           *
+C251 COMPILER V4.55,  sub_display                                                          23/05/16  10:41:53  PAGE 3   
+
+  125           * Returns     : void
+  126           *
+  127           * Notes       :
+  128           *
+  129           ********************************************************************************
+  130           */
+  131          void RefreshMainScreen(void)
+  132          {
+  133   1          LEDClearScreen();
+  134   1          switch (CurUI_Type)
+  135   1          {
+  136   2          case Music_UI:
+  137   2              show_play_ui();
+  138   2              break;
+  139   2          case Volume_UI:
+  140   2              show_volume_ui();
+  141   2              break;
+  142   2          case FileNo_UI:
+  143   2              show_fileno_ui();
+  144   2              break;
+  145   2          case Digital_UI:
+  146   2              show_digital_ui();
+  147   2              break;
+  148   2          case EQ_UI:
+  149   2              show_eq_ui();
+  150   2              break;
+  151   2          case Repeat_UI:
+  152   2              show_repeat_ui();
+  153   2              break;
+  154   2          case DIRNAME_UI:
+  155   2              show_dirno_ui();
+  156   2              break;
+  157   2          case STANDBY_UI:
+  158   2              //        ShowTimerSetting_UI();
+  159   2              break;
+  160   2          default:
+  161   2              break;
+  162   2          }
+  163   1      }
+  164          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       591     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        44     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,128 @@
+C251 COMPILER V4.55,  uart_msg                                                             25/07/16  15:03:09  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE uart_msg
+OBJECT MODULE PLACED IN .\Obj\uart_msg.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE uart_msg.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BROWSE
+                    - INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\uart_msg.lst) OBJECT(.\Obj\uart_msg.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              AS260A
+    3           *                            Module: USB Sound
+    4           *                 Copyright(c) 2001-2012 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>            <version >             <desc>
+    9           *      dengtaiping 2012-10-23 16:40     1.0                build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * \file     usound_init.c
+   13           * \brief    .
+   14           * \author   dengtaiping
+   15           * \par      GENERAL DESCRIPTION:
+   16           *               usb、AUDIO等模块初始化
+   17           * \par      EXTERNALIZED FUNCTIONS:
+   18           *               这里描述调用到外面的模块
+   19           *
+   20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
+   21           *
+   22           * \version 1.0
+   23           * \date  2012/10/23
+   24           *******************************************************************************/
+   25          #include "uart.h"
+   26          
+   27          #pragma name(UART_MSG)
+   28          
+   29          void uart_isr(void)
+   30          {
+   31   1              uint8 sfr_temp = SFR_BANK;
+   32   1          SFR_BANK = BANK_UART;
+   33   1          if(uart_fifo.flags==2)
+   34   1          {
+   35   2              //wait uart idle
+   36   2              while (UART_STA & 0x08)
+   37   2              {
+   38   3                  
+   39   3              }
+   40   2              //tx fifo 数据还没发送完毕，继续发送
+   41   2              if(uart_fifo.putP!=0)
+   42   2              {
+   43   3                 uart_fifo.time_count++;
+   44   3                 if(uart_fifo.time_count>uart_data->time_delay)
+   45   3                 {
+   46   4                      UART_DRQ &= 0xF7;//disable rx irq
+   47   4                      uart_send_msg_hex(data_read_buf+uart_fifo.used,uart_fifo.putP);
+   48   4                 }
+   49   3              }
+   50   2              else
+   51   2              {
+   52   3                  //数据发送完后才重新使能rx 
+   53   3                  UART_CTL |=1<<6;
+   54   3                  uart_fifo.flags=0;
+   55   3                  uart_fifo.used=0;
+   56   3                  uart_fifo.time_count=0;
+   57   3                  UART_DRQ &= 0xF7;//disable tx irq
+   58   3              }
+C251 COMPILER V4.55,  uart_msg                                                             25/07/16  15:03:09  PAGE 2   
+
+   59   2              SFR_BANK = sfr_temp; 
+   60   2              return;
+   61   2              
+   62   2          }
+   63   1          //rx fifo非空时，接受第一个数据，然后关闭rx
+   64   1          while ((UART_STA & 0x20) == 0)
+   65   1              {
+   66   2              uart_fifo.buf[0] = UART_RXDAT; 
+   67   2              //关闭rx,以防过来的数据过长时，清掉第一笔后，后来又来数据，导致tx的fifo数据异常
+   68   2              UART_CTL &=~(1<<6);
+   69   2              UART_STA |=1<<1;
+   70   2              while ((UART_STA & 0x20) == 0)
+   71   2              {
+   72   3                  ;
+   73   3              }
+   74   2              uart_fifo.flags=1;
+   75   2              
+   76   2              }  
+   77   1              SFR_BANK = sfr_temp; 
+   78   1          if(uart_fifo.flags==1)
+   79   1          {
+   80   2              SFR_BANK = BANK_UART;
+   81   2              UART_DRQ |= 0x01;
+   82   2              UART_DRQ |= 0x0a;
+   83   2              SFR_BANK = sfr_temp; 
+   84   2              get_uart_data(uart_fifo.rx_count);
+   85   2              uart_fifo.rx_count++;
+   86   2              uart_fifo.time_count=0;
+   87   2              uart_fifo.flags=2;
+   88   2          }   
+   89   1      }
+   90          
+   91          
+   92          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       188     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

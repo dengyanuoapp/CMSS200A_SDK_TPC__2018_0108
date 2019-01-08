@@ -1,0 +1,32 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\welcome\welcome.uv2
+Project File Date:  03/03/2014
+
+<h2>Output:</h2>
+Build target 'welcome'
+User command #1: .\buildlin.bat
+apl编译正常!
+compiling welcome.c...
+compiling Hdrv_HardInit.c...
+compiling Hdrv_HardDeal.c...
+compiling Sdrv_LEDDisplay.c...
+linking...
+Program Size: data=0.0 edata+hdata=66 xdata=0 const=51 code=1031
+creating hex file from ".\obj\welcome"...
+User command #1: .\builddrv.bat evb_drv
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\welcome>"..\..\..\psp_rel\tools\HexToBin251.EXE" ".\obj\welcome.hex" "..\..\fwpkg\welcome.bin" ff2000 500 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\welcome>copy .\Obj\welcome.map welcome.map 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\welcome>copy .\Obj\welcome.hex welcome.hex 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\welcome>copy .\Obj\welcome welcome 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\welcome>IF {evb_drv} == {} goto nocopy 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\welcome>if exist "..\..\fwpkg\evb_drv" (copy "..\..\fwpkg\welcome.bin" "..\..\fwpkg\evb_drv\welcome.bin" ) 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\welcome>echo build end  
+build end 
+".\obj\welcome" - 0 Error(s), 0 Warning(s).

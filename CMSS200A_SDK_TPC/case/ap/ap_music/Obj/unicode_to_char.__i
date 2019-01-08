@@ -1,0 +1,1 @@
+"..\common\unicode_to_char.c" XSMALL NOALIAS FUNCTIONS (REENTRANT) ROM(HUGE) OPTIMIZE (9,SPEED) BROWSE INCDIR(..\..\inc;..\..\..\psp_rel\inc) I4 DEBUG PRINT(.\Lst\unicode_to_char.lst) OBJECT(.\Obj\unicode_to_char.obj)

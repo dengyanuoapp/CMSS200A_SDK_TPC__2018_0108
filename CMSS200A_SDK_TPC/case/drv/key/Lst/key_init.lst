@@ -1,0 +1,286 @@
+C251 COMPILER V4.55,  key_init                                                             13/12/18  16:28:33  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE key_init
+OBJECT MODULE PLACED IN .\Obj\key_init.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE key_init.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BROWSE
+                    - INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\key_init.lst) OBJECT(.\Obj\key_init.obj) 
+
+stmt  level    source
+
+    1          #include "drv_key.h"
+    2          
+    3          #pragma name(BAC_IE0)
+    4          bool key_init(uint8 api_no)
+    5          {
+    6   1          uint8 sfr_bak;
+    7   1          api_no = api_no;
+    8   1          sfr_bak = SFR_BANK;
+    9   1      
+   10   1          SFR_BANK = BANK_GPIO;
+   11   1          AD_Select1 |= 0x01;/*gpio_g2 mapping to LRADC1(rem_con)*/
+   12   1          SFR_BANK = BANK_PMU;
+   13   1          PMUADC_CTL |= 0xa0; //enable LRADC1,ADC FREQUENCY 128Hz
+   14   1          _nop_();
+   15   1          delay(); //enable LRADC1后需要等待最长10ms才能读出正确的数据，否则可能是全0
+   16   1          SYSTEM_CTL &= 0x7f; //设置play按键时间=2S
+   17   1      
+   18   1              adjust_key_sequence();
+   19   1              
+   20   1          TM_SetTimer((uint32) key_scan, 2); //设置RTC中断函数入口
+   21   1          //   TM_SetClock((int) (uint16) key_scan, 1);
+   22   1      
+   23   1          //ctc set
+   24   1          SFR_BANK = BANK_RTC;
+   25   1          CTCCNTH = 0xb7; //0x07;
+   26   1          CTCCNTL = 0x1a; //0x52;
+   27   1          CTCCTL = 0xc0; //0xc8;       /256  hosc
+   28   1      
+   29   1          IRQ_Intercept((uint32) ctc_isr, IRQ_CTC); //设置CTC中断函数入口
+   30   1          CTCCTL |= 1 << 7; //enable ctc
+   31   1          IE0 |= 1 << 1; //enable IE.1
+   32   1      
+   33   1          //init ir key
+   34   1          //init_ir();
+   35   1          //    ADC_DAC_init();
+   36   1          init_ADSelect0();
+   37   1          init_bat_gpio();
+   38   1          return 1;
+   39   1      }
+   40          
+   41          void delay(void)
+   42          {
+   43   1          uint8 i, j;
+   44   1          for (i = 0; i < 255; i++)
+   45   1          {
+   46   2              for (j = 0; j < 255; j++)
+   47   2              {
+   48   3                  _nop_();
+   49   3                  _nop_();
+   50   3              }
+   51   2          }
+   52   1      }
+   53          void key_exit(uint8 api_no)
+   54          {
+   55   1          api_no = api_no;
+   56   1          TM_KillTimer(0x02); //关闭RTC
+   57   1          IE0 &= ~(1 << 1); //disable IE.1
+   58   1          IRQ_Release((uint16) ctc_isr, IRQ_CTC);
+C251 COMPILER V4.55,  key_init                                                             13/12/18  16:28:33  PAGE 2   
+
+   59   1          IRQ_Release((uint16) IR_Interrupt, IRQ_UART);
+   60   1      }
+   61          void ADC_DAC_init(void)
+   62          {
+   63   1      
+   64   1          uint16 i;
+   65   1          uint8 sfr_temp = SFR_BANK;
+   66   1      
+   67   1          SFR_BANK = BANK_CMU_RMU;
+   68   1              CLKENCTL0 = 0x0;
+   69   1          CLKENCTL0 |= 0x20;
+   70   1       //   CLKENCTL2 |= 0x40;
+   71   1          MRCR2 &= 0xEF;
+   72   1          MRCR2 |= 0x10;
+   73   1          MRCR3 &= 0xFE;
+   74   1      
+   75   1          SFR_BANK = 0x06; //initial MFP_GPIO
+   76   1          GPIOEINEN = 0x00;
+   77   1          GPIOEOUTEN = 0x00;
+   78   1      
+   79   1          SFR_BANK = BANK_CMU_RMU; //set i2s_sr
+   80   1          ADC_DAC_CLK_CTL &= 0xf8;
+   81   1          //ADC_DAC_CLK_CTL |= 0x10;
+   82   1          ADC_DAC_CLK_CTL |= 0x02;
+   83   1          AUDIO_PLL_CTL &= 0xf1;
+   84   1          AUDIO_PLL_CTL |= 0x09;
+   85   1      
+   86   1          SFR_BANK = BANK_SPDIF;
+   87   1          I2S_CTL1 |= 0x20;
+   88   1      
+   89   1          SFR_BANK = BANK_AUIP;
+   90   1          //init dac
+   91   1          DAC_CH0_FIFO_CTL0 |= 0x10;
+   92   1          DAC_CTL = 0x41;
+   93   1          DAC_CH0_FIFO_CTL0 |= 0x01;
+   94   1          DAC_CTL |= 0x10;
+   95   1      
+   96   1          SFR_BANK = BANK_CMU_RMU; //
+   97   1          MEMCLKENCTL0 |= 0x02;
+   98   1          MEMCLKSELCTL1 &= 0xf3;
+   99   1          for (i = 0; i < 0xC0; i++) //fir_rds_ram_l
+  100   1          {
+  101   2              *((uint8 *) (0x9640 + i)) = 0;
+  102   2              *((uint8 *) (0x9740 + i)) = 0;
+  103   2          }
+  104   1      
+  105   1          MEMCLKSELCTL1 |= 0x04;
+  106   1          //set SRC
+  107   1          SFR_BANK = BANK_DAC_ADC;
+  108   1          DAC_CH0_SR_CTL &= 0xf8;
+  109   1          DAC_CH0_SR_CTL |= 0;
+  110   1          SFR_BANK = BANK_CMU_RMU;
+  111   1          MRCR3 |= 0x01;
+  112   1          SFR_BANK = sfr_temp;
+  113   1      
+  114   1      }
+  115          //初始红外遥控器按键相关的寄存器
+  116          void init_ir(void)
+  117          {
+  118   1      #if 0
+                   uint8 sfr_bak;
+                   /*IRC config*/
+                   SFR_BANK = BANK_CMU_RMU;
+                   //IRC controller reset
+                   MRCR1 &= 0xFB;
+                   MRCR1 |= 0x04;
+C251 COMPILER V4.55,  key_init                                                             13/12/18  16:28:33  PAGE 3   
+
+                   CLKENCTL1 |= 0x20;
+               
+                   SFR_BANK = BANK_GPIO;
+                   //数字红外指外接红外头
+                   //模拟红外指外接二极管
+                   //set GPIO_c5 as IR_RX
+                   GPIOCOUTEN &= 0xDF;
+                   GPIOCINEN &= 0xDF;
+                   GPIODDAT &= 0xDF;
+                   MFP_CTL5 |= 0x10;
+               
+                   SFR_BANK = BANK_IR;
+                   //enable irc ,select nec decode and enable ir_irq
+                   IR_CTL = 0xb0;
+                   IR_LUC = 0x0; //IRC low user code
+                   IR_HUC = 0xbf; //IRC high user code
+                   IE0 |= 0x10; //enable IRC interrupt
+                   SFR_BANK = sfr_bak;
+                   //注册IR中断
+                   IRQ_Intercept((uint32) IR_Interrupt, IRQ_UART);
+               #endif
+  146   1      }
+  147          void init_LRADCkey(void)
+  148          {
+  149   1          uint8 sfr_bak;
+  150   1          sfr_bak = SFR_BANK;
+  151   1          SFR_BANK = BANK_GPIO;
+  152   1          AD_Select1 |= 0x01;
+  153   1          SFR_BANK = sfr_bak;
+  154   1      }
+  155          void init_bat_gpio(void)
+  156          {
+  157   1          uint8 sfr_bak;
+  158   1          sfr_bak = SFR_BANK;
+  159   1          SFR_BANK = BANK_GPIO;
+  160   1          //使能bat检测,将GPIO A6切换到LCD_seg2模式
+  161   1          BAT_CHECK_GPIO_INPUT &= ~ (1 << BAT_CHECK_GPIO_NUM);
+  162   1          MFP_CTL0 &= 0xEF;
+  163   1          MFP_CTL0 |= 0x08;
+  164   1          //使能red light开关GPIO 口
+  165   1          RED_LIGHT_GPIO_OUTPUT |= (1 << RED_LIGHT_GPIO_NUM);
+  166   1          RED_LIGHT_GPIO_DAT &= ~(1 << RED_LIGHT_GPIO_NUM);
+  167   1      #if 0
+                   //使能blue light开关GPIO 口
+                   BLUE_LIGHT_GPIO_OUTPUT |= (1 << BLUE_LIGHT_GPIO_NUM);
+                   BLUE_LIGHT_GPIO_DAT &= ~(1 << BLUE_LIGHT_GPIO_NUM);
+               #endif
+  172   1          SFR_BANK = sfr_bak;
+  173   1      }
+  174          void switch_red_light(uint8 flag)
+  175          {
+  176   1      #if 0
+                   uint8 sfr_bak;
+                   sfr_bak = SFR_BANK;
+                   SFR_BANK = BANK_GPIO;
+                   if(flag != 0)
+                   {
+                       RED_LIGHT_GPIO_DAT |= (1 << RED_LIGHT_GPIO_NUM);
+                   }
+                   else
+                   {
+                       RED_LIGHT_GPIO_DAT &= ~(1 << RED_LIGHT_GPIO_NUM);
+                   }
+                   SFR_BANK = sfr_bak;
+               #endif
+  190   1      }
+C251 COMPILER V4.55,  key_init                                                             13/12/18  16:28:33  PAGE 4   
+
+*** WARNING C47 IN LINE 174 OF KEY_INIT.C: 'flag': unreferenced parameter
+  191          void switch_blue_light(uint8 flag)
+  192          {
+  193   1      #if 0
+                   uint8 sfr_bak;
+                   sfr_bak = SFR_BANK;
+                   SFR_BANK = BANK_GPIO;
+                   if(flag != 0)
+                   {
+                       BLUE_LIGHT_GPIO_DAT |= (1 << BLUE_LIGHT_GPIO_NUM);
+                   }
+                   else
+                   {
+                       BLUE_LIGHT_GPIO_DAT &= ~(1 << BLUE_LIGHT_GPIO_NUM);
+                   }
+                   SFR_BANK = sfr_bak;
+               #else
+  207   1          flag = flag;
+  208   1      #endif
+  209   1      }
+  210          void drv_switch_pilot_light(uint8 api_no, uint8 light_type, uint8 flag)
+  211          {
+  212   1      #if 0
+                   api_no = api_no;
+                   switch(light_type)
+                   {
+                   case 0:
+                       switch_red_light(flag);
+                       break;
+                   case 1:
+                       switch_blue_light(flag);
+                       break;
+                   default:
+                       break;
+                   }
+               #endif
+  226   1      }
+*** WARNING C47 IN LINE 210 OF KEY_INIT.C: 'api_no': unreferenced parameter
+*** WARNING C47 IN LINE 210 OF KEY_INIT.C: 'light_type': unreferenced parameter
+*** WARNING C47 IN LINE 210 OF KEY_INIT.C: 'flag': unreferenced parameter
+  227          //将GPIOC6切换到AVCC1模式，以便给mic端供电
+  228          //将GPIOC7切换到LRADC5,用于作为LRADC按键使用
+  229          void init_ADSelect0(void)
+  230          {
+  231   1          uint8 sfr_bak;
+  232   1          sfr_bak = SFR_BANK;
+  233   1          SFR_BANK = BANK_GPIO;
+  234   1          AD_Select &= 0x3F;
+  235   1          AD_Select |= 0x40;//GPIOC6 is used as AVCC1(analog function)
+  236   1      //    AD_Select |= 0x10;//GPIOC7 is used as LRADC5(analog function)
+  237   1      //    AD_Select |= 0x01;//GPIOA6 is used as LRADC4(analog function)
+  238   1              
+  239   1          SFR_BANK = sfr_bak;
+  240   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       340     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+C251 COMPILER V4.55,  key_init                                                             13/12/18  16:28:33  PAGE 5   
+
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  4 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,936 @@
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE main
+OBJECT MODULE PLACED IN .\Obj\main.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE main.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BROWSE INC
+                    -DIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEFINE(MAIN_AP) DEBUG PRINT(.\Lst\main.lst) OBJECT(.\Obj\main.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************
+    3           *                       ACTOS
+    4           *               standby ap of sdk 3.0
+    5           *
+    6           *                (c) Copyright 2002-2003, Actions Co,Ld.
+    7           *                        All Right Reserved
+    8           *
+    9           * File   : main.c
+   10           * By     : Gongee
+   11           * Version: 1> v1.00     first version     1/12/2004 11:10PM
+   12           ********************************************************************************
+   13           * $Id: main.c,v 1.1.1.1 2006/05/22 03:23:59 selina Exp $
+   14           ********************************************************************************
+   15           */
+   16          #include "ap_common.h"
+   17          #include "actos.h"
+   18          
+   19          //#define FAKE_HARD_SWITCH
+   20          #pragma name(AP_STANDBY)
+   21          uint8 far intBuf[2];
+   22          uint8 far PMUBuf[9];
+   23          uint8 far RTCBuf[9];
+   24          uint8 far USBBuf[2];
+   25          uint8 far RESETBuf[6];
+   26          uint8 far CMUBuf[8];
+   27          uint16 far standby_count;
+   28          uint8 far hard_onoff_status;
+   29          
+   30          uint8 Enter_HardStandby(void);
+   31          uint8 Enter_SoftStandby(void);
+   32          uint8 enter_fake_standby(void);
+   33          uint8 GetUsbStatus(void);
+   34          void time_delay(uint8 time);
+   35          uint8 Get_PowerON_Message(void);
+   36          void RecoverPara(void);
+   37          extern void _nop_(void);
+   38          void MCU_delay(uint8 time);
+   39          void LOSC_delay(void);
+   40          void SetParaToStandby(void);
+   41          void MyDI(void);
+   42          void MyEI(void);
+   43          void SetRESET(void);
+   44          void RecoverRESET(void);
+   45          void SetRTC(void);
+   46          void RecoverRTC(void);
+   47          void SetPMU(void);
+   48          void RecoverPMU(void);
+   49          void SetCMU(void);
+   50          void SetUSBEfuse(void);
+   51          void RecoverUSBEfuse(void);
+   52          void RecoverHOSC(void);
+   53          void reg_update(void);
+   54          void Recover_CMU(void);
+   55          uint8 get_ir_msg(void);
+   56          void disable_charge_pump(void);
+   57          void enable_charge_pump(void);
+   58          void Delay_us(uint8 delay_ms);
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 2   
+
+   59          uint8 get_onoff_key_status(void);
+   60          
+   61          int16 main(int16 param)
+   62          {
+   63   1          uint8 retval = 0;
+   64   1          uint8 rtc_count = 0;
+   65   1          uint8 key = 0 ;
+   66   1      
+   67   1          param = param;
+   68   1          //关闭外部pa电源
+   69   1          switch_pa_power(0);
+   70   1          //灭掉电源指示灯
+   71   1          //    switch_pilot_light(RED_LIGHT, 0);
+   72   1          ClearWatchDog();
+   73   1          LEDClearScreen();
+   74   1          //进入假关机状态
+   75   1          //   DRV_UnInstall(DRV_KY);
+   76   1          VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval));
+   77   1          if (g_comval.SleepTime != 0)
+   78   1          {
+   79   2              g_comval.SleepTime = 0; //此变量要清0，使睡眠模式设置一次仅一次有效。
+   80   2              VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval));
+   81   2          }
+   82   1          //先过渡长按play键，以防长按关机后又出现开机的问题
+   83   1          while(ap_get_message() != NULL)
+   84   1          {
+   85   2          };
+   86   1          while(1)
+   87   1          {
+   88   2              ClearWatchDog();
+   89   2              if(get_onoff_key_status() == 0)
+   90   2              {
+   91   3                  break;
+   92   3              }
+   93   2          }
+   94   1          longkey_flag = 0;
+   95   1          standby_count = 0;
+   96   1          retval = GetUsbStatus();
+   97   1          //AS260B方案由于udisk端不会直接供电，所以不需要检测是否插着usb线。
+   98   1          //只需检测DC5V,如果检测检测不到USB线和DC5V，则直接进入s3模式
+   99   1          if (((retval & 0x80) != 0x80))
+  100   1          {
+  101   2              Enter_SoftStandby();//断VCC，VDD
+  102   2          }
+  103   1      #if 1
+  104   1      
+  105   1          retval = enter_fake_standby();
+  106   1          if(retval != NULL)
+  107   1          {
+  108   2              LEDPuts(NUMBER1, "LOAD", 1);
+  109   2              switch_pa_power(1);
+  110   2              power_on_flag = 0;
+  111   2              return retval;
+  112   2          }
+  113   1          //如果中间检测不到DC5V时，则直接进入s3模式。
+  114   1          return Enter_SoftStandby();//断VCC，VDD
+  115   1      #else
+                   //进入s2模式
+                   disable_charge_pump();
+                   retval = Enter_HardStandby();
+                   enable_charge_pump();
+                   return retval;
+               #endif
+  122   1      }
+  123          /********************************************************************************
+  124           * Description : 获取硬开关的状态
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 3   
+
+  125           *
+  126           * Arguments   :
+  127           *
+  128           * Returns     : 无
+  129           *
+  130           * Notes       :
+  131           *
+  132           ********************************************************************************/
+  133          
+  134          uint8 get_hard_switch_status(void)
+  135          {
+  136   1          uint8 sfr_bak, hard_switch_staus;
+  137   1          sfr_bak = SFR_BANK;
+  138   1          SFR_BANK = BANK_PMU;
+  139   1          hard_switch_staus = SYSTEM_ONOFF & 0x10;  //获取硬开关的状态
+  140   1          SFR_BANK = sfr_bak;
+  141   1          return hard_switch_staus;
+  142   1      }
+  143          
+  144          
+  145          /********************************************************************************
+  146           * Description : 进入假关机状态
+  147           *
+  148           * Arguments   :
+  149           *
+  150           * Returns     : 无
+  151           *
+  152           * Notes       :
+  153           *
+  154           ********************************************************************************/
+  155          
+  156          uint8 enter_fake_standby(void)
+  157          {
+  158   1          uint8 sfr_bank, device_flag;
+  159   1          uint8 play_status, onoff_status;
+  160   1          uint16 count = 0;
+  161   1          hard_onoff_status = get_hard_switch_status();  //获取硬开关的状态
+  162   1          standby_count = 0;
+  163   1          while(1)
+  164   1          {
+  165   2              ClearWatchDog();
+  166   2              //防止硬开关快速拔动时，还没检测到硬开关关闭消息，硬开关又开起来的情况
+  167   2              if((power_on_flag == 1) && (hard_onoff_status == 0))
+  168   2              {
+  169   3                  return RESULT_MAIN;
+  170   3              }
+  171   2              //检测闹钟消息
+  172   2              if (alarmtimerflag == 1)
+  173   2              {
+  174   3                  alarmtimerflag = 0;
+  175   3                  //如果硬开关关闭，则不响应闹钟
+  176   3                  if ((g_comval.g_alarm.AlarmEnable != 0) && (hard_onoff_status == 0))
+  177   3                  {
+  178   4                      return RESULT_ALARM; //闹钟关闭
+  179   4                  }
+  180   3              }
+  181   2      
+  182   2              play_status = get_onoff_key_status();
+  183   2              onoff_status = get_hard_switch_status();
+  184   2              SFR_BANK = BANK_PMU;
+  185   2              //判断硬开关是否有拔动动作
+  186   2              if((hard_onoff_status == 0) && (TEST_CTL & 0x02) != 0)
+  187   2              {
+  188   3                  TEST_CTL |= 0x02;
+  189   3                  hard_onoff_status = get_hard_switch_status();
+  190   3                  TM_DelayMS(10);
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 4   
+
+  191   3              }
+  192   2              SFR_BANK = sfr_bank;
+  193   2              device_flag = GetUsbStatus();
+  194   2              if ((device_flag & 0x80) != 0x80)//如果没有DC5V,则直接进入s3模式
+  195   2              {
+  196   3                  Enter_SoftStandby();
+  197   3              }
+  198   2              //检测长按onoff键消息
+  199   2              if((play_status != 0) && (hard_onoff_status == 0))
+  200   2              {
+  201   3                  count = 0;
+  202   3                  standby_count++;
+  203   3                  TM_DelayMS(10);
+  204   3                  if ((standby_count > 40) && (get_hard_switch_status() == 0))
+  205   3                  {
+  206   4                      longkey_flag = 1;
+  207   4                      return RESULT_MAIN;
+  208   4                  }
+  209   3              }
+  210   2              //如果硬开关从关闭状态拔动到开机状态，则直接开机
+  211   2              if(hard_onoff_status == 0x10)
+  212   2              {
+  213   3                  onoff_status = get_hard_switch_status();
+  214   3                  if(onoff_status == 0)
+  215   3                  {
+  216   4                      while(1)
+  217   4                      {
+  218   5                          count++;
+  219   5                          Delay_us(1);
+  220   5                          play_status = get_onoff_key_status();
+  221   5                          onoff_status = get_hard_switch_status();
+  222   5                          if((onoff_status == 0) && (play_status == 0) && (count > 600))
+  223   5                          {
+  224   6                              return RESULT_MAIN;
+  225   6                          }
+  226   5                          if((count > 600) || (play_status != 0) || (onoff_status != 0))
+  227   5                          {
+  228   6                              count = 0;
+  229   6                              break;
+  230   6                          }
+  231   5                      }
+  232   4      
+  233   4                  }
+  234   3              }
+  235   2              else if(play_status == 0)
+  236   2              {
+  237   3                  count = 0;
+  238   3                  standby_count = 0;
+  239   3              }
+  240   2          }
+  241   1          return NULL;
+  242   1      }
+  243          /********************************************************************************
+  244           * Description : 进入软开关既S3模式，这时VCC，VDD全部断开
+  245           *
+  246           * Arguments   :
+  247           *
+  248           * Returns     : 无
+  249           *
+  250           * Notes       :
+  251           *
+  252           ********************************************************************************/
+  253          uint8 Enter_SoftStandby(void)
+  254          {
+  255   1          uint8 sfr_bak;
+  256   1          uint8 count = 0;
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 5   
+
+  257   1          DisablePA();
+  258   1          DisableDAC();
+  259   1          DisableAIN();
+  260   1          while(1)
+  261   1          {
+  262   2              ClearWatchDog();
+  263   2              disable_charge_pump();
+  264   2              SFR_BANK = BANK_PMU;
+  265   2              //disable uvlob检测信号，否则电池检电时去掉DC5V后会自动唤醒
+  266   2              SYSTEM_ONOFF = (uint8 ) (SYSTEM_ONOFF & 0x7f);
+  267   2              SYSTEM_CTL = (uint8 ) (SYSTEM_CTL & 0xfe);//断开vcc,VDD
+  268   2              SFR_BANK = sfr_bak;
+  269   2              TM_DelayMS(1);
+  270   2              count++;
+  271   2              if(count > 10)
+  272   2              {
+  273   3                  break;
+  274   3              }
+  275   2          }
+  276   1          enable_charge_pump();
+  277   1          return NULL;
+  278   1      }
+  279          
+  280          /********************************************************************************
+  281           * Description : 进入硬开关，既S2模式，系统跑的是低频32K
+  282           *
+  283           * Arguments   :
+  284           *
+  285           * Returns     : 无
+  286           *
+  287           * Notes       :
+  288           *
+  289           ********************************************************************************/
+  290          uint8 Enter_HardStandby(void)
+  291          {
+  292   1          uint8 retval, sfr_bank;
+  293   1          sfr_bank = SFR_BANK;
+  294   1          SFR_BANK = BANK_PMU;
+  295   1          hard_onoff_status = SYSTEM_ONOFF & 0x10;
+  296   1          SFR_BANK = sfr_bank;
+  297   1          UHOST_Power_CLOSE(sfr_bank);
+  298   1          DRV_UnInstall(DRV_UI);
+  299   1          DRV_UnInstall(DRV_KY);
+  300   1          SetParaToStandby();
+  301   1          while(1)
+  302   1          {
+  303   2              ClearWatchDog();
+  304   2              retval = Get_PowerON_Message();//获取长按PLAY键消息或者插入USB线，充电器时的消息
+  305   2              switch (retval)
+  306   2              {
+  307   3              case RESULT_MAIN:
+  308   3              case RESULT_UDISK:
+  309   3              case RESULT_ALARM:
+  310   3                  RecoverPara();//恢复高频，然后开机
+  311   3                  enable_charge_pump();
+  312   3                  if (!DRV_Install("DRV_UI.DRV", 0))
+  313   3                  {
+  314   4                      while (1)
+  315   4                      {
+  316   5                          ;//缺省简体
+  317   5                      }
+  318   4                  }
+  319   3                  if (!DRV_Install("KY_HARD.DRV", 0))
+  320   3                  {
+  321   4                      while (1)
+  322   4                      {
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 6   
+
+  323   5                          ;
+  324   5                      }
+  325   4                  }
+  326   3                  LEDPuts(NUMBER1, "LOAD", 1);
+  327   3                  switch_pa_power(1);
+  328   3                  return retval;
+  329   3                  break;
+  330   3      
+  331   3              case RESULT_STANDBY:
+  332   3                  Enter_SoftStandby();//断VCC，VDD
+  333   3                  break;
+  334   3              default:
+  335   3                  break;
+  336   3              }
+  337   2              if ((retval != 0) && (retval != RESULT_STANDBY))
+  338   2              {
+  339   3                  break;
+  340   3              }
+  341   2          }
+  342   1          return RESULT_MAIN;
+  343   1      }
+  344          
+  345          void time_delay(uint8 time)
+  346          {
+  347   1          uint16 i;
+  348   1          uint32 timer;
+  349   1          for (i = 0; i < 10 * time; i++)
+  350   1          {
+  351   2              timer = 8000;
+  352   2              ClearWatchDog();
+  353   2              while (timer > 0)
+  354   2              {
+  355   3                  --timer;
+  356   3              }
+  357   2          }
+  358   1      
+  359   1      }
+  360          void disable_charge_pump(void)
+  361          {
+  362   1          uint8 sfr_bak = SFR_BANK;
+  363   1          SFR_BANK = BANK_PMU;
+  364   1          //disable charge pump
+  365   1          CP_CTL0 &= 0xFE;
+  366   1          CP_CTL1 &= 0xF7;
+  367   1          SFR_BANK = sfr_bak;
+  368   1      }
+  369          void enable_charge_pump(void)
+  370          {
+  371   1          uint8 sfr_bak = SFR_BANK;
+  372   1          SFR_BANK = BANK_PMU;
+  373   1          //enable charge pump
+  374   1          CP_CTL0 |= 0x01; //电荷泵使能
+  375   1          CP_CTL1 |= 0x08;    //charge pump直通功能使能
+  376   1          SFR_BANK = sfr_bak;
+  377   1      }
+  378          
+  379          /********************************************************************************
+  380           * Description : 恢复高频，恢复其他设置的一些参数
+  381           *
+  382           * Arguments   :
+  383           *
+  384           * Returns     : 无
+  385           *
+  386           * Notes       :
+  387           *
+  388           ********************************************************************************/
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 7   
+
+  389          void RecoverPara(void)
+  390          {
+  391   1          RecoverHOSC();
+  392   1          Recover_CMU();
+  393   1          RecoverRESET();
+  394   1          RecoverUSBEfuse();
+  395   1          RecoverRTC();
+  396   1          RecoverPMU();
+  397   1          //恢复高频24M，VDD1.6V
+  398   1          //主要是防止黑屏自动关机时，PLL设成6M，VDD为1.4V，开机起来没有恢复。
+  399   1          SetPLL(PLL_48MHZ);
+  400   1          SetVDD(VDDSET_1_6V);
+  401   1          MyEI();
+  402   1      }
+  403          
+  404          /********************************************************************************
+  405           * Description : 进入STANDBY之前，设置相关寄存器，降低功耗
+  406           *
+  407           * Arguments   :
+  408           *
+  409           * Returns     : 无
+  410           *
+  411           * Notes       :
+  412           *
+  413           ********************************************************************************/
+  414          void SetParaToStandby(void)
+  415          {
+  416   1          DisablePA();
+  417   1          DisableDAC();
+  418   1          DisableAIN();
+  419   1          SetRTC();
+  420   1          SetRESET();
+  421   1          SetUSBEfuse();
+  422   1          SetPMU();
+  423   1          MyDI();
+  424   1          SetCMU();
+  425   1      }
+  426          
+  427          /********************************************************************************
+  428           * Description : 低频32K下的延时，大概为3MS
+  429           *
+  430           * Arguments   :
+  431           *
+  432           * Returns     : 无
+  433           *
+  434           * Notes       :
+  435           *
+  436           ********************************************************************************/
+  437          
+  438          void LOSC_delay(void)
+  439          {
+  440   1          uint8 time = 0x10;
+  441   1          while (1)
+  442   1          {
+  443   2              time--;
+  444   2              _nop_();
+  445   2              _nop_();
+  446   2              _nop_();
+  447   2              _nop_();
+  448   2              _nop_();
+  449   2              _nop_();
+  450   2              ClearWatchDog();
+  451   2              if (time == 0)
+  452   2              {
+  453   3                  break;
+  454   3              }
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 8   
+
+  455   2      
+  456   2          }
+  457   1      }
+  458          /********************************************************************************
+  459           * Description : MCU24M时的延时
+  460           *
+  461           * Arguments   :
+  462           *
+  463           * Returns     : 无
+  464           *
+  465           * Notes       :
+  466           *
+  467           ********************************************************************************/
+  468          void MCU_delay(uint8 time)
+  469          {
+  470   1          uint8 tmp_time = time;
+  471   1          while (1)
+  472   1          {
+  473   2              tmp_time--;
+  474   2              _nop_();
+  475   2              _nop_();
+  476   2              _nop_();
+  477   2              _nop_();
+  478   2              _nop_();
+  479   2              _nop_();
+  480   2              ClearWatchDog();
+  481   2              if (tmp_time == 0)
+  482   2              {
+  483   3                  break;
+  484   3              }
+  485   2          }
+  486   1      }
+  487          void SetRESET(void)
+  488          {
+  489   1          SFR_BANK = 0x01;
+  490   1          RESETBuf[0] = MRCR1;
+  491   1          RESETBuf[1] = MRCR2;
+  492   1          RESETBuf[2] = MRCR3;
+  493   1          RESETBuf[3] = CLKENCTL0;
+  494   1          RESETBuf[4] = CLKENCTL1;
+  495   1          RESETBuf[5] = CLKENCTL2;
+  496   1      
+  497   1          //reset audio code,accelerator,sd/mmc car ,uart,irc and spi controller
+  498   1          MRCR1 = 0x02;
+  499   1          //reset RAM&ROM BIST,SPDIF,ADC and IIS RX,DAC and IIS TX,PWM ,DMA01234,set USB to normal
+  500   1          MRCR2 = 0x0C;//USB normal
+  501   1          //reset touch key and ASRC controller
+  502   1          MRCR3 = 0x0;
+  503   1          //disable audio codec clock,spdif RX  clock,DAC clock,SD card clock,IISIN special colck and FM clock
+  504   1          CLKENCTL0 = 0x0;
+  505   1          //disable PWM,IR clcok,SPI clock,URAT clock
+  506   1          CLKENCTL1 = 0x40;
+  507   1          //disable touch key clock,ASRC clock,DMA01234 clock,LCD&SEGLCD clock,ACC clock
+  508   1          CLKENCTL2 = 0x0;
+  509   1      
+  510   1          _nop_();
+  511   1          _nop_();
+  512   1          _nop_();
+  513   1      }
+  514          
+  515          void RecoverRESET(void)
+  516          {
+  517   1          SFR_BANK = 0x01;
+  518   1          MRCR1 = RESETBuf[0];
+  519   1          MRCR2 = RESETBuf[1];
+  520   1          MRCR3 = RESETBuf[2];
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 9   
+
+  521   1          CLKENCTL0 = RESETBuf[3];
+  522   1          CLKENCTL1 = RESETBuf[4];
+  523   1          CLKENCTL2 = RESETBuf[5];
+  524   1          _nop_();
+  525   1          _nop_();
+  526   1          _nop_();
+  527   1      }
+  528          
+  529          void SetUSBEfuse(void)
+  530          {
+  531   1          SFR_BANK = 0x07;
+  532   1          USBBuf[0] = USB_Efuse_Ref;
+  533   1          USBBuf[1] = USB_PHYCTRL;
+  534   1          USB_Efuse_Ref = (uint8) (USB_Efuse_Ref | 0x40);//bit6 set to 1, efuse is standby,and its standby curr
+             -ent is 5UA max
+  535   1          USB_PHYCTRL = (uint8) (USB_PHYCTRL | 0x80);//enable phy_PLLEn
+  536   1          USB_PHYCTRL = (uint8) (USB_PHYCTRL | 0x40);//enable phy_dallallen
+  537   1          _nop_();
+  538   1          _nop_();
+  539   1      }
+  540          
+  541          void RecoverUSBEfuse(void)
+  542          {
+  543   1          SFR_BANK = 0x07;
+  544   1          USB_Efuse_Ref = USBBuf[0];
+  545   1          USB_PHYCTRL = USBBuf[1];
+  546   1          _nop_();
+  547   1          _nop_();
+  548   1      }
+  549          void SetRTC(void)
+  550          {
+  551   1          SFR_BANK = 0x0c;
+  552   1          RTCBuf[0] = CTCCTL;
+  553   1          RTCBuf[1] = CTCCNTL;
+  554   1          RTCBuf[2] = CTCCNTH;
+  555   1          RTCBuf[3] = RTC_CTL0;
+  556   1          RTCBuf[4] = WDCTL;
+  557   1          RTCBuf[5] = RTC_CTL1;
+  558   1          RTCBuf[6] = CTCCTL2;
+  559   1          RTCBuf[7] = CTCCNTL2;
+  560   1          RTCBuf[8] = CTCCNTH2;
+  561   1          RTC_CTL0 = 0x0;// (uint8) (RTC_CTL0& 0xE7);
+  562   1          RTC_CTL0 |= 0x80;
+  563   1      
+  564   1          WDCTL = (uint8) (WDCTL | 0x08);//清watchdog计数器
+  565   1          WDCTL = (uint8) (WDCTL & 0x7f);//关闭watchdog
+  566   1          //关闭定时器,关闭2Hz中断
+  567   1          RTC_CTL1 &= 0x1F;
+  568   1          //    CTCCTL &= 0x7f;
+  569   1          //    CTCCTL2 &= 0x7f;
+  570   1          reg_update();
+  571   1          _nop_();
+  572   1      }
+  573          
+  574          void RecoverRTC(void)
+  575          {
+  576   1          SFR_BANK = 0x0c;
+  577   1          CTCCTL = RTCBuf[0];
+  578   1          CTCCNTL = RTCBuf[1];
+  579   1          CTCCNTH = RTCBuf[2];
+  580   1          RTC_CTL0 = RTCBuf[3];
+  581   1          WDCTL = RTCBuf[4];
+  582   1          RTC_CTL1 = RTCBuf[5];
+  583   1          CTCCTL2 = RTCBuf[6];
+  584   1          CTCCNTL2 = RTCBuf[7];
+  585   1          CTCCNTH2 = RTCBuf[8];
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 10  
+
+  586   1          reg_update();
+  587   1          _nop_();
+  588   1          _nop_();
+  589   1      }
+  590          void SetPMU(void)
+  591          {
+  592   1          SFR_BANK = 0x05;
+  593   1          PMUBuf[0] = MULTI_USED;
+  594   1          PMUBuf[1] = LDOPD_CTL;
+  595   1          PMUBuf[2] = EFUSE_CTL;
+  596   1          PMUBuf[3] = BDG_CTL;
+  597   1          PMUBuf[4] = CP_CTL0;
+  598   1          PMUBuf[5] = FS_CTL;
+  599   1          PMUBuf[6] = PMUADC_CTL;
+  600   1          PMUBuf[7] = TEST_CTL;
+  601   1          PMUBuf[8] = SYSTEM_ONOFF;
+  602   1          //    MULTI_USED &= 0x7F;//关闭UVDD
+  603   1          LDOPD_CTL = 0x0;
+  604   1          EFUSE_CTL = 0x0;
+  605   1          BDG_CTL &= 0xEF;
+  606   1          CP_CTL0 &= 0xFE;
+  607   1          FS_CTL &= 0x7F;
+  608   1          MULTI_USED &= 0xF7;
+  609   1          PMUADC_CTL &= 0xDF;
+  610   1          PMUADC_CTL &= 0xBF;
+  611   1          TEST_CTL &= 0xEF;
+  612   1          SYSTEM_ONOFF &= 0x7f;
+  613   1          _nop_();
+  614   1          MCU_delay(0xff);
+  615   1      }
+  616          void RecoverPMU(void)
+  617          {
+  618   1          SFR_BANK = 0x05;
+  619   1          MULTI_USED = PMUBuf[0];
+  620   1          LDOPD_CTL = PMUBuf[1];
+  621   1          EFUSE_CTL = PMUBuf[2];
+  622   1          BDG_CTL = PMUBuf[3];
+  623   1          CP_CTL0 = PMUBuf[4];
+  624   1          FS_CTL = PMUBuf[5];
+  625   1          PMUADC_CTL = PMUBuf[6];
+  626   1          TEST_CTL = PMUBuf[7];
+  627   1          SYSTEM_ONOFF = PMUBuf[8];
+  628   1      }
+  629          void SetCMU(void)
+  630          {
+  631   1          SFR_BANK = 0x01;
+  632   1          CMUBuf[0] = MEMCLKSELCTL0;
+  633   1          CMUBuf[1] = MEMCLKSELCTL1;
+  634   1          CMUBuf[2] = MEMCLKENCTL0;
+  635   1          CMUBuf[3] = AUDIO_PLL_CTL;
+  636   1          CMUBuf[4] = MEMCLKSELCTL0;
+  637   1          CMUBuf[5] = HCL_CLK_CTL;
+  638   1          CMUBuf[6] = LOSC_CTL;
+  639   1          CMUBuf[7] = MCU_PLL_SSC_CTL;
+  640   1          MEMCLKSELCTL0 = 0x0;
+  641   1          MEMCLKSELCTL1 = 0x0;
+  642   1          MEMCLKENCTL0 = 0x0;
+  643   1          AUDIO_PLL_CTL &= 0xFE;//disable AudioPLL
+  644   1          HCL_CLK_CTL &= 0xc0;
+  645   1          LOSC_CTL &= 0xFE;//DISABLE DUAL PIN LOSC
+  646   1          CPUCLKCTL = 0x02;
+  647   1          MCU_PLL_CTL &= 0xDF;
+  648   1          MCU_PLL_SSC_CTL &= 0xfe;
+  649   1          reg_update();
+  650   1      #if 1
+  651   1          SFR_BANK = 0x01;
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 11  
+
+  652   1          CPUCLKCTL &= 0xFD;//SELECT LOSC
+  653   1      
+  654   1          MCU_delay(0xff);
+  655   1          MCU_PLL_CTL &= 0x7f;//HOSC Disable
+  656   1      #endif
+  657   1          _nop_();
+  658   1      }
+  659          void Recover_CMU(void)
+  660          {
+  661   1          SFR_BANK = 0x01;
+  662   1          MEMCLKSELCTL0 = CMUBuf[0];
+  663   1          MEMCLKSELCTL1 = CMUBuf[1];
+  664   1          MEMCLKENCTL0 = CMUBuf[2];
+  665   1          AUDIO_PLL_CTL = CMUBuf[3];
+  666   1          MEMCLKSELCTL0 = CMUBuf[4];
+  667   1          HCL_CLK_CTL = CMUBuf[5];
+  668   1          LOSC_CTL = CMUBuf[6];
+  669   1          MCU_PLL_SSC_CTL = CMUBuf[7];
+  670   1          reg_update();
+  671   1      }
+  672          
+  673          void reg_update(void)
+  674          {
+  675   1          SFR_BANK = 0x0c;
+  676   1          RTCRUPD = 0xa5;
+  677   1          while (RTCRUPD != 0x5a)
+  678   1              ;
+  679   1          MCU_delay(0x0f);
+  680   1      }
+  681          void RecoverHOSC(void)
+  682          {
+  683   1          SFR_BANK = 0x01;
+  684   1          MCU_PLL_CTL = (char) (MCU_PLL_CTL | 0x80); //HOSC Enable
+  685   1          MCU_delay(0xFF);
+  686   1          _nop_();
+  687   1          _nop_();
+  688   1          CPUCLKCTL = (char) (CPUCLKCTL | 0x02);//切换HOSC模式,高频默认24M
+  689   1          _nop_();
+  690   1          _nop_();
+  691   1          _nop_();
+  692   1          _nop_();
+  693   1          _nop_();
+  694   1          _nop_();
+  695   1      
+  696   1      }
+  697          /********************************************************************************
+  698           * Description : 获取USB或充电器的状态，
+  699           *
+  700           * Arguments  :
+  701           *
+  702           *
+  703           * Returns     :dpdm_status=0X40表示插入的是USB线，dpdm_status=0X80为充电器
+  704           *            无
+  705           * Notes       :
+  706           *
+  707           ********************************************************************************/
+  708          
+  709          uint8 GetUsbStatus(void)
+  710          {
+  711   1          uint8 sfr_bak, dpdm_status;
+  712   1          uint8 usb_status;
+  713   1          sfr_bak = SFR_BANK;
+  714   1          SFR_BANK = BANK_USB;
+  715   1          dpdm_status = DPDMCTRL;
+  716   1          DPDMCTRL = 0x1f;
+  717   1          usb_status = 0x80;
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 12  
+
+  718   1          while(usb_status--)
+  719   1          {
+  720   2              ;
+  721   2          }
+  722   1          if((USBSTATUS & 0x18) != 0x18)
+  723   1          {
+  724   2              usb_status = 0xff;
+  725   2              while(usb_status--)
+  726   2              {
+  727   3                  ;
+  728   3              }
+  729   2              if((USBSTATUS & 0x18) != 0x18)
+  730   2              {
+  731   3                  usb_status = 0x40;
+  732   3              }
+  733   2              else
+  734   2              {
+  735   3                  usb_status = 0x00;
+  736   3              }
+  737   2          }
+  738   1          else
+  739   1          {
+  740   2              usb_status = 0x00;
+  741   2          }
+  742   1          DPDMCTRL = dpdm_status;
+  743   1      
+  744   1          SFR_BANK = BANK_PMU;
+  745   1          usb_status |= (TEST_CTL & 0x80);
+  746   1      
+  747   1          SFR_BANK = sfr_bak;
+  748   1          return usb_status;
+  749   1      
+  750   1      }
+  751          
+  752          /********************************************************************************
+  753           * Description : 获取开机的消息及拔出DC5V消息
+  754           *
+  755           * Arguments  :
+  756           *
+  757           *
+  758           * Returns     :
+  759           * RESULT_POWERON：长按PLAY键开机
+  760           * RESULT_UDISK：长按PLAY键，并且插入USB线开机
+  761           * RESULT_STANDBY：DC5V拔出
+  762           * RESULT_TIMER 闹铃开机
+  763           * Notes       :
+  764           *
+  765           ********************************************************************************/
+  766          uint8 Get_PowerON_Message(void)
+  767          {
+  768   1          uint8 sfr_bak;
+  769   1          uint8 play_key_flag, device_flag, fake_onoff_flag, alarm_msg;
+  770   1          sfr_bak = SFR_BANK;
+  771   1          SFR_BANK = BANK_PMU;
+  772   1      #ifndef FAKE_HARD_SWITCH
+  773   1          play_key_flag = SYSTEM_ONOFF & 0x08;
+  774   1          fake_onoff_flag = SYSTEM_ONOFF & 0x10;
+  775   1          if((hard_onoff_status == 0) && (TEST_CTL & 0x02) != 0)
+  776   1          {
+  777   2              hard_onoff_status = 1;
+  778   2              TEST_CTL |= 0x02;
+  779   2          }
+  780   1          SFR_BANK = BANK_RTC;
+  781   1          alarm_msg = RTC_CTL0 & 0x01; //将闹钟标志清除
+  782   1          SFR_BANK = sfr_bak;
+  783   1      #else
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 13  
+
+                   play_key_flag = SYSTEM_ONOFF & 0x18;
+               #endif
+  786   1          SFR_BANK = sfr_bak;
+  787   1          if(alarm_msg != 0)
+  788   1          {
+  789   2              SFR_BANK = BANK_RTC;
+  790   2              RTC_CTL0 = RTC_CTL0 | 0x01;//将闹钟标志清除
+  791   2              SFR_BANK = sfr_bak;
+  792   2              if(hard_onoff_status == 0)
+  793   2              {
+  794   3                  return RESULT_ALARM;
+  795   3              }
+  796   2          }
+  797   1          device_flag = GetUsbStatus();
+  798   1          if (((device_flag & 0x40) != 0x40) && ((device_flag & 0x80) != 0x80))
+  799   1          {
+  800   2              return RESULT_STANDBY;
+  801   2          }
+  802   1      #ifndef FAKE_HARD_SWITCH
+  803   1          if ((play_key_flag != 0) && (hard_onoff_status == 0)) //检测按PLAY键消息
+  804   1          {
+  805   2              standby_count++;
+  806   2              if (standby_count > 5)
+  807   2              {
+  808   3                  standby_count = 1;
+  809   3                  return RESULT_MAIN;
+  810   3              }
+  811   2          }
+  812   1          else if(play_key_flag == 0)
+  813   1          {
+  814   2              standby_count = 0;
+  815   2              if((fake_onoff_flag == 0) && (hard_onoff_status != 0))
+  816   2              {
+  817   3                  return RESULT_MAIN;
+  818   3              }
+  819   2      
+  820   2          }
+  821   1      #else
+                   if(play_key_flag == 0)
+                   {
+                       return RESULT_MAIN;
+                   }
+               #endif
+  827   1          return 0;
+  828   1      }
+  829          /********************************************************************************
+  830           * Description : 关闭所有的中断
+  831           *
+  832           * Arguments  :
+  833           *
+  834           *
+  835           * Returns     :
+  836           *
+  837           * Notes       :
+  838           *
+  839           ********************************************************************************/
+  840          void MyDI(void)
+  841          {
+  842   1          intBuf[0] = IE0;
+  843   1          intBuf[1] = AIE;
+  844   1          IE0 = 0x0;
+  845   1          AIE = 0x0;
+  846   1      }
+  847          /********************************************************************************
+  848           * Description : 恢复中断
+  849           *
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:27  PAGE 14  
+
+  850           * Arguments  :
+  851           *
+  852           *
+  853           * Returns     :
+  854           *
+  855           * Notes       :
+  856           *
+  857           ********************************************************************************/
+  858          void MyEI(void)
+  859          {
+  860   1          IE0 = intBuf[0];
+  861   1          AIE = intBuf[1];
+  862   1      }
+  863          void Delay_us(uint8 delay_ms)
+  864          {
+  865   1          uint8  j;
+  866   1          while (delay_ms != 0)
+  867   1          {
+  868   2              for (j = 0; j < 255; j++)
+  869   2              {
+  870   3                  _nop_();
+  871   3              }
+  872   2              delay_ms--;
+  873   2          }
+  874   1      }
+  875          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      2492     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =        39     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        28     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,1 @@
+"Drv_header.A51" MODSRC INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 SET (XSMALL,ROMHUGE) DEBUG PRINT(.\output\Drv_header.lst) OBJECT(.\output\Drv_header.obj) EP

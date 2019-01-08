@@ -1,0 +1,149 @@
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:41:37  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE main
+OBJECT MODULE PLACED IN .\Obj\main.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE main.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BROWSE INC
+                    -DIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\main.lst) OBJECT(.\Obj\main.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        main ap of sdk 3.0
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *******************************************************************************
+   10           */
+   11          #include "ap_linein.h"
+   12          #include "actos.h"
+   13          #include "alarmdef.h"
+   14          
+   15          #pragma name(AP_MAIN)
+   16          uint8 g_PAOpenFlag = 0;
+   17          int8 AuCodecRun = 0;
+   18          int16 SentenceDectTime;
+   19          uint8 SentenceDectEnergy;
+   20          int16 SentenceDectTime_bak;
+   21          int8 c_decEffectFlag;
+   22          int8 SetenceFlag = 0;
+   23          uint8 m_decSpdifTimer_Sav, m_decAnalogTimer_Sav;
+   24          uint32 m_decSpdifddrSav;
+   25          bool g_PAOpenFlag;
+   26          int8 last_SetenceFlag;
+   27          #ifdef LINEIN_AP
+               char report_buf[16]; //存诸播报数据的buffer
+               info_report_t info =
+               {   report_buf, 0, TRUE};
+               #endif
+   32          
+   33          int16 main(int param)
+   34          {
+   35   1          int16 result;
+   36   1          result = VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval));
+   37   1      #ifdef LINEIN_AP
+                   result = report_cur_ap(EXTEND_LINEIN);
+                   if(result != NULL)
+                   {
+                       return result;
+                   }
+               #endif
+   44   1          init_linein_channel();
+   45   1      
+   46   1          result = show_ui_func(param);
+   47   1      
+   48   1          exit_linein_func();
+   49   1          VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval));
+   50   1          return result;
+   51   1      }
+   52          
+   53          void init_linein_channel(void)
+   54          {
+   55   1          //    SetPAVolume_LR(g_comval.volume);
+   56   1          SentenceDectTime = 10000;
+   57   1          SentenceDectEnergy = 0x0;
+   58   1          AuCodecRun = 0;
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:41:37  PAGE 2   
+
+   59   1          SetenceFlag = 0; // SetenceFlag =1 close PA
+   60   1          last_SetenceFlag = SetenceFlag;
+   61   1          callback_eq(g_comval.eq_type, NULL);
+   62   1          decinitAnalog(AD_Aux);
+   63   1          decstartAnalog(AD_Aux);
+   64   1          volume_callback(g_comval.volume);
+   65   1      }
+   66          
+   67          void exit_linein_func(void)
+   68          {
+   69   1          decAnalogexit();
+   70   1      }
+   71          
+   72          void linein_open_dac(void)
+   73          {
+   74   1          dac_t dac_attr;
+   75   1          dac_attr.dacselect = 0;
+   76   1          dac_attr.rate = FS_44K1;
+   77   1          EnableDAC(&dac_attr);
+   78   1      }
+   79          
+   80          void linein_open_pa(void)
+   81          {
+   82   1          pa_t pa_attr;
+   83   1      
+   84   1          if (g_PAOpenFlag == 0x00)
+   85   1          {
+   86   2              pa_attr.pa_in.dacin = 1;
+   87   2              pa_attr.pa_in.fmin = 0;
+   88   2              pa_attr.pa_in.linein = 0;
+   89   2              pa_attr.pa_in.micin = 0;
+   90   2              pa_attr.volume = 0;
+   91   2              EnablePA(&pa_attr);
+   92   2              g_PAOpenFlag = 0x01;
+   93   2          }
+   94   1      }
+   95          #ifdef LINEIN_AP
+               uint8 report_cur_ap(uint8 report_msg)
+               {
+                   uint8 retval = NULL;
+                   if(g_comval.SuppTTS != 0)
+                   {
+                       report_buf[0] = ' ';
+                       report_buf[1] = report_msg;
+                       report_buf[2] = ' ';
+                       report_buf[3] = 0;
+                       check_report_state(&info);
+                       retval = wait_report_end(NULL);
+                   }
+                   return retval;
+               }
+               #endif
+  111          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       217     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        16     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:41:37  PAGE 3   
+
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        15     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

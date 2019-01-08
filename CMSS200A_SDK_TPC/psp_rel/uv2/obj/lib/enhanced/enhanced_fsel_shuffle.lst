@@ -1,0 +1,842 @@
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE enhanced_fsel_shuffle
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\enhanced\enhanced_fsel_shuffle.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\enhanced\fsel\enhanced_fsel_shuffle.c XSMAL
+                    -L INTR2 FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) ORDER INCDIR(..\..\..\..\..\inc) DEFINE(_ACTIVE_USERPL,_ACTIVE_
+                    -SHUFFLE,_ACTIVE_DIRL) DEBUG PRINT(..\..\..\..\obj\lib\enhanced\enhanced_fsel_shuffle.lst) OBJECT(..\..\..\..\obj\lib\enh
+                    -anced\enhanced_fsel_shuffle.obj) 
+
+stmt  level    source
+
+    1          /*******************************************************************************
+    2           *                              US212A
+    3           *                            Module: ENHANCED
+    4           *                 Copyright(c) 2003-2011 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *       liminxian  2011-9-15 15:37    1.0             build this file
+   10           *******************************************************************************/
+   11          /*!
+   12           * \file     *.c
+   13           * \brief    随机机制
+   14           * \author   liminxian
+   15           * \par      GENERAL DESCRIPTION:
+   16           *               这里对文件进行描述
+   17           * \par      EXTERNALIZED FUNCTIONS:
+   18           *
+   19           * \version 1.0
+   20           * \date  2011/9/15
+   21           *******************************************************************************/
+   22          
+   23          #include <actos.h>
+   24          #include <enhanced.h>
+   25          #include <stringH.h>
+   26          #include <rand.h>
+   27          
+   28          //#define  OVERTURN_DEF  //反转bitmap播放功能
+   29          #define SET_GROUP_MAX   64
+   30          #define SET_MEMBER_MAX  256
+   31          #define SET_PREV_MAX    10
+   32          #define VALUE_SIZE              0x80
+   33          #define VALUE_ADDR              0xd80
+   34          
+   35          #pragma name(MW_EH_FSEL_SHUFFLE)
+   36          extern uint8 fselError; // store error id;
+   37          extern uint16 fselTotalInDisk;// 全盘文件总数
+   38          extern uint16 fselFileNoInDisk;// 文件在全盘的序号
+   39          extern uint8 fselPLOrCommonDir;
+   40          
+   41          #ifdef _ACTIVE_USERPL
+   42          extern uint8 User_ItemTotal;
+   43          #endif
+   44          
+   45          #ifdef FILE_PLAY_LIST
+   46          //for playlist
+   47          extern uint16 shuffle_plist_total;
+   48          #endif
+   49          
+   50          uint16 shuffle_total;//shuffle的总个数
+   51          uint8 group_map[SET_GROUP_MAX / 8];//分组，共64组
+   52          uint8 member_map[SET_MEMBER_MAX / 8];//组内成员，共256
+   53          uint8 member_avg;//成员平均值，商值
+   54          uint8 member_avg_group;//平均值成员的组号起始
+   55          uint8 group_max;//有效的组号
+   56          uint8 member_max;//当前组的最大成员个数
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 2   
+
+   57          uint8 use_member_flag;//使用组内shuffle功能
+   58          uint8 cur_group;//当前的组号（1，2，。。。
+   59          uint16 cur_member;//当前组内的成员号（1，2，。。。
+   60          uint16 filtrate_shuffle_no; //shuffle过滤播放序号，避免重复
+   61          
+   62          uint16 play_num_list[SET_PREV_MAX];
+   63          uint8 cur_save_pt; //当前存的指针
+   64          uint8 cur_save_prev_count;
+   65          uint8 cur_save_next_count;
+   66          uint8 cur_overturn_flag; //表翻转标记
+   67          
+   68          static const uint8 byte_set_val[8] =
+   69          { 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff };
+   70          static const uint8 byte_check_val[8] =
+   71          { 0x01, 0x02, 0x4, 0x08, 0x10, 0x20, 0x40, 0x80 };
+   72          
+   73          static void init_member_map(void);
+   74          static bool set_bitmap_bit(uint8 *dest_map, uint16 num);
+   75          static uint16 find_bitmap_bit(uint8 *bitmap, uint8 count_max, uint16 rand_num);
+   76          static uint16 get_group_num(void);
+   77          static uint16 get_member_num(void);
+   78          static uint16 get_nextlist_num(void);
+   79          static uint16 get_prevlist_num(void);
+   80          static uint16 get_shuffle_num(void);
+   81          
+   82          #pragma renamecode(MW_EH_FSEL_SHUFFLE)
+   83          /******************************************************************************/
+   84          /*
+   85           * \par  Description:根据组号初始化组内成员的map状态
+   86           *
+   87           * \param[in]
+   88          
+   89           * \param[out]
+   90          
+   91           * \return        TRUE OR FALSE
+   92          
+   93           * \note
+   94           *******************************************************************************/
+   95          
+   96          void init_member_map(void)
+   97          {
+   98   1          uint8 i, j;
+   99   1          for (i = 0; i < (member_avg / 8); i++)
+  100   1          {
+  101   2              member_map[i] = 0xff;
+  102   2          }
+  103   1      
+  104   1          j = member_avg % 8;
+  105   1      
+  106   1          member_max = member_avg;
+  107   1      
+  108   1          if (cur_group < member_avg_group)
+  109   1          {
+  110   2              //组号在平均值组的前面时
+  111   2              j++;
+  112   2              member_max++;
+  113   2          }
+  114   1      
+  115   1          if (j != 0)
+  116   1          {
+  117   2              member_map[i] = byte_set_val[j - 1];
+  118   2          }
+  119   1      
+  120   1          return;
+  121   1      
+  122   1      }
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 3   
+
+  123          
+  124          /******************************************************************************/
+  125          /*
+  126           * \par  Description:初始shuffle机制
+  127           *
+  128           * \param[in]
+  129          
+  130           * \param[out]
+  131          
+  132           * \return        TRUE OF FALSE
+  133          
+  134           * \note
+  135           *******************************************************************************/
+  136          bool init_shuffle(uint16 num_total)
+  137          {
+  138   1          uint8 i, j;
+  139   1      
+  140   1          VMRead(VALUE_ADDR, VM_SHUFFLE, VALUE_SIZE);
+  141   1      #ifdef FILE_PLAY_LIST
+  142   1          if(fselPLOrCommonDir == FSEL_TYPE_PLAYLIST)
+  143   1          {
+  144   2              filtrate_shuffle_no = num_total;
+  145   2          }
+  146   1          else
+  147   1      #endif
+  148   1          {
+  149   2              filtrate_shuffle_no = fselFileNoInDisk;
+  150   2          }
+  151   1      
+  152   1          if (num_total == 0)
+  153   1          {
+  154   2              return FALSE;
+  155   2          }
+  156   1      
+  157   1          memset(group_map, 0x00, sizeof(group_map));
+  158   1          memset(member_map, 0x00, sizeof(member_map));
+  159   1          use_member_flag = FALSE;
+  160   1          cur_group = 0;
+  161   1          cur_member = 0;
+  162   1          //    cur_save_count=0;
+  163   1          //    cur_play_pos=0;
+  164   1          cur_save_pt = SET_PREV_MAX;
+  165   1          cur_save_prev_count = 1;
+  166   1          cur_save_next_count = 1;
+  167   1          cur_overturn_flag = 0;
+  168   1      
+  169   1          shuffle_total = num_total;
+  170   1      #ifdef FILE_PLAY_LIST
+  171   1          shuffle_plist_total = num_total;
+  172   1      #endif
+  173   1      
+  174   1          if (num_total > SET_GROUP_MAX)
+  175   1          {
+  176   2              //个数大于组数,启用组内成员shuffle
+  177   2              use_member_flag = TRUE;
+  178   2              memset(group_map, 0xff, sizeof(group_map));
+  179   2              group_max = SET_GROUP_MAX;
+  180   2          }
+  181   1          else
+  182   1          {
+  183   2              //个数少于组数,只用组shuffle就可以了
+  184   2              group_max = (uint8) num_total;
+  185   2              for (i = 0; i < (num_total / 8); i++)
+  186   2              {
+  187   3                  group_map[i] = 0xff;
+  188   3              }
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 4   
+
+  189   2      
+  190   2              if ((num_total % 8) != 0)
+  191   2              {
+  192   3                  //            j=num_total%8;
+  193   3                  //            group_map[i]=byte_set_val[j-1];
+  194   3                  j = (num_total % 8) - 1;
+  195   3                  group_map[i % (SET_GROUP_MAX / 8)] = byte_set_val[j];
+  196   3              }
+  197   2          }
+  198   1      
+  199   1          if (FALSE != use_member_flag)
+  200   1          {
+  201   2              member_avg = num_total / SET_GROUP_MAX;
+  202   2              member_avg_group = (num_total % SET_GROUP_MAX) + 1;
+  203   2          }
+  204   1      
+  205   1      
+  206   1          VMWrite(VALUE_ADDR, VM_SHUFFLE, VALUE_SIZE);
+  207   1          return TRUE;
+  208   1      
+  209   1      }
+  210          
+  211          /******************************************************************************/
+  212          /*
+  213           * \par  Description:把map翻转
+  214           *
+  215           * \param[in]
+  216          
+  217           * \param[out]
+  218          
+  219           * \return        TRUE OR FALSE
+  220          
+  221           * \note
+  222           *******************************************************************************/
+  223          
+  224          #ifdef OVERTURN_DEF
+               
+               void overturn_map(void)
+               {
+                   uint8 i;
+                   uint8 temp8;
+               
+                   cur_overturn_flag = (cur_overturn_flag + 1) % 2;
+               
+                   for(i = 0; i < (group_max / 8); i++)
+                   {
+                       group_map[i] = (~group_map[i]);
+                   }
+               
+                   temp8 = group_max % 8;
+               
+                   if(temp8 != 0)
+                   {
+                       group_map[i] = (~group_map[i])&byte_set_val[temp8 - 1];
+                   }
+               
+                   temp8 = member_max;
+               
+                   if(cur_group < member_avg_group)
+                   {
+                       //组号在平均值组的前面时
+                       temp8++;
+                   }
+               
+                   for(i = 0; i < temp8 / 8; i++)
+                   {
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 5   
+
+                       member_map[i] = ~member_map[i];
+                   }
+               
+                   temp8 = temp8 % 8;
+               
+                   if(temp8 != 0)
+                   {
+                       member_map[i] = (~member_map[i])&member_map[temp8 - 1];
+                   }
+               
+               }
+               
+               #endif
+  268          
+  269          /******************************************************************************/
+  270          /*
+  271           * \par  Description:获取shuffle的组号
+  272           *
+  273           * \param[in]
+  274          
+  275           * \param[out]
+  276          
+  277           * \return      group_num(1~n)
+  278          
+  279           * \note
+  280           *******************************************************************************/
+  281          
+  282          static uint16 get_group_num(void)
+  283          {
+  284   1          uint16 rand_num;
+  285   1          uint8 i = 3;
+  286   1      
+  287   1          if (0 == group_max)
+  288   1          {
+  289   2              return 1;
+  290   2          }
+  291   1      
+  292   1          while (i != 0)
+  293   1          {
+  294   2              i--;
+  295   2              //try 3次
+  296   2              rand_num = (rand() % group_max) + 1;
+  297   2              if (FALSE != set_bitmap_bit(group_map, rand_num))
+  298   2              {
+  299   3                  return rand_num;
+  300   3              }
+  301   2          }
+  302   1      
+  303   1          return find_bitmap_bit(group_map, group_max, rand_num);
+  304   1      }
+  305          
+  306          /******************************************************************************/
+  307          /*
+  308           * \par  Description:获取组内成员的shuffle号
+  309           *
+  310           * \param[in]
+  311          
+  312           * \param[out]
+  313          
+  314           * \return        member_num(1~n)
+  315          
+  316           * \note
+  317           *******************************************************************************/
+  318          
+  319          static uint16 get_member_num(void)
+  320          {
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 6   
+
+  321   1          uint16 rand_num;
+  322   1          uint16 temp8;
+  323   1          uint8 i = 3;
+  324   1      
+  325   1          if (0 == member_max)
+  326   1          {
+  327   2              return 1;
+  328   2          }
+  329   1      
+  330   1          temp8 = member_max;
+  331   1      
+  332   1          if (cur_group < member_avg_group)
+  333   1          {
+  334   2              //组号在平均值组的前面时
+  335   2              temp8++;
+  336   2          }
+  337   1      
+  338   1          while (i != 0)
+  339   1          {
+  340   2              i--;
+  341   2              //try 3次
+  342   2              rand_num = (rand() % temp8) + 1;
+  343   2              if (FALSE != set_bitmap_bit(member_map, rand_num))
+  344   2              {
+  345   3                  return rand_num;
+  346   3              }
+  347   2          }
+  348   1      
+  349   1          return find_bitmap_bit(member_map, member_max, rand_num);
+  350   1      
+  351   1      }
+  352          
+  353          /******************************************************************************/
+  354          /*
+  355           * \par  Description: 设置占用组的状态
+  356           *
+  357           * \param[in]    bitmap-位图表地址
+  358           num-第几个bit(1~8)
+  359          
+  360           * \param[out]
+  361          
+  362           * \return        TRUE OR FALSE
+  363          
+  364           * \note
+  365           *******************************************************************************/
+  366          
+  367          static bool set_bitmap_bit(uint8 *bitmap, uint16 num)
+  368          {
+  369   1          uint8 i, j;
+  370   1      
+  371   1          num--;//变为从0开始
+  372   1          i = num / 8;
+  373   1          j = num % 8;
+  374   1      
+  375   1          if ((bitmap[i] & byte_check_val[j]) > 0)
+  376   1          {
+  377   2              bitmap[i] = bitmap[i] & (255 - byte_check_val[j]);
+  378   2              return TRUE;
+  379   2          }
+  380   1      
+  381   1          return FALSE;
+  382   1      }
+  383          
+  384          /******************************************************************************/
+  385          /*
+  386           * \par  Description:查找未播放过的成员
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 7   
+
+  387           *
+  388           * \param[in]
+  389          
+  390           * \param[out]
+  391          
+  392           * \return        1~n
+  393          
+  394           * \note
+  395           *******************************************************************************/
+  396          
+  397          static uint16 find_bitmap_bit(uint8 *bitmap, uint8 count_max, uint16 rand_num)
+  398          {
+  399   1          uint16 i;
+  400   1      
+  401   1          if ((rand_num & 0x01) > 0)
+  402   1          {
+  403   2              //从头往前找
+  404   2              for (i = 1; i < (count_max + 1); i++)
+  405   2              {
+  406   3                  if (FALSE != set_bitmap_bit(bitmap, i))
+  407   3                  {
+  408   4                      return i;
+  409   4                  }
+  410   3              }
+  411   2          }
+  412   1          else
+  413   1          {
+  414   2              //从末往回找
+  415   2              for (i = count_max; i > 0; i--)
+  416   2              {
+  417   3                  if (FALSE != set_bitmap_bit(bitmap, i))
+  418   3                  {
+  419   4                      return i;
+  420   4                  }
+  421   3              }
+  422   2      
+  423   2          }
+  424   1      
+  425   1          return 0;
+  426   1      }
+  427          
+  428          /******************************************************************************/
+  429          /*
+  430           * \par  Description:获取回溯队列中的下一个
+  431           *
+  432           * \param[in]
+  433          
+  434           * \param[out]
+  435          
+  436           * \return       file_no (1~file_total)
+  437          
+  438           * \note
+  439           *******************************************************************************/
+  440          
+  441          static uint16 get_nextlist_num(void)
+  442          {
+  443   1          if (cur_save_pt >= (SET_PREV_MAX - 1))
+  444   1          {
+  445   2              //循环buffer的方式存放
+  446   2              cur_save_pt = 0;
+  447   2          }
+  448   1          else
+  449   1          {
+  450   2              cur_save_pt++;
+  451   2          }
+  452   1      
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 8   
+
+  453   1          if (cur_save_prev_count < SET_PREV_MAX)
+  454   1          {
+  455   2              cur_save_prev_count++;
+  456   2          }
+  457   1      
+  458   1          cur_save_next_count--;
+  459   1      
+  460   1          return play_num_list[cur_save_pt];
+  461   1      
+  462   1      }
+  463          
+  464          /******************************************************************************/
+  465          /*
+  466           * \par  Description:获取回溯队列中的上一个
+  467           *
+  468           * \param[in]
+  469          
+  470           * \param[out]
+  471          
+  472           * \return        file_no (1~file_total)
+  473          
+  474           * \note
+  475           *******************************************************************************/
+  476          
+  477          static uint16 get_prevlist_num(void)
+  478          {
+  479   1          if (cur_save_pt == 0)
+  480   1          {
+  481   2              //循环buffer的方式存放
+  482   2              cur_save_pt = SET_PREV_MAX - 1;
+  483   2          }
+  484   1          else
+  485   1          {
+  486   2              cur_save_pt--;
+  487   2          }
+  488   1      
+  489   1          if (cur_save_next_count < SET_PREV_MAX)
+  490   1          {
+  491   2              cur_save_next_count++;
+  492   2          }
+  493   1      
+  494   1          cur_save_prev_count--;
+  495   1      
+  496   1          return play_num_list[cur_save_pt];
+  497   1      }
+  498          
+  499          /******************************************************************************/
+  500          /*
+  501           * \par  Description:获取播放的shuffle的number
+  502           *
+  503           * \param[in]
+  504          
+  505           * \param[out]
+  506          
+  507           * \return        file_no (1~file_total)
+  508          
+  509           * \note
+  510           *******************************************************************************/
+  511          
+  512          static uint16 get_shuffle_num(void)
+  513          {
+  514   1          uint16 temp_num;
+  515   1      
+  516   1          if (FALSE == use_member_flag)
+  517   1          {
+  518   2              //只使用组号shuffle
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 9   
+
+  519   2              cur_group = (uint8) get_group_num();
+  520   2              return (uint16) cur_group;
+  521   2          }
+  522   1      
+  523   1          //使用组内shuffle
+  524   1      
+  525   1          if (0 == cur_group)
+  526   1          {
+  527   2              //首次进入
+  528   2              cur_group = (uint8) get_group_num();
+  529   2              if (0 == cur_group)
+  530   2              {
+  531   3                  //所有组已经播放完
+  532   3                  return 0;
+  533   3              }
+  534   2              init_member_map();
+  535   2          }
+  536   1      
+  537   1          cur_member = get_member_num();
+  538   1          if (0 == cur_member)
+  539   1          {
+  540   2              //当前组成员已全部播放完
+  541   2              cur_group = (uint8) get_group_num();
+  542   2              if (0 == cur_group)
+  543   2              {
+  544   3                  //所有组已经播放完
+  545   3                  return 0;
+  546   3              }
+  547   2              init_member_map();
+  548   2              cur_member = get_member_num();
+  549   2              if (0 == cur_member)
+  550   2              {
+  551   3                  fselError = FSEL_ERR_SHUFFLE;
+  552   3                  return 0;
+  553   3              }
+  554   2          }
+  555   1      
+  556   1          temp_num = SET_GROUP_MAX * (cur_member - 1) + cur_group;
+  557   1          return temp_num;
+  558   1      }
+  559          
+  560          /******************************************************************************/
+  561          /*
+  562           * \par  Description:获取shuffle机制的下一个
+  563           *
+  564           * \param[in]
+  565          
+  566           * \param[out]
+  567          
+  568           * \return        file_no (1~file_total)
+  569          
+  570           * \note
+  571           *******************************************************************************/
+  572          //shuffle mode  get next
+  573          uint16 shuffle_next_file(void)
+  574          {
+  575   1          uint16 temp_num;
+  576   1      
+  577   1          VMRead(VALUE_ADDR, VM_SHUFFLE, VALUE_SIZE);
+  578   1      
+  579   1          if(fselPLOrCommonDir == FSEL_TYPE_COMMONDIR)
+  580   1          {
+  581   2              shuffle_total = fselTotalInDisk;
+  582   2          }
+  583   1      #ifdef _ACTIVE_USERPL
+  584   1          else if (fselPLOrCommonDir == FSEL_TYPE_USERPL)
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 10  
+
+  585   1          {
+  586   2              shuffle_total = User_ItemTotal;
+  587   2          }
+  588   1      #endif
+  589   1      #ifdef FILE_PLAY_LIST
+  590   1          else if (fselPLOrCommonDir == FSEL_TYPE_PLAYLIST)
+  591   1          {
+  592   2              shuffle_total = shuffle_plist_total;
+  593   2          }
+  594   1      #endif
+  595   1          else
+  596   1          {
+  597   2          }
+  598   1      
+  599   1          if (shuffle_total == 0)
+  600   1          {
+  601   2              VMWrite(VALUE_ADDR, VM_SHUFFLE, VALUE_SIZE);
+  602   2              return 0;
+  603   2          }
+  604   1      
+  605   1          while (cur_save_next_count > 1)
+  606   1          {
+  607   2              temp_num = get_nextlist_num();
+  608   2              if (temp_num <= shuffle_total)
+  609   2              {
+  610   3                  if (temp_num != 0)
+  611   3                  {
+  612   4                      VMWrite(VALUE_ADDR, VM_SHUFFLE, VALUE_SIZE);
+  613   4                      return temp_num;
+  614   4                  }
+  615   3                  else
+  616   3                  {
+  617   4                      break;
+  618   4                  }
+  619   3              }
+  620   2      
+  621   2              cur_save_next_count--;
+  622   2          }
+  623   1      
+  624   1      #ifdef OVERTURN_DEF
+                   if(cur_save_pt != SET_PREV_MAX && cur_overturn_flag == 0)
+                   {
+                       overturn_map();
+                   }
+               #endif
+  630   1      
+  631   1          //list can't find,use shuffle al
+  632   1      
+  633   1          //保证随机出来的值在shuffle_total范围内,并与file_no不相同
+  634   1          do
+  635   1          {
+  636   2              temp_num = get_shuffle_num();
+  637   2              if (temp_num == 0)
+  638   2              {
+  639   3                  break;
+  640   3              }
+  641   2      
+  642   2          }
+  643   1          while ((filtrate_shuffle_no == temp_num) || (temp_num > shuffle_total));
+  644   1      
+  645   1          if (0 != temp_num)
+  646   1          {
+  647   2              //SAVE TO PLAY_NUM_LIST
+  648   2              if (cur_save_pt >= (SET_PREV_MAX - 1))
+  649   2              {
+  650   3                  //循环buffer的方式存放
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 11  
+
+  651   3                  cur_save_pt = 0;
+  652   3              }
+  653   2              else
+  654   2              {
+  655   3                  cur_save_pt++;
+  656   3              }
+  657   2      
+  658   2              if (cur_save_prev_count < SET_PREV_MAX)
+  659   2              {
+  660   3                  cur_save_prev_count++;
+  661   3              }
+  662   2              play_num_list[cur_save_pt] = temp_num;
+  663   2          }
+  664   1      
+  665   1          VMWrite(VALUE_ADDR, VM_SHUFFLE, VALUE_SIZE);
+  666   1          return temp_num;
+  667   1      }
+  668          
+  669          /******************************************************************************/
+  670          /*
+  671           * \par  Description:获取shuffle机制的上一个
+  672           *
+  673           * \param[in]
+  674          
+  675           * \param[out]
+  676          
+  677           * \return      file_no (1~file_total)
+  678          
+  679           * \note
+  680           *******************************************************************************/
+  681          //shuffle mode  get prev
+  682          uint16 shuffle_prev_file(void)
+  683          {
+  684   1          uint16 temp_num;
+  685   1      
+  686   1          VMRead(VALUE_ADDR, VM_SHUFFLE, VALUE_SIZE);
+  687   1      
+  688   1          if(fselPLOrCommonDir == FSEL_TYPE_COMMONDIR)
+  689   1          {
+  690   2              shuffle_total = fselTotalInDisk;
+  691   2          }
+  692   1      #ifdef _ACTIVE_USERPL
+  693   1          else if (fselPLOrCommonDir == FSEL_TYPE_USERPL)
+  694   1          {
+  695   2              shuffle_total = User_ItemTotal;
+  696   2          }
+  697   1      #endif
+  698   1      #ifdef FILE_PLAY_LIST
+  699   1          else if (fselPLOrCommonDir == FSEL_TYPE_PLAYLIST)
+  700   1          {
+  701   2              shuffle_total = shuffle_plist_total;
+  702   2          }
+  703   1      #endif
+  704   1          else
+  705   1          {
+  706   2          }
+  707   1      
+  708   1          if (shuffle_total == 0)
+  709   1          {
+  710   2              VMWrite(VALUE_ADDR, VM_SHUFFLE, VALUE_SIZE);
+  711   2              return 0;
+  712   2          }
+  713   1      
+  714   1          while (cur_save_prev_count > 1)
+  715   1          {
+  716   2              temp_num = get_prevlist_num();
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 12  
+
+  717   2      
+  718   2              if (temp_num <= shuffle_total)
+  719   2              {
+  720   3                  if (temp_num != 0)
+  721   3                  {
+  722   4                      VMWrite(VALUE_ADDR, VM_SHUFFLE, VALUE_SIZE);
+  723   4                      return temp_num;
+  724   4                  }
+  725   3                  else
+  726   3                  {
+  727   4                      break;
+  728   4                  }
+  729   3              }
+  730   2      
+  731   2              cur_save_prev_count--;
+  732   2          }
+  733   1      
+  734   1      #ifdef OVERTURN_DEF
+                   if(cur_save_pt != SET_PREV_MAX && cur_overturn_flag == 1)
+                   {
+                       overturn_map();
+                   }
+               #endif
+  740   1      
+  741   1          //list can't find, use shuffle al
+  742   1      
+  743   1          //保证随机出来的值在shuffle_total范围内,并与file_no不相同
+  744   1          do
+  745   1          {
+  746   2              temp_num = get_shuffle_num();
+  747   2              if (temp_num == 0)
+  748   2              {
+  749   3                  break;
+  750   3              }
+  751   2      
+  752   2          }
+  753   1          while ((filtrate_shuffle_no == temp_num) || (temp_num > shuffle_total));
+  754   1      
+  755   1          if (0 != temp_num)
+  756   1          {
+  757   2              //SAVE TO PLAY_NUM_LIST
+  758   2              if (cur_save_pt == 0)
+  759   2              {
+  760   3                  //循环buffer的方式存放
+  761   3                  cur_save_pt = SET_PREV_MAX - 1;
+  762   3              }
+  763   2              else
+  764   2              {
+  765   3                  cur_save_pt--;
+  766   3              }
+  767   2      
+  768   2              if (cur_save_next_count < SET_PREV_MAX)
+  769   2              {
+  770   3                  cur_save_next_count++;
+  771   3              }
+  772   2      
+  773   2              play_num_list[cur_save_pt] = temp_num;
+  774   2      
+  775   2          }
+  776   1      
+  777   1          VMWrite(VALUE_ADDR, VM_SHUFFLE, VALUE_SIZE);
+  778   1          return temp_num;
+  779   1      }
+  780          
+  781          
+  782          
+C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 13  
+
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1480     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        76     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        16     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

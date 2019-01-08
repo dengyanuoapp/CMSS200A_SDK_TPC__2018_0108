@@ -1,0 +1,410 @@
+C251 COMPILER V4.55,  ap_message2                                                          23/05/16  10:42:47  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE ap_message2
+OBJECT MODULE PLACED IN .\Obj\ap_message2.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\common\ap_message2.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPT
+                    -IMIZE(9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\ap_message2.lst) OBJECT(.\Obj\ap_messa
+                    -ge2.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        ap common lib message file
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: ap_message2.c,v 1.1.1.1 2006/05/22 03:23:59 selina Exp $
+   10           *******************************************************************************
+   11           */
+   12          
+   13          #include "ap_common.h"
+   14          
+   15          #define START_KEY_NUM AP_KEY_NUM0
+   16          #define END_KEY_NUM     AP_KEY_NUM9
+   17          #pragma name(COM_MSG2)
+   18          const uint8 lowpower_str[] =
+   19          { "LBAT" };
+   20          const uint8 tmp_key_val[] =
+   21          {
+   22              AP_KEY_USBTEST | AP_KEY_LONG, AP_KEY_AUTOSLEEP | AP_KEY_UP, AP_KEY_USBTEST | AP_KEY_UP, AP_KEY_VOL | 
+             -AP_KEY_LONG,
+   23              AP_KEY_LOOP | AP_KEY_UP, AP_KEY_CLOCK | AP_KEY_LONG, AP_KEY_CLOCK | AP_KEY_UP,
+   24              AP_KEY_EQ | AP_KEY_UP, AP_KEY_REC | AP_KEY_LONG, AP_KEY_REC | AP_KEY_UP
+   25          };
+   26          
+   27          uint8 ap_handle_hotkey_core(uint8 key);
+   28          uint8 FW_Card_Updata(void);
+   29          void show_lowpower_msg(void)
+   30          {
+   31   1          LEDClearScreen();
+   32   1          if (show_what != 0)
+   33   1          {
+   34   2              LEDPuts(NUMBER1, lowpower_str, 1);
+   35   2          }
+   36   1      }
+   37          
+   38          //打开按键音
+   39          void Open_KeyTone(uint8 keytone)
+   40          {
+   41   1      #if 0
+                   if (keytone != 0)
+                   {
+                       KY_Beep(keytone);
+                   }
+               #else
+   47   1          keytone = keytone;
+   48   1      #endif
+   49   1      }
+   50          //对长按数字键进行复用处理
+   51          uint8 switch_key_func(uint8 key)
+   52          {
+   53   1          if ((key >= START_KEY_NUM) && (key <= END_KEY_NUM ))
+   54   1          {
+   55   2              return tmp_key_val[key - START_KEY_NUM];
+   56   2          }
+C251 COMPILER V4.55,  ap_message2                                                          23/05/16  10:42:47  PAGE 2   
+
+   57   1          return NULL;
+   58   1      }
+   59          
+   60          /*
+   61           ********************************************************************************
+   62           * Description : 处理系统消息, 返回按键消息, 同时负责开/关背光
+   63           *
+   64           * Arguments   : key, 系统消息
+   65           *
+   66           * Returns     : 返回ap能够识别的消息, 如果没有系统消息, 返回 AP_KEY_NULL
+   67           *
+   68           * Notes       :
+   69          
+   70           * 按键时序:
+   71           *  0.....1.2....1.5........... (s)
+   72           *  key    long   hold    up    (>1.2s)
+   73           *  key  up            (<1.2s)
+   74           *
+   75           * key rate: 0.3s
+   76           *
+   77           ********************************************************************************
+   78           */
+   79          uint8 ap_get_message_core(uint8 key)
+   80          {
+   81   1          uint8 tmp_key;
+   82   1          /*按键消息和上次的一样时的处理*/
+   83   1          if (key == key_value)
+   84   1          {
+   85   2              /*背光没开时，等抬起键开背光，忽略按键*/
+   86   2              g_rtc_counter = 0;
+   87   2              g_standby_time = 0;
+   88   2              key_count++;
+   89   2      
+   90   2              /*按住按键时，320ms发送一次相同按键消息*/
+   91   2              if (key_count >= 4)
+   92   2              {
+   93   3                  key_value = key;
+   94   3                  //处理数字键长按复用功能
+   95   3                  tmp_key = switch_key_func(key);
+   96   3                  if(tmp_key == NULL)
+   97   3                  {
+   98   4                      key = (uint8) (key | AP_KEY_LONG); //=1.2s,发长按键消息
+   99   4                  }
+  100   3                  else
+  101   3                  {
+  102   4                      key = tmp_key;
+  103   4                      //避免复用长按键多次处理
+  104   4                      if(holdkey_flag == TRUE)
+  105   4                      {
+  106   5                          longkey_flag = 1;
+  107   5                      }
+  108   4                  }
+  109   3                  holdkey_flag = TRUE;
+  110   3              }
+  111   2              return key;
+  112   2          }
+  113   1      
+  114   1          switch (key)
+  115   1          {
+  116   2          case Msg_KeyShortUp:
+  117   2              key_count = 0;
+  118   2              g_rtc_counter = 0;
+  119   2              g_standby_time = 0;
+  120   2              //如果当前的按键为play键，则检测到onoff并没有松开，则丢弃发出up消息
+  121   2              if((key_value == Msg_KeyPlayPause) && (get_onoff_key_status() != 0))
+  122   2              {
+C251 COMPILER V4.55,  ap_message2                                                          23/05/16  10:42:47  PAGE 3   
+
+  123   3                  break;
+  124   3              }
+  125   2              Open_KeyTone(g_comval.SuppKeyTone);
+  126   2              if (holdkey_flag == TRUE)
+  127   2              {
+  128   3                  key = AP_KEY_LONGUP;
+  129   3                  holdkey_flag = FALSE;
+  130   3              }
+  131   2              else
+  132   2              {
+  133   3                  /*key_value的置需改变*/
+  134   3                  key = key_value | AP_KEY_UP;
+  135   3              }
+  136   2              key_value = key;
+  137   2      
+  138   2              break;
+  139   2          case MSG_LOW_POWER:
+  140   2              /*系统低电消息处理为强制关机*/
+  141   2              lowpower_count++;
+  142   2              if (lowpower_count > 6)
+  143   2              {
+  144   3                  key = AP_MSG_STANDBY;
+  145   3              }
+  146   2              else
+  147   2              {
+  148   3                  show_what = !show_what;
+  149   3                  show_lowpower_msg();
+  150   3                  key = NULL;
+  151   3              }
+  152   2              break;
+  153   2          case AP_MSG_UH_OUT:
+  154   2              close_usb_phyctrol();
+  155   2              break;
+  156   2          case MSG_USB_UNSTICK:
+  157   2              key = AP_KEY_NULL;
+  158   2              break;
+  159   2          default: /*新按键处理*/
+  160   2              g_rtc_counter = 0;
+  161   2              key_value = key;
+  162   2              key_count = 1;
+  163   2      
+  164   2          } /*end of switch*/
+  165   1      
+  166   1          return key;
+  167   1      }
+  168          
+  169          /*
+  170           ********************************************************************************
+  171           * Description : 处理热键消息, 返回结果消息
+  172           *
+  173           * Arguments   : key, 按键消息
+  174           *
+  175           * Returns     : 如果有可识别的热键消息,  返回结果消息
+  176           如果没有可识别的热键消息,  返回0
+  177           *
+  178           * Notes       :
+  179           *
+  180           ********************************************************************************
+  181           */
+  182          uint8 ap_handle_hotkey_core(uint8 key)
+  183          {
+  184   1          switch (key)
+  185   1          {
+  186   2          case AP_KEY_PLAY | AP_KEY_LONG: //长按play发standby
+  187   2          case AP_KEY_FUNCTION | AP_KEY_LONG:
+  188   2              longkey_flag = 1;
+C251 COMPILER V4.55,  ap_message2                                                          23/05/16  10:42:47  PAGE 4   
+
+  189   2          case AP_MSG_STANDBY: //自动关机
+  190   2              return RESULT_STANDBY;
+  191   2          case AP_KEY_USBTEST | AP_KEY_UP:
+  192   2              //如果没有连接USB线，则不进入utest功能
+  193   2              if(usb_on_flag == 0)
+  194   2              {
+  195   3                  return NULL;
+  196   3              }
+  197   2              return RESULT_USBTEST;
+  198   2          case AP_KEY_USBTEST | AP_KEY_LONG:
+  199   2              longkey_flag = 1;
+  200   2              return RESULT_PITCH;
+  201   2      
+  202   2              break;
+  203   2          case AP_KEY_REC | AP_KEY_UP: //进入录音
+  204   2              //这里的条件判断主要是为了处理数字长按键复用成录音键时，
+  205   2              //防止退出当前ap后再次处理该按键
+  206   2              if(holdkey_flag == TRUE)
+  207   2              {
+  208   3                  longkey_flag = 1;
+  209   3              }
+  210   2              return RESULT_RECORD;
+  211   2          case AP_MSG_SD_IN:
+  212   2              return RESULT_MUSIC_CPLAY;
+  213   2          case AP_MSG_UH_IN:
+  214   2              return RESULT_MUSIC_UPLAY;
+  215   2          case AP_MSG_ALARM:
+  216   2              return RESULT_ALARM;
+  217   2          case AP_MSG_LINEIN_IN:
+  218   2              return RESULT_LINEIN;
+  219   2          case AP_KEY_REC | AP_KEY_LONG:
+  220   2              longkey_flag = 1;
+  221   2              FW_Card_Updata();
+  222   2              SetPLL(PLL_48MHZ);
+  223   2              return 0;
+  224   2          case AP_MSG_USB_PLUGIN:
+  225   2              return RESULT_UDISK;
+  226   2              break;
+  227   2          default:
+  228   2              return 0;
+  229   2          }
+  230   1      }
+  231          /********************************************************************************
+  232           * Description : 获取onoff键的状态
+  233           *
+  234           * Arguments   :
+  235           *
+  236           * Returns     : 无
+  237           *
+  238           * Notes       :
+  239           *
+  240           ********************************************************************************/
+  241          
+  242          uint8 get_onoff_key_status(void)
+  243          {
+  244   1          uint8 sfr_bak, onoff_staus;
+  245   1          sfr_bak = SFR_BANK;
+  246   1          SFR_BANK = BANK_PMU;
+  247   1          onoff_staus = SYSTEM_ONOFF & 0x08;  //获取onoff键的状态
+  248   1          SFR_BANK = sfr_bak;
+  249   1          return onoff_staus;
+  250   1      }
+  251          
+  252          /********************************************************************************
+  253           * Description :处理长按PLAY键关机，或长按Play键关机的消息
+  254           *
+C251 COMPILER V4.55,  ap_message2                                                          23/05/16  10:42:47  PAGE 5   
+
+  255           * Arguments  :
+  256           *
+  257           * Returns     :
+  258           *            无
+  259           * Notes       :
+  260           如果对相应的长按键要进行处理时，必须先将longkey_flag置为1.否则不进行特别处理。
+  261           *                      由于RTC中断会不断发出来，所以在检测长按消息时，要过滤掉RTC消息。
+  262           ********************************************************************************/
+  263          
+  264          uint8 check_longkey_msg(uint8 key)
+  265          {
+  266   1          if ((key == AP_MSG_SD_IN) || (key == AP_MSG_UH_IN) || (key == AP_MSG_SD_OUT) || (key == AP_MSG_UH_OUT
+             -) || (key
+  267   1                  == AP_MSG_WAIT_TIMEOUT))
+  268   1          {
+  269   2              return 1;
+  270   2          }
+  271   1          else if ((key & AP_KEY_UP) != 0)
+  272   1          {
+  273   2              //如果检测到onoff键还是按住的，则可能是误发出了up消息，则不作处理。
+  274   2              if(get_onoff_key_status() != 0)
+  275   2              {
+  276   3                  return 1;
+  277   3              }
+  278   2              longkey_flag = 0;
+  279   2              return 0;
+  280   2          }
+  281   1          else if (key == AP_MSG_RTC)
+  282   1          {
+  283   2              return 1;
+  284   2          }
+  285   1          else
+  286   1          {
+  287   2              return 0;
+  288   2          }
+  289   1      }
+  290          /*
+  291           ********************************************************************************
+  292           * Description : int FW_Updata(void) 通过卡或U盘进行小机固件升级，当前仅支持卡升级
+  293           *
+  294           * Arguments   : 当前只支持卡升级
+  295           *
+  296           * Returns     : 1 = updata ok,0 = updata fail
+  297           *
+  298           * Notes       :
+  299           *
+  300           ********************************************************************************
+  301           */
+  302          uint8 FW_Card_Updata(void)
+  303          {
+  304   1          UD_RW sdcard_rw;
+  305   1          uint16 *data_p;
+  306   1          uint16 checksum, i;
+  307   1      
+  308   1          if (DRV_DetectUD(1) != 0x20)
+  309   1          {
+  310   2              return 0;
+  311   2          }
+  312   1          else
+  313   1          {
+  314   2              SetPLL(PLL_24MHZ);
+  315   2              if (DRV_ActiveUD(1, MODE_SLOW) != 0x00)
+  316   2              {
+  317   3                  sdcard_rw.lba = 0x01;
+  318   3                  sdcard_rw.sramaddr = 0x2800;
+  319   3                  sdcard_rw.reserv = 0x01;
+C251 COMPILER V4.55,  ap_message2                                                          23/05/16  10:42:47  PAGE 6   
+
+  320   3                  sdcard_rw.srampage = 0x00;
+  321   3                  UD_SectorRead(&sdcard_rw);
+  322   3                  data_p = 0x2800;
+  323   3                  if (data_p[254] != 0xaa55)
+  324   3                  {
+  325   4                      return 0;
+  326   4                  }
+  327   3                  checksum = 0x00;
+  328   3                  for (i = 0x00; i <= 254; i++)
+  329   3                  {
+  330   4                      checksum += data_p[i];
+  331   4                  }
+  332   3                  checksum += 0x1234;
+  333   3                  if (checksum != data_p[255])
+  334   3                  {
+  335   4                      return 0;
+  336   4                  }
+  337   3              }
+  338   2              else
+  339   2              {
+  340   3                  return 0;
+  341   3              }
+  342   2              LEDClearScreen();
+  343   2              LEDPuts(NUMBER1, "UPDA", 1);
+  344   2              switch_pa_power(0);
+  345   2              SpiNor_FW_Upgrd();
+  346   2              switch_pa_power(1);
+  347   2              return 1;
+  348   2          }
+  349   1      }
+  350          #if 0
+               uint8 deal_standby_msg(void)
+               {
+                   uint8 sfr_bak;
+                   sfr_bak = SFR_BANK;
+                   SFR_BANK = BANK_PMU;
+                   TEST_CTL |= 0x02;
+                   SFR_BANK = sfr_bak;
+                   //    set_poweroff_HCL();
+                   return AP_MSG_STANDBY;
+               }
+               #endif
+  362          
+  363          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       718     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        20     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

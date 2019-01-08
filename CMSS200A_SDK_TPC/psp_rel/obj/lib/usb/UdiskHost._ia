@@ -1,0 +1,1 @@
+"..\..\..\libsrc\usb\UdiskHost.A51" MODSRC INCDIR(..\..\..\inc) I4 SET (XSMALL,ROMHUGE) DEBUG PRINT(..\..\..\obj\lib\usb\UdiskHost.lst) OBJECT(..\..\..\obj\lib\usb\UdiskHost.obj) EP

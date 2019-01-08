@@ -1,0 +1,39 @@
+#/*****************************************************************************************
+#*                                 asdk 5102
+#*                            Module: fw_cfg
+#*                 Copyright(c) 2001-2009 Actions Semiconductor,
+#*                            All Rights Reserved. 
+#*
+#* History:         
+#*      <author>       <time>             <version >           <desc>
+#*       mike    2012-8-14 11:36          1.0             build this file 
+#*
+#* Description: fwcfg的链接脚本。
+#*					 		
+#*******************************************************************************************/  
+#
+#
+#/****************************************************************************************** 
+# * common settting 
+# ******************************************************************************************/
+linkcfg0=begin
+NOOVERLAY 
+NOJMPTAB
+NODEFAULTLIBRARY
+CLASSES(ECODE(0x800000-0xFFFFFF))
+CLASSES(HCONST(0x800000-0xFFFFFF))
+CLASSES(NCONST_CFG_HEAD(0x0000-0xFFFF))
+CLASSES(NCONST_CFG_PARA(0x0000-0xFFFF))
+CLASSES(NCONST_CFG_KEY(0x0000-0xFFFF))
+CLASSES(NCONST_CFG_AP(0x0000-0xFFFF))
+CLASSES(NCONST_CFG_LAN(0x0000-0xFFFF))
+CLASSES(NCONST_CFG_FILE_EX(0x0000-0xFFFF))
+CLASSES(NCONST_CFG_FUNC(0x0000-0xFFFF))
+linkcfg0=end
+
+#/***************************************************************************************** 
+# * Program Memory  
+# *****************************************************************************************/
+#
+#/******************************************常驻内存代码段*************************************/
+seg_data(0x0000)=?NC?CFG_HEAD?CFG_MAIN,?NC?CFG_PARA?*,?NC?CFG_KEY?*,?NC?CFG_AP?*,?NC?CFG_LAN?*,?NC?CFG_FILE_EX?*,?NC?CFG_FUNC?*

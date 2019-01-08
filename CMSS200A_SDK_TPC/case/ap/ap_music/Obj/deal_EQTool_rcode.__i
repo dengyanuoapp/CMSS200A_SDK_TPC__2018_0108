@@ -1,0 +1,1 @@
+"..\common\deal_EQTool_rcode.c" XSMALL NOALIAS FUNCTIONS (REENTRANT) ROM(HUGE) OPTIMIZE (9,SPEED) BROWSE INCDIR(..\..\inc;..\..\..\psp_rel\inc) I4 DEBUG PRINT(.\Lst\deal_EQTool_rcode.lst) OBJECT(.\Obj\deal_EQTool_rcode.obj)

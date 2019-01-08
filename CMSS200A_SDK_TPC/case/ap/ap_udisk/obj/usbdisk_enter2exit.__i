@@ -1,0 +1,1 @@
+"usbdisk_enter2exit.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) OPTIMIZE (9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 ORDER DEFINE (UDISK_AP) DEBUG PRINT(.\list\usbdisk_enter2exit.lst) OBJECT(.\obj\usbdisk_enter2exit.obj)

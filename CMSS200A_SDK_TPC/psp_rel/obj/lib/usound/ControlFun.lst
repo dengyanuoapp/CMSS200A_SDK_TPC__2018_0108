@@ -1,0 +1,357 @@
+C251 COMPILER V4.55,  ControlFun                                                           15/07/16  15:45:42  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE ControlFun
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usb\ControlFun.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usb\ControlFun.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) IN
+                    -CDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\ControlFun.lst) OBJECT(..\..\..\obj\lib\usb\ControlFun.o
+                    -bj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************************************
+             -*
+    3           *                                       ACTOS GL3976
+    4           *
+    5           *
+    6           *                           (c) Copyright 2002-2007, Actions Co,Ld.
+    7           *                                   All Right Reserved
+    8           *
+    9           * File   : ControlFun.msa
+   10           * By     : zhouxl
+   11           * Version: v1.02     first version     2004-12-16 08:19
+   12           ********************************************************************************************************
+             -*
+   13           */
+   14          
+   15          #include "udisklib.h"
+   16          
+   17          #pragma name(CONTROLFUN_C)
+   18          #pragma renamecode(?PR?CONTROLFUN_C)
+   19          
+   20          #pragma ROM(HUGE)
+   21          /*
+   22           ********************************************************************************
+   23           *                           Control_Read
+   24           * Description : Perform control read operation.
+   25           * Arguments   : de: The address of data to be transfered to the host;
+   26           *             : bc: The data length;
+   27           *             : (sp+2): Request transfer Length.
+   28           * Returns     : none
+   29           * Notes       :
+   30           ********************************************************************************
+   31           */
+   32          void Control_Read(char *data_p, int data_length, int request_length)
+   33          {
+   34   1          char *dataAddr;
+   35   1          int i, sendLength, count;
+   36   1      
+   37   1          dataAddr = data_p;
+   38   1      
+   39   1          if (request_length < data_length)
+   40   1          {
+   41   2              sendLength = request_length;
+   42   2          }
+   43   1          else
+   44   1          {
+   45   2              sendLength = data_length;
+   46   2          }
+   47   1      
+   48   1          while (sendLength != 0)
+   49   1          {
+   50   2              count = ((sendLength - 0x40) >= 0) ? 0x40 : (sendLength % 0x40);
+   51   2              for (i = 0; i < count; i++)
+   52   2              {
+   53   3                  //fill ep0 fifo
+   54   3                  Ep0indata = (char *) dataAddr[i];
+   55   3              }
+C251 COMPILER V4.55,  ControlFun                                                           15/07/16  15:45:42  PAGE 2   
+
+   56   2              In0bc_hcout0bc = (uint8) count;
+   57   2              //FIFO Empty?
+   58   2              while ((Ep0cs_hcep0cs & 0x04) != 0)
+   59   2              {
+   60   3                  //°ÎÏß´¦Àí
+   61   3                  ifIsConnect();
+   62   3              }
+   63   2              sendLength = sendLength - count;
+   64   2              dataAddr = dataAddr + count;
+   65   2          }
+   66   1      
+   67   1          //AOTG ack with zero packet status stage
+   68   1          Ep0cs_hcep0cs = Ep0cs_hcep0cs | 0x02;
+   69   1      
+   70   1          //clear setup packet interrupt
+   71   1          Usbirq_hcusbirq = 0xff;
+   72   1      }
+   73          
+   74          /*
+   75           ********************************************************************************
+   76           *                           NoData_PhaseReturn
+   77           * Description : Return zero length data to host for Phase stage in control transfer.
+   78           * Arguments   : none
+   79           * Returns     : none
+   80           * Notes       :
+   81           ********************************************************************************
+   82           */
+   83          void NoData_PhaseReturn(void)
+   84          {
+   85   1          //AOTG ack with zero packet status stage
+   86   1          Ep0cs_hcep0cs = Ep0cs_hcep0cs | 0x02;
+   87   1          //clear setup packet interrupt
+   88   1          Usbirq_hcusbirq = 0xff;
+   89   1      }
+   90          
+   91          /*
+   92           ********************************************************************************
+   93           *                           Set_EPA_BulkInMode
+   94           * Description : Set Endpoint A Bulk IN type.
+   95           * Arguments   : none
+   96           * Returns     : none
+   97           * Notes       :
+   98           ********************************************************************************
+   99           */
+  100          void Set_EPA_BulkInMode(void)
+  101          {
+  102   1          //usb speed mode
+  103   1          if ((BKDOOR & 0x40) != 0)
+  104   1          {
+  105   2              //EPA High Speed,Max Packet Size=512
+  106   2              Hcout1maxpckl = 0x00;
+  107   2              Hcout1maxpckh = 0x02;
+  108   2          }
+  109   1          else
+  110   1          {
+  111   2              //EPA Full Speed,Max Packet Size=64
+  112   2              Hcout1maxpckl = 0x40;
+  113   2              Hcout1maxpckh = 0x00;
+  114   2          }
+  115   1      
+  116   1          //quad buffer, bulk transfer, endpoint enable
+  117   1          In1ctrl_hcout1ctrl = 0x8B;
+  118   1      
+  119   1          //select ep1
+  120   1          EPRST = 0x01;
+  121   1          //reset toggle
+C251 COMPILER V4.55,  ControlFun                                                           15/07/16  15:45:42  PAGE 3   
+
+  122   1          EPRST = 0x21;
+  123   1          //reset fifo
+  124   1          EPRST = 0x41; //reset fifo
+  125   1          //set EPA fifo auto mode, with full packet auto in
+  126   1          Fifoctrl = 0x21;
+  127   1      }
+  128          
+  129          /*
+  130           ********************************************************************************
+  131           *                           Set_EPB_BulkOutMode
+  132           * Description : Set Endpoint B Bulk Out type.
+  133           * Arguments   : none
+  134           * Returns     : none
+  135           * Notes       :
+  136           ********************************************************************************
+  137           */
+  138          void Set_EPB_BulkOutMode(void)
+  139          {
+  140   1          //usb speed mode
+  141   1          if ((BKDOOR & 0x40) != 0)
+  142   1          {
+  143   2              //EPB High Speed,Max Packet Size=512
+  144   2              Hcin2maxpckl = 0x00;
+  145   2              Hcin2maxpckh = 0x02;
+  146   2              //set EPA & EPB max packet size
+  147   2              max_pkt_size = 0x200;
+  148   2          }
+  149   1          else
+  150   1          {
+  151   2              //EPB Full Speed,Max Packet Size=64
+  152   2              Hcin2maxpckl = 0x40;
+  153   2              Hcin2maxpckh = 0x00;
+  154   2              //set EPA & EPB max packet size
+  155   2              max_pkt_size = 0x40;
+  156   2          }
+  157   1      
+  158   1          Out2ctrl_hcin2ctrl = 0x8B;//0x8B;
+  159   1      
+  160   1          //set EPB short packet nakout mode
+  161   1          AUTONAKCTRL = AUTONAKCTRL | 0x02;
+  162   1          //disable out packet counter
+  163   1          OUTPCKCNTH = 0x00;
+  164   1      
+  165   1          //set fifo out direction(EPB)
+  166   1      
+  167   1          //select ep2
+  168   1          EPRST = 0x02;
+  169   1          //reset toggle
+  170   1          EPRST = 0x22;
+  171   1          //reset fifo
+  172   1          EPRST = 0x42; //reset fifo
+  173   1          //set EPB fifo auto mode, recieve full packet, move to next sub-buffer
+  174   1          Fifoctrl = 0x22;
+  175   1      }
+  176          
+  177          /*
+  178           ********************************************************************************************************
+             -*
+  179           *                                           Rest_Endp_Toggle
+  180           *
+  181           * Description: Reset usb bulk endpoint data toggle(data0/data1).
+  182           *
+  183           * Arguments  : None.
+  184           *
+  185           * Returns    : None.
+  186           *
+C251 COMPILER V4.55,  ControlFun                                                           15/07/16  15:45:42  PAGE 4   
+
+  187           * Note(s)    : for compatible of WIN98.
+  188           ********************************************************************************************************
+             -*
+  189           */
+  190          void Rest_Endp_Toggle(void)
+  191          {
+  192   1          //reset endpointA toggle
+  193   1          EPRST = 0x01;
+  194   1          EPRST = 0x21;
+  195   1      
+  196   1          //reset endpointB toggle
+  197   1          EPRST = 0x02;
+  198   1          EPRST = 0x22;
+  199   1      }
+  200          
+  201          /*
+  202           ********************************************************************************
+  203           *                           Stall_Endpoint
+  204           * Description : syntax error, Must Stall EndPoint.
+  205           * Arguments   : e: The endpoint whitch is selected to stall;
+  206           * Returns     : none
+  207           * Notes       :
+  208           ********************************************************************************
+  209           */
+  210          void Stall_Endpoint(char Ep_Num)
+  211          {
+  212   1          switch (Ep_Num)
+  213   1          {
+  214   2          case ENDPOINT_0:
+  215   2              Ep0cs_hcep0cs = Ep0cs_hcep0cs | 0x01;
+  216   2              break;
+  217   2          case ENDPOINT_A:
+  218   2              In1ctrl_hcout1ctrl = In1ctrl_hcout1ctrl | 0x40;
+  219   2              break;
+  220   2          case ENDPOINT_B:
+  221   2              Out2ctrl_hcin2ctrl = Out2ctrl_hcin2ctrl | 0x40;
+  222   2              break;
+  223   2          case ENDPOINT_C:
+  224   2              In3ctrl_hcout3ctrl = In3ctrl_hcout3ctrl | 0x40;
+  225   2          default:
+  226   2              break;
+  227   2          }
+  228   1      }
+  229          
+  230          /*
+  231           ********************************************************************************
+  232           *                           Recover_Stall_Endpoint
+  233           * Description : Recover the Stall EndPoint.
+  234           * Arguments   : e: The endpoint whitch is selected to recover;
+  235           * Returns     : none
+  236           * Notes       :
+  237           ********************************************************************************
+  238           */
+  239          void Recover_Stall_Endpoint(char Ep_Num)
+  240          {
+  241   1          switch (Ep_Num)
+  242   1          {
+  243   2          case ENDPOINT_0:
+  244   2              Ep0cs_hcep0cs = Ep0cs_hcep0cs & (uint8) 0xFE;
+  245   2              break;
+  246   2          case ENDPOINT_A:
+  247   2              In1ctrl_hcout1ctrl = In1ctrl_hcout1ctrl & (uint8) 0xBF;
+  248   2              break;
+  249   2          case ENDPOINT_B:
+  250   2              Out2ctrl_hcin2ctrl = Out2ctrl_hcin2ctrl & (uint8) 0xBF;
+  251   2              break;
+C251 COMPILER V4.55,  ControlFun                                                           15/07/16  15:45:42  PAGE 5   
+
+  252   2          case ENDPOINT_C:
+  253   2              In3ctrl_hcout3ctrl = In3ctrl_hcout3ctrl & (uint8) 0xBF;
+  254   2          default:
+  255   2              break;
+  256   2          }
+  257   1      }
+  258          
+  259          /*
+  260           ********************************************************************************************************
+             -*
+  261           *                                           TestModeTest
+  262           *
+  263           * Description: USB hardware test.
+  264           *
+  265           * Arguments  : e: The test mode selector;
+  266           *
+  267           * Returns    : None.
+  268           *
+  269           * Note(s)    : None.
+  270           ********************************************************************************************************
+             -*
+  271           */
+  272          void TestModeTest(uint8 mode_selector)
+  273          {
+  274   1          mode_selector++;
+  275   1      
+  276   1          while (1)
+  277   1          {
+  278   2              ClearWatchdog();
+  279   2          }
+  280   1      }
+  281          
+  282          /*
+  283           ********************************************************************************************************
+             -*
+  284           *                                           Set_HighSpeed_Mode
+  285           *
+  286           * Description: Enable High Speed mode
+  287           *
+  288           * Arguments  : None.
+  289           *
+  290           * Returns    : None.
+  291           *
+  292           * Note(s)    : if call,please note that is bank function
+  293           ********************************************************************************************************
+             -*
+  294           */
+  295          void Set_HighSpeed_Mode(void)
+  296          {
+  297   1          //if is high speed,cancel high speed disable
+  298   1          if ((BKDOOR & 0x40) != 0x00)
+  299   1          {
+  300   2              BKDOOR = (BKDOOR & 0x7f) | 0x10;
+  301   2          }
+  302   1      }
+  303          
+  304          #pragma ROM(HUGE)
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       337     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+C251 COMPILER V4.55,  ControlFun                                                           15/07/16  15:45:42  PAGE 6   
+
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

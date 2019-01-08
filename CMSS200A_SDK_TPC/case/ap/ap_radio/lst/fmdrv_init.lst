@@ -1,0 +1,268 @@
+C251 COMPILER V4.55,  fmdrv_init                                                           23/05/16  10:42:16  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE fmdrv_init
+OBJECT MODULE PLACED IN .\obj\fmdrv_init.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE FM_QN8035\fmdrv_init.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,S
+                    -PEED) BROWSE ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE(CHECKALARM) DEBUG PRINT(.\lst\fmdrv_ini
+                    -t.lst) OBJECT(.\obj\fmdrv_init.obj) 
+
+stmt  level    source
+
+    1          /*******************************************************************************
+    2           *                              AS260A
+    3           *                            Module: fm drvier for qn8035
+    4           *                 Copyright(c) 2003-2011 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>        <time>           <version >            <desc>
+    9           *     mikeyang     2011-11-03 15:00     1.0             build this file
+   10           *******************************************************************************/
+   11          
+   12          #include "fm_drv.h"
+   13          
+   14          
+   15          #pragma name(FM_DRV_INIT)
+   16          
+   17          const uint16 rssi_snr_TH_tbl [20] =
+   18          {
+   19              CCA_SENSITIVITY_LEVEL_0, CCA_SENSITIVITY_LEVEL_1,
+   20              CCA_SENSITIVITY_LEVEL_2, CCA_SENSITIVITY_LEVEL_3,
+   21              CCA_SENSITIVITY_LEVEL_4, CCA_SENSITIVITY_LEVEL_5,
+   22              CCA_SENSITIVITY_LEVEL_6, CCA_SENSITIVITY_LEVEL_7,
+   23              CCA_SENSITIVITY_LEVEL_8, CCA_SENSITIVITY_LEVEL_9,
+   24              CCA_SENSITIVITY_LEVEL_10, CCA_SENSITIVITY_LEVEL_11,
+   25              CCA_SENSITIVITY_LEVEL_12, CCA_SENSITIVITY_LEVEL_13,
+   26              CCA_SENSITIVITY_LEVEL_14, CCA_SENSITIVITY_LEVEL_15,
+   27              CCA_SENSITIVITY_LEVEL_16, CCA_SENSITIVITY_LEVEL_17,
+   28              CCA_SENSITIVITY_LEVEL_18, CCA_SENSITIVITY_LEVEL_19
+   29          };
+   30          
+   31          /**********************************************************************
+   32           * Description: 初始化FM模组
+   33           *
+   34           * Arguments: none
+   35           *
+   36           * Returns: success/fail
+   37           *
+   38           * Note:
+   39           *
+   40           ***********************************************************************/
+   41          uint8 QN_ChipInitialization(void)
+   42          {
+   43   1          //reset all registers, CCA_CH_DIS =1
+   44   1          QND_WriteReg(0x00, 0x81);//对所有寄存器复位
+   45   1          TM_DelayMS(20); //延时10MS以上，等待复位完成
+   46   1      
+   47   1          // change crystal frequency setting here
+   48   1          //设置bit7选择时钟源
+   49   1          QNF_SetRegBit(0x01, 0x80, 0x00);//setting clock source type:  0  sine-wave clock or  1  digital clock
+   50   1          //以0x15,0x16,0x17进行设置来选择时钟频率
+   51   1          //如果时钟频率为32.768KHz则可以不对这3个寄存器进行操作(使用默认值)
+   52   1          QND_WriteReg(XTAL_DIV0, QND_XTAL_DIV0); //设置时钟频率
+   53   1          QND_WriteReg(XTAL_DIV1, QND_XTAL_DIV1);
+   54   1          QND_WriteReg(XTAL_DIV2, QND_XTAL_DIV2);
+   55   1      
+   56   1          TM_DelayMS(50);
+   57   1          QND_WriteReg(0x54, 0x47);//mod pll setting
+C251 COMPILER V4.55,  fmdrv_init                                                           23/05/16  10:42:16  PAGE 2   
+
+   58   1          QND_WriteReg(0x19, 0x40);//AGC setting
+   59   1          QND_WriteReg(0x2d, 0xD6);//notch filter threshold adjusting
+   60   1          QND_WriteReg(0x43, 0x10);//notch filter threshold enable
+   61   1      
+   62   1          //发送有限状态机校验命令给qn8035
+   63   1          QND_WriteReg(0x00, 0x51);//reset the FSM
+   64   1          //发送有限状态机检验命令完成
+   65   1          QND_WriteReg(0x00, 0x21);//enter standby mode
+   66   1          //等待有限状态机检验完成
+   67   1          TM_DelayMS(100);
+   68   1      
+   69   1          //these variables are used in QNF_SetCh() function.
+   70   1          qnd_R16 = QND_ReadReg(0x16);
+   71   1          qnd_R17 = QND_ReadReg(0x17);
+   72   1          qnd_R46 = QND_ReadReg(0x46);
+   73   1      
+   74   1          //check chipID==QN8035
+   75   1          if (QND_ReadReg(0x06) == CHIPID_QN8035)
+   76   1          {
+   77   2              return 1;
+   78   2          }
+   79   1          return 0;
+   80   1      }
+   81          
+   82          /***********************************************************************
+   83          void QND_RXSetTH(uint8 db)
+   84           ***********************************************************************
+   85           Description: Setting the threshold value of automatic scan channel
+   86           db:
+   87           Setting threshold for quality of channel to be searched,
+   88           the db value range:0~(63-CCA_THRESHOLD).
+   89           Return Value:
+   90           None
+   91          ***********************************************************************/
+   92          
+   93          void QND_RXSetTH(uint8 db)
+   94          {
+   95   1          uint8 rssiTH;
+   96   1          uint8 snrTH;
+   97   1          uint16 rssi_snr_TH;
+   98   1      
+   99   1      
+  100   1          //rssi_snr_TH = rssi_snr_TH_tbl[db];
+  101   1          rssiTH = (uint8) (rssi_snr_TH >> 8);          //0x1b~0x1e
+  102   1          //snrTH = (uint8) (rssi_snr_TH & 0xff);//0x1E06~0x1e0a
+  103   1      #ifdef PILOT_CCA
+  104   1          snrTH = 0x0f;
+  105   1      #else
+                   snrTH = 0x04;
+               #endif
+  108   1          //QNF_SetRegBit(0x49, 0x0f, 0x0A);
+  109   1          QNF_SetRegBit(GAIN_SEL, 0x08, 0x08);//NFILT program is enabled
+  110   1          //selection filter:filter3
+  111   1          QNF_SetRegBit(CCA1, 0x30, 0x30);
+  112   1          //Enable the channel condition filter3 adaptation,Let ccfilter3 adjust freely
+  113   1          QNF_SetRegBit(SYSTEM_CTL2, 0x40, 0x00);
+  114   1      #ifdef PILOT_CCA
+  115   1          QND_WRITE(0x2f, 0x00);
+  116   1      #endif
+  117   1      
+  118   1          //selection pilot threshold: 2/250(default)
+  119   1          QNF_SetRegBit(0x30, 0x1C, 0x08);
+  120   1      
+  121   1          QND_WRITE(0x37, 0x00);
+  122   1          QNF_SetRegBit(0x38, 0x3F, 0x01);
+  123   1          //selection the time of CCA FSM wait SNR calculator to settle:20ms
+C251 COMPILER V4.55,  fmdrv_init                                                           23/05/16  10:42:16  PAGE 3   
+
+  124   1          //0x00:         20ms(default)
+  125   1          //0x40:         40ms
+  126   1          //0x80:         60ms
+  127   1          //0xC0:         100m
+  128   1          QNF_SetRegBit(0x39, 0xC0, 0x00);
+  129   1          //selection the time of CCA FSM wait RF front end and AGC to settle:20ms
+  130   1          //0x00:     10ms
+  131   1          //0x40:     20ms(default)
+  132   1          //0x80:     40ms
+  133   1          //0xC0:     60ms
+  134   1          QNF_SetRegBit(0x3a, 0xC0, 0x80);
+  135   1          QNF_SetRegBit(CCA, 0x3F, db); //setting RSSI threshold for CCA
+  136   1          QNF_SetRegBit(0x39, 0x3F, snrTH); //setting SNR threshold for CCA
+  137   1      }
+  138          
+  139          uint8 FMdrv_setthrod(uint8 level)
+  140          {
+  141   1          FM_Slevel = level;
+  142   1          QND_RXSetTH(level);
+  143   1          return 1;
+  144   1      }
+  145          /*
+  146           ********************************************************************************
+  147           *             uint8 FMdrv_Init(uint8 mode)
+  148           *
+  149           * Description : FM 初始化函数
+  150           *
+  151           * Arguments   : mode: 暂不使用
+  152           *
+  153           * Returns     : 若初始化成功,则返回1,否则,返回0
+  154           *
+  155           * Notes       : 由驱动安装函数调用
+  156           *
+  157           ********************************************************************************
+  158           */
+  159          uint8 FMdrv_Init(uint8 mode)
+  160          {
+  161   1          uint8 ChipStatus;
+  162   1          //mode = mode;
+  163   1          ChipStatus = QN_ChipInitialization();
+  164   1          if (ChipStatus != 0)
+  165   1          {
+  166   2              //enter RX mode
+  167   2              QNF_SetRegBit(0x00, 0x30, 0x10);
+  168   2          }
+  169   1          QND_RXSetTH(mode);
+  170   1          return ChipStatus;
+  171   1      }
+  172          
+  173          /*
+  174           ********************************************************************************
+  175           *             uint8 FMdrv_hardware(uint8 onoff,  uint8 PA_mode)
+  176           *
+  177           * Description : FM 相关硬件操作, 如AIN, PA等
+  178           *
+  179           * Arguments   : onoff:  1--打开FM时    0--关闭FM时
+  180           *               PA_mode:   1-- 要操作PA    0--不操作PA
+  181           *
+  182           * Returns     : 若成功,则返回1,否则,返回0
+  183           *
+  184           * Notes       : 1. 此函数要结合驱动的安装卸载来调用
+  185           *               2. PA_mode 主要是为兼容某些模组, 在main AP 中需要进standby而用
+  186           ********************************************************************************
+  187           */
+  188          uint8 FMdrv_hardware(uint8 onoff, uint8 PA_mode)
+  189          {
+C251 COMPILER V4.55,  fmdrv_init                                                           23/05/16  10:42:16  PAGE 4   
+
+  190   1          onoff = onoff;
+  191   1          PA_mode = PA_mode;
+  192   1          return 1;
+  193   1      }
+  194          
+  195          /*
+  196           ********************************************************************************
+  197           *             uint8 FMdrv_Exit(uint8 mode)
+  198           *
+  199           * Description : FM驱动退出函数
+  200           *
+  201           * Arguments   : mode: 无实际作用
+  202           *
+  203           * Returns     : 无实际作用
+  204           *
+  205           * Notes       : 由驱动卸载函数调用
+  206           *
+  207           ********************************************************************************
+  208           */
+  209          uint8 FMdrv_Exit(uint8 mode)
+  210          {
+  211   1          mode = mode;
+  212   1          //first, enter standby
+  213   1          //QNF_SetRegBit(0x4C, 0x08, 0x00);
+  214   1          //QNF_SetRegBit(0x00, 0x30, 0x20);
+  215   1      
+  216   1          return 1;
+  217   1      }
+  218          
+  219          /* FM 模组进入Standby */
+  220          uint8 FMdrv_Standby(void)
+  221          {
+  222   1          //first, enter standby
+  223   1          QNF_SetRegBit(0x4C, 0x08, 0x00);
+  224   1          QNF_SetRegBit(0x00, 0x30, 0x20);
+  225   1          return 1;
+  226   1      }
+  227          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       375     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        40     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,270 @@
+C251 COMPILER V4.55,  fm_effect                                                            23/05/16  10:42:09  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE fm_effect
+OBJECT MODULE PLACED IN .\obj\fm_effect.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE fm_effect.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BROWS
+                    -E ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE(CHECKALARM) DEBUG PRINT(.\lst\fm_effect.lst) OBJEC
+                    -T(.\obj\fm_effect.obj) 
+
+stmt  level    source
+
+    1          #include "ap_radio.h"
+    2          #include "actos.h"
+    3          #include "ap_common.h"
+    4          #include "decC.h"       //设置EQ时使用
+    5          #pragma name(FM_EFFECT)
+    6          
+    7          const uint8 EQtemp[8][10] =
+    8          {
+    9              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //none
+   10              5, 3, -1, -2, 0, 1, 3, 6, 0, 0, //rock
+   11              0, 3, 4, 3, 0, -1, -2, 6, 0, 0, //Pop
+   12              6, 4, 2, 0, 1, 3, 5, 6, 0, 0, //Classic
+   13              0, 0, 1, 2, 0, 2, 4, 6, 0, 0, //Soft
+   14              2, 1, 0, -1, -2, 0, 3, 6, 0, 0, //Jazz
+   15              6, 5, 3, 2, 1, 0, 0, 6, 0, 0,//Dbb
+   16              6, 6, 5, 4, 6, 1, 0, 6, 1, 0 //user
+   17          };
+   18          
+   19          
+   20          void set_eq_data(eq_t eq_type, void *dat)
+   21          {
+   22   1          //memcpy(g_decControlInfor.EQVal, dat, sizeof(g_decControlInfor.EQVal));
+   23   1          if ((eq_type == 0) && (dat == NULL))
+   24   1          {
+   25   2              g_decControlInfor.EQFlag = 0x00;
+   26   2              if (AuCodecRun)
+   27   2              {
+   28   3                  deal_Effectcoff();
+   29   3              }
+   30   2          }
+   31   1          else
+   32   1          {
+   33   2              g_decControlInfor.EQFlag = 0x67;
+   34   2              if (dat == NULL)
+   35   2              {
+   36   3                  //从VRAM读，保存的参数及时生效
+   37   3                  VMRead(&g_eq_para, VM_PCSET_EQ, sizeof(EQ_VM_t));
+   38   3                  if (g_eq_para.magic != EQ_VRAM_MAGIC)
+   39   3                  {
+   40   4                      //使用代码默认EQ表
+   41   4                      memcpy(g_decControlInfor.EQVal, (void *) EQtemp[(uint8) g_comval.eq_type],
+   42   4                             sizeof(g_decControlInfor.EQVal));
+   43   4                  }
+   44   3                  else
+   45   3                  {
+   46   4                      //使用工具设置EQ表
+   47   4                      memcpy(g_decControlInfor.EQVal, (void *) &g_eq_para.left_eq_para[(uint8) ONE_EQPARA_BYTE
+   48   4                              * g_comval.eq_type], ONE_EQPARA_BYTE);
+   49   4                  }
+   50   3              }
+   51   2              else
+   52   2              {
+   53   3                  memcpy(g_decControlInfor.EQVal, (void *) dat, sizeof(g_decControlInfor.EQVal));
+   54   3              }
+   55   2      
+   56   2              if (AuCodecRun)
+   57   2              {
+C251 COMPILER V4.55,  fm_effect                                                            23/05/16  10:42:09  PAGE 2   
+
+   58   3                  decEffectDeal();
+   59   3              }
+   60   2      
+   61   2              g_decControlInfor.EQFlag = 0x87;
+   62   2      
+   63   2              if (dat == NULL)
+   64   2              {
+   65   3                  if (g_eq_para.magic != EQ_VRAM_MAGIC)
+   66   3                  {
+   67   4                      //使用代码默认EQ表
+   68   4                      memcpy(g_decControlInfor.EQVal, (void *) EQtemp[(uint8) g_comval.eq_type],
+   69   4                             sizeof(g_decControlInfor.EQVal));
+   70   4                  }
+   71   3                  else
+   72   3                  {
+   73   4                      //使用工具设置EQ表
+   74   4                      memcpy(g_decControlInfor.EQVal, (void *) &g_eq_para.right_eq_para[(uint8) ONE_EQPARA_BYTE
+   75   4                              * g_comval.eq_type], ONE_EQPARA_BYTE);
+   76   4                  }
+   77   3              }
+   78   2              else
+   79   2              {
+   80   3                  memcpy(g_decControlInfor.EQVal, (void *) dat, sizeof(g_decControlInfor.EQVal));
+   81   3              }
+   82   2      
+   83   2              if (AuCodecRun)
+   84   2              {
+   85   3                  decEffectDeal();
+   86   3              }
+   87   2          }
+   88   1      }
+   89          /********************************************************************************
+   90           * Description : Callback eq function
+   91           *
+   92           * Arguments  :
+   93           *
+   94           * Returns     :
+   95           *            无
+   96           * Notes       :
+   97           *
+   98           ********************************************************************************/
+   99          uint8 EQMode_callback(eq_t eq_type)
+  100          {
+  101   1          uint8 tmp_eqdata[12];
+  102   1          memcpy(tmp_eqdata, (void *) EQtemp[(uint8) g_comval.eq_type], 10);
+  103   1          set_eq_data(eq_type, NULL);
+  104   1          return 0;
+  105   1      }
+  106          
+  107          /*
+  108           ********************************************************************************
+  109           *             void deal_eq_msg(void)
+  110           *
+  111           * Description : 处理EQ模式调节消息
+  112           *
+  113           *
+  114           * Arguments   :
+  115           *
+  116           * Returns     : void
+  117           *
+  118           * Notes       :
+  119           *
+  120           *
+  121           *
+  122           ********************************************************************************
+  123           */
+C251 COMPILER V4.55,  fm_effect                                                            23/05/16  10:42:09  PAGE 3   
+
+  124          
+  125          uint8 deal_eq_msg(uint8 key)
+  126          {
+  127   1          if (key == Key_None)
+  128   1          {
+  129   2              if (CurUI_Type != EQ_UI)
+  130   2              {
+  131   3                  SetCurUI_Type(EQ_UI);
+  132   3                  return NULL;
+  133   3              }
+  134   2              key = Key_Next;
+  135   2          }
+  136   1      
+  137   1          if (key == Key_Next)
+  138   1          {
+  139   2              if (g_comval.eq_type < (eq_max - 1))
+  140   2              {
+  141   3                  g_comval.eq_type++;
+  142   3              }
+  143   2              else
+  144   2              {
+  145   3                  g_comval.eq_type = 0;
+  146   3              }
+  147   2          }
+  148   1          else
+  149   1          {
+  150   2              if (g_comval.eq_type > 0)
+  151   2              {
+  152   3                  g_comval.eq_type--;
+  153   3              }
+  154   2              else
+  155   2              {
+  156   3                  g_comval.eq_type = (eq_max - 1);
+  157   3              }
+  158   2      
+  159   2          }
+  160   1          EQMode_callback(g_comval.eq_type);
+  161   1          need_draw = TRUE;
+  162   1          return NULL;
+  163   1      }
+  164          
+  165          void exit_fmin_channel(void)
+  166          {
+  167   1          decAnalogexit();
+  168   1      }
+  169          
+  170          void init_fmin_channel(void)
+  171          {
+  172   1          SentenceDectTime = 10000;
+  173   1          SentenceDectEnergy = 0;
+  174   1          AuCodecRun = 0;
+  175   1          SetenceFlag = 0; // SetenceFlag =1 close PA
+  176   1          last_SetenceFlag = SetenceFlag;
+  177   1          //EQMode_callback(g_comval.eq_type);
+  178   1          set_eq_data(g_comval.eq_type, NULL);
+  179   1      
+  180   1          decinitAnalog(AD_FM); //demo layout error
+  181   1          //TM_DelayMS(50); //延时，防止PAPA 声
+  182   1          decstartAnalog(AD_FM);
+  183   1          SetAINGain(7, 0 );
+  184   1          volume_callback(g_comval.volume);
+  185   1      
+  186   1          //SetPAVolume(g_comval.volume);
+  187   1      }
+  188          
+  189          /*
+C251 COMPILER V4.55,  fm_effect                                                            23/05/16  10:42:09  PAGE 4   
+
+  190           ********************************************************************************
+  191           *             void    volume_callback(uint16 Vol)
+  192           *
+  193           * Description : 音量设置的CALLBACK函数
+  194           *
+  195           * Arguments   :    当前需设置的音量值
+  196           *
+  197           * Returns     :
+  198           *
+  199           * Notes       :
+  200           *
+  201           ********************************************************************************
+  202           */
+  203          void volume_callback(uint16 Vol)
+  204          {
+  205   1          //实时改变音量的值
+  206   1          g_comval.vol_display = (uint8) Vol;
+  207   1          if (g_comval.VolumeMax != 0)
+  208   1          {
+  209   2              g_comval.volume = g_comval.vol_display; // g_comval.vol_display * SOFTVOL_MAX / g_comval.VolumeMa
+             -x;
+  210   2          }
+  211   1      
+  212   1      #ifdef use_external_pa
+                   set_external_pavol(PA2_0_UI, g_comval.pavol2_0);
+                   set_external_pavol(PA0_1_UI, g_comval.pavol0_1);
+                   set_external_pavol(PABASS_UI, g_comval.pabass);
+                   set_external_pavol(PAFLT_UI, g_comval.paflt);
+               #else
+  218   1          fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
+  219   1          if (g_comval.volume == 0)
+  220   1          {
+  221   2              fmSendCommand(FM_MUTE, SetMUTE, NULL);
+  222   2          }
+  223   1          else
+  224   1          {
+  225   2              fmSendCommand(FM_MUTE, releaseMUTE, NULL);
+  226   2          }
+  227   1      #endif
+  228   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       566     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        80     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

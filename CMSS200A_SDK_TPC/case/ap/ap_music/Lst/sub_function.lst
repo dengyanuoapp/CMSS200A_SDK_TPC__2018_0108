@@ -1,0 +1,1063 @@
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE sub_function
+OBJECT MODULE PLACED IN .\Obj\sub_function.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE sub_function.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,S
+                    -PEED) BROWSE INCDIR(..\..\inc;..\..\..\psp_rel\inc) I4 DEBUG PRINT(.\Lst\sub_function.lst) OBJECT(.\Obj\sub_function.obj
+                    -) 
+
+stmt  level    source
+
+    1          /*
+    2           ******************************************************************************
+    3           *                               AS211A
+    4           *                            Module: music
+    5           *                 Copyright(c) 2002-2010 Actions Semiconductor,
+    6           *                            All Rights Reserved.
+    7           *
+    8           * Descripton: sub functions 4 of music
+    9           *
+   10           * History:
+   11           *      <author>    <time>           <version >             <desc>
+   12           *       xusong    2010-07-15 15:00     1.0             build this file
+   13           ******************************************************************************
+   14           */
+   15          #include "ap_music.h"
+   16          #pragma name(SUB_FUNCTION)
+   17          const uint8 repeat_val[MAX_REPEAT_MODE] =
+   18          { FSEL_ALL_REPEATALL, FSEL_ALL_REPEATONE, FSEL_ALL_RANDOM, FSEL_DIR_REPEATALL };
+   19          const uint8 EQtemp[eq_max][10] =
+   20          {
+   21              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //none
+   22              5, 3, -1, -2, 0, 1, 3, 6, 0, 0, //rock
+   23              0, 3, 4, 3, 0, -1, -2, 6, 0, 0, //Pop
+   24              6, 4, 2, 0, 1, 3, 5, 6, 0, 0, //Classic
+   25              0, 0, 1, 2, 0, 2, 4, 6, 0, 0, //Soft
+   26              2, 1, 0, -1, -2, 0, 3, 6, 0, 0, //Jazz
+   27              6, 5, 3, 2, 1, 0, 0, 6, 0, 0,//Dbb
+   28              6, 6, 5, 4, 6, 1, 0, 6, 1, 0 //user
+   29          };
+   30          
+   31          
+   32          /****************************code ************************************************/
+   33          /*
+   34           ********************************************************************************
+   35           *             void volume_callback(void)
+   36           *
+   37           * Description : 调整音量的大小
+   38           *
+   39           *
+   40           * Arguments   : Vol:当前的音量值
+   41           *
+   42           * Returns     : void
+   43           *
+   44           * Notes       :
+   45           *
+   46           ********************************************************************************
+   47           */
+   48          
+   49          void volume_callback(uint16 Vol)
+   50          {
+   51   1          //    uint8 sfr_bak;
+   52   1          //    g_comval.vol_display = (uint8) Vol;
+   53   1          //    g_comval.volume = (uint8) Vol * SOFTVOL_MAX / g_comval.VolumeMax;
+   54   1          g_comval.volume = Vol;
+   55   1          set_dac_volume(g_comval.volume);
+   56   1          //    musicpSendCommand(MC_SETVOLUME, (void*) g_comval.volume);
+   57   1      
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 2   
+
+   58   1      }
+   59          
+   60          /*
+   61           ********************************************************************************
+   62           *             void SelectCurMusic(void)
+   63           *
+   64           * Description : 重选当前的歌曲播放
+   65           *
+   66           *
+   67           * Arguments   :
+   68           *
+   69           * Returns     : void
+   70           *
+   71           * Notes       : 主要是快退到文件头时，需要先关闭播放的歌曲，然后再打开播放
+   72           *
+   73           ********************************************************************************
+   74           */
+   75          
+   76          void SelectCurMusic(void)
+   77          {
+   78   1          musicpSendCommand(MC_STOP, NULL);
+   79   1          musicpSendCommand(MC_CLOSE, NULL);
+   80   1          ClearTimePara();
+   81   1          if (g_Openparam.typeerror == 0)
+   82   1          {
+   83   2              musicpSendCommand(MC_OPEN, (void *) &g_Openparam);
+   84   2              musicpSendCommand(MC_LOAD, NULL);
+   85   2              musicpSendCommand(MC_PLAY, NULL);
+   86   2          }
+   87   1      }
+   88          /*
+   89           ********************************************************************************
+   90           *             void DisInFBHead(void)
+   91           *
+   92           * Description : 处理文件到头的情况
+   93           *
+   94           *
+   95           * Arguments   :  DisMod:暂时保留
+   96           *
+   97           * Returns     : void
+   98           *
+   99           * Notes       : 当快退到头时，只有当按键抬起后才重新播放
+  100           *
+  101           ********************************************************************************
+  102           */
+  103          
+  104          void DisInFBHead(uint8 DisMod)
+  105          {
+  106   1          DisMod = DisMod;
+  107   1          memset(temp_buffer, 0x0, 9);
+  108   1          LEDPuts(NUMBER1, temp_buffer, 1);
+  109   1          LEDDisplay(LED_COL, 0xff, 1);
+  110   1          //等待长按键的抬起
+  111   1          while (ap_get_message() != AP_KEY_LONGUP)
+  112   1          {
+  113   2              ;
+  114   2          }
+  115   1          SelectCurMusic();
+  116   1      }
+  117          
+  118          /*
+  119           ********************************************************************************
+  120           *             void DealMusicFileEnd(void)
+  121           *
+  122           * Description : 处理文件播放到尾的情况
+  123           *
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 3   
+
+  124           *
+  125           * Arguments   :
+  126           *
+  127           * Returns     : void
+  128           *
+  129           * Notes       :1.处理快退到头的情况
+  130           *                         2.处理快进到文件尾的情况
+  131           *                         3.处理正常播放到文件尾的情况
+  132           *
+  133           ********************************************************************************
+  134           */
+  135          
+  136          uint16 DealMusicFileEnd(uint8 DisMod)
+  137          {
+  138   1          need_draw = TRUE;
+  139   1          if (PlayStatus == FBPlaySta)
+  140   1          {
+  141   2              DisInFBHead(DisMod);//到头显示
+  142   2          }
+  143   1          else if (PlayStatus == FFPlaySta)
+  144   1          {
+  145   2              while (ap_get_message() != AP_KEY_LONGUP/* (AP_KEY_NEXT | AP_KEY_UP)*/)
+  146   2              {
+  147   3                  ;
+  148   3              }
+  149   2              stop_music_play(FALSE);
+  150   2              return get_next_prev_music(Music_Next, Manu_Sel);
+  151   2          }
+  152   1          else
+  153   1          {
+  154   2              stop_music_play(FALSE);
+  155   2              return get_next_prev_music(Music_Next, Auto_Sel);
+  156   2          }
+  157   1          return NULL;
+  158   1      }
+  159          uint8 deal_music_filehead(void)
+  160          {
+  161   1          uint8 retval = NULL;
+  162   1          if (PlayStatus == PlaySta)
+  163   1          {
+  164   2              DisInFBHead(1);//到头显示
+  165   2          }
+  166   1          else
+  167   1          {
+  168   2              retval = DealMusicFileEnd(1);
+  169   2              ClearTimePara();
+  170   2          }
+  171   1          return retval;
+  172   1      }
+  173          /*
+  174           ********************************************************************************
+  175           *             void FadeOut(void)
+  176           *
+  177           * Description : 处理淡出效果
+  178           *
+  179           *
+  180           * Arguments   :
+  181           *
+  182           * Returns     : void
+  183           *
+  184           * Notes       :
+  185           *
+  186           *
+  187           *
+  188           ********************************************************************************
+  189           */
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 4   
+
+  190          
+  191          void FadeOut(bool DisMod)
+  192          {
+  193   1          /*淡出处理*/
+  194   1          DisMod = DisMod;
+  195   1      #ifdef OPT_Sup_FadeOut_fun
+                   music_play_status_t status_buf;
+               
+                   while (1)
+                   {
+                       bool result = musicpSendCommand(MC_FADEINOUT, FADEOUT_DEF | USE_FADEOUT_TIME);
+                       if (result != 0)
+                       {
+                           break;
+                       }
+               
+                       musicpSendCommand(MC_GETSTATUS, (void *) (&status_buf));
+                       if ((status_buf.status == PLAYING_REACH_END) || (status_buf.status == PLAYING_REACH_HEAD) || (sta
+             -tus_buf.status
+                               == PLAYING_ERROR))
+                       {
+                           break;
+                       }
+                       if ((status_buf.status == PLAYING_WAIT_A) || (status_buf.signal == SIGNAL_REACH_B) || (status_buf
+             -.signal
+                               == SIGNAL_REACH_V))
+                       {
+                           musicpSendCommand(MC_SETA_B, ClrABPoint);
+                           break;
+                       }
+                   }
+               #endif
+  220   1      }
+  221          /*
+  222           ********************************************************************************
+  223           *             void deal_long_keyup(void)
+  224           *
+  225           * Description : 处理长按键抬起的情况
+  226           *
+  227           *
+  228           * Arguments   :
+  229           *
+  230           * Returns     : void
+  231           *
+  232           * Notes       : 1.在播放时间界面时，主要是修复快进退为正常播放的情况
+  233           *                          2.在文件序号或目录序号显示界面时，主要停止快速切换文件或目录，转而播放切换到的文件
+  234           *
+  235           *
+  236           ********************************************************************************
+  237           */
+  238          
+  239          void deal_long_keyup(void)
+  240          {
+  241   1          switch (CurUI_Type)
+  242   1          {
+  243   2          case Music_UI:
+  244   2              if (PlayStatus > PlaySta)
+  245   2              {
+  246   3                  musicpSendCommand_bank(MC_STEP, 0);
+  247   3                  PlayStatus = PlaySta;
+  248   3              }
+  249   2              break;
+  250   2          case FileNo_UI:
+  251   2          case DIRNAME_UI:
+  252   2              if ((PlayStatus < PlaySta) && (FF_flag != 0))
+  253   2              {
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 5   
+
+  254   3                  if (prev_PlayStatus == PlaySta)
+  255   3                  {
+  256   4                      get_fileinfo_flag = TRUE;
+  257   4                  }
+  258   3              }
+  259   2              break;
+  260   2          default:
+  261   2              break;
+  262   2          }
+  263   1          FF_flag = 0;
+  264   1      }
+  265          /**************************************************************************
+  266           * Description:  EQ 参数设置函数
+  267           *
+  268           * Input:  mode   EQ 设置模式
+  269           *
+  270           * Output:  null
+  271           *
+  272           * note:
+  273           ***************************************************************************
+  274           ***/
+  275          void EQMode_callback(EQ_set_mod_t mode)
+  276          {
+  277   1          uint8 eq_left[12], eq_right[12];
+  278   1      
+  279   1          mode = mode;
+  280   1          memset(eq_left, 0, 12);
+  281   1          memset(eq_right, 0, 12);
+  282   1      
+  283   1          //从VRAM读，保存的参数及时生效
+  284   1          VMRead(&g_eq_para, VM_PCSET_EQ, sizeof(g_eq_para));
+  285   1          if (g_eq_para.magic != EQ_VRAM_MAGIC)
+  286   1          {
+  287   2              memcpy(eq_left, (void *) EQtemp[(uint8) g_comval.eq_type], 10);
+  288   2              memcpy(eq_right, (void *) EQtemp[(uint8) g_comval.eq_type], 10);
+  289   2          }
+  290   1          else
+  291   1          {
+  292   2              memcpy(eq_left, (void *) &g_eq_para.left_eq_para[(uint8) ONE_EQPARA_BYTE * g_comval.eq_type], 7);
+  293   2              memcpy(eq_right, (void *)&g_eq_para.right_eq_para[(uint8) ONE_EQPARA_BYTE * g_comval.eq_type], 7)
+             -;
+  294   2          }
+  295   1          if (g_comval.eq_type == 0)
+  296   1          {
+  297   2              musicpSendCommand(MC_SETUSEREQ, (void *) eq_left);
+  298   2              musicpSendCommand(MC_SETEQ, 0);
+  299   2          }
+  300   1          else
+  301   1          {
+  302   2              musicpSendCommand(MC_SETUSEREQ, (void *) eq_left);
+  303   2              musicpSendCommand(MC_SETEQ, 0x67);
+  304   2              musicpSendCommand(MC_SETUSEREQ, (void *) eq_right);
+  305   2              musicpSendCommand(MC_SETEQ, 0x87);
+  306   2          }
+  307   1      }
+  308          
+  309          /*
+  310           ********************************************************************************
+  311           *             void deal_eq_msg(void)
+  312           *
+  313           * Description : 处理EQ模式调节消息
+  314           *
+  315           *
+  316           * Arguments   :
+  317           *
+  318           * Returns     : void
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 6   
+
+  319           *
+  320           * Notes       :
+  321           *
+  322           *
+  323           *
+  324           ********************************************************************************
+  325           */
+  326          
+  327          uint8 deal_eq_msg(uint8 key)
+  328          {
+  329   1          if (key == Key_None)
+  330   1          {
+  331   2              if (CurUI_Type != EQ_UI)
+  332   2              {
+  333   3                  SetCurUI_Type(EQ_UI);
+  334   3                  return NULL;
+  335   3              }
+  336   2              key = Key_Next;
+  337   2          }
+  338   1      
+  339   1          if (key == Key_Next)
+  340   1          {
+  341   2              if (g_comval.eq_type < (eq_max - 1))
+  342   2              {
+  343   3                  g_comval.eq_type++;
+  344   3              }
+  345   2              else
+  346   2              {
+  347   3                  g_comval.eq_type = 0;
+  348   3              }
+  349   2          }
+  350   1          else
+  351   1          {
+  352   2              if (g_comval.eq_type > 0)
+  353   2              {
+  354   3                  g_comval.eq_type--;
+  355   3              }
+  356   2              else
+  357   2              {
+  358   3                  g_comval.eq_type = eq_max - 1;
+  359   3              }
+  360   2      
+  361   2          }
+  362   1          if (PlayStatus == PlaySta)
+  363   1          {
+  364   2              EQMode_callback(All_EQ_Set);
+  365   2          }
+  366   1          need_draw = TRUE;
+  367   1          return NULL;
+  368   1      }
+  369          /*
+  370           ********************************************************************************
+  371           *             void deal_mute_msg(void)
+  372           *
+  373           * Description : 开关静音模式
+  374           *
+  375           *
+  376           * Arguments   :
+  377           *
+  378           * Returns     : void
+  379           *
+  380           * Notes       :
+  381           *
+  382           *
+  383           *
+  384           ********************************************************************************
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 7   
+
+  385           */
+  386          
+  387          void deal_mute_msg(void)
+  388          {
+  389   1          if (mute_flag == 1)
+  390   1          {
+  391   2              set_dac_volume(0);
+  392   2          }
+  393   1          else
+  394   1          {
+  395   2              set_dac_volume(g_comval.volume);
+  396   2          }
+  397   1      }
+  398          /*
+  399           ********************************************************************************
+  400           *             deal_repeat_msg(uint8 key)
+  401           *
+  402           * Description : 处理循环播放的模式
+  403           *
+  404           *
+  405           * Arguments   :
+  406           *
+  407           * Returns     : void
+  408           *
+  409           * Notes       :
+  410           *
+  411           *
+  412           *
+  413           ********************************************************************************
+  414           */
+  415          
+  416          uint8 deal_repeat_msg(uint8 key)
+  417          {
+  418   1          uint8 repeat_mode;
+  419   1          uint8 i;
+  420   1          if (key == Key_None)
+  421   1          {
+  422   2              if (CurUI_Type != Repeat_UI)
+  423   2              {
+  424   3                  SetCurUI_Type(Repeat_UI);
+  425   3                  return NULL;
+  426   3              }
+  427   2              key = Key_Next;
+  428   2          }
+  429   1          for (i = 0; i < MAX_REPEAT_MODE; i++)
+  430   1          {
+  431   2              if (g_music_vars.repeat_mode == repeat_val[i])
+  432   2              {
+  433   3                  repeat_mode = i;
+  434   3                  break;
+  435   3              }
+  436   2          }
+  437   1          if (i >= MAX_REPEAT_MODE)
+  438   1          {
+  439   2              repeat_mode = 0;
+  440   2          }
+  441   1          if (key == Key_Next)
+  442   1          {
+  443   2              if (repeat_mode < (MAX_REPEAT_MODE - 1))
+  444   2              {
+  445   3                  repeat_mode++;
+  446   3              }
+  447   2              else
+  448   2              {
+  449   3                  repeat_mode = 0;
+  450   3              }
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 8   
+
+  451   2          }
+  452   1          else
+  453   1          {
+  454   2              if (repeat_mode > 0)
+  455   2              {
+  456   3                  repeat_mode--;
+  457   3              }
+  458   2              else
+  459   2              {
+  460   3                  repeat_mode = MAX_REPEAT_MODE;
+  461   3              }
+  462   2          }
+  463   1          g_music_vars.repeat_mode = repeat_val[repeat_mode];
+  464   1          need_draw = TRUE;
+  465   1          return NULL;
+  466   1      }
+  467          #if 0
+               /********************************************************************************
+                * Description : 处理音量键
+                *
+                * Arguments  :
+                *
+                * Returns     :
+                *            无
+                * Notes       :
+                *
+                ********************************************************************************/
+               uint8 deal_vol_msg(uint8 key)
+               {
+                   if (key == Key_None)
+                   {
+                       if (CurUI_Type != Volume_UI)
+                       {
+                           SetCurUI_Type(Volume_UI);
+                       }
+                       else
+                       {
+                           SetCurUI_Type(Music_UI);
+                       }
+                   }
+                   else
+                   {
+                       if (CurUI_Type != Volume_UI)
+                       {
+                           SetCurUI_Type(Volume_UI);
+                       }
+                       if (key == Key_Next)
+                       {
+                           if (g_comval.volume < g_comval.VolumeMax)
+                           {
+                               g_comval.volume++;
+                           }
+                       }
+                       else
+                       {
+                           if (g_comval.volume > 0)
+                           {
+                               g_comval.volume--;
+                           }
+                       }
+                       volume_callback(g_comval.volume);
+                   }
+                   need_draw = TRUE;
+                   return NULL;
+               }
+               #endif
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 9   
+
+  517          void reinit_file_info(void)
+  518          {
+  519   1          PlayStatus = StopSta;
+  520   1          scan_flag = TRUE;
+  521   1          if (no_device_flag == FALSE)
+  522   1          {
+  523   2              LEDClearScreen();
+  524   2              LEDPuts(NUMBER1, load_str, 1);
+  525   2      check_uhost:
+  526   2              if (CurUselocation.disk == disk_char[0] && (USBH_Check_Udisk() == 0x0))
+  527   2              {
+  528   3                  CurUselocation.disk = disk_char[1];
+  529   3                  if(first_init != TRUE)
+  530   3                  {
+  531   4                      no_device_flag = TRUE;
+  532   4                      goto reinit;
+  533   4                  }
+  534   3                  first_init = FALSE;
+  535   3                  goto check_card;
+  536   3              }
+  537   2      check_card:
+  538   2              if (CurUselocation.disk == disk_char[1] && DRV_DetectUD(1) != 0x20)
+  539   2              {
+  540   3                  CurUselocation.disk = disk_char[0];
+  541   3                  if(first_init != TRUE)
+  542   3                  {
+  543   4                      no_device_flag = TRUE;
+  544   4                      goto reinit;
+  545   4                  }
+  546   3                  first_init = FALSE;
+  547   3                  goto check_uhost;
+  548   3              }
+  549   2          }
+  550   1      reinit:
+  551   1          write_poweroff_flag(0);
+  552   1          if (no_device_flag == FALSE)
+  553   1          {
+  554   2              if(InitFileSelector() != 0)
+  555   2              {
+  556   3                  get_fileinfo_flag = TRUE;
+  557   3                  need_draw = TRUE;
+  558   3                  Read_VMflag = TRUE;
+  559   3                  auto_switch_device_flag = TRUE;
+  560   3                  return ;
+  561   3              }
+  562   2              else
+  563   2              {
+  564   3                  LEDPuts(NUMBER1, err_str, 1);
+  565   3                  ap_sleep(4);
+  566   3                  if(first_init == TRUE)
+  567   3                  {
+  568   4                      //对已坏掉的卡或u盘进行特别处理
+  569   4                      DRV_UnInstall(DRV_STG);
+  570   4                      first_init = FALSE;
+  571   4                      if(CurUselocation.disk == disk_char[1])
+  572   4                      {
+  573   5                          CurUselocation.disk = disk_char[0];
+  574   5                          goto check_uhost;
+  575   5                      }
+  576   4                      else
+  577   4                      {
+  578   5                          CurUselocation.disk = disk_char[1];
+  579   5                          goto check_card;
+  580   5                      }
+  581   4                  }
+  582   3              }
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 10  
+
+  583   2      
+  584   2          }
+  585   1          need_draw = FALSE;
+  586   1          get_fileinfo_flag = FALSE;
+  587   1          no_device_flag = TRUE;
+  588   1      }
+  589          
+  590          /*
+  591           ********************************************************************************
+  592           *             void deal_device_msg(void)
+  593           *
+  594           * Description : 处理设备拔插消息
+  595           *
+  596           *
+  597           * Arguments   :
+  598           *
+  599           * Returns     : void
+  600           *
+  601           * Notes       :
+  602           *
+  603           *
+  604           *
+  605           ********************************************************************************
+  606           */
+  607          
+  608          uint8 deal_device_msg(uint8 key)
+  609          {
+  610   1          uint8 retval;
+  611   1          //    while (ap_get_message() != NULL)
+  612   1          //        ;
+  613   1          no_device_flag = FALSE;
+  614   1          if (key == AP_MSG_SD_OUT)//卡拔出
+  615   1          {
+  616   2              if (CurUselocation.disk == disk_char[0])//如果播放的是u盘，则不处理卡拔出消息
+  617   2              {
+  618   3                  return NULL;
+  619   3              }
+  620   2              else if (USBH_Check_Udisk())//如果播放的是卡，并且存在u盘，则切换到u盘播放
+  621   2              {
+  622   3                  CurUselocation.disk = disk_char[0];
+  623   3              }
+  624   2              else//如果没有u盘，则将no_device_flag置起来
+  625   2              {
+  626   3                  no_device_flag = TRUE;
+  627   3              }
+  628   2          }
+  629   1          else if (key == AP_MSG_UH_OUT)//uhost 拔出
+  630   1          {
+  631   2              if (CurUselocation.disk == disk_char[1])//如果播放的是卡盘，则不处理uhost拔出消息
+  632   2              {
+  633   3                  return NULL;
+  634   3              }
+  635   2              else if (DRV_DetectUD(1) == 0x20)//如果播放的是uhost，并且存在卡，则切换到卡盘播放
+  636   2              {
+  637   3                  CurUselocation.disk = disk_char[1];
+  638   3              }
+  639   2              else//如果没有卡盘，则将no_device_flag置起来
+  640   2              {
+  641   3                  no_device_flag = TRUE;
+  642   3              }
+  643   2          }
+  644   1          else if (key == AP_MSG_SD_IN)//卡插入
+  645   1          {
+  646   2              first_init = TRUE;
+  647   2              //如果原先的盘符是卡盘，并且不是停止状态，则说明是误检，不做任何处理
+  648   2              //否则直接切换到卡盘
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 11  
+
+  649   2              if ((CurUselocation.disk == disk_char[1]) && (PlayStatus == PlaySta))
+  650   2              {
+  651   3                  return NULL;
+  652   3              }
+  653   2              CurUselocation.disk = disk_char[1];
+  654   2          }
+  655   1          else
+  656   1          {
+  657   2              first_init = TRUE;
+  658   2              //如果原先的盘符是u盘，并且不是停止状态，则说明是误检，不做任何处理
+  659   2              //否则直接切换到u盘
+  660   2              if ((CurUselocation.disk == disk_char[0]) && (PlayStatus == PlaySta))
+  661   2              {
+  662   3                  return NULL;
+  663   3              }
+  664   2              CurUselocation.disk = disk_char[0];
+  665   2          }
+  666   1          //切换磁盘时，先保存断点信息
+  667   1          stop_music_play(TRUE);
+  668   1          reinit_file_info();
+  669   1      #ifdef MUSIC_AP
+                   if(no_device_flag == TRUE)
+                   {
+                       return 1;
+                   }
+                   PlayStatus = StopSta;
+                   prev_PlayStatus = PlayStatus;
+                   if(g_comval.SuppTTS != 0)
+                   {
+                       retval = report_disk_info();
+                       if(retval > 1)
+                       {
+                           return retval;
+                       }
+                   }
+               
+               #else
+  686   1      
+  687   1          retval = retval;
+  688   1      #endif
+  689   1          return 1;
+  690   1      }
+  691          /*
+  692           ********************************************************************************
+  693           *             void deal_folder_longmsg(void)
+  694           *
+  695           * Description : 处理长按folder key功能
+  696           *
+  697           *
+  698           * Arguments   : void
+  699           *
+  700           * Returns     : void
+  701           *
+  702           * Notes       :
+  703           *
+  704           ********************************************************************************
+  705           */
+  706          uint8 deal_folder_longmsg(uint8 key)
+  707          {
+  708   1          stop_music_play(FALSE);
+  709   1          if (CurUI_Type != DIRNAME_UI)
+  710   1          {
+  711   2              SetCurUI_Type(DIRNAME_UI);
+  712   2              LEDDisplay(LED_COL, 0xff, 0);
+  713   2              LEDDisplay(LED_PAUSE, 0xff, 0);
+  714   2              itoa4(dir_no, temp_buffer);
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 12  
+
+  715   2              LEDPuts(NUMBER1, temp_buffer, 1);
+  716   2              show_count = 0;
+  717   2          }
+  718   1          if (key == Key_Next)
+  719   1          {
+  720   2              FF_flag = Key_Next;
+  721   2          }
+  722   1          else
+  723   1          {
+  724   2              FF_flag = Key_Prev;
+  725   2          }
+  726   1          need_draw = FALSE;
+  727   1          return NULL;
+  728   1      }
+  729          /*
+  730           ********************************************************************************
+  731           *             void deal_next_prev_longmsg(void)
+  732           *
+  733           * Description : 处理不同场景下长按next,prev key的功能
+  734           *
+  735           *
+  736           * Arguments   : void
+  737           *
+  738           * Returns     : void
+  739           *
+  740           * Notes       :1.在播放显示播放时间界面实现快进退
+  741           *                         2.在播放显示文件序号界面实现快速切换歌曲
+  742           *                         3.在暂停显示播放时间界面实现快速切换歌曲
+  743           *                         4.在显示音量调节界面实现继续调节音量功能
+  744           *
+  745           ********************************************************************************
+  746           */
+  747          
+  748          uint8 deal_next_prev_longmsg(uint8 key)
+  749          {
+  750   1          uint8 retval = NULL;
+  751   1          switch (CurUI_Type)
+  752   1          {
+  753   2          case Music_UI:
+  754   2              if (PlayStatus == PlaySta)
+  755   2              {
+  756   3                  if (key == Key_Next)
+  757   3                  {
+  758   4                      PlayStatus = FFPlaySta;
+  759   4                      musicpSendCommand_bank(MC_STEP, 4);
+  760   4                  }
+  761   3                  else
+  762   3                  {
+  763   4                      PlayStatus = FBPlaySta;
+  764   4                      musicpSendCommand_bank(MC_STEP, -4);
+  765   4                  }
+  766   3              }
+  767   2              else if ((PlayStatus < PlaySta) && (FF_flag == 0))
+  768   2              {
+  769   3      
+  770   3                  if (key == Key_Next)
+  771   3                  {
+  772   4                      FF_flag = Key_Next;
+  773   4                  }
+  774   3                  else
+  775   3                  {
+  776   4                      FF_flag = Key_Prev;
+  777   4                  }
+  778   3                  prev_key_direc = key;
+  779   3                  SetCurUI_Type(FileNo_UI);
+  780   3                  LEDDisplay(LED_COL, 0xff, 0);
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 13  
+
+  781   3                  LEDDisplay(LED_PAUSE, 0xff, 0);
+  782   3                  itoa4(g_musicsequence, temp_buffer);
+  783   3                  LEDPuts(NUMBER1, temp_buffer, 1);
+  784   3                  show_count = 0;
+  785   3                  need_draw = FALSE;
+  786   3              }
+  787   2              break;
+  788   2          case Volume_UI:
+  789   2              deal_vol_msg(key, Music_UI);
+  790   2              break;
+  791   2          case FileNo_UI:
+  792   2              if (FF_flag == 0)
+  793   2              {
+  794   3                  if (key == Key_Next)
+  795   3                  {
+  796   4                      FF_flag = Key_Next;
+  797   4                  }
+  798   3                  else
+  799   3                  {
+  800   4                      FF_flag = Key_Prev;
+  801   4                  }
+  802   3                  stop_music_play(FALSE);
+  803   3                  need_draw = FALSE;
+  804   3              }
+  805   2              break;
+  806   2          default:
+  807   2              break;
+  808   2      
+  809   2          }
+  810   1          return NULL;
+  811   1      }
+  812          /*
+  813           ********************************************************************************
+  814           *             void deal_digital_key(void)
+  815           *
+  816           * Description : 处理数字键输入的功能
+  817           *
+  818           *
+  819           * Arguments   : void
+  820           *
+  821           * Returns     : void
+  822           *
+  823           * Notes       :1.主要是将输入的数字键值转换为相对应的数字，然后存储到buf中
+  824           *
+  825           ********************************************************************************
+  826           */
+  827          
+  828          uint8 deal_digital_key(uint8 key)
+  829          {
+  830   1          uint8 key_val;
+  831   1          if ((DigitalCount >= 4) || (DigitalCount == 0))
+  832   1          {
+  833   2              SetCurUI_Type(Digital_UI);
+  834   2          }
+  835   1          key_val = (key & ~AP_KEY_UP) - AP_KEY_NUM0;//将数字按键消息转换成数字
+  836   1          DigitalBuf[DigitalCount] = key_val;
+  837   1          DigitalCount++;
+  838   1          need_draw = TRUE;
+  839   1          return NULL;
+  840   1      }
+  841          /*
+  842           ********************************************************************************
+  843           *             void SelMusicByDigital(void)
+  844           *
+  845           * Description : 实现数字点歌功能
+  846           *
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 14  
+
+  847           *
+  848           * Arguments   : void
+  849           *
+  850           * Returns     : void
+  851           *
+  852           * Notes       :如果输入的数字超过磁盘的音乐文件总数或者为0，则不做任何响应
+  853           *                        否则根据输入的数字找到对应的歌曲进行播放
+  854           ********************************************************************************
+  855           */
+  856          
+  857          void SelMusicByDigital(void)
+  858          {
+  859   1          uint16 realNum = 0;
+  860   1          uint8 filename[12];
+  861   1          realNum = DigitalSwitchToRealNum();
+  862   1          //如果当前的数字小于或文件总数时，则播放选取的数字对应的歌曲
+  863   1          //否则什么都不做，直接返回播放界面。
+  864   1          if ((realNum <= g_musicamount) && (realNum > 0) && (realNum != g_musicsequence))
+  865   1          {
+  866   2              stop_music_play(FALSE);
+  867   2              ClearTimePara();
+  868   2              fselGetFileByNoInDisk(filename, realNum);
+  869   2              get_music_location(FALSE);
+  870   2              get_fileinfo_flag = TRUE;
+  871   2          }
+  872   1          else
+  873   1          {
+  874   2              DigitalCount = 0;
+  875   2              memset(DigitalBuf, 0, 4);
+  876   2          }
+  877   1          SetCurUI_Type(Music_UI);
+  878   1      }
+  879          /*
+  880           ********************************************************************************
+  881           *             void deal_folder_key(void)
+  882           *
+  883           * Description : 处理短按folder 键功能
+  884           *
+  885           *
+  886           * Arguments   : void
+  887           *
+  888           * Returns     : void
+  889           *
+  890           * Notes       :1.主要实现上下切换目录的功能
+  891           *
+  892           ********************************************************************************
+  893           */
+  894          uint8 deal_folder_key(uint8 key)
+  895          {
+  896   1          uint8 retval = NULL;
+  897   1          uint8 filename[16];
+  898   1          stop_music_play(FALSE);
+  899   1          err_music_count = 0;
+  900   1          if (key == Key_Next)
+  901   1          {
+  902   2              retval = fselGetNextFolderFile(filename);
+  903   2          }
+  904   1          else
+  905   1          {
+  906   2              retval = fselGetPrevFolderFile(filename);
+  907   2          }
+  908   1          get_music_location(FALSE);
+  909   1          dir_no = fselGetDirNo(filename, 8);
+  910   1          if (CurUI_Type != DIRNAME_UI)
+  911   1          {
+  912   2              SetCurUI_Type(DIRNAME_UI);
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 15  
+
+  913   2          }
+  914   1          ClearTimePara();
+  915   1          if (prev_PlayStatus == PlaySta)
+  916   1          {
+  917   2              get_fileinfo_flag = TRUE;
+  918   2          }
+  919   1          return NULL;
+  920   1      }
+  921          /*
+  922           ********************************************************************************
+  923           *             void deal_mode_msg(void)
+  924           *
+  925           * Description : 处理不同场景下短按mode 键的功能
+  926           *
+  927           *
+  928           * Arguments   : void
+  929           *
+  930           * Returns     : void
+  931           *
+  932           * Notes       :1.在数字输入界面，实现数字点歌功能
+  933           *                         2.在其他界面实现一键切换功能
+  934           ********************************************************************************
+  935           */
+  936          
+  937          uint8 deal_mode_msg(void)
+  938          {
+  939   1          uint8 retval;
+  940   1          stop_music_play(TRUE);
+  941   1          g_music_vars.MusicOpenMod = Nor_open;
+  942   1          PlayStatus = StopSta;
+  943   1          prev_PlayStatus = PlayStatus;
+  944   1          first_init = TRUE;
+  945   1          if (CurUselocation.disk == disk_char[0])
+  946   1          {
+  947   2              if (DRV_DetectUD(1) == 0x20)
+  948   2              {
+  949   3                  no_device_flag = FALSE;
+  950   3              }
+  951   2              else
+  952   2              {
+  953   3                  return RESULT_MAIN;
+  954   3              }
+  955   2              CurUselocation.disk = disk_char[1];
+  956   2              g_music_vars.cur_disk = CurUselocation.disk;
+  957   2      #ifdef MUSIC_AP
+                       retval = report_disk_info();
+                       if(retval != 0)
+                       {
+                           return retval;
+                       }
+               
+               #else
+  965   2      
+  966   2              retval = retval;
+  967   2      #endif
+  968   2      
+  969   2              if (no_device_flag == FALSE)
+  970   2              {
+  971   3                  LEDClearScreen();
+  972   3                  LEDPuts(NUMBER1, load_str, 1);
+  973   3              }
+  974   2              write_poweroff_flag(0);
+  975   2              if (no_device_flag == FALSE)
+  976   2              {
+  977   3                  scan_flag = TRUE;
+  978   3                  if(InitFileSelector() != 0)
+C251 COMPILER V4.55,  sub_function                                                         23/05/16  10:41:56  PAGE 16  
+
+  979   3                  {
+  980   4                      get_fileinfo_flag = TRUE;
+  981   4                      need_draw = TRUE;
+  982   4                      Read_VMflag = TRUE;
+  983   4                      return 1;
+  984   4                  }
+  985   3                  else
+  986   3                  {
+  987   4                      LEDPuts(NUMBER1, err_str, 1);
+  988   4                      ap_sleep(4);
+  989   4                  }
+  990   3              }
+  991   2      
+  992   2          }
+  993   1          return RESULT_MUSIC_UPLAY;
+  994   1      }
+  995          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      2072     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        84     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

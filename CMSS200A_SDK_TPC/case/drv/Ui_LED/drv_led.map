@@ -1,0 +1,2115 @@
+L251 LINKER/LOCATER V4.25                                                               12/26/2012  14:07:03  PAGE 1
+
+
+L251 LINKER/LOCATER V4.25, INVOKED BY:
+C:\KEIL\C251\BIN\L251.EXE ..\..\..\psp_rel\lib\actos30api.LIB, ..\..\..\psp_rel\lib\LIBC.LIB, .\UI_Release\obj\Hdrv_Hard
+>> Deal.obj, .\UI_Release\obj\Hdrv_HardInit.obj, .\UI_Release\obj\Sdrv_ClrScreen.obj, .\UI_Release\obj\sdrv_Init.obj, .\
+>> UI_Release\obj\Sdrv_LEDDisplay.obj, .\UI_Release\obj\Drv_header.obj, .\UI_Release\obj\LED_apitable.obj TO .\UI_Releas
+>> e\obj\drv_led NOOVERLAY NOJMPTAB NODEFAULTLIBRARY CLASSES (ECODE (0X800000-0XFFFFFF)) CLASSES (HCONST (0X800000-0XFFF
+>> FFF)) SEGMENTS (LED_APITABLE (0XFF0200), ?PR?SDRV_CLRS, ?HC?SDRV_DISPLAY, ?PR?SDRV_DISPLAY, ?PR?HARD_DEAL) RESERVE (0
+>> XFF09FF-0XFF09FF) SEGMENTS (?PR?BBC_INIT (0XED5600), ?PR?HARD_INIT) RESERVE (0XED5DFF-0XED5DFF) SEGMENTS (UI_INFO (0X
+>> FF0000))
+
+
+CPU MODE:     251 SOURCE MODE
+MEMORY MODEL: XSMALL
+
+
+INPUT MODULES INCLUDED:
+  .\UI_Release\obj\Hdrv_HardDeal.obj (HARD_DEAL)
+         COMMENT TYPE 0: C251 V4.55
+  .\UI_Release\obj\Hdrv_HardInit.obj (HARD_INIT)
+         COMMENT TYPE 0: C251 V4.55
+  .\UI_Release\obj\Sdrv_ClrScreen.obj (SDRV_CLRS)
+         COMMENT TYPE 0: C251 V4.55
+  .\UI_Release\obj\sdrv_Init.obj (BBC_INIT)
+         COMMENT TYPE 0: C251 V4.55
+  .\UI_Release\obj\Sdrv_LEDDisplay.obj (SDRV_DISPLAY)
+         COMMENT TYPE 0: C251 V4.55
+  .\UI_Release\obj\Drv_header.obj (DRV_HEADER)
+         COMMENT TYPE 0: A251 V4.52b
+  .\UI_Release\obj\LED_apitable.obj (LED_apitable)
+         COMMENT TYPE 0: A251 V4.52b
+
+
+ACTIVE MEMORY CLASSES OF MODULE:  .\UI_Release\obj\drv_led (HARD_DEAL)
+
+BASE        START       END         USED      MEMORY CLASS
+==========================================================
+000000H     800000H     FFFFFFH     000236H   ECODE
+000000H     800000H     FFFFFFH     000026H   HCONST
+
+
+MEMORY MAP OF MODULE:  .\UI_Release\obj\drv_led (HARD_DEAL)
+
+
+START     STOP      LENGTH    ALIGN  RELOC    MEMORY CLASS   SEGMENT NAME
+=========================================================================
+ED5600H   ED560CH   00000DH   BYTE   INSEG    ECODE          ?PR?BBC_INIT
+ED560DH   ED5663H   000057H   BYTE   INSEG    ECODE          ?PR?HARD_INIT
+ED5664H   ED5DFEH   00079BH   ---    ---      **GAP**
+ED5DFFH   ED5DFFH   000001H   ---    ---      *** RESERVED MEMORY ***
+ED5E00H   FEFFFFH   11A200H   ---    ---      **GAP**
+FF0000H   FF0021H   000022H   BYTE   UNIT     ECODE          UI_INFO
+FF0022H   FF01FFH   0001DEH   ---    ---      **GAP**
+FF0200H   FF0213H   000014H   BYTE   UNIT     ECODE          LED_APITABLE
+FF0214H   FF0229H   000016H   BYTE   INSEG    ECODE          ?PR?SDRV_CLRS
+FF022AH   FF024FH   000026H   BYTE   UNIT     HCONST         ?HC?SDRV_DISPLAY
+FF0250H   FF0395H   000146H   BYTE   INSEG    ECODE          ?PR?SDRV_DISPLAY
+FF0396H   FF03D5H   000040H   BYTE   INSEG    ECODE          ?PR?HARD_DEAL
+FF03D6H   FF09FEH   000629H   ---    ---      **GAP**
+FF09FFH   FF09FFH   000001H   ---    ---      *** RESERVED MEMORY ***
+
+
+
+PUBLIC SYMBOLS OF MODULE:  .\UI_Release\obj\drv_led (HARD_DEAL)
+
+
+      VALUE       CLASS    TYPE      PUBLIC SYMBOL NAME
+      =================================================
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 2
+
+
+      000000FFH   NUMBER   ---       ?C?CODESEG
+      00000001H   NUMBER   ---       ?C?XDATASEG
+*SFR* 000000ABH   DATA     BYTE      CLKENCTL2
+      00FF0396H   ECODE    ---       Hdrv_DataSend??
+      00ED563EH   ECODE    ---       Hdrv_HardInit??
+      00ED5627H   ECODE    ---       Hdrv_SetLED??
+      00ED560DH   ECODE    ---       Hdrv_SetMfpToEmif??
+      00FF0249H   HCONST   ---       iconshowval
+*SFR* 000000A8H   DATA     BYTE      IE0
+*SFR* 0000008BH   DATA     BYTE      LCD_DATA0
+*SFR* 0000008CH   DATA     BYTE      LCD_DATA1
+*SFR* 0000008DH   DATA     BYTE      LCD_DATA2
+*SFR* 00000090H   DATA     BYTE      LCD_DATA3
+*SFR* 00000091H   DATA     BYTE      LCD_DATA4
+*SFR* 0000008AH   DATA     BYTE      LCD_MODE
+      00FF0200H   ECODE    ---       LED_API_TABLE
+*SFR* 000000ECH   DATA     BYTE      LED_SEG_BIAS_EN
+*SFR* 000000C9H   DATA     BYTE      LED_SEGLCDCLKCTL
+*SFR* 000000C8H   DATA     BYTE      MFP_CTL0
+*SFR* 000000C9H   DATA     BYTE      MFP_CTL1
+*SFR* 000000CAH   DATA     BYTE      MFP_CTL2
+*SFR* 000000CBH   DATA     BYTE      MFP_CTL3
+*SFR* 000000CCH   DATA     BYTE      MFP_CTL4
+*SFR* 0000009FH   DATA     BYTE      MRCR3
+      00FF022AH   HCONST   ---       numbershowval
+      00FF0214H   ECODE    ---       Sdrv_ClearScreen??
+      00ED560CH   ECODE    ---       Sdrv_Exit??
+      00ED5600H   ECODE    ---       Sdrv_Init??
+      00FF0334H   ECODE    ---       Sdrv_LEDDisplay??
+      00FF0250H   ECODE    ---       Sdrv_LEDPuts??
+*SFR* 00000080H   DATA     BYTE      SFR_BANK
+
+
+
+SYMBOL TABLE OF MODULE:  .\UI_Release\obj\drv_led (HARD_DEAL)
+
+      VALUE       REP       CLASS    TYPE      SYMBOL NAME
+      ====================================================
+      ---         MODULE    ---      ---       HARD_DEAL
+      00FF0396H   PUBLIC    ECODE    ---       Hdrv_DataSend??
+      00000080H   SFRSYM    DATA     BYTE      SFR_BANK
+      0000008AH   SFRSYM    DATA     BYTE      LCD_MODE
+      000000A8H   SFRSYM    DATA     BYTE      IE0
+      00000091H   SFRSYM    DATA     BYTE      LCD_DATA4
+      00000090H   SFRSYM    DATA     BYTE      LCD_DATA3
+      0000008DH   SFRSYM    DATA     BYTE      LCD_DATA2
+      0000008CH   SFRSYM    DATA     BYTE      LCD_DATA1
+      0000008BH   SFRSYM    DATA     BYTE      LCD_DATA0
+
+      00FF0396H   BLOCK     ECODE    ---       LVL=0
+      R6          REGSYM    ---      BYTE      addr
+      R7          REGSYM    ---      BYTE      val
+      00FF0398H   BLOCK     ECODE    NEAR LAB  LVL=1
+      R10         REGSYM    ---      BYTE      sfr_bak
+      ---         BLOCKEND  ---      ---       LVL=1
+      00FF0396H   LINE      ECODE    ---       #31
+      00FF0398H   LINE      ECODE    ---       #32
+      00FF0398H   LINE      ECODE    ---       #34
+      00FF039BH   LINE      ECODE    ---       #35
+      00FF039EH   LINE      ECODE    ---       #37
+      00FF03B2H   LINE      ECODE    ---       #39
+      00FF03B2H   LINE      ECODE    ---       #40
+      00FF03B5H   LINE      ECODE    ---       #41
+      00FF03B7H   LINE      ECODE    ---       #42
+      00FF03B7H   LINE      ECODE    ---       #43
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 3
+
+
+      00FF03BAH   LINE      ECODE    ---       #44
+      00FF03BCH   LINE      ECODE    ---       #45
+      00FF03BCH   LINE      ECODE    ---       #46
+      00FF03BFH   LINE      ECODE    ---       #47
+      00FF03C1H   LINE      ECODE    ---       #48
+      00FF03C1H   LINE      ECODE    ---       #49
+      00FF03C4H   LINE      ECODE    ---       #50
+      00FF03C6H   LINE      ECODE    ---       #51
+      00FF03C6H   LINE      ECODE    ---       #52
+      00FF03CAH   LINE      ECODE    ---       #53
+      00FF03CAH   LINE      ECODE    ---       #54
+      00FF03CAH   LINE      ECODE    ---       #55
+      00FF03CAH   LINE      ECODE    ---       #56
+      00FF03CAH   LINE      ECODE    ---       #58
+      00FF03CDH   LINE      ECODE    ---       #60
+      00FF03CDH   LINE      ECODE    ---       #62
+      00FF03D2H   LINE      ECODE    ---       #64
+      00FF03D2H   LINE      ECODE    ---       #65
+      00FF03D2H   LINE      ECODE    ---       #67
+      00FF03D5H   LINE      ECODE    ---       #68
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      ---         MODULE    ---      ---       HARD_INIT
+      00ED563EH   PUBLIC    ECODE    ---       Hdrv_HardInit??
+      00ED560DH   PUBLIC    ECODE    ---       Hdrv_SetMfpToEmif??
+      00ED5627H   PUBLIC    ECODE    ---       Hdrv_SetLED??
+      00000080H   SFRSYM    DATA     BYTE      SFR_BANK
+      0000009FH   SFRSYM    DATA     BYTE      MRCR3
+      000000CCH   SFRSYM    DATA     BYTE      MFP_CTL4
+      000000CBH   SFRSYM    DATA     BYTE      MFP_CTL3
+      0000008AH   SFRSYM    DATA     BYTE      LCD_MODE
+      000000CAH   SFRSYM    DATA     BYTE      MFP_CTL2
+      000000C9H   SFRSYM    DATA     BYTE      MFP_CTL1
+      000000C8H   SFRSYM    DATA     BYTE      MFP_CTL0
+      000000A8H   SFRSYM    DATA     BYTE      IE0
+      000000C9H   SFRSYM    DATA     BYTE      LED_SEGLCDCLKCTL
+      000000ECH   SFRSYM    DATA     BYTE      LED_SEG_BIAS_EN
+      000000ABH   SFRSYM    DATA     BYTE      CLKENCTL2
+
+      00ED560DH   BLOCK     ECODE    ---       LVL=0
+      R11         REGSYM    ---      BYTE      sfr_bak
+      00ED560DH   LINE      ECODE    ---       #31
+      00ED560DH   LINE      ECODE    ---       #32
+      00ED560DH   LINE      ECODE    ---       #34
+      00ED560FH   LINE      ECODE    ---       #36
+      00ED5612H   LINE      ECODE    ---       #39
+      00ED5615H   LINE      ECODE    ---       #41
+      00ED5618H   LINE      ECODE    ---       #43
+      00ED561BH   LINE      ECODE    ---       #44
+      00ED561EH   LINE      ECODE    ---       #46
+      00ED5621H   LINE      ECODE    ---       #48
+      00ED5624H   LINE      ECODE    ---       #50
+      00ED5626H   LINE      ECODE    ---       #51
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      00ED5627H   BLOCK     ECODE    ---       LVL=0
+      R11         REGSYM    ---      BYTE      sfr_bak
+      00ED5627H   LINE      ECODE    ---       #65
+      00ED5627H   LINE      ECODE    ---       #66
+      00ED5627H   LINE      ECODE    ---       #68
+      00ED5629H   LINE      ECODE    ---       #70
+      00ED562CH   LINE      ECODE    ---       #72
+      00ED562FH   LINE      ECODE    ---       #74
+      00ED5632H   LINE      ECODE    ---       #75
+      00ED5635H   LINE      ECODE    ---       #78
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 4
+
+
+      00ED5638H   LINE      ECODE    ---       #79
+      00ED563BH   LINE      ECODE    ---       #80
+      00ED563DH   LINE      ECODE    ---       #81
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      00ED563EH   BLOCK     ECODE    ---       LVL=0
+      R10         REGSYM    ---      BYTE      sfr_bak
+      00ED563EH   LINE      ECODE    ---       #95
+      00ED563EH   LINE      ECODE    ---       #96
+      00ED563EH   LINE      ECODE    ---       #97
+      00ED5641H   LINE      ECODE    ---       #99
+      00ED5645H   LINE      ECODE    ---       #101
+      00ED5649H   LINE      ECODE    ---       #102
+      00ED564CH   LINE      ECODE    ---       #104
+      00ED5654H   LINE      ECODE    ---       #106
+      00ED5657H   LINE      ECODE    ---       #108
+      00ED565AH   LINE      ECODE    ---       #109
+      00ED565DH   LINE      ECODE    ---       #110
+      00ED5660H   LINE      ECODE    ---       #111
+      00ED5663H   LINE      ECODE    ---       #113
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      ---         MODULE    ---      ---       SDRV_CLRS
+      00FF0214H   PUBLIC    ECODE    ---       Sdrv_ClearScreen??
+      000000A8H   SFRSYM    DATA     BYTE      IE0
+
+      00FF0214H   BLOCK     ECODE    ---       LVL=0
+      00FF0216H   BLOCK     ECODE    NEAR LAB  LVL=1
+      R15         REGSYM    ---      BYTE      i
+      ---         BLOCKEND  ---      ---       LVL=1
+      00FF0214H   LINE      ECODE    ---       #34
+      00FF0216H   LINE      ECODE    ---       #35
+      00FF0216H   LINE      ECODE    ---       #37
+      00FF0218H   LINE      ECODE    ---       #40
+      00FF0218H   LINE      ECODE    ---       #43
+      00FF0220H   LINE      ECODE    ---       #44
+      00FF0222H   LINE      ECODE    ---       #45
+      00FF0227H   LINE      ECODE    ---       #46
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      ---         MODULE    ---      ---       BBC_INIT
+      00ED5600H   PUBLIC    ECODE    ---       Sdrv_Init??
+      00ED560CH   PUBLIC    ECODE    ---       Sdrv_Exit??
+      000000A8H   SFRSYM    DATA     BYTE      IE0
+
+      00ED5600H   BLOCK     ECODE    ---       LVL=0
+      00ED5600H   LINE      ECODE    ---       #20
+      00ED5600H   LINE      ECODE    ---       #23
+      00ED5604H   LINE      ECODE    ---       #24
+      00ED5609H   LINE      ECODE    ---       #25
+      00ED560BH   LINE      ECODE    ---       #26
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      00ED560CH   BLOCK     ECODE    ---       LVL=0
+      00ED560CH   LINE      ECODE    ---       #28
+      00ED560CH   LINE      ECODE    ---       #31
+      00ED560CH   LINE      ECODE    ---       #32
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      ---         MODULE    ---      ---       SDRV_DISPLAY
+      00FF0250H   PUBLIC    ECODE    ---       Sdrv_LEDPuts??
+      00FF0334H   PUBLIC    ECODE    ---       Sdrv_LEDDisplay??
+      00FF022AH   PUBLIC    HCONST   ---       numbershowval
+      00FF0249H   PUBLIC    HCONST   ---       iconshowval
+      000000A8H   SFRSYM    DATA     BYTE      IE0
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 5
+
+
+
+      00FF0250H   BLOCK     ECODE    ---       LVL=0
+      FFFFFFFDH   STKSYM    ---      BYTE      addr
+      REG=3       REGSYM    ---      ---       str
+      R6          REGSYM    ---      BYTE      type
+      00FF025AH   BLOCK     ECODE    NEAR LAB  LVL=1
+      00000000H   STKSYM    ---      BYTE      i
+      FFFFFFFFH   STKSYM    ---      BYTE      tmp_val
+      FFFFFFFEH   STKSYM    ---      BYTE      displayval
+      ---         BLOCKEND  ---      ---       LVL=1
+      00FF0250H   LINE      ECODE    ---       #73
+      00FF025AH   LINE      ECODE    ---       #74
+      00FF025AH   LINE      ECODE    ---       #75
+      00FF025EH   LINE      ECODE    ---       #78
+      00FF0262H   LINE      ECODE    ---       #80
+      00FF026BH   LINE      ECODE    ---       #82
+      00FF0274H   LINE      ECODE    ---       #83
+      00FF0283H   LINE      ECODE    ---       #84
+      00FF0286H   LINE      ECODE    ---       #87
+      00FF0290H   LINE      ECODE    ---       #89
+      00FF029BH   LINE      ECODE    ---       #90
+      00FF02A6H   LINE      ECODE    ---       #92
+      00FF02A6H   LINE      ECODE    ---       #93
+      00FF02A6H   LINE      ECODE    ---       #94
+      00FF02B0H   LINE      ECODE    ---       #96
+      00FF02B0H   LINE      ECODE    ---       #97
+      00FF02BAH   LINE      ECODE    ---       #99
+      00FF02C0H   LINE      ECODE    ---       #100
+      00FF02C2H   LINE      ECODE    ---       #101
+      00FF02CCH   LINE      ECODE    ---       #103
+      00FF02DCH   LINE      ECODE    ---       #104
+      00FF02DEH   LINE      ECODE    ---       #105
+      00FF02E8H   LINE      ECODE    ---       #107
+      00FF02F6H   LINE      ECODE    ---       #108
+      00FF02F8H   LINE      ECODE    ---       #111
+      00FF02FDH   LINE      ECODE    ---       #112
+      00FF02FFH   LINE      ECODE    ---       #113
+      00FF02FFH   LINE      ECODE    ---       #114
+      00FF0316H   LINE      ECODE    ---       #115
+      00FF031DH   LINE      ECODE    ---       #116
+      00FF032FH   LINE      ECODE    ---       #117
+      00FF032FH   LINE      ECODE    ---       #119
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      00FF0334H   BLOCK     ECODE    ---       LVL=0
+      R7          REGSYM    ---      BYTE      addr
+      R6          REGSYM    ---      BYTE      content
+      R5          REGSYM    ---      BYTE      type
+      00FF0336H   BLOCK     ECODE    NEAR LAB  LVL=1
+      R15         REGSYM    ---      BYTE      displayval
+      R14         REGSYM    ---      BYTE      displayaddr
+      ---         BLOCKEND  ---      ---       LVL=1
+      00FF0334H   LINE      ECODE    ---       #138
+      00FF0336H   LINE      ECODE    ---       #139
+      00FF0336H   LINE      ECODE    ---       #144
+      00FF033AH   LINE      ECODE    ---       #149
+      00FF033DH   LINE      ECODE    ---       #151
+      00FF0341H   LINE      ECODE    ---       #153
+      00FF034DH   LINE      ECODE    ---       #154
+      00FF034FH   LINE      ECODE    ---       #157
+      00FF0368H   LINE      ECODE    ---       #158
+      00FF0368H   LINE      ECODE    ---       #159
+      00FF036AH   LINE      ECODE    ---       #163
+      00FF036CH   LINE      ECODE    ---       #165
+      00FF0370H   LINE      ECODE    ---       #167
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 6
+
+
+      00FF0375H   LINE      ECODE    ---       #169
+      00FF0378H   LINE      ECODE    ---       #170
+      00FF0378H   LINE      ECODE    ---       #171
+      00FF0387H   LINE      ECODE    ---       #172
+      00FF0389H   LINE      ECODE    ---       #175
+      00FF038BH   LINE      ECODE    ---       #176
+      00FF038BH   LINE      ECODE    ---       #177
+      00FF038BH   LINE      ECODE    ---       #178
+      00FF0393H   LINE      ECODE    ---       #179
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      ---         MODULE    ---      ---       DRV_HEADER
+      00000686H   SYMBOL    BIT      ---       AC
+      000000E0H   SYMBOL    NUMBER   ---       ACC
+      000000F7H   SYMBOL    NUMBER   ---       ACC_BITMAPHI
+      000000F8H   SYMBOL    NUMBER   ---       ACC_BITMAPLO
+      0000008AH   SYMBOL    NUMBER   ---       ACC_BLKLEN_LENHI
+      0000008BH   SYMBOL    NUMBER   ---       ACC_BLKNUM_LENLO
+      000000F1H   SYMBOL    NUMBER   ---       ACC_CMPDATA0_SUMHIE
+      000000F2H   SYMBOL    NUMBER   ---       ACC_CMPDATA1_SUMHI
+      000000F3H   SYMBOL    NUMBER   ---       ACC_CMPDATA2_SUMLO
+      000000F4H   SYMBOL    NUMBER   ---       ACC_CMPDATA3_SUMLOE
+      00000089H   SYMBOL    NUMBER   ---       ACC_CTRL
+      0000008CH   SYMBOL    NUMBER   ---       ACC_FIFO
+      000000F5H   SYMBOL    NUMBER   ---       ACC_MATCNTHI
+      000000F6H   SYMBOL    NUMBER   ---       ACC_MATCNTLO
+      000000F1H   SYMBOL    NUMBER   ---       ADC_CTL0
+      000000FDH   SYMBOL    NUMBER   ---       ADC_CTL1
+      000000BDH   SYMBOL    NUMBER   ---       ADC_DAC_CLK_CTL
+      000000F8H   SYMBOL    NUMBER   ---       ADC_FIFOCTL0
+      000000FCH   SYMBOL    NUMBER   ---       ADC_FIFOCTL1
+      000000F7H   SYMBOL    NUMBER   ---       ADC_FIFO_DAT
+      000000F3H   SYMBOL    NUMBER   ---       ADC_GAIN0
+      000000F4H   SYMBOL    NUMBER   ---       ADC_GAIN1
+      000000A2H   SYMBOL    NUMBER   ---       ADC_SRFT_CTL0
+      000000A3H   SYMBOL    NUMBER   ---       ADC_SRFT_CTL1
+      000000A4H   SYMBOL    NUMBER   ---       ADC_SRFT_CTL2
+      000000A5H   SYMBOL    NUMBER   ---       ADC_SRFT_CTL3
+      000000A6H   SYMBOL    NUMBER   ---       ADC_SRFT_CTL4
+      000000F5H   SYMBOL    NUMBER   ---       ADC_TUNE0
+      000000F6H   SYMBOL    NUMBER   ---       ADC_TUNE1
+      000000D3H   SYMBOL    NUMBER   ---       AD_SELECT
+      000000C4H   SYMBOL    NUMBER   ---       AECLKCTL
+      000000E8H   SYMBOL    NUMBER   ---       AIE
+      000000C0H   SYMBOL    NUMBER   ---       AIF
+      000000F2H   SYMBOL    NUMBER   ---       AINOP_CTL
+      000000F7H   SYMBOL    NUMBER   ---       AIPH
+      000000F8H   SYMBOL    NUMBER   ---       AIPL
+      000000ADH   SYMBOL    NUMBER   ---       AUCODECBIRRATEH
+      000000AEH   SYMBOL    NUMBER   ---       AUCODECBIRRATEL
+      000000B2H   SYMBOL    NUMBER   ---       AUCODECCTIMEH
+      000000B3H   SYMBOL    NUMBER   ---       AUCODECCTIMEM
+      000000B4H   SYMBOL    NUMBER   ---       AUCODECCTIMES
+      00000090H   SYMBOL    NUMBER   ---       AUCODECCTL
+      00000092H   SYMBOL    NUMBER   ---       AUCODECDEBUG
+      00000095H   SYMBOL    NUMBER   ---       AUCODECDEBUG2
+      00000097H   SYMBOL    NUMBER   ---       AUCODECDECSTATEH
+      00000098H   SYMBOL    NUMBER   ---       AUCODECDECSTATEL
+      00000093H   SYMBOL    NUMBER   ---       AUCODECFIFOCTL
+      00000094H   SYMBOL    NUMBER   ---       AUCODECFIFODATA
+      000000ACH   SYMBOL    NUMBER   ---       AUCODECHEADERINFO
+      000000A9H   SYMBOL    NUMBER   ---       AUCODECIE
+      000000AAH   SYMBOL    NUMBER   ---       AUCODECIP
+      000000AFH   SYMBOL    NUMBER   ---       AUCODECTTIMEH
+      000000B0H   SYMBOL    NUMBER   ---       AUCODECTTIMEM
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 7
+
+
+      000000B1H   SYMBOL    NUMBER   ---       AUCODECTTIMES
+      00000091H   SYMBOL    NUMBER   ---       AUDEBUGLENGTH
+      000000ABH   SYMBOL    NUMBER   ---       AUDECENCCTL
+      000000B9H   SYMBOL    NUMBER   ---       AUDIO_PLL_CTL
+      00000089H   SYMBOL    NUMBER   ---       AUTOINTIMER
+      000000ECH   SYMBOL    NUMBER   ---       AUTONAKCTRL
+      000000F0H   SYMBOL    NUMBER   ---       B
+      00000091H   SYMBOL    NUMBER   ---       BATADC_DATA
+      0000008BH   SYMBOL    NUMBER   ---       BDG_CTL
+      0000008CH   SYMBOL    NUMBER   ---       BDG_VOL
+      000000C2H   SYMBOL    NUMBER   ---       BEPCTL1
+      000000C3H   SYMBOL    NUMBER   ---       BEPCTL2
+      000000C4H   SYMBOL    NUMBER   ---       BEPCTL3
+      000000C5H   SYMBOL    NUMBER   ---       BEPCTL4
+      000000C6H   SYMBOL    NUMBER   ---       BEPCTL5
+      00000085H   SYMBOL    NUMBER   ---       BIRDINFO
+      000000E1H   SYMBOL    NUMBER   ---       BIST_EN1
+      000000E2H   SYMBOL    NUMBER   ---       BIST_EN2
+      000000E4H   SYMBOL    NUMBER   ---       BIST_FIN1
+      000000E5H   SYMBOL    NUMBER   ---       BIST_FIN2
+      000000E7H   SYMBOL    NUMBER   ---       BIST_INFO1
+      000000E9H   SYMBOL    NUMBER   ---       BIST_INFO2
+      000000F3H   SYMBOL    NUMBER   ---       BKDOOR
+      000000B8H   SYMBOL    NUMBER   ---       CALENDAR_CLK_CTL
+      0000008EH   SYMBOL    NUMBER   ---       CCMCON
+      0000008FH   SYMBOL    NUMBER   ---       CCMVAL
+      000000F4H   SYMBOL    NUMBER   ---       CHIPVERSION
+      000000A9H   SYMBOL    NUMBER   ---       CLKENCTL0
+      000000AAH   SYMBOL    NUMBER   ---       CLKENCTL1
+      000000ABH   SYMBOL    NUMBER   ---       CLKENCTL2
+      000000CFH   SYMBOL    NUMBER   ---       CLKGATE
+      000000A5H   SYMBOL    NUMBER   ---       CODEREPLACEENTRYEX
+      000000A6H   SYMBOL    NUMBER   ---       CODEREPLACEENTRYH
+      000000A7H   SYMBOL    NUMBER   ---       CODEREPLACEENTRYL
+      000000C2H   SYMBOL    NUMBER   ---       CPUCLKCTL
+      00000097H   SYMBOL    NUMBER   ---       CP_CTL0
+      00000098H   SYMBOL    NUMBER   ---       CP_CTL1
+      000000BBH   SYMBOL    NUMBER   ---       CTCCNTH
+      000000D9H   SYMBOL    NUMBER   ---       CTCCNTH2
+      000000BAH   SYMBOL    NUMBER   ---       CTCCNTL
+      000000D8H   SYMBOL    NUMBER   ---       CTCCNTL2
+      000000B9H   SYMBOL    NUMBER   ---       CTCCTL
+      000000D7H   SYMBOL    NUMBER   ---       CTCCTL2
+      000000CAH   SYMBOL    NUMBER   ---       CURRENTENERGY
+      00000687H   SYMBOL    BIT      ---       CY
+      000000E4H   SYMBOL    NUMBER   ---       DAC_ANALOG0
+      000000E5H   SYMBOL    NUMBER   ---       DAC_ANALOG1
+      000000D8H   SYMBOL    NUMBER   ---       DAC_CH0_FIFO_CTL0
+      000000D9H   SYMBOL    NUMBER   ---       DAC_CH0_FIFO_CTL1
+      000000DCH   SYMBOL    NUMBER   ---       DAC_CH0_PCMH
+      000000DAH   SYMBOL    NUMBER   ---       DAC_CH0_PCML
+      000000DBH   SYMBOL    NUMBER   ---       DAC_CH0_PCMM
+      00000092H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL0
+      00000093H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL1
+      00000094H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL2
+      00000095H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL3
+      00000097H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL4
+      000000A9H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL5
+      00000090H   SYMBOL    NUMBER   ---       DAC_CH0_SR_CTL
+      00000091H   SYMBOL    NUMBER   ---       DAC_CH0_SR_GAIN
+      000000DDH   SYMBOL    NUMBER   ---       DAC_CH1_FIFO_CTL0
+      000000DEH   SYMBOL    NUMBER   ---       DAC_CH1_FIFO_CTL1
+      000000E1H   SYMBOL    NUMBER   ---       DAC_CH1_PCMH
+      000000DFH   SYMBOL    NUMBER   ---       DAC_CH1_PCML
+      0000009AH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL0
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 8
+
+
+      0000009BH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL1
+      0000009CH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL2
+      0000009DH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL3
+      0000009EH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL4
+      000000AAH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL5
+      00000098H   SYMBOL    NUMBER   ---       DAC_CH1_SR_CTL
+      00000099H   SYMBOL    NUMBER   ---       DAC_CH1_SR_GAIN
+      000000D5H   SYMBOL    NUMBER   ---       DAC_CTL
+      000000E6H   SYMBOL    NUMBER   ---       DAC_TUNE0
+      000000E7H   SYMBOL    NUMBER   ---       DAC_TUNE1
+      000000D6H   SYMBOL    NUMBER   ---       DAC_VOLUME0
+      000000D7H   SYMBOL    NUMBER   ---       DAC_VOLUME1
+      000000E3H   SYMBOL    NUMBER   ---       DBGAIE
+      000000E2H   SYMBOL    NUMBER   ---       DBGAOE
+      000000E5H   SYMBOL    NUMBER   ---       DBGBIE
+      000000E4H   SYMBOL    NUMBER   ---       DBGBOE
+      000000E6H   SYMBOL    NUMBER   ---       DBGCOE
+      000000E9H   SYMBOL    NUMBER   ---       DBGDOE
+      000000EEH   SYMBOL    NUMBER   ---       DBGMODE
+      000000DBH   SYMBOL    NUMBER   ---       DBGSEL
+      000000ECH   SYMBOL    NUMBER   ---       DDV_CTL0
+      000000C1H   SYMBOL    NUMBER   ---       DISCARDLEN
+      00000093H   SYMBOL    NUMBER   ---       DMA01234DBG
+      00000094H   SYMBOL    NUMBER   ---       DMA0CTL0
+      00000095H   SYMBOL    NUMBER   ---       DMA0CTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMA0DADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMA0DADDR0L
+      0000009FH   SYMBOL    NUMBER   ---       DMA0DADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMA0DADDR1H
+      000000A3H   SYMBOL    NUMBER   ---       DMA0DADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMA0DADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMA0FRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMA0FRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMA0IE
+      00000091H   SYMBOL    NUMBER   ---       DMA0IP
+      00000097H   SYMBOL    NUMBER   ---       DMA0SADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMA0SADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMA0SADDR0M
+      00000099H   SYMBOL    NUMBER   ---       DMA0SADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMA0SADDR1L
+      0000009CH   SYMBOL    NUMBER   ---       DMA0SADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DMA1CTL0
+      00000095H   SYMBOL    NUMBER   ---       DMA1CTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMA1DADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMA1DADDR0L
+      0000009FH   SYMBOL    NUMBER   ---       DMA1DADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMA1DADDR1H
+      000000A3H   SYMBOL    NUMBER   ---       DMA1DADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMA1DADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMA1FRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMA1FRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMA1IE
+      00000091H   SYMBOL    NUMBER   ---       DMA1IP
+      00000097H   SYMBOL    NUMBER   ---       DMA1SADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMA1SADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMA1SADDR0M
+      00000099H   SYMBOL    NUMBER   ---       DMA1SADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMA1SADDR1L
+      0000009CH   SYMBOL    NUMBER   ---       DMA1SADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DMA2CTL0
+      00000095H   SYMBOL    NUMBER   ---       DMA2CTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMA2DADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMA2DADDR0L
+      0000009FH   SYMBOL    NUMBER   ---       DMA2DADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMA2DADDR1H
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 9
+
+
+      000000A3H   SYMBOL    NUMBER   ---       DMA2DADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMA2DADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMA2FRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMA2FRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMA2IE
+      00000091H   SYMBOL    NUMBER   ---       DMA2IP
+      00000097H   SYMBOL    NUMBER   ---       DMA2SADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMA2SADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMA2SADDR0M
+      00000099H   SYMBOL    NUMBER   ---       DMA2SADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMA2SADDR1L
+      0000009CH   SYMBOL    NUMBER   ---       DMA2SADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DMA3CTL0
+      00000095H   SYMBOL    NUMBER   ---       DMA3CTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMA3DADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMA3DADDR0L
+      0000009FH   SYMBOL    NUMBER   ---       DMA3DADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMA3DADDR1H
+      000000A3H   SYMBOL    NUMBER   ---       DMA3DADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMA3DADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMA3FRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMA3FRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMA3IE
+      00000091H   SYMBOL    NUMBER   ---       DMA3IP
+      00000097H   SYMBOL    NUMBER   ---       DMA3SADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMA3SADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMA3SADDR0M
+      00000099H   SYMBOL    NUMBER   ---       DMA3SADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMA3SADDR1L
+      0000009CH   SYMBOL    NUMBER   ---       DMA3SADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DMA4CTL0
+      00000095H   SYMBOL    NUMBER   ---       DMA4CTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMA4DADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMA4DADDR0L
+      0000009FH   SYMBOL    NUMBER   ---       DMA4DADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMA4DADDR1H
+      000000A3H   SYMBOL    NUMBER   ---       DMA4DADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMA4DADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMA4FRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMA4FRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMA4IE
+      00000091H   SYMBOL    NUMBER   ---       DMA4IP
+      00000097H   SYMBOL    NUMBER   ---       DMA4SADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMA4SADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMA4SADDR0M
+      00000099H   SYMBOL    NUMBER   ---       DMA4SADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMA4SADDR1L
+      0000009CH   SYMBOL    NUMBER   ---       DMA4SADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DMANCTL0
+      00000095H   SYMBOL    NUMBER   ---       DMANCTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMANDADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMANDADDR0L
+      0000009FH   SYMBOL    NUMBER   ---       DMANDADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMANDADDR1H
+      000000A3H   SYMBOL    NUMBER   ---       DMANDADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMANDADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMANFRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMANFRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMANIE
+      00000091H   SYMBOL    NUMBER   ---       DMANIP
+      00000097H   SYMBOL    NUMBER   ---       DMANSADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMANSADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMANSADDR0M
+      00000099H   SYMBOL    NUMBER   ---       DMANSADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMANSADDR1L
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 10
+
+
+      0000009CH   SYMBOL    NUMBER   ---       DMANSADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DPDMCTRL
+      00000083H   SYMBOL    NUMBER   ---       DPH
+      00000082H   SYMBOL    NUMBER   ---       DPL
+      00000084H   SYMBOL    NUMBER   ---       DPXL
+      00FF0016H   SYMBOL    ECODE    ---       DRV_BNKAFILEADDR
+      00FF001AH   SYMBOL    ECODE    ---       DRV_BNKBFILEADDR
+      00FF0012H   SYMBOL    ECODE    DWORD     DRV_EXITAPI
+      00FF0000H   SYMBOL    ECODE    BYTE      DRV_FILETYPE
+      00FF000EH   SYMBOL    ECODE    DWORD     DRV_INITAPI
+      00FF001EH   SYMBOL    ECODE    DWORD     DRV_OPENTRY
+      00FF0008H   SYMBOL    ECODE    WORD      DRV_RCODE2LENGTH
+      00FF0006H   SYMBOL    ECODE    WORD      DRV_RCODE2STARTADDR
+      00FF0004H   SYMBOL    ECODE    WORD      DRV_RCODELENGTH
+      00FF0002H   SYMBOL    ECODE    WORD      DRV_RCODESTARTADDR
+      00FF000CH   SYMBOL    ECODE    WORD      DRV_RDATALENGTH
+      00FF000AH   SYMBOL    ECODE    WORD      DRV_RDATASTARTADDR
+      00FF0001H   SYMBOL    ECODE    BYTE      DRV_TYPE
+      00000547H   SYMBOL    BIT      ---       EA
+      000000A4H   SYMBOL    NUMBER   ---       EFUSE0
+      000000A5H   SYMBOL    NUMBER   ---       EFUSE1
+      000000A6H   SYMBOL    NUMBER   ---       EFUSE2
+      000000A7H   SYMBOL    NUMBER   ---       EFUSE3
+      000000A3H   SYMBOL    NUMBER   ---       EFUSE_CTL
+      000000C6H   SYMBOL    NUMBER   ---       EP03IEN
+      000000C5H   SYMBOL    NUMBER   ---       EP03IRQ
+      000000C8H   SYMBOL    NUMBER   ---       EP03TOKIEN
+      000000C7H   SYMBOL    NUMBER   ---       EP03TOKIRQ
+      00000099H   SYMBOL    NUMBER   ---       EP0CS_HCEP0CS
+      000000ABH   SYMBOL    NUMBER   ---       EP0INDATA
+      000000ACH   SYMBOL    NUMBER   ---       EP0OUTDATA
+      0000008CH   SYMBOL    NUMBER   ---       EP1DMALENH
+      0000008DH   SYMBOL    NUMBER   ---       EP1DMALENL
+      0000008AH   SYMBOL    NUMBER   ---       EP1STADDRH
+      0000008BH   SYMBOL    NUMBER   ---       EP1STADDRL
+      000000E2H   SYMBOL    NUMBER   ---       EP2DMALENH
+      000000E3H   SYMBOL    NUMBER   ---       EP2DMALENL
+      000000B7H   SYMBOL    NUMBER   ---       EP2STADDRH
+      000000B8H   SYMBOL    NUMBER   ---       EP2STADDRL
+      000000CAH   SYMBOL    NUMBER   ---       EPRST
+      000000CCH   SYMBOL    NUMBER   ---       EQCOE0
+      000000CDH   SYMBOL    NUMBER   ---       EQCOE1
+      000000CEH   SYMBOL    NUMBER   ---       EQCOE2
+      000000CFH   SYMBOL    NUMBER   ---       EQCOE3
+      000000D2H   SYMBOL    NUMBER   ---       EQCOE4
+      000000D3H   SYMBOL    NUMBER   ---       EQCOE5
+      000000D4H   SYMBOL    NUMBER   ---       EQCOE6
+      000000D8H   SYMBOL    NUMBER   ---       EXTINT
+      0000009EH   SYMBOL    NUMBER   ---       EXTMEM_CTL
+      000000FFH   SYMBOL    NUMBER   ---       EXTMEM_DL
+      0000009FH   SYMBOL    NUMBER   ---       EXTMEM_WT
+      00000096H   SYMBOL    NUMBER   ---       EXWAIT
+      00000685H   SYMBOL    BIT      ---       F0
+      000000A7H   SYMBOL    NUMBER   ---       FIFO1DAT
+      000000A9H   SYMBOL    NUMBER   ---       FIFO2DAT
+      000000AAH   SYMBOL    NUMBER   ---       FIFO3DAT
+      000000D2H   SYMBOL    NUMBER   ---       FIFOCTRL
+      000000D3H   SYMBOL    NUMBER   ---       FIXADDR0H
+      000000BAH   SYMBOL    NUMBER   ---       FIXADDR0L
+      000000B9H   SYMBOL    NUMBER   ---       FIXADDR0M
+      000000BBH   SYMBOL    NUMBER   ---       FIXADDR1H
+      000000BDH   SYMBOL    NUMBER   ---       FIXADDR1L
+      000000BCH   SYMBOL    NUMBER   ---       FIXADDR1M
+      000000C2H   SYMBOL    NUMBER   ---       FIXADDR2H
+      000000C4H   SYMBOL    NUMBER   ---       FIXADDR2L
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 11
+
+
+      000000C3H   SYMBOL    NUMBER   ---       FIXADDR2M
+      000000C5H   SYMBOL    NUMBER   ---       FIXADDR3H
+      000000C7H   SYMBOL    NUMBER   ---       FIXADDR3L
+      000000C6H   SYMBOL    NUMBER   ---       FIXADDR3M
+      000000C8H   SYMBOL    NUMBER   ---       FMCLKCTL
+      000000C7H   SYMBOL    NUMBER   ---       FMRDSCLKCTL
+      000000A6H   SYMBOL    NUMBER   ---       FMRX_ADC_CTL
+      000000A5H   SYMBOL    NUMBER   ---       FMRX_ADC_EN
+      000000C2H   SYMBOL    NUMBER   ---       FMRX_AFC_CTL
+      0000009BH   SYMBOL    NUMBER   ---       FMRX_AGC_CTL
+      0000009AH   SYMBOL    NUMBER   ---       FMRX_AGC_EN
+      000000AFH   SYMBOL    NUMBER   ---       FMRX_APLL_ACAP_CTL
+      000000B4H   SYMBOL    NUMBER   ---       FMRX_APLL_AMPCAL
+      000000AEH   SYMBOL    NUMBER   ---       FMRX_APLL_CTL
+      000000B1H   SYMBOL    NUMBER   ---       FMRX_APLL_DCAP
+      000000B5H   SYMBOL    NUMBER   ---       FMRX_APLL_DCAPCAL
+      000000ADH   SYMBOL    NUMBER   ---       FMRX_APLL_EN
+      000000B7H   SYMBOL    NUMBER   ---       FMRX_APLL_KH
+      000000B8H   SYMBOL    NUMBER   ---       FMRX_APLL_KL
+      000000B0H   SYMBOL    NUMBER   ---       FMRX_APLL_LTIME
+      00000094H   SYMBOL    NUMBER   ---       FMRX_APLL_MIXER_LDO_CTL
+      000000B6H   SYMBOL    NUMBER   ---       FMRX_APLL_N
+      000000B9H   SYMBOL    NUMBER   ---       FMRX_APLL_POSTDIV
+      000000B2H   SYMBOL    NUMBER   ---       FMRX_APLL_VCO
+      000000B3H   SYMBOL    NUMBER   ---       FMRX_APLL_VCO_CTL
+      000000BFH   SYMBOL    NUMBER   ---       FMRX_AUDIO_CTL
+      000000D2H   SYMBOL    NUMBER   ---       FMRX_CHNH_RD
+      000000D3H   SYMBOL    NUMBER   ---       FMRX_CHNL_RD
+      000000C9H   SYMBOL    NUMBER   ---       FMRX_CHN_H
+      000000CAH   SYMBOL    NUMBER   ---       FMRX_CHN_L
+      000000AAH   SYMBOL    NUMBER   ---       FMRX_DPLL_CTL
+      000000A9H   SYMBOL    NUMBER   ---       FMRX_DPLL_EN
+      000000ABH   SYMBOL    NUMBER   ---       FMRX_DPLL_LDIV
+      00000090H   SYMBOL    NUMBER   ---       FMRX_EN
+      000000D5H   SYMBOL    NUMBER   ---       FMRX_ENVELOP_RD
+      000000C8H   SYMBOL    NUMBER   ---       FMRX_ENVELOP_TH
+      000000D6H   SYMBOL    NUMBER   ---       FMRX_FD_RD
+      000000C5H   SYMBOL    NUMBER   ---       FMRX_HCC_TH
+      00000093H   SYMBOL    NUMBER   ---       FMRX_LDO_CAL
+      00000092H   SYMBOL    NUMBER   ---       FMRX_LDO_EN
+      00000095H   SYMBOL    NUMBER   ---       FMRX_LNA_ADC_LDO_CTL
+      00000099H   SYMBOL    NUMBER   ---       FMRX_LNA_CTL
+      000000A2H   SYMBOL    NUMBER   ---       FMRX_LNA_MIXER_GAIN_CTL
+      0000009CH   SYMBOL    NUMBER   ---       FMRX_MIXER_CTL
+      000000BDH   SYMBOL    NUMBER   ---       FMRX_MPX_CTL
+      000000BCH   SYMBOL    NUMBER   ---       FMRX_PGATH
+      0000009EH   SYMBOL    NUMBER   ---       FMRX_PGA_CAL
+      0000009DH   SYMBOL    NUMBER   ---       FMRX_PGA_EN
+      000000A3H   SYMBOL    NUMBER   ---       FMRX_PGA_GAIN_CTL
+      000000C4H   SYMBOL    NUMBER   ---       FMRX_PGA_RD_CTL
+      000000DBH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK12_IDX
+      000000DDH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK1H
+      000000DEH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK1L
+      000000DFH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK2H
+      000000E1H   SYMBOL    NUMBER   ---       FMRX_RDS_BLK2L
+      000000DCH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK34_IDX
+      000000E2H   SYMBOL    NUMBER   ---       FMRX_RDS_BLK3H
+      000000E3H   SYMBOL    NUMBER   ---       FMRX_RDS_BLK3L
+      000000E4H   SYMBOL    NUMBER   ---       FMRX_RDS_BLK4H
+      000000E5H   SYMBOL    NUMBER   ---       FMRX_RDS_BLK4L
+      000000DAH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK_STA
+      000000E9H   SYMBOL    NUMBER   ---       FMRX_RDS_BS_M
+      000000EAH   SYMBOL    NUMBER   ---       FMRX_RDS_CPTL_CDDETH
+      000000EBH   SYMBOL    NUMBER   ---       FMRX_RDS_CPTL_CDDETL
+      000000D8H   SYMBOL    NUMBER   ---       FMRX_RDS_CTL
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 12
+
+
+      000000F6H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_NORDS_AH
+      000000F7H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_NORDS_AL
+      000000F4H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_NORDS_EH
+      000000F5H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_NORDS_EL
+      000000F2H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_RDSEXIST_AH
+      000000F3H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_RDSEXIST_AL
+      000000EFH   SYMBOL    NUMBER   ---       FMRX_RDS_ED_RDSEXIST_EH
+      000000F1H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_RDSEXIST_EL
+      000000ECH   SYMBOL    NUMBER   ---       FMRX_RDS_ED_TIMEH
+      000000EEH   SYMBOL    NUMBER   ---       FMRX_RDS_ED_TIMEL
+      000000EDH   SYMBOL    NUMBER   ---       FMRX_RDS_ED_TIMEM
+      000000E6H   SYMBOL    NUMBER   ---       FMRX_RDS_LP_G1H
+      000000E7H   SYMBOL    NUMBER   ---       FMRX_RDS_LP_G1L
+      000000D9H   SYMBOL    NUMBER   ---       FMRX_RDS_STA
+      000000A4H   SYMBOL    NUMBER   ---       FMRX_RD_CTL
+      000000C3H   SYMBOL    NUMBER   ---       FMRX_RSSI_CTL
+      000000D4H   SYMBOL    NUMBER   ---       FMRX_RSSI_RD
+      00000097H   SYMBOL    NUMBER   ---       FMRX_RSV
+      000000CDH   SYMBOL    NUMBER   ---       FMRX_SEEK
+      000000C7H   SYMBOL    NUMBER   ---       FMRX_SEEK_TH
+      000000C6H   SYMBOL    NUMBER   ---       FMRX_SM_TH
+      000000CEH   SYMBOL    NUMBER   ---       FMRX_STA
+      000000FDH   SYMBOL    NUMBER   ---       FMRX_TEST_DIGITAL_CTL
+      000000FEH   SYMBOL    NUMBER   ---       FMRX_TEST_DIGITAL_STA
+      000000FCH   SYMBOL    NUMBER   ---       FMRX_TEST_PLL
+      000000F8H   SYMBOL    NUMBER   ---       FMRX_TEST_RF
+      00000091H   SYMBOL    NUMBER   ---       FMRX_TOP
+      000000CCH   SYMBOL    NUMBER   ---       FMRX_TUNE
+      000000C1H   SYMBOL    NUMBER   ---       FMRX_VOLUMN_CTL
+      000000CEH   SYMBOL    NUMBER   ---       FNADDR
+      000000B9H   SYMBOL    NUMBER   ---       FRAMELEN0
+      000000B8H   SYMBOL    NUMBER   ---       FRAMELEN1
+      000000CCH   SYMBOL    NUMBER   ---       FRMCNTH
+      000000CDH   SYMBOL    NUMBER   ---       FRMCNTL
+      000000FCH   SYMBOL    NUMBER   ---       FSMPRESTATE
+      000000A2H   SYMBOL    NUMBER   ---       FS_CTL
+      000000C7H   SYMBOL    NUMBER   ---       GLOBALGAINH
+      000000C9H   SYMBOL    NUMBER   ---       GLOBALGAINL
+      000000C8H   SYMBOL    NUMBER   ---       GLOBALGAINM
+      000000A4H   SYMBOL    NUMBER   ---       GPIOADAT
+      000000A3H   SYMBOL    NUMBER   ---       GPIOAINEN
+      000000A2H   SYMBOL    NUMBER   ---       GPIOAOUTEN
+      000000A6H   SYMBOL    NUMBER   ---       GPIOAPDEN
+      000000A5H   SYMBOL    NUMBER   ---       GPIOAPUEN
+      000000AAH   SYMBOL    NUMBER   ---       GPIOBDAT
+      000000A9H   SYMBOL    NUMBER   ---       GPIOBINEN
+      000000A7H   SYMBOL    NUMBER   ---       GPIOBOUTEN
+      000000ACH   SYMBOL    NUMBER   ---       GPIOBPDEN
+      000000ABH   SYMBOL    NUMBER   ---       GPIOBPUEN
+      000000AFH   SYMBOL    NUMBER   ---       GPIOCDAT
+      000000AEH   SYMBOL    NUMBER   ---       GPIOCINEN
+      000000ADH   SYMBOL    NUMBER   ---       GPIOCOUTEN
+      000000B1H   SYMBOL    NUMBER   ---       GPIOCPDEN
+      000000B0H   SYMBOL    NUMBER   ---       GPIOCPUEN
+      000000B4H   SYMBOL    NUMBER   ---       GPIODDAT
+      000000B3H   SYMBOL    NUMBER   ---       GPIODINEN
+      000000B2H   SYMBOL    NUMBER   ---       GPIODOUTEN
+      000000B6H   SYMBOL    NUMBER   ---       GPIODPDEN
+      000000B5H   SYMBOL    NUMBER   ---       GPIODPUEN
+      000000B9H   SYMBOL    NUMBER   ---       GPIOEDAT
+      000000B8H   SYMBOL    NUMBER   ---       GPIOEINEN
+      000000B7H   SYMBOL    NUMBER   ---       GPIOEOUTEN
+      000000BBH   SYMBOL    NUMBER   ---       GPIOEPDEN
+      000000BAH   SYMBOL    NUMBER   ---       GPIOEPUEN
+      000000BFH   SYMBOL    NUMBER   ---       GPIOFDAT
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 13
+
+
+      000000BDH   SYMBOL    NUMBER   ---       GPIOFINEN
+      000000BCH   SYMBOL    NUMBER   ---       GPIOFOUTEN
+      000000C2H   SYMBOL    NUMBER   ---       GPIOFPDEN
+      000000C1H   SYMBOL    NUMBER   ---       GPIOFPUEN
+      000000C5H   SYMBOL    NUMBER   ---       GPIOGDAT
+      000000C4H   SYMBOL    NUMBER   ---       GPIOGINEN
+      000000C3H   SYMBOL    NUMBER   ---       GPIOGOUTEN
+      000000C7H   SYMBOL    NUMBER   ---       GPIOGPDEN
+      000000C6H   SYMBOL    NUMBER   ---       GPIOGPUEN
+      000000D9H   SYMBOL    NUMBER   ---       HCEP03ERRIEN
+      000000D8H   SYMBOL    NUMBER   ---       HCEP03ERRIRQ
+      000000B0H   SYMBOL    NUMBER   ---       HCEP0CTRL
+      000000D4H   SYMBOL    NUMBER   ---       HCFRMNH
+      000000D5H   SYMBOL    NUMBER   ---       HCFRMNL
+      000000D6H   SYMBOL    NUMBER   ---       HCFRMREMAINH
+      000000D7H   SYMBOL    NUMBER   ---       HCFRMREMAINL
+      000000B2H   SYMBOL    NUMBER   ---       HCIN0ERR
+      000000E4H   SYMBOL    NUMBER   ---       HCIN0MAXPCK
+      000000FDH   SYMBOL    NUMBER   ---       HCIN2CNTH
+      000000FEH   SYMBOL    NUMBER   ---       HCIN2CNTL
+      000000B5H   SYMBOL    NUMBER   ---       HCIN2CTRL
+      000000B6H   SYMBOL    NUMBER   ---       HCIN2ERR
+      000000E5H   SYMBOL    NUMBER   ---       HCIN2MAXPCKH
+      000000E6H   SYMBOL    NUMBER   ---       HCIN2MAXPCKL
+      000000EDH   SYMBOL    NUMBER   ---       HCINCTRL
+      000000B1H   SYMBOL    NUMBER   ---       HCOUT0ERR
+      000000B3H   SYMBOL    NUMBER   ---       HCOUT1CTRL
+      000000B4H   SYMBOL    NUMBER   ---       HCOUT1ERR
+      000000E9H   SYMBOL    NUMBER   ---       HCOUT1MAXPCKH
+      000000EAH   SYMBOL    NUMBER   ---       HCOUT1MAXPCKL
+      000000B9H   SYMBOL    NUMBER   ---       HCOUT3CTRL
+      000000BAH   SYMBOL    NUMBER   ---       HCOUT3ERR
+      000000E7H   SYMBOL    NUMBER   ---       HCOUT3MAXPCK
+      000000D3H   SYMBOL    NUMBER   ---       HCPORTCTRL
+      000000B6H   SYMBOL    NUMBER   ---       HOSC_CTL
+      000000CFH   SYMBOL    NUMBER   ---       HPFGAIN
+      0000008CH   SYMBOL    NUMBER   ---       I2C_ADDR
+      00000089H   SYMBOL    NUMBER   ---       I2C_CTL
+      0000008BH   SYMBOL    NUMBER   ---       I2C_DAT
+      0000008DH   SYMBOL    NUMBER   ---       I2C_DEBUG
+      0000008AH   SYMBOL    NUMBER   ---       I2C_STA
+      000000E2H   SYMBOL    NUMBER   ---       I2S_CTL0
+      000000E3H   SYMBOL    NUMBER   ---       I2S_CTL1
+      00000092H   SYMBOL    NUMBER   ---       IDVBUSCTRL
+      000000A8H   SYMBOL    NUMBER   ---       IE0
+      00000088H   SYMBOL    NUMBER   ---       IF0
+      000000F5H   SYMBOL    NUMBER   ---       IFDEBUG0
+      000000F6H   SYMBOL    NUMBER   ---       IFDEBUG1
+      00000098H   SYMBOL    NUMBER   ---       IN0BC_HCOUT0BC
+      0000009AH   SYMBOL    NUMBER   ---       IN1BCH_HCOUT1BCH
+      0000009BH   SYMBOL    NUMBER   ---       IN1BCL_HCOUT1BCL
+      0000009DH   SYMBOL    NUMBER   ---       IN1CS_HCOUT1CS
+      0000009CH   SYMBOL    NUMBER   ---       IN1CTRL_HCOUT1CTRL
+      000000A4H   SYMBOL    NUMBER   ---       IN3BC_HCOUT3BC
+      000000A6H   SYMBOL    NUMBER   ---       IN3CS_HCOUT3CS
+      000000A5H   SYMBOL    NUMBER   ---       IN3CTRL_HCOUT3CTRL
+      000000B7H   SYMBOL    NUMBER   ---       IPH0
+      000000B8H   SYMBOL    NUMBER   ---       IPL0
+      000000ADH   SYMBOL    NUMBER   ---       IR_CONFIG0
+      000000AEH   SYMBOL    NUMBER   ---       IR_CONFIG1
+      000000AFH   SYMBOL    NUMBER   ---       IR_CONFIG2
+      000000B0H   SYMBOL    NUMBER   ---       IR_CONFIG3
+      000000B1H   SYMBOL    NUMBER   ---       IR_CONFIG4
+      000000B2H   SYMBOL    NUMBER   ---       IR_CONFIG5
+      000000B3H   SYMBOL    NUMBER   ---       IR_CONFIG6
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 14
+
+
+      000000B4H   SYMBOL    NUMBER   ---       IR_CONFIG7
+      000000B5H   SYMBOL    NUMBER   ---       IR_CONFIG8
+      000000A5H   SYMBOL    NUMBER   ---       IR_CTL
+      000000A9H   SYMBOL    NUMBER   ---       IR_HUC
+      000000AAH   SYMBOL    NUMBER   ---       IR_KDC
+      000000A7H   SYMBOL    NUMBER   ---       IR_LUC
+      000000A6H   SYMBOL    NUMBER   ---       IR_STA
+      000000ABH   SYMBOL    NUMBER   ---       IR_TEST
+      000000C9H   SYMBOL    NUMBER   ---       IVECT
+      000000CBH   SYMBOL    NUMBER   ---       KARAOKECTL
+      0000008BH   SYMBOL    NUMBER   ---       LCD_DATA0
+      0000008CH   SYMBOL    NUMBER   ---       LCD_DATA1
+      00000098H   SYMBOL    NUMBER   ---       LCD_DATA10
+      00000099H   SYMBOL    NUMBER   ---       LCD_DATA11
+      0000009AH   SYMBOL    NUMBER   ---       LCD_DATA12
+      0000009BH   SYMBOL    NUMBER   ---       LCD_DATA13
+      0000009CH   SYMBOL    NUMBER   ---       LCD_DATA14
+      0000009DH   SYMBOL    NUMBER   ---       LCD_DATA15
+      0000008DH   SYMBOL    NUMBER   ---       LCD_DATA2
+      00000090H   SYMBOL    NUMBER   ---       LCD_DATA3
+      00000091H   SYMBOL    NUMBER   ---       LCD_DATA4
+      00000092H   SYMBOL    NUMBER   ---       LCD_DATA5
+      00000093H   SYMBOL    NUMBER   ---       LCD_DATA6
+      00000094H   SYMBOL    NUMBER   ---       LCD_DATA7
+      00000095H   SYMBOL    NUMBER   ---       LCD_DATA8
+      00000097H   SYMBOL    NUMBER   ---       LCD_DATA9
+      0000008AH   SYMBOL    NUMBER   ---       LCD_MODE
+      000000CCH   SYMBOL    NUMBER   ---       LCHGAIN
+      0000008AH   SYMBOL    NUMBER   ---       LDOPD_CTL
+      000000C9H   SYMBOL    NUMBER   ---       LED_SEGLCDCLKCTL
+      000000ECH   SYMBOL    NUMBER   ---       LED_SEG_BIAS_EN
+      000000EBH   SYMBOL    NUMBER   ---       LED_SEG_RC_EN
+      000000B7H   SYMBOL    NUMBER   ---       LOSC_CTL
+      000000CEH   SYMBOL    NUMBER   ---       LPFGAIN
+      00000092H   SYMBOL    NUMBER   ---       LRADC1_DATA
+      00000093H   SYMBOL    NUMBER   ---       LRADC3_DATA
+      00000094H   SYMBOL    NUMBER   ---       LRADC4_DATA
+      00000095H   SYMBOL    NUMBER   ---       LRADC5_DATA
+      000000B3H   SYMBOL    NUMBER   ---       MCU_PLL_CTL
+      000000BCH   SYMBOL    NUMBER   ---       MCU_PLL_DEBUG_CTL
+      000000BAH   SYMBOL    NUMBER   ---       MCU_PLL_SSC_CTL
+      000000BBH   SYMBOL    NUMBER   ---       MCU_PLL_SSC_FSTEP
+      000000F9H   SYMBOL    NUMBER   ---       MEMBANKCTL
+      000000B4H   SYMBOL    NUMBER   ---       MEMCLKENCTL0
+      000000ADH   SYMBOL    NUMBER   ---       MEMCLKSELCTL0
+      000000AEH   SYMBOL    NUMBER   ---       MEMCLKSELCTL1
+      000000C8H   SYMBOL    NUMBER   ---       MFP_CTL0
+      000000C9H   SYMBOL    NUMBER   ---       MFP_CTL1
+      000000CAH   SYMBOL    NUMBER   ---       MFP_CTL2
+      000000CBH   SYMBOL    NUMBER   ---       MFP_CTL3
+      000000CCH   SYMBOL    NUMBER   ---       MFP_CTL4
+      000000CDH   SYMBOL    NUMBER   ---       MFP_CTL5
+      000000CEH   SYMBOL    NUMBER   ---       MFP_CTL6
+      000000CFH   SYMBOL    NUMBER   ---       MFP_CTL7
+      000000D2H   SYMBOL    NUMBER   ---       MFP_CTL8
+      000000ADH   SYMBOL    NUMBER   ---       MP3BITRATEH
+      000000AEH   SYMBOL    NUMBER   ---       MP3BITRATEL
+      000000B2H   SYMBOL    NUMBER   ---       MP3CTIMEH
+      000000B3H   SYMBOL    NUMBER   ---       MP3CTIMEM
+      000000B4H   SYMBOL    NUMBER   ---       MP3CTIMES
+      000000ABH   SYMBOL    NUMBER   ---       MP3CTL
+      000000BAH   SYMBOL    NUMBER   ---       MP3FILELEN1
+      000000B9H   SYMBOL    NUMBER   ---       MP3FILELEN2
+      000000B8H   SYMBOL    NUMBER   ---       MP3FILELEN3
+      000000B5H   SYMBOL    NUMBER   ---       MP3FRAMENUMH
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 15
+
+
+      000000B7H   SYMBOL    NUMBER   ---       MP3FRAMENUML
+      000000B6H   SYMBOL    NUMBER   ---       MP3FRAMENUMM
+      000000ACH   SYMBOL    NUMBER   ---       MP3HEADERINFO
+      000000BBH   SYMBOL    NUMBER   ---       MP3HEADERSYNCTL
+      000000A9H   SYMBOL    NUMBER   ---       MP3IE
+      000000AAH   SYMBOL    NUMBER   ---       MP3IP
+      000000AFH   SYMBOL    NUMBER   ---       MP3TTIMEH
+      000000B0H   SYMBOL    NUMBER   ---       MP3TTIMEM
+      000000B1H   SYMBOL    NUMBER   ---       MP3TTIMES
+      000000A1H   SYMBOL    NUMBER   ---       MPAGE
+      00000086H   SYMBOL    NUMBER   ---       MRCR1
+      00000089H   SYMBOL    NUMBER   ---       MRCR2
+      0000009FH   SYMBOL    NUMBER   ---       MRCR3
+      0000008DH   SYMBOL    NUMBER   ---       MULTI_USED
+      000000DCH   SYMBOL    NUMBER   ---       OTGCTRL
+      000000DEH   SYMBOL    NUMBER   ---       OTGIEN
+      000000DAH   SYMBOL    NUMBER   ---       OTGIRQ
+      000000DBH   SYMBOL    NUMBER   ---       OTGSTATE
+      000000DDH   SYMBOL    NUMBER   ---       OTGSTATUS
+      000000F5H   SYMBOL    NUMBER   ---       OTGTRIEN
+      000000F6H   SYMBOL    NUMBER   ---       OTGTRIRQ
+      00000097H   SYMBOL    NUMBER   ---       OUT0BC_HCIN0BC
+      0000009EH   SYMBOL    NUMBER   ---       OUT2BCH_HCIN2BCH
+      0000009FH   SYMBOL    NUMBER   ---       OUT2BCL_HCIN2BCL
+      000000A3H   SYMBOL    NUMBER   ---       OUT2CS_HCIN2CS
+      000000A2H   SYMBOL    NUMBER   ---       OUT2CTRL_HCIN2CTRL
+      00000090H   SYMBOL    NUMBER   ---       OUTPCKCNTH
+      00000091H   SYMBOL    NUMBER   ---       OUTPCKCNTL
+      00000682H   SYMBOL    BIT      ---       OV
+      00000680H   SYMBOL    BIT      ---       P
+      000000A0H   SYMBOL    NUMBER   ---       P2
+      000000D5H   SYMBOL    NUMBER   ---       PADDRV0
+      000000D6H   SYMBOL    NUMBER   ---       PADDRV1
+      000000D7H   SYMBOL    NUMBER   ---       PADDRV2
+      000000D9H   SYMBOL    NUMBER   ---       PADDRV3
+      000000DAH   SYMBOL    NUMBER   ---       PADDRV4
+      000000D4H   SYMBOL    NUMBER   ---       PADPUPD
+      00000090H   SYMBOL    NUMBER   ---       PAGEADDR0H
+      00000091H   SYMBOL    NUMBER   ---       PAGEADDR0L
+      00000092H   SYMBOL    NUMBER   ---       PAGEADDR1H
+      00000093H   SYMBOL    NUMBER   ---       PAGEADDR1L
+      00000094H   SYMBOL    NUMBER   ---       PAGEADDR2H
+      00000095H   SYMBOL    NUMBER   ---       PAGEADDR2L
+      00000098H   SYMBOL    NUMBER   ---       PAGEADDR3H
+      00000099H   SYMBOL    NUMBER   ---       PAGEADDR3L
+      0000009AH   SYMBOL    NUMBER   ---       PAGEADDR4H
+      0000009BH   SYMBOL    NUMBER   ---       PAGEADDR4L
+      0000009CH   SYMBOL    NUMBER   ---       PAGEADDR5H
+      0000009DH   SYMBOL    NUMBER   ---       PAGEADDR5L
+      0000009EH   SYMBOL    NUMBER   ---       PAGEADDR6H
+      0000009FH   SYMBOL    NUMBER   ---       PAGEADDR6L
+      000000A2H   SYMBOL    NUMBER   ---       PAGEADDR7H
+      000000A3H   SYMBOL    NUMBER   ---       PAGEADDR7L
+      000000D8H   SYMBOL    NUMBER   ---       PAGEADDR8H
+      000000D9H   SYMBOL    NUMBER   ---       PAGEADDR8L
+      000000DAH   SYMBOL    NUMBER   ---       PAGEADDR9H
+      000000DBH   SYMBOL    NUMBER   ---       PAGEADDR9L
+      000000B0H   SYMBOL    NUMBER   ---       PAGEADDRMASK0
+      000000B1H   SYMBOL    NUMBER   ---       PAGEADDRMASK1
+      000000B2H   SYMBOL    NUMBER   ---       PAGEADDRMASK2
+      000000B3H   SYMBOL    NUMBER   ---       PAGEADDRMASK3
+      000000B4H   SYMBOL    NUMBER   ---       PAGEADDRMASK4
+      000000B5H   SYMBOL    NUMBER   ---       PAGEADDRMASK5
+      000000B6H   SYMBOL    NUMBER   ---       PAGEADDRMASK6
+      000000D2H   SYMBOL    NUMBER   ---       PAGEADDRMASK7
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 16
+
+
+      000000D4H   SYMBOL    NUMBER   ---       PAGEADDRMASK8
+      000000D5H   SYMBOL    NUMBER   ---       PAGEADDRMASK9
+      000000F4H   SYMBOL    NUMBER   ---       PAGEMISSENTRYEX
+      000000F5H   SYMBOL    NUMBER   ---       PAGEMISSENTRYH
+      000000F6H   SYMBOL    NUMBER   ---       PAGEMISSENTRYL
+      000000EBH   SYMBOL    NUMBER   ---       PA_APCTL
+      000000EAH   SYMBOL    NUMBER   ---       PA_CTL
+      000000E9H   SYMBOL    NUMBER   ---       PA_VOLUME
+      00000087H   SYMBOL    NUMBER   ---       PCON
+      000000BDH   SYMBOL    NUMBER   ---       PHYSICALADDRH
+      000000BFH   SYMBOL    NUMBER   ---       PHYSICALADDRL
+      00000090H   SYMBOL    NUMBER   ---       PMUADC_CTL
+      000000D0H   SYMBOL    NUMBER   ---       PSW
+      000000D1H   SYMBOL    NUMBER   ---       PSW1
+      000000C3H   SYMBOL    NUMBER   ---       PWMCLKCTL
+      000000AFH   SYMBOL    NUMBER   ---       PWMDUTY
+      000000CDH   SYMBOL    NUMBER   ---       RCHGAIN
+      000000C8H   SYMBOL    NUMBER   ---       REDIRECTADDR0
+      000000C9H   SYMBOL    NUMBER   ---       REDIRECTADDR1
+      000000CAH   SYMBOL    NUMBER   ---       REDIRECTADDR2
+      000000CBH   SYMBOL    NUMBER   ---       REDIRECTADDR3
+      000000CCH   SYMBOL    NUMBER   ---       REDIRECTADDR4
+      000000CDH   SYMBOL    NUMBER   ---       REDIRECTADDR5
+      000000CEH   SYMBOL    NUMBER   ---       REDIRECTADDR6
+      000000CFH   SYMBOL    NUMBER   ---       REDIRECTADDR7
+      000000D6H   SYMBOL    NUMBER   ---       REDIRECTADDR8
+      000000D7H   SYMBOL    NUMBER   ---       REDIRECTADDR9
+      00000098H   SYMBOL    NUMBER   ---       RESERVED1
+      000000FFH   SYMBOL    NUMBER   ---       RESERVED11
+      0000009FH   SYMBOL    NUMBER   ---       RESERVED2
+      000000A7H   SYMBOL    NUMBER   ---       RESERVED3
+      000000ACH   SYMBOL    NUMBER   ---       RESERVED4
+      000000BAH   SYMBOL    NUMBER   ---       RESERVED5
+      000000BBH   SYMBOL    NUMBER   ---       RESERVED6
+      000000CBH   SYMBOL    NUMBER   ---       RESERVED7
+      000000CFH   SYMBOL    NUMBER   ---       RESERVED8
+      000000D7H   SYMBOL    NUMBER   ---       RESERVED9
+      00000683H   SYMBOL    BIT      ---       RS0
+      00000684H   SYMBOL    BIT      ---       RS1
+      000000B3H   SYMBOL    NUMBER   ---       RTCALMH
+      000000B2H   SYMBOL    NUMBER   ---       RTCALMM
+      000000B1H   SYMBOL    NUMBER   ---       RTCALMS
+      000000BCH   SYMBOL    NUMBER   ---       RTCRDM0
+      000000BDH   SYMBOL    NUMBER   ---       RTCRDM1
+      000000C8H   SYMBOL    NUMBER   ---       RTCRDM10
+      000000C9H   SYMBOL    NUMBER   ---       RTCRDM11
+      000000CAH   SYMBOL    NUMBER   ---       RTCRDM12
+      000000CBH   SYMBOL    NUMBER   ---       RTCRDM13
+      000000CCH   SYMBOL    NUMBER   ---       RTCRDM14
+      000000CDH   SYMBOL    NUMBER   ---       RTCRDM15
+      000000CEH   SYMBOL    NUMBER   ---       RTCRDM16
+      000000CFH   SYMBOL    NUMBER   ---       RTCRDM17
+      000000D2H   SYMBOL    NUMBER   ---       RTCRDM18
+      000000D3H   SYMBOL    NUMBER   ---       RTCRDM19
+      000000BFH   SYMBOL    NUMBER   ---       RTCRDM2
+      000000D4H   SYMBOL    NUMBER   ---       RTCRDM20
+      000000D5H   SYMBOL    NUMBER   ---       RTCRDM21
+      000000D6H   SYMBOL    NUMBER   ---       RTCRDM22
+      000000C1H   SYMBOL    NUMBER   ---       RTCRDM3
+      000000C2H   SYMBOL    NUMBER   ---       RTCRDM4
+      000000C3H   SYMBOL    NUMBER   ---       RTCRDM5
+      000000C4H   SYMBOL    NUMBER   ---       RTCRDM6
+      000000C5H   SYMBOL    NUMBER   ---       RTCRDM7
+      000000C6H   SYMBOL    NUMBER   ---       RTCRDM8
+      000000C7H   SYMBOL    NUMBER   ---       RTCRDM9
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 17
+
+
+      000000B4H   SYMBOL    NUMBER   ---       RTCRUPD
+      000000AEH   SYMBOL    NUMBER   ---       RTCTIMED
+      000000ADH   SYMBOL    NUMBER   ---       RTCTIMEH
+      000000ACH   SYMBOL    NUMBER   ---       RTCTIMEMINT
+      000000AFH   SYMBOL    NUMBER   ---       RTCTIMEMON
+      000000ABH   SYMBOL    NUMBER   ---       RTCTIMES
+      000000B0H   SYMBOL    NUMBER   ---       RTCTIMEY
+      0000009DH   SYMBOL    NUMBER   ---       RTCVDD_RESERVED
+      000000A9H   SYMBOL    NUMBER   ---       RTC_CTL0
+      000000AAH   SYMBOL    NUMBER   ---       RTC_CTL1
+      000000ACH   SYMBOL    NUMBER   ---       SDCLKCTL
+      00000099H   SYMBOL    NUMBER   ---       SD_BLK_NUM
+      00000097H   SYMBOL    NUMBER   ---       SD_BLK_SIZE_H
+      00000098H   SYMBOL    NUMBER   ---       SD_BLK_SIZE_L
+      0000009AH   SYMBOL    NUMBER   ---       SD_CLK_CTL
+      00000090H   SYMBOL    NUMBER   ---       SD_CMD
+      00000091H   SYMBOL    NUMBER   ---       SD_CMD_ARGRSP
+      0000009DH   SYMBOL    NUMBER   ---       SD_DATA_FIFO
+      000000AEH   SYMBOL    NUMBER   ---       SD_DBG_CTL
+      0000009CH   SYMBOL    NUMBER   ---       SD_INT_CTL
+      0000009BH   SYMBOL    NUMBER   ---       SD_PAD_CTL
+      00000092H   SYMBOL    NUMBER   ---       SD_RSP_POIN
+      00000094H   SYMBOL    NUMBER   ---       SD_STATE
+      00000093H   SYMBOL    NUMBER   ---       SD_TF_CTL
+      0000009EH   SYMBOL    NUMBER   ---       SD_TIMEOUT_CTL
+      000000ADH   SYMBOL    NUMBER   ---       SD_TIMING_CTL
+      000000BBH   SYMBOL    NUMBER   ---       SETUPDAT0
+      000000BCH   SYMBOL    NUMBER   ---       SETUPDAT1
+      000000BDH   SYMBOL    NUMBER   ---       SETUPDAT2
+      000000BFH   SYMBOL    NUMBER   ---       SETUPDAT3
+      000000C1H   SYMBOL    NUMBER   ---       SETUPDAT4
+      000000C2H   SYMBOL    NUMBER   ---       SETUPDAT5
+      000000C3H   SYMBOL    NUMBER   ---       SETUPDAT6
+      000000C4H   SYMBOL    NUMBER   ---       SETUPDAT7
+      00000080H   SYMBOL    NUMBER   ---       SFR_BANK
+      000000AFH   SYMBOL    NUMBER   ---       SHORTPCKIRQ
+      000000ABH   SYMBOL    NUMBER   ---       SOFTCTL
+      000000A9H   SYMBOL    NUMBER   ---       SOFTIE
+      000000AAH   SYMBOL    NUMBER   ---       SOFTIP
+      00000081H   SYMBOL    NUMBER   ---       SP
+      000000B5H   SYMBOL    NUMBER   ---       SPDIFRX_CNT_WR0
+      000000B6H   SYMBOL    NUMBER   ---       SPDIFRX_CNT_WR1
+      000000B7H   SYMBOL    NUMBER   ---       SPDIFRX_CNT_WR2
+      000000B2H   SYMBOL    NUMBER   ---       SPDIFRX_CSTAT
+      000000B0H   SYMBOL    NUMBER   ---       SPDIFRX_CTL
+      000000B4H   SYMBOL    NUMBER   ---       SPDIFRX_DAT
+      000000B3H   SYMBOL    NUMBER   ---       SPDIFRX_DEBUG
+      000000B1H   SYMBOL    NUMBER   ---       SPDIFRX_STAT
+      000000BEH   SYMBOL    NUMBER   ---       SPH
+      000000A4H   SYMBOL    NUMBER   ---       SPIBT_CTL
+      000000ACH   SYMBOL    NUMBER   ---       SPIBT_DLY
+      000000CAH   SYMBOL    NUMBER   ---       SPICLKCTL
+      000000A2H   SYMBOL    NUMBER   ---       SPI_BCH
+      0000009FH   SYMBOL    NUMBER   ---       SPI_BCL
+      0000009CH   SYMBOL    NUMBER   ---       SPI_CLKDIV
+      00000099H   SYMBOL    NUMBER   ---       SPI_CTL
+      000000A3H   SYMBOL    NUMBER   ---       SPI_DEBUG
+      0000009AH   SYMBOL    NUMBER   ---       SPI_DRQ
+      000000C8H   SYMBOL    NUMBER   ---       SPI_RAND
+      0000009EH   SYMBOL    NUMBER   ---       SPI_RXDAT
+      000000C9H   SYMBOL    NUMBER   ---       SPI_SEED0
+      000000CAH   SYMBOL    NUMBER   ---       SPI_SEED1
+      0000009BH   SYMBOL    NUMBER   ---       SPI_STA
+      0000009DH   SYMBOL    NUMBER   ---       SPI_TXDAT
+      00000081H   SYMBOL    NUMBER   ---       SPL
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 18
+
+
+      000000CDH   SYMBOL    NUMBER   ---       SRSCFG1
+      000000CEH   SYMBOL    NUMBER   ---       SRSCFG2
+      000000CFH   SYMBOL    NUMBER   ---       SRSCFG3
+      000000D2H   SYMBOL    NUMBER   ---       SRSCFG4
+      000000CCH   SYMBOL    NUMBER   ---       SRSCTL
+      000000BCH   SYMBOL    NUMBER   ---       SYNHEADERDATA1
+      000000BDH   SYMBOL    NUMBER   ---       SYNHEADERDATA2
+      0000009BH   SYMBOL    NUMBER   ---       SYSTEM_CTL
+      0000009CH   SYMBOL    NUMBER   ---       SYSTEM_ONOFF
+      000000FCH   SYMBOL    NUMBER   ---       TESTCOUNTERBYTE0
+      000000FDH   SYMBOL    NUMBER   ---       TESTCOUNTERBYTE1
+      000000FEH   SYMBOL    NUMBER   ---       TESTCOUNTERBYTE2
+      000000FFH   SYMBOL    NUMBER   ---       TESTCOUNTERBYTE3
+      000000F1H   SYMBOL    NUMBER   ---       TESTCOUNTERBYTE4
+      0000009AH   SYMBOL    NUMBER   ---       TEST_CTL
+      000000B7H   SYMBOL    NUMBER   ---       TIMERHB
+      000000B5H   SYMBOL    NUMBER   ---       TIMERLB
+      000000B6H   SYMBOL    NUMBER   ---       TIMERMB
+      00000090H   SYMBOL    NUMBER   ---       UART_BR
+      00000092H   SYMBOL    NUMBER   ---       UART_CTL
+      00000098H   SYMBOL    NUMBER   ---       UART_DEBUG
+      00000093H   SYMBOL    NUMBER   ---       UART_DRQ
+      00000091H   SYMBOL    NUMBER   ---       UART_MODE
+      00000097H   SYMBOL    NUMBER   ---       UART_RXDAT
+      00000094H   SYMBOL    NUMBER   ---       UART_STA
+      00000095H   SYMBOL    NUMBER   ---       UART_TXDAT
+      00000681H   SYMBOL    BIT      ---       UD
+      00000086H   SYMBOL    NUMBER   ---       UDMAM
+      000000CBH   SYMBOL    NUMBER   ---       USBCTRL_STUS
+      000000EBH   SYMBOL    NUMBER   ---       USBEIRQ
+      000000AEH   SYMBOL    NUMBER   ---       USBIEN_HCUSBIEN
+      000000ADH   SYMBOL    NUMBER   ---       USBIRQ_HCUSBIRQ
+      00000093H   SYMBOL    NUMBER   ---       USBSTATUS
+      000000F7H   SYMBOL    NUMBER   ---       USB_EFUSE_REF
+      00000095H   SYMBOL    NUMBER   ---       USB_PHYCTRL
+      000000EFH   SYMBOL    NUMBER   ---       VDCTRL
+      00000099H   SYMBOL    NUMBER   ---       VDD_RESERVED
+      000000F1H   SYMBOL    NUMBER   ---       VDSTAT
+      000000BBH   SYMBOL    NUMBER   ---       VIRTUALADDRH
+      000000BCH   SYMBOL    NUMBER   ---       VIRTUALADDRL
+      00000089H   SYMBOL    NUMBER   ---       VOUT_CTL
+      000000B5H   SYMBOL    NUMBER   ---       WAVBLOCKNUMH
+      000000B7H   SYMBOL    NUMBER   ---       WAVBLOCKNUML
+      000000B6H   SYMBOL    NUMBER   ---       WAVBLOCKNUMM
+      000000B2H   SYMBOL    NUMBER   ---       WAVCTIMEH
+      000000B3H   SYMBOL    NUMBER   ---       WAVCTIMEM
+      000000B4H   SYMBOL    NUMBER   ---       WAVCTIMES
+      000000ABH   SYMBOL    NUMBER   ---       WAVCTL
+      000000ABH   SYMBOL    NUMBER   ---       WAVENCCTL
+      000000ACH   SYMBOL    NUMBER   ---       WAVENCINFO
+      000000ACH   SYMBOL    NUMBER   ---       WAVHEADERINFO1
+      000000ADH   SYMBOL    NUMBER   ---       WAVHEADERINFO2
+      000000A9H   SYMBOL    NUMBER   ---       WAVIE
+      000000AAH   SYMBOL    NUMBER   ---       WAVIP
+      000000AFH   SYMBOL    NUMBER   ---       WAVTTIMEH
+      000000B0H   SYMBOL    NUMBER   ---       WAVTTIMEM
+      000000B1H   SYMBOL    NUMBER   ---       WAVTTIMES
+      000000B8H   SYMBOL    NUMBER   ---       WDCTL
+      000000ADH   SYMBOL    NUMBER   ---       WMABITRATEH
+      000000AEH   SYMBOL    NUMBER   ---       WMABITRATEL
+      000000B2H   SYMBOL    NUMBER   ---       WMACTIMEH
+      000000B3H   SYMBOL    NUMBER   ---       WMACTIMEM
+      000000B4H   SYMBOL    NUMBER   ---       WMACTIMES
+      000000ABH   SYMBOL    NUMBER   ---       WMACTL
+      000000ACH   SYMBOL    NUMBER   ---       WMAHEADERINFO
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 19
+
+
+      000000A9H   SYMBOL    NUMBER   ---       WMAIE
+      000000AAH   SYMBOL    NUMBER   ---       WMAIP
+      000000B5H   SYMBOL    NUMBER   ---       WMAPACKNUMH
+      000000B7H   SYMBOL    NUMBER   ---       WMAPACKNUML
+      000000B6H   SYMBOL    NUMBER   ---       WMAPACKNUMM
+      000000B8H   SYMBOL    NUMBER   ---       WMAPACKSIZEH
+      000000BAH   SYMBOL    NUMBER   ---       WMAPACKSIZEL
+      000000B9H   SYMBOL    NUMBER   ---       WMAPACKSIZEM
+      000000AFH   SYMBOL    NUMBER   ---       WMATTIMEH
+      000000B0H   SYMBOL    NUMBER   ---       WMATTIMEM
+      000000B1H   SYMBOL    NUMBER   ---       WMATTIMES
+
+      ---         MODULE    ---      ---       LED_apitable
+      00FF0200H   PUBLIC    ECODE    ---       LED_API_TABLE
+      00000686H   SYMBOL    BIT      ---       AC
+      000000E0H   SYMBOL    NUMBER   ---       ACC
+      000000F7H   SYMBOL    NUMBER   ---       ACC_BITMAPHI
+      000000F8H   SYMBOL    NUMBER   ---       ACC_BITMAPLO
+      0000008AH   SYMBOL    NUMBER   ---       ACC_BLKLEN_LENHI
+      0000008BH   SYMBOL    NUMBER   ---       ACC_BLKNUM_LENLO
+      000000F1H   SYMBOL    NUMBER   ---       ACC_CMPDATA0_SUMHIE
+      000000F2H   SYMBOL    NUMBER   ---       ACC_CMPDATA1_SUMHI
+      000000F3H   SYMBOL    NUMBER   ---       ACC_CMPDATA2_SUMLO
+      000000F4H   SYMBOL    NUMBER   ---       ACC_CMPDATA3_SUMLOE
+      00000089H   SYMBOL    NUMBER   ---       ACC_CTRL
+      0000008CH   SYMBOL    NUMBER   ---       ACC_FIFO
+      000000F5H   SYMBOL    NUMBER   ---       ACC_MATCNTHI
+      000000F6H   SYMBOL    NUMBER   ---       ACC_MATCNTLO
+      000000F1H   SYMBOL    NUMBER   ---       ADC_CTL0
+      000000FDH   SYMBOL    NUMBER   ---       ADC_CTL1
+      000000BDH   SYMBOL    NUMBER   ---       ADC_DAC_CLK_CTL
+      000000F8H   SYMBOL    NUMBER   ---       ADC_FIFOCTL0
+      000000FCH   SYMBOL    NUMBER   ---       ADC_FIFOCTL1
+      000000F7H   SYMBOL    NUMBER   ---       ADC_FIFO_DAT
+      000000F3H   SYMBOL    NUMBER   ---       ADC_GAIN0
+      000000F4H   SYMBOL    NUMBER   ---       ADC_GAIN1
+      000000A2H   SYMBOL    NUMBER   ---       ADC_SRFT_CTL0
+      000000A3H   SYMBOL    NUMBER   ---       ADC_SRFT_CTL1
+      000000A4H   SYMBOL    NUMBER   ---       ADC_SRFT_CTL2
+      000000A5H   SYMBOL    NUMBER   ---       ADC_SRFT_CTL3
+      000000A6H   SYMBOL    NUMBER   ---       ADC_SRFT_CTL4
+      000000F5H   SYMBOL    NUMBER   ---       ADC_TUNE0
+      000000F6H   SYMBOL    NUMBER   ---       ADC_TUNE1
+      000000D3H   SYMBOL    NUMBER   ---       AD_SELECT
+      000000C4H   SYMBOL    NUMBER   ---       AECLKCTL
+      000000E8H   SYMBOL    NUMBER   ---       AIE
+      000000C0H   SYMBOL    NUMBER   ---       AIF
+      000000F2H   SYMBOL    NUMBER   ---       AINOP_CTL
+      000000F7H   SYMBOL    NUMBER   ---       AIPH
+      000000F8H   SYMBOL    NUMBER   ---       AIPL
+      000000ADH   SYMBOL    NUMBER   ---       AUCODECBIRRATEH
+      000000AEH   SYMBOL    NUMBER   ---       AUCODECBIRRATEL
+      000000B2H   SYMBOL    NUMBER   ---       AUCODECCTIMEH
+      000000B3H   SYMBOL    NUMBER   ---       AUCODECCTIMEM
+      000000B4H   SYMBOL    NUMBER   ---       AUCODECCTIMES
+      00000090H   SYMBOL    NUMBER   ---       AUCODECCTL
+      00000092H   SYMBOL    NUMBER   ---       AUCODECDEBUG
+      00000095H   SYMBOL    NUMBER   ---       AUCODECDEBUG2
+      00000097H   SYMBOL    NUMBER   ---       AUCODECDECSTATEH
+      00000098H   SYMBOL    NUMBER   ---       AUCODECDECSTATEL
+      00000093H   SYMBOL    NUMBER   ---       AUCODECFIFOCTL
+      00000094H   SYMBOL    NUMBER   ---       AUCODECFIFODATA
+      000000ACH   SYMBOL    NUMBER   ---       AUCODECHEADERINFO
+      000000A9H   SYMBOL    NUMBER   ---       AUCODECIE
+      000000AAH   SYMBOL    NUMBER   ---       AUCODECIP
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 20
+
+
+      000000AFH   SYMBOL    NUMBER   ---       AUCODECTTIMEH
+      000000B0H   SYMBOL    NUMBER   ---       AUCODECTTIMEM
+      000000B1H   SYMBOL    NUMBER   ---       AUCODECTTIMES
+      00000091H   SYMBOL    NUMBER   ---       AUDEBUGLENGTH
+      000000ABH   SYMBOL    NUMBER   ---       AUDECENCCTL
+      000000B9H   SYMBOL    NUMBER   ---       AUDIO_PLL_CTL
+      00000089H   SYMBOL    NUMBER   ---       AUTOINTIMER
+      000000ECH   SYMBOL    NUMBER   ---       AUTONAKCTRL
+      000000F0H   SYMBOL    NUMBER   ---       B
+      00000091H   SYMBOL    NUMBER   ---       BATADC_DATA
+      0000008BH   SYMBOL    NUMBER   ---       BDG_CTL
+      0000008CH   SYMBOL    NUMBER   ---       BDG_VOL
+      000000C2H   SYMBOL    NUMBER   ---       BEPCTL1
+      000000C3H   SYMBOL    NUMBER   ---       BEPCTL2
+      000000C4H   SYMBOL    NUMBER   ---       BEPCTL3
+      000000C5H   SYMBOL    NUMBER   ---       BEPCTL4
+      000000C6H   SYMBOL    NUMBER   ---       BEPCTL5
+      00000085H   SYMBOL    NUMBER   ---       BIRDINFO
+      000000E1H   SYMBOL    NUMBER   ---       BIST_EN1
+      000000E2H   SYMBOL    NUMBER   ---       BIST_EN2
+      000000E4H   SYMBOL    NUMBER   ---       BIST_FIN1
+      000000E5H   SYMBOL    NUMBER   ---       BIST_FIN2
+      000000E7H   SYMBOL    NUMBER   ---       BIST_INFO1
+      000000E9H   SYMBOL    NUMBER   ---       BIST_INFO2
+      000000F3H   SYMBOL    NUMBER   ---       BKDOOR
+      000000B8H   SYMBOL    NUMBER   ---       CALENDAR_CLK_CTL
+      0000008EH   SYMBOL    NUMBER   ---       CCMCON
+      0000008FH   SYMBOL    NUMBER   ---       CCMVAL
+      000000F4H   SYMBOL    NUMBER   ---       CHIPVERSION
+      000000A9H   SYMBOL    NUMBER   ---       CLKENCTL0
+      000000AAH   SYMBOL    NUMBER   ---       CLKENCTL1
+      000000ABH   SYMBOL    NUMBER   ---       CLKENCTL2
+      000000CFH   SYMBOL    NUMBER   ---       CLKGATE
+      000000A5H   SYMBOL    NUMBER   ---       CODEREPLACEENTRYEX
+      000000A6H   SYMBOL    NUMBER   ---       CODEREPLACEENTRYH
+      000000A7H   SYMBOL    NUMBER   ---       CODEREPLACEENTRYL
+      000000C2H   SYMBOL    NUMBER   ---       CPUCLKCTL
+      00000097H   SYMBOL    NUMBER   ---       CP_CTL0
+      00000098H   SYMBOL    NUMBER   ---       CP_CTL1
+      000000BBH   SYMBOL    NUMBER   ---       CTCCNTH
+      000000D9H   SYMBOL    NUMBER   ---       CTCCNTH2
+      000000BAH   SYMBOL    NUMBER   ---       CTCCNTL
+      000000D8H   SYMBOL    NUMBER   ---       CTCCNTL2
+      000000B9H   SYMBOL    NUMBER   ---       CTCCTL
+      000000D7H   SYMBOL    NUMBER   ---       CTCCTL2
+      000000CAH   SYMBOL    NUMBER   ---       CURRENTENERGY
+      00000687H   SYMBOL    BIT      ---       CY
+      000000E4H   SYMBOL    NUMBER   ---       DAC_ANALOG0
+      000000E5H   SYMBOL    NUMBER   ---       DAC_ANALOG1
+      000000D8H   SYMBOL    NUMBER   ---       DAC_CH0_FIFO_CTL0
+      000000D9H   SYMBOL    NUMBER   ---       DAC_CH0_FIFO_CTL1
+      000000DCH   SYMBOL    NUMBER   ---       DAC_CH0_PCMH
+      000000DAH   SYMBOL    NUMBER   ---       DAC_CH0_PCML
+      000000DBH   SYMBOL    NUMBER   ---       DAC_CH0_PCMM
+      00000092H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL0
+      00000093H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL1
+      00000094H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL2
+      00000095H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL3
+      00000097H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL4
+      000000A9H   SYMBOL    NUMBER   ---       DAC_CH0_SRFT_CTL5
+      00000090H   SYMBOL    NUMBER   ---       DAC_CH0_SR_CTL
+      00000091H   SYMBOL    NUMBER   ---       DAC_CH0_SR_GAIN
+      000000DDH   SYMBOL    NUMBER   ---       DAC_CH1_FIFO_CTL0
+      000000DEH   SYMBOL    NUMBER   ---       DAC_CH1_FIFO_CTL1
+      000000E1H   SYMBOL    NUMBER   ---       DAC_CH1_PCMH
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 21
+
+
+      000000DFH   SYMBOL    NUMBER   ---       DAC_CH1_PCML
+      0000009AH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL0
+      0000009BH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL1
+      0000009CH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL2
+      0000009DH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL3
+      0000009EH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL4
+      000000AAH   SYMBOL    NUMBER   ---       DAC_CH1_SRFT_CTL5
+      00000098H   SYMBOL    NUMBER   ---       DAC_CH1_SR_CTL
+      00000099H   SYMBOL    NUMBER   ---       DAC_CH1_SR_GAIN
+      000000D5H   SYMBOL    NUMBER   ---       DAC_CTL
+      000000E6H   SYMBOL    NUMBER   ---       DAC_TUNE0
+      000000E7H   SYMBOL    NUMBER   ---       DAC_TUNE1
+      000000D6H   SYMBOL    NUMBER   ---       DAC_VOLUME0
+      000000D7H   SYMBOL    NUMBER   ---       DAC_VOLUME1
+      000000E3H   SYMBOL    NUMBER   ---       DBGAIE
+      000000E2H   SYMBOL    NUMBER   ---       DBGAOE
+      000000E5H   SYMBOL    NUMBER   ---       DBGBIE
+      000000E4H   SYMBOL    NUMBER   ---       DBGBOE
+      000000E6H   SYMBOL    NUMBER   ---       DBGCOE
+      000000E9H   SYMBOL    NUMBER   ---       DBGDOE
+      000000EEH   SYMBOL    NUMBER   ---       DBGMODE
+      000000DBH   SYMBOL    NUMBER   ---       DBGSEL
+      000000ECH   SYMBOL    NUMBER   ---       DDV_CTL0
+      000000C1H   SYMBOL    NUMBER   ---       DISCARDLEN
+      00000093H   SYMBOL    NUMBER   ---       DMA01234DBG
+      00000094H   SYMBOL    NUMBER   ---       DMA0CTL0
+      00000095H   SYMBOL    NUMBER   ---       DMA0CTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMA0DADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMA0DADDR0L
+      0000009FH   SYMBOL    NUMBER   ---       DMA0DADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMA0DADDR1H
+      000000A3H   SYMBOL    NUMBER   ---       DMA0DADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMA0DADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMA0FRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMA0FRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMA0IE
+      00000091H   SYMBOL    NUMBER   ---       DMA0IP
+      00000097H   SYMBOL    NUMBER   ---       DMA0SADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMA0SADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMA0SADDR0M
+      00000099H   SYMBOL    NUMBER   ---       DMA0SADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMA0SADDR1L
+      0000009CH   SYMBOL    NUMBER   ---       DMA0SADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DMA1CTL0
+      00000095H   SYMBOL    NUMBER   ---       DMA1CTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMA1DADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMA1DADDR0L
+      0000009FH   SYMBOL    NUMBER   ---       DMA1DADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMA1DADDR1H
+      000000A3H   SYMBOL    NUMBER   ---       DMA1DADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMA1DADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMA1FRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMA1FRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMA1IE
+      00000091H   SYMBOL    NUMBER   ---       DMA1IP
+      00000097H   SYMBOL    NUMBER   ---       DMA1SADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMA1SADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMA1SADDR0M
+      00000099H   SYMBOL    NUMBER   ---       DMA1SADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMA1SADDR1L
+      0000009CH   SYMBOL    NUMBER   ---       DMA1SADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DMA2CTL0
+      00000095H   SYMBOL    NUMBER   ---       DMA2CTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMA2DADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMA2DADDR0L
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 22
+
+
+      0000009FH   SYMBOL    NUMBER   ---       DMA2DADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMA2DADDR1H
+      000000A3H   SYMBOL    NUMBER   ---       DMA2DADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMA2DADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMA2FRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMA2FRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMA2IE
+      00000091H   SYMBOL    NUMBER   ---       DMA2IP
+      00000097H   SYMBOL    NUMBER   ---       DMA2SADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMA2SADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMA2SADDR0M
+      00000099H   SYMBOL    NUMBER   ---       DMA2SADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMA2SADDR1L
+      0000009CH   SYMBOL    NUMBER   ---       DMA2SADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DMA3CTL0
+      00000095H   SYMBOL    NUMBER   ---       DMA3CTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMA3DADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMA3DADDR0L
+      0000009FH   SYMBOL    NUMBER   ---       DMA3DADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMA3DADDR1H
+      000000A3H   SYMBOL    NUMBER   ---       DMA3DADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMA3DADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMA3FRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMA3FRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMA3IE
+      00000091H   SYMBOL    NUMBER   ---       DMA3IP
+      00000097H   SYMBOL    NUMBER   ---       DMA3SADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMA3SADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMA3SADDR0M
+      00000099H   SYMBOL    NUMBER   ---       DMA3SADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMA3SADDR1L
+      0000009CH   SYMBOL    NUMBER   ---       DMA3SADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DMA4CTL0
+      00000095H   SYMBOL    NUMBER   ---       DMA4CTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMA4DADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMA4DADDR0L
+      0000009FH   SYMBOL    NUMBER   ---       DMA4DADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMA4DADDR1H
+      000000A3H   SYMBOL    NUMBER   ---       DMA4DADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMA4DADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMA4FRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMA4FRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMA4IE
+      00000091H   SYMBOL    NUMBER   ---       DMA4IP
+      00000097H   SYMBOL    NUMBER   ---       DMA4SADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMA4SADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMA4SADDR0M
+      00000099H   SYMBOL    NUMBER   ---       DMA4SADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMA4SADDR1L
+      0000009CH   SYMBOL    NUMBER   ---       DMA4SADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DMANCTL0
+      00000095H   SYMBOL    NUMBER   ---       DMANCTL1
+      0000009DH   SYMBOL    NUMBER   ---       DMANDADDR0H
+      0000009EH   SYMBOL    NUMBER   ---       DMANDADDR0L
+      0000009FH   SYMBOL    NUMBER   ---       DMANDADDR0M
+      000000A2H   SYMBOL    NUMBER   ---       DMANDADDR1H
+      000000A3H   SYMBOL    NUMBER   ---       DMANDADDR1L
+      000000A6H   SYMBOL    NUMBER   ---       DMANDADDR1M
+      000000A4H   SYMBOL    NUMBER   ---       DMANFRAMELENH
+      000000A5H   SYMBOL    NUMBER   ---       DMANFRAMELENL
+      00000092H   SYMBOL    NUMBER   ---       DMANIE
+      00000091H   SYMBOL    NUMBER   ---       DMANIP
+      00000097H   SYMBOL    NUMBER   ---       DMANSADDR0H
+      00000098H   SYMBOL    NUMBER   ---       DMANSADDR0L
+      0000009BH   SYMBOL    NUMBER   ---       DMANSADDR0M
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 23
+
+
+      00000099H   SYMBOL    NUMBER   ---       DMANSADDR1H
+      0000009AH   SYMBOL    NUMBER   ---       DMANSADDR1L
+      0000009CH   SYMBOL    NUMBER   ---       DMANSADDR1M
+      00000094H   SYMBOL    NUMBER   ---       DPDMCTRL
+      00000083H   SYMBOL    NUMBER   ---       DPH
+      00000082H   SYMBOL    NUMBER   ---       DPL
+      00000084H   SYMBOL    NUMBER   ---       DPXL
+      00000547H   SYMBOL    BIT      ---       EA
+      000000A4H   SYMBOL    NUMBER   ---       EFUSE0
+      000000A5H   SYMBOL    NUMBER   ---       EFUSE1
+      000000A6H   SYMBOL    NUMBER   ---       EFUSE2
+      000000A7H   SYMBOL    NUMBER   ---       EFUSE3
+      000000A3H   SYMBOL    NUMBER   ---       EFUSE_CTL
+      000000C6H   SYMBOL    NUMBER   ---       EP03IEN
+      000000C5H   SYMBOL    NUMBER   ---       EP03IRQ
+      000000C8H   SYMBOL    NUMBER   ---       EP03TOKIEN
+      000000C7H   SYMBOL    NUMBER   ---       EP03TOKIRQ
+      00000099H   SYMBOL    NUMBER   ---       EP0CS_HCEP0CS
+      000000ABH   SYMBOL    NUMBER   ---       EP0INDATA
+      000000ACH   SYMBOL    NUMBER   ---       EP0OUTDATA
+      0000008CH   SYMBOL    NUMBER   ---       EP1DMALENH
+      0000008DH   SYMBOL    NUMBER   ---       EP1DMALENL
+      0000008AH   SYMBOL    NUMBER   ---       EP1STADDRH
+      0000008BH   SYMBOL    NUMBER   ---       EP1STADDRL
+      000000E2H   SYMBOL    NUMBER   ---       EP2DMALENH
+      000000E3H   SYMBOL    NUMBER   ---       EP2DMALENL
+      000000B7H   SYMBOL    NUMBER   ---       EP2STADDRH
+      000000B8H   SYMBOL    NUMBER   ---       EP2STADDRL
+      000000CAH   SYMBOL    NUMBER   ---       EPRST
+      000000CCH   SYMBOL    NUMBER   ---       EQCOE0
+      000000CDH   SYMBOL    NUMBER   ---       EQCOE1
+      000000CEH   SYMBOL    NUMBER   ---       EQCOE2
+      000000CFH   SYMBOL    NUMBER   ---       EQCOE3
+      000000D2H   SYMBOL    NUMBER   ---       EQCOE4
+      000000D3H   SYMBOL    NUMBER   ---       EQCOE5
+      000000D4H   SYMBOL    NUMBER   ---       EQCOE6
+      000000D8H   SYMBOL    NUMBER   ---       EXTINT
+      0000009EH   SYMBOL    NUMBER   ---       EXTMEM_CTL
+      000000FFH   SYMBOL    NUMBER   ---       EXTMEM_DL
+      0000009FH   SYMBOL    NUMBER   ---       EXTMEM_WT
+      00000096H   SYMBOL    NUMBER   ---       EXWAIT
+      00000685H   SYMBOL    BIT      ---       F0
+      000000A7H   SYMBOL    NUMBER   ---       FIFO1DAT
+      000000A9H   SYMBOL    NUMBER   ---       FIFO2DAT
+      000000AAH   SYMBOL    NUMBER   ---       FIFO3DAT
+      000000D2H   SYMBOL    NUMBER   ---       FIFOCTRL
+      000000D3H   SYMBOL    NUMBER   ---       FIXADDR0H
+      000000BAH   SYMBOL    NUMBER   ---       FIXADDR0L
+      000000B9H   SYMBOL    NUMBER   ---       FIXADDR0M
+      000000BBH   SYMBOL    NUMBER   ---       FIXADDR1H
+      000000BDH   SYMBOL    NUMBER   ---       FIXADDR1L
+      000000BCH   SYMBOL    NUMBER   ---       FIXADDR1M
+      000000C2H   SYMBOL    NUMBER   ---       FIXADDR2H
+      000000C4H   SYMBOL    NUMBER   ---       FIXADDR2L
+      000000C3H   SYMBOL    NUMBER   ---       FIXADDR2M
+      000000C5H   SYMBOL    NUMBER   ---       FIXADDR3H
+      000000C7H   SYMBOL    NUMBER   ---       FIXADDR3L
+      000000C6H   SYMBOL    NUMBER   ---       FIXADDR3M
+      000000C8H   SYMBOL    NUMBER   ---       FMCLKCTL
+      000000C7H   SYMBOL    NUMBER   ---       FMRDSCLKCTL
+      000000A6H   SYMBOL    NUMBER   ---       FMRX_ADC_CTL
+      000000A5H   SYMBOL    NUMBER   ---       FMRX_ADC_EN
+      000000C2H   SYMBOL    NUMBER   ---       FMRX_AFC_CTL
+      0000009BH   SYMBOL    NUMBER   ---       FMRX_AGC_CTL
+      0000009AH   SYMBOL    NUMBER   ---       FMRX_AGC_EN
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 24
+
+
+      000000AFH   SYMBOL    NUMBER   ---       FMRX_APLL_ACAP_CTL
+      000000B4H   SYMBOL    NUMBER   ---       FMRX_APLL_AMPCAL
+      000000AEH   SYMBOL    NUMBER   ---       FMRX_APLL_CTL
+      000000B1H   SYMBOL    NUMBER   ---       FMRX_APLL_DCAP
+      000000B5H   SYMBOL    NUMBER   ---       FMRX_APLL_DCAPCAL
+      000000ADH   SYMBOL    NUMBER   ---       FMRX_APLL_EN
+      000000B7H   SYMBOL    NUMBER   ---       FMRX_APLL_KH
+      000000B8H   SYMBOL    NUMBER   ---       FMRX_APLL_KL
+      000000B0H   SYMBOL    NUMBER   ---       FMRX_APLL_LTIME
+      00000094H   SYMBOL    NUMBER   ---       FMRX_APLL_MIXER_LDO_CTL
+      000000B6H   SYMBOL    NUMBER   ---       FMRX_APLL_N
+      000000B9H   SYMBOL    NUMBER   ---       FMRX_APLL_POSTDIV
+      000000B2H   SYMBOL    NUMBER   ---       FMRX_APLL_VCO
+      000000B3H   SYMBOL    NUMBER   ---       FMRX_APLL_VCO_CTL
+      000000BFH   SYMBOL    NUMBER   ---       FMRX_AUDIO_CTL
+      000000D2H   SYMBOL    NUMBER   ---       FMRX_CHNH_RD
+      000000D3H   SYMBOL    NUMBER   ---       FMRX_CHNL_RD
+      000000C9H   SYMBOL    NUMBER   ---       FMRX_CHN_H
+      000000CAH   SYMBOL    NUMBER   ---       FMRX_CHN_L
+      000000AAH   SYMBOL    NUMBER   ---       FMRX_DPLL_CTL
+      000000A9H   SYMBOL    NUMBER   ---       FMRX_DPLL_EN
+      000000ABH   SYMBOL    NUMBER   ---       FMRX_DPLL_LDIV
+      00000090H   SYMBOL    NUMBER   ---       FMRX_EN
+      000000D5H   SYMBOL    NUMBER   ---       FMRX_ENVELOP_RD
+      000000C8H   SYMBOL    NUMBER   ---       FMRX_ENVELOP_TH
+      000000D6H   SYMBOL    NUMBER   ---       FMRX_FD_RD
+      000000C5H   SYMBOL    NUMBER   ---       FMRX_HCC_TH
+      00000093H   SYMBOL    NUMBER   ---       FMRX_LDO_CAL
+      00000092H   SYMBOL    NUMBER   ---       FMRX_LDO_EN
+      00000095H   SYMBOL    NUMBER   ---       FMRX_LNA_ADC_LDO_CTL
+      00000099H   SYMBOL    NUMBER   ---       FMRX_LNA_CTL
+      000000A2H   SYMBOL    NUMBER   ---       FMRX_LNA_MIXER_GAIN_CTL
+      0000009CH   SYMBOL    NUMBER   ---       FMRX_MIXER_CTL
+      000000BDH   SYMBOL    NUMBER   ---       FMRX_MPX_CTL
+      000000BCH   SYMBOL    NUMBER   ---       FMRX_PGATH
+      0000009EH   SYMBOL    NUMBER   ---       FMRX_PGA_CAL
+      0000009DH   SYMBOL    NUMBER   ---       FMRX_PGA_EN
+      000000A3H   SYMBOL    NUMBER   ---       FMRX_PGA_GAIN_CTL
+      000000C4H   SYMBOL    NUMBER   ---       FMRX_PGA_RD_CTL
+      000000DBH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK12_IDX
+      000000DDH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK1H
+      000000DEH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK1L
+      000000DFH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK2H
+      000000E1H   SYMBOL    NUMBER   ---       FMRX_RDS_BLK2L
+      000000DCH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK34_IDX
+      000000E2H   SYMBOL    NUMBER   ---       FMRX_RDS_BLK3H
+      000000E3H   SYMBOL    NUMBER   ---       FMRX_RDS_BLK3L
+      000000E4H   SYMBOL    NUMBER   ---       FMRX_RDS_BLK4H
+      000000E5H   SYMBOL    NUMBER   ---       FMRX_RDS_BLK4L
+      000000DAH   SYMBOL    NUMBER   ---       FMRX_RDS_BLK_STA
+      000000E9H   SYMBOL    NUMBER   ---       FMRX_RDS_BS_M
+      000000EAH   SYMBOL    NUMBER   ---       FMRX_RDS_CPTL_CDDETH
+      000000EBH   SYMBOL    NUMBER   ---       FMRX_RDS_CPTL_CDDETL
+      000000D8H   SYMBOL    NUMBER   ---       FMRX_RDS_CTL
+      000000F6H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_NORDS_AH
+      000000F7H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_NORDS_AL
+      000000F4H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_NORDS_EH
+      000000F5H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_NORDS_EL
+      000000F2H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_RDSEXIST_AH
+      000000F3H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_RDSEXIST_AL
+      000000EFH   SYMBOL    NUMBER   ---       FMRX_RDS_ED_RDSEXIST_EH
+      000000F1H   SYMBOL    NUMBER   ---       FMRX_RDS_ED_RDSEXIST_EL
+      000000ECH   SYMBOL    NUMBER   ---       FMRX_RDS_ED_TIMEH
+      000000EEH   SYMBOL    NUMBER   ---       FMRX_RDS_ED_TIMEL
+      000000EDH   SYMBOL    NUMBER   ---       FMRX_RDS_ED_TIMEM
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 25
+
+
+      000000E6H   SYMBOL    NUMBER   ---       FMRX_RDS_LP_G1H
+      000000E7H   SYMBOL    NUMBER   ---       FMRX_RDS_LP_G1L
+      000000D9H   SYMBOL    NUMBER   ---       FMRX_RDS_STA
+      000000A4H   SYMBOL    NUMBER   ---       FMRX_RD_CTL
+      000000C3H   SYMBOL    NUMBER   ---       FMRX_RSSI_CTL
+      000000D4H   SYMBOL    NUMBER   ---       FMRX_RSSI_RD
+      00000097H   SYMBOL    NUMBER   ---       FMRX_RSV
+      000000CDH   SYMBOL    NUMBER   ---       FMRX_SEEK
+      000000C7H   SYMBOL    NUMBER   ---       FMRX_SEEK_TH
+      000000C6H   SYMBOL    NUMBER   ---       FMRX_SM_TH
+      000000CEH   SYMBOL    NUMBER   ---       FMRX_STA
+      000000FDH   SYMBOL    NUMBER   ---       FMRX_TEST_DIGITAL_CTL
+      000000FEH   SYMBOL    NUMBER   ---       FMRX_TEST_DIGITAL_STA
+      000000FCH   SYMBOL    NUMBER   ---       FMRX_TEST_PLL
+      000000F8H   SYMBOL    NUMBER   ---       FMRX_TEST_RF
+      00000091H   SYMBOL    NUMBER   ---       FMRX_TOP
+      000000CCH   SYMBOL    NUMBER   ---       FMRX_TUNE
+      000000C1H   SYMBOL    NUMBER   ---       FMRX_VOLUMN_CTL
+      000000CEH   SYMBOL    NUMBER   ---       FNADDR
+      000000B9H   SYMBOL    NUMBER   ---       FRAMELEN0
+      000000B8H   SYMBOL    NUMBER   ---       FRAMELEN1
+      000000CCH   SYMBOL    NUMBER   ---       FRMCNTH
+      000000CDH   SYMBOL    NUMBER   ---       FRMCNTL
+      000000FCH   SYMBOL    NUMBER   ---       FSMPRESTATE
+      000000A2H   SYMBOL    NUMBER   ---       FS_CTL
+      000000C7H   SYMBOL    NUMBER   ---       GLOBALGAINH
+      000000C9H   SYMBOL    NUMBER   ---       GLOBALGAINL
+      000000C8H   SYMBOL    NUMBER   ---       GLOBALGAINM
+      000000A4H   SYMBOL    NUMBER   ---       GPIOADAT
+      000000A3H   SYMBOL    NUMBER   ---       GPIOAINEN
+      000000A2H   SYMBOL    NUMBER   ---       GPIOAOUTEN
+      000000A6H   SYMBOL    NUMBER   ---       GPIOAPDEN
+      000000A5H   SYMBOL    NUMBER   ---       GPIOAPUEN
+      000000AAH   SYMBOL    NUMBER   ---       GPIOBDAT
+      000000A9H   SYMBOL    NUMBER   ---       GPIOBINEN
+      000000A7H   SYMBOL    NUMBER   ---       GPIOBOUTEN
+      000000ACH   SYMBOL    NUMBER   ---       GPIOBPDEN
+      000000ABH   SYMBOL    NUMBER   ---       GPIOBPUEN
+      000000AFH   SYMBOL    NUMBER   ---       GPIOCDAT
+      000000AEH   SYMBOL    NUMBER   ---       GPIOCINEN
+      000000ADH   SYMBOL    NUMBER   ---       GPIOCOUTEN
+      000000B1H   SYMBOL    NUMBER   ---       GPIOCPDEN
+      000000B0H   SYMBOL    NUMBER   ---       GPIOCPUEN
+      000000B4H   SYMBOL    NUMBER   ---       GPIODDAT
+      000000B3H   SYMBOL    NUMBER   ---       GPIODINEN
+      000000B2H   SYMBOL    NUMBER   ---       GPIODOUTEN
+      000000B6H   SYMBOL    NUMBER   ---       GPIODPDEN
+      000000B5H   SYMBOL    NUMBER   ---       GPIODPUEN
+      000000B9H   SYMBOL    NUMBER   ---       GPIOEDAT
+      000000B8H   SYMBOL    NUMBER   ---       GPIOEINEN
+      000000B7H   SYMBOL    NUMBER   ---       GPIOEOUTEN
+      000000BBH   SYMBOL    NUMBER   ---       GPIOEPDEN
+      000000BAH   SYMBOL    NUMBER   ---       GPIOEPUEN
+      000000BFH   SYMBOL    NUMBER   ---       GPIOFDAT
+      000000BDH   SYMBOL    NUMBER   ---       GPIOFINEN
+      000000BCH   SYMBOL    NUMBER   ---       GPIOFOUTEN
+      000000C2H   SYMBOL    NUMBER   ---       GPIOFPDEN
+      000000C1H   SYMBOL    NUMBER   ---       GPIOFPUEN
+      000000C5H   SYMBOL    NUMBER   ---       GPIOGDAT
+      000000C4H   SYMBOL    NUMBER   ---       GPIOGINEN
+      000000C3H   SYMBOL    NUMBER   ---       GPIOGOUTEN
+      000000C7H   SYMBOL    NUMBER   ---       GPIOGPDEN
+      000000C6H   SYMBOL    NUMBER   ---       GPIOGPUEN
+      000000D9H   SYMBOL    NUMBER   ---       HCEP03ERRIEN
+      000000D8H   SYMBOL    NUMBER   ---       HCEP03ERRIRQ
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 26
+
+
+      000000B0H   SYMBOL    NUMBER   ---       HCEP0CTRL
+      000000D4H   SYMBOL    NUMBER   ---       HCFRMNH
+      000000D5H   SYMBOL    NUMBER   ---       HCFRMNL
+      000000D6H   SYMBOL    NUMBER   ---       HCFRMREMAINH
+      000000D7H   SYMBOL    NUMBER   ---       HCFRMREMAINL
+      000000B2H   SYMBOL    NUMBER   ---       HCIN0ERR
+      000000E4H   SYMBOL    NUMBER   ---       HCIN0MAXPCK
+      000000FDH   SYMBOL    NUMBER   ---       HCIN2CNTH
+      000000FEH   SYMBOL    NUMBER   ---       HCIN2CNTL
+      000000B5H   SYMBOL    NUMBER   ---       HCIN2CTRL
+      000000B6H   SYMBOL    NUMBER   ---       HCIN2ERR
+      000000E5H   SYMBOL    NUMBER   ---       HCIN2MAXPCKH
+      000000E6H   SYMBOL    NUMBER   ---       HCIN2MAXPCKL
+      000000EDH   SYMBOL    NUMBER   ---       HCINCTRL
+      000000B1H   SYMBOL    NUMBER   ---       HCOUT0ERR
+      000000B3H   SYMBOL    NUMBER   ---       HCOUT1CTRL
+      000000B4H   SYMBOL    NUMBER   ---       HCOUT1ERR
+      000000E9H   SYMBOL    NUMBER   ---       HCOUT1MAXPCKH
+      000000EAH   SYMBOL    NUMBER   ---       HCOUT1MAXPCKL
+      000000B9H   SYMBOL    NUMBER   ---       HCOUT3CTRL
+      000000BAH   SYMBOL    NUMBER   ---       HCOUT3ERR
+      000000E7H   SYMBOL    NUMBER   ---       HCOUT3MAXPCK
+      000000D3H   SYMBOL    NUMBER   ---       HCPORTCTRL
+      000000B6H   SYMBOL    NUMBER   ---       HOSC_CTL
+      000000CFH   SYMBOL    NUMBER   ---       HPFGAIN
+      0000008CH   SYMBOL    NUMBER   ---       I2C_ADDR
+      00000089H   SYMBOL    NUMBER   ---       I2C_CTL
+      0000008BH   SYMBOL    NUMBER   ---       I2C_DAT
+      0000008DH   SYMBOL    NUMBER   ---       I2C_DEBUG
+      0000008AH   SYMBOL    NUMBER   ---       I2C_STA
+      000000E2H   SYMBOL    NUMBER   ---       I2S_CTL0
+      000000E3H   SYMBOL    NUMBER   ---       I2S_CTL1
+      00000092H   SYMBOL    NUMBER   ---       IDVBUSCTRL
+      000000A8H   SYMBOL    NUMBER   ---       IE0
+      00000088H   SYMBOL    NUMBER   ---       IF0
+      000000F5H   SYMBOL    NUMBER   ---       IFDEBUG0
+      000000F6H   SYMBOL    NUMBER   ---       IFDEBUG1
+      00000098H   SYMBOL    NUMBER   ---       IN0BC_HCOUT0BC
+      0000009AH   SYMBOL    NUMBER   ---       IN1BCH_HCOUT1BCH
+      0000009BH   SYMBOL    NUMBER   ---       IN1BCL_HCOUT1BCL
+      0000009DH   SYMBOL    NUMBER   ---       IN1CS_HCOUT1CS
+      0000009CH   SYMBOL    NUMBER   ---       IN1CTRL_HCOUT1CTRL
+      000000A4H   SYMBOL    NUMBER   ---       IN3BC_HCOUT3BC
+      000000A6H   SYMBOL    NUMBER   ---       IN3CS_HCOUT3CS
+      000000A5H   SYMBOL    NUMBER   ---       IN3CTRL_HCOUT3CTRL
+      000000B7H   SYMBOL    NUMBER   ---       IPH0
+      000000B8H   SYMBOL    NUMBER   ---       IPL0
+      000000ADH   SYMBOL    NUMBER   ---       IR_CONFIG0
+      000000AEH   SYMBOL    NUMBER   ---       IR_CONFIG1
+      000000AFH   SYMBOL    NUMBER   ---       IR_CONFIG2
+      000000B0H   SYMBOL    NUMBER   ---       IR_CONFIG3
+      000000B1H   SYMBOL    NUMBER   ---       IR_CONFIG4
+      000000B2H   SYMBOL    NUMBER   ---       IR_CONFIG5
+      000000B3H   SYMBOL    NUMBER   ---       IR_CONFIG6
+      000000B4H   SYMBOL    NUMBER   ---       IR_CONFIG7
+      000000B5H   SYMBOL    NUMBER   ---       IR_CONFIG8
+      000000A5H   SYMBOL    NUMBER   ---       IR_CTL
+      000000A9H   SYMBOL    NUMBER   ---       IR_HUC
+      000000AAH   SYMBOL    NUMBER   ---       IR_KDC
+      000000A7H   SYMBOL    NUMBER   ---       IR_LUC
+      000000A6H   SYMBOL    NUMBER   ---       IR_STA
+      000000ABH   SYMBOL    NUMBER   ---       IR_TEST
+      000000C9H   SYMBOL    NUMBER   ---       IVECT
+      000000CBH   SYMBOL    NUMBER   ---       KARAOKECTL
+      0000008BH   SYMBOL    NUMBER   ---       LCD_DATA0
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 27
+
+
+      0000008CH   SYMBOL    NUMBER   ---       LCD_DATA1
+      00000098H   SYMBOL    NUMBER   ---       LCD_DATA10
+      00000099H   SYMBOL    NUMBER   ---       LCD_DATA11
+      0000009AH   SYMBOL    NUMBER   ---       LCD_DATA12
+      0000009BH   SYMBOL    NUMBER   ---       LCD_DATA13
+      0000009CH   SYMBOL    NUMBER   ---       LCD_DATA14
+      0000009DH   SYMBOL    NUMBER   ---       LCD_DATA15
+      0000008DH   SYMBOL    NUMBER   ---       LCD_DATA2
+      00000090H   SYMBOL    NUMBER   ---       LCD_DATA3
+      00000091H   SYMBOL    NUMBER   ---       LCD_DATA4
+      00000092H   SYMBOL    NUMBER   ---       LCD_DATA5
+      00000093H   SYMBOL    NUMBER   ---       LCD_DATA6
+      00000094H   SYMBOL    NUMBER   ---       LCD_DATA7
+      00000095H   SYMBOL    NUMBER   ---       LCD_DATA8
+      00000097H   SYMBOL    NUMBER   ---       LCD_DATA9
+      0000008AH   SYMBOL    NUMBER   ---       LCD_MODE
+      000000CCH   SYMBOL    NUMBER   ---       LCHGAIN
+      0000008AH   SYMBOL    NUMBER   ---       LDOPD_CTL
+      000000C9H   SYMBOL    NUMBER   ---       LED_SEGLCDCLKCTL
+      000000ECH   SYMBOL    NUMBER   ---       LED_SEG_BIAS_EN
+      000000EBH   SYMBOL    NUMBER   ---       LED_SEG_RC_EN
+      000000B7H   SYMBOL    NUMBER   ---       LOSC_CTL
+      000000CEH   SYMBOL    NUMBER   ---       LPFGAIN
+      00000092H   SYMBOL    NUMBER   ---       LRADC1_DATA
+      00000093H   SYMBOL    NUMBER   ---       LRADC3_DATA
+      00000094H   SYMBOL    NUMBER   ---       LRADC4_DATA
+      00000095H   SYMBOL    NUMBER   ---       LRADC5_DATA
+      000000B3H   SYMBOL    NUMBER   ---       MCU_PLL_CTL
+      000000BCH   SYMBOL    NUMBER   ---       MCU_PLL_DEBUG_CTL
+      000000BAH   SYMBOL    NUMBER   ---       MCU_PLL_SSC_CTL
+      000000BBH   SYMBOL    NUMBER   ---       MCU_PLL_SSC_FSTEP
+      000000F9H   SYMBOL    NUMBER   ---       MEMBANKCTL
+      000000B4H   SYMBOL    NUMBER   ---       MEMCLKENCTL0
+      000000ADH   SYMBOL    NUMBER   ---       MEMCLKSELCTL0
+      000000AEH   SYMBOL    NUMBER   ---       MEMCLKSELCTL1
+      000000C8H   SYMBOL    NUMBER   ---       MFP_CTL0
+      000000C9H   SYMBOL    NUMBER   ---       MFP_CTL1
+      000000CAH   SYMBOL    NUMBER   ---       MFP_CTL2
+      000000CBH   SYMBOL    NUMBER   ---       MFP_CTL3
+      000000CCH   SYMBOL    NUMBER   ---       MFP_CTL4
+      000000CDH   SYMBOL    NUMBER   ---       MFP_CTL5
+      000000CEH   SYMBOL    NUMBER   ---       MFP_CTL6
+      000000CFH   SYMBOL    NUMBER   ---       MFP_CTL7
+      000000D2H   SYMBOL    NUMBER   ---       MFP_CTL8
+      000000ADH   SYMBOL    NUMBER   ---       MP3BITRATEH
+      000000AEH   SYMBOL    NUMBER   ---       MP3BITRATEL
+      000000B2H   SYMBOL    NUMBER   ---       MP3CTIMEH
+      000000B3H   SYMBOL    NUMBER   ---       MP3CTIMEM
+      000000B4H   SYMBOL    NUMBER   ---       MP3CTIMES
+      000000ABH   SYMBOL    NUMBER   ---       MP3CTL
+      000000BAH   SYMBOL    NUMBER   ---       MP3FILELEN1
+      000000B9H   SYMBOL    NUMBER   ---       MP3FILELEN2
+      000000B8H   SYMBOL    NUMBER   ---       MP3FILELEN3
+      000000B5H   SYMBOL    NUMBER   ---       MP3FRAMENUMH
+      000000B7H   SYMBOL    NUMBER   ---       MP3FRAMENUML
+      000000B6H   SYMBOL    NUMBER   ---       MP3FRAMENUMM
+      000000ACH   SYMBOL    NUMBER   ---       MP3HEADERINFO
+      000000BBH   SYMBOL    NUMBER   ---       MP3HEADERSYNCTL
+      000000A9H   SYMBOL    NUMBER   ---       MP3IE
+      000000AAH   SYMBOL    NUMBER   ---       MP3IP
+      000000AFH   SYMBOL    NUMBER   ---       MP3TTIMEH
+      000000B0H   SYMBOL    NUMBER   ---       MP3TTIMEM
+      000000B1H   SYMBOL    NUMBER   ---       MP3TTIMES
+      000000A1H   SYMBOL    NUMBER   ---       MPAGE
+      00000086H   SYMBOL    NUMBER   ---       MRCR1
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 28
+
+
+      00000089H   SYMBOL    NUMBER   ---       MRCR2
+      0000009FH   SYMBOL    NUMBER   ---       MRCR3
+      0000008DH   SYMBOL    NUMBER   ---       MULTI_USED
+      000000DCH   SYMBOL    NUMBER   ---       OTGCTRL
+      000000DEH   SYMBOL    NUMBER   ---       OTGIEN
+      000000DAH   SYMBOL    NUMBER   ---       OTGIRQ
+      000000DBH   SYMBOL    NUMBER   ---       OTGSTATE
+      000000DDH   SYMBOL    NUMBER   ---       OTGSTATUS
+      000000F5H   SYMBOL    NUMBER   ---       OTGTRIEN
+      000000F6H   SYMBOL    NUMBER   ---       OTGTRIRQ
+      00000097H   SYMBOL    NUMBER   ---       OUT0BC_HCIN0BC
+      0000009EH   SYMBOL    NUMBER   ---       OUT2BCH_HCIN2BCH
+      0000009FH   SYMBOL    NUMBER   ---       OUT2BCL_HCIN2BCL
+      000000A3H   SYMBOL    NUMBER   ---       OUT2CS_HCIN2CS
+      000000A2H   SYMBOL    NUMBER   ---       OUT2CTRL_HCIN2CTRL
+      00000090H   SYMBOL    NUMBER   ---       OUTPCKCNTH
+      00000091H   SYMBOL    NUMBER   ---       OUTPCKCNTL
+      00000682H   SYMBOL    BIT      ---       OV
+      00000680H   SYMBOL    BIT      ---       P
+      000000A0H   SYMBOL    NUMBER   ---       P2
+      000000D5H   SYMBOL    NUMBER   ---       PADDRV0
+      000000D6H   SYMBOL    NUMBER   ---       PADDRV1
+      000000D7H   SYMBOL    NUMBER   ---       PADDRV2
+      000000D9H   SYMBOL    NUMBER   ---       PADDRV3
+      000000DAH   SYMBOL    NUMBER   ---       PADDRV4
+      000000D4H   SYMBOL    NUMBER   ---       PADPUPD
+      00000090H   SYMBOL    NUMBER   ---       PAGEADDR0H
+      00000091H   SYMBOL    NUMBER   ---       PAGEADDR0L
+      00000092H   SYMBOL    NUMBER   ---       PAGEADDR1H
+      00000093H   SYMBOL    NUMBER   ---       PAGEADDR1L
+      00000094H   SYMBOL    NUMBER   ---       PAGEADDR2H
+      00000095H   SYMBOL    NUMBER   ---       PAGEADDR2L
+      00000098H   SYMBOL    NUMBER   ---       PAGEADDR3H
+      00000099H   SYMBOL    NUMBER   ---       PAGEADDR3L
+      0000009AH   SYMBOL    NUMBER   ---       PAGEADDR4H
+      0000009BH   SYMBOL    NUMBER   ---       PAGEADDR4L
+      0000009CH   SYMBOL    NUMBER   ---       PAGEADDR5H
+      0000009DH   SYMBOL    NUMBER   ---       PAGEADDR5L
+      0000009EH   SYMBOL    NUMBER   ---       PAGEADDR6H
+      0000009FH   SYMBOL    NUMBER   ---       PAGEADDR6L
+      000000A2H   SYMBOL    NUMBER   ---       PAGEADDR7H
+      000000A3H   SYMBOL    NUMBER   ---       PAGEADDR7L
+      000000D8H   SYMBOL    NUMBER   ---       PAGEADDR8H
+      000000D9H   SYMBOL    NUMBER   ---       PAGEADDR8L
+      000000DAH   SYMBOL    NUMBER   ---       PAGEADDR9H
+      000000DBH   SYMBOL    NUMBER   ---       PAGEADDR9L
+      000000B0H   SYMBOL    NUMBER   ---       PAGEADDRMASK0
+      000000B1H   SYMBOL    NUMBER   ---       PAGEADDRMASK1
+      000000B2H   SYMBOL    NUMBER   ---       PAGEADDRMASK2
+      000000B3H   SYMBOL    NUMBER   ---       PAGEADDRMASK3
+      000000B4H   SYMBOL    NUMBER   ---       PAGEADDRMASK4
+      000000B5H   SYMBOL    NUMBER   ---       PAGEADDRMASK5
+      000000B6H   SYMBOL    NUMBER   ---       PAGEADDRMASK6
+      000000D2H   SYMBOL    NUMBER   ---       PAGEADDRMASK7
+      000000D4H   SYMBOL    NUMBER   ---       PAGEADDRMASK8
+      000000D5H   SYMBOL    NUMBER   ---       PAGEADDRMASK9
+      000000F4H   SYMBOL    NUMBER   ---       PAGEMISSENTRYEX
+      000000F5H   SYMBOL    NUMBER   ---       PAGEMISSENTRYH
+      000000F6H   SYMBOL    NUMBER   ---       PAGEMISSENTRYL
+      000000EBH   SYMBOL    NUMBER   ---       PA_APCTL
+      000000EAH   SYMBOL    NUMBER   ---       PA_CTL
+      000000E9H   SYMBOL    NUMBER   ---       PA_VOLUME
+      00000087H   SYMBOL    NUMBER   ---       PCON
+      000000BDH   SYMBOL    NUMBER   ---       PHYSICALADDRH
+      000000BFH   SYMBOL    NUMBER   ---       PHYSICALADDRL
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 29
+
+
+      00000090H   SYMBOL    NUMBER   ---       PMUADC_CTL
+      000000D0H   SYMBOL    NUMBER   ---       PSW
+      000000D1H   SYMBOL    NUMBER   ---       PSW1
+      000000C3H   SYMBOL    NUMBER   ---       PWMCLKCTL
+      000000AFH   SYMBOL    NUMBER   ---       PWMDUTY
+      000000CDH   SYMBOL    NUMBER   ---       RCHGAIN
+      000000C8H   SYMBOL    NUMBER   ---       REDIRECTADDR0
+      000000C9H   SYMBOL    NUMBER   ---       REDIRECTADDR1
+      000000CAH   SYMBOL    NUMBER   ---       REDIRECTADDR2
+      000000CBH   SYMBOL    NUMBER   ---       REDIRECTADDR3
+      000000CCH   SYMBOL    NUMBER   ---       REDIRECTADDR4
+      000000CDH   SYMBOL    NUMBER   ---       REDIRECTADDR5
+      000000CEH   SYMBOL    NUMBER   ---       REDIRECTADDR6
+      000000CFH   SYMBOL    NUMBER   ---       REDIRECTADDR7
+      000000D6H   SYMBOL    NUMBER   ---       REDIRECTADDR8
+      000000D7H   SYMBOL    NUMBER   ---       REDIRECTADDR9
+      00000098H   SYMBOL    NUMBER   ---       RESERVED1
+      000000FFH   SYMBOL    NUMBER   ---       RESERVED11
+      0000009FH   SYMBOL    NUMBER   ---       RESERVED2
+      000000A7H   SYMBOL    NUMBER   ---       RESERVED3
+      000000ACH   SYMBOL    NUMBER   ---       RESERVED4
+      000000BAH   SYMBOL    NUMBER   ---       RESERVED5
+      000000BBH   SYMBOL    NUMBER   ---       RESERVED6
+      000000CBH   SYMBOL    NUMBER   ---       RESERVED7
+      000000CFH   SYMBOL    NUMBER   ---       RESERVED8
+      000000D7H   SYMBOL    NUMBER   ---       RESERVED9
+      00000683H   SYMBOL    BIT      ---       RS0
+      00000684H   SYMBOL    BIT      ---       RS1
+      000000B3H   SYMBOL    NUMBER   ---       RTCALMH
+      000000B2H   SYMBOL    NUMBER   ---       RTCALMM
+      000000B1H   SYMBOL    NUMBER   ---       RTCALMS
+      000000BCH   SYMBOL    NUMBER   ---       RTCRDM0
+      000000BDH   SYMBOL    NUMBER   ---       RTCRDM1
+      000000C8H   SYMBOL    NUMBER   ---       RTCRDM10
+      000000C9H   SYMBOL    NUMBER   ---       RTCRDM11
+      000000CAH   SYMBOL    NUMBER   ---       RTCRDM12
+      000000CBH   SYMBOL    NUMBER   ---       RTCRDM13
+      000000CCH   SYMBOL    NUMBER   ---       RTCRDM14
+      000000CDH   SYMBOL    NUMBER   ---       RTCRDM15
+      000000CEH   SYMBOL    NUMBER   ---       RTCRDM16
+      000000CFH   SYMBOL    NUMBER   ---       RTCRDM17
+      000000D2H   SYMBOL    NUMBER   ---       RTCRDM18
+      000000D3H   SYMBOL    NUMBER   ---       RTCRDM19
+      000000BFH   SYMBOL    NUMBER   ---       RTCRDM2
+      000000D4H   SYMBOL    NUMBER   ---       RTCRDM20
+      000000D5H   SYMBOL    NUMBER   ---       RTCRDM21
+      000000D6H   SYMBOL    NUMBER   ---       RTCRDM22
+      000000C1H   SYMBOL    NUMBER   ---       RTCRDM3
+      000000C2H   SYMBOL    NUMBER   ---       RTCRDM4
+      000000C3H   SYMBOL    NUMBER   ---       RTCRDM5
+      000000C4H   SYMBOL    NUMBER   ---       RTCRDM6
+      000000C5H   SYMBOL    NUMBER   ---       RTCRDM7
+      000000C6H   SYMBOL    NUMBER   ---       RTCRDM8
+      000000C7H   SYMBOL    NUMBER   ---       RTCRDM9
+      000000B4H   SYMBOL    NUMBER   ---       RTCRUPD
+      000000AEH   SYMBOL    NUMBER   ---       RTCTIMED
+      000000ADH   SYMBOL    NUMBER   ---       RTCTIMEH
+      000000ACH   SYMBOL    NUMBER   ---       RTCTIMEMINT
+      000000AFH   SYMBOL    NUMBER   ---       RTCTIMEMON
+      000000ABH   SYMBOL    NUMBER   ---       RTCTIMES
+      000000B0H   SYMBOL    NUMBER   ---       RTCTIMEY
+      0000009DH   SYMBOL    NUMBER   ---       RTCVDD_RESERVED
+      000000A9H   SYMBOL    NUMBER   ---       RTC_CTL0
+      000000AAH   SYMBOL    NUMBER   ---       RTC_CTL1
+      000000ACH   SYMBOL    NUMBER   ---       SDCLKCTL
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 30
+
+
+      00000099H   SYMBOL    NUMBER   ---       SD_BLK_NUM
+      00000097H   SYMBOL    NUMBER   ---       SD_BLK_SIZE_H
+      00000098H   SYMBOL    NUMBER   ---       SD_BLK_SIZE_L
+      0000009AH   SYMBOL    NUMBER   ---       SD_CLK_CTL
+      00000090H   SYMBOL    NUMBER   ---       SD_CMD
+      00000091H   SYMBOL    NUMBER   ---       SD_CMD_ARGRSP
+      0000009DH   SYMBOL    NUMBER   ---       SD_DATA_FIFO
+      000000AEH   SYMBOL    NUMBER   ---       SD_DBG_CTL
+      0000009CH   SYMBOL    NUMBER   ---       SD_INT_CTL
+      0000009BH   SYMBOL    NUMBER   ---       SD_PAD_CTL
+      00000092H   SYMBOL    NUMBER   ---       SD_RSP_POIN
+      00000094H   SYMBOL    NUMBER   ---       SD_STATE
+      00000093H   SYMBOL    NUMBER   ---       SD_TF_CTL
+      0000009EH   SYMBOL    NUMBER   ---       SD_TIMEOUT_CTL
+      000000ADH   SYMBOL    NUMBER   ---       SD_TIMING_CTL
+      000000BBH   SYMBOL    NUMBER   ---       SETUPDAT0
+      000000BCH   SYMBOL    NUMBER   ---       SETUPDAT1
+      000000BDH   SYMBOL    NUMBER   ---       SETUPDAT2
+      000000BFH   SYMBOL    NUMBER   ---       SETUPDAT3
+      000000C1H   SYMBOL    NUMBER   ---       SETUPDAT4
+      000000C2H   SYMBOL    NUMBER   ---       SETUPDAT5
+      000000C3H   SYMBOL    NUMBER   ---       SETUPDAT6
+      000000C4H   SYMBOL    NUMBER   ---       SETUPDAT7
+      00000080H   SYMBOL    NUMBER   ---       SFR_BANK
+      000000AFH   SYMBOL    NUMBER   ---       SHORTPCKIRQ
+      000000ABH   SYMBOL    NUMBER   ---       SOFTCTL
+      000000A9H   SYMBOL    NUMBER   ---       SOFTIE
+      000000AAH   SYMBOL    NUMBER   ---       SOFTIP
+      00000081H   SYMBOL    NUMBER   ---       SP
+      000000B5H   SYMBOL    NUMBER   ---       SPDIFRX_CNT_WR0
+      000000B6H   SYMBOL    NUMBER   ---       SPDIFRX_CNT_WR1
+      000000B7H   SYMBOL    NUMBER   ---       SPDIFRX_CNT_WR2
+      000000B2H   SYMBOL    NUMBER   ---       SPDIFRX_CSTAT
+      000000B0H   SYMBOL    NUMBER   ---       SPDIFRX_CTL
+      000000B4H   SYMBOL    NUMBER   ---       SPDIFRX_DAT
+      000000B3H   SYMBOL    NUMBER   ---       SPDIFRX_DEBUG
+      000000B1H   SYMBOL    NUMBER   ---       SPDIFRX_STAT
+      000000BEH   SYMBOL    NUMBER   ---       SPH
+      000000A4H   SYMBOL    NUMBER   ---       SPIBT_CTL
+      000000ACH   SYMBOL    NUMBER   ---       SPIBT_DLY
+      000000CAH   SYMBOL    NUMBER   ---       SPICLKCTL
+      000000A2H   SYMBOL    NUMBER   ---       SPI_BCH
+      0000009FH   SYMBOL    NUMBER   ---       SPI_BCL
+      0000009CH   SYMBOL    NUMBER   ---       SPI_CLKDIV
+      00000099H   SYMBOL    NUMBER   ---       SPI_CTL
+      000000A3H   SYMBOL    NUMBER   ---       SPI_DEBUG
+      0000009AH   SYMBOL    NUMBER   ---       SPI_DRQ
+      000000C8H   SYMBOL    NUMBER   ---       SPI_RAND
+      0000009EH   SYMBOL    NUMBER   ---       SPI_RXDAT
+      000000C9H   SYMBOL    NUMBER   ---       SPI_SEED0
+      000000CAH   SYMBOL    NUMBER   ---       SPI_SEED1
+      0000009BH   SYMBOL    NUMBER   ---       SPI_STA
+      0000009DH   SYMBOL    NUMBER   ---       SPI_TXDAT
+      00000081H   SYMBOL    NUMBER   ---       SPL
+      000000CDH   SYMBOL    NUMBER   ---       SRSCFG1
+      000000CEH   SYMBOL    NUMBER   ---       SRSCFG2
+      000000CFH   SYMBOL    NUMBER   ---       SRSCFG3
+      000000D2H   SYMBOL    NUMBER   ---       SRSCFG4
+      000000CCH   SYMBOL    NUMBER   ---       SRSCTL
+      000000BCH   SYMBOL    NUMBER   ---       SYNHEADERDATA1
+      000000BDH   SYMBOL    NUMBER   ---       SYNHEADERDATA2
+      0000009BH   SYMBOL    NUMBER   ---       SYSTEM_CTL
+      0000009CH   SYMBOL    NUMBER   ---       SYSTEM_ONOFF
+      000000FCH   SYMBOL    NUMBER   ---       TESTCOUNTERBYTE0
+      000000FDH   SYMBOL    NUMBER   ---       TESTCOUNTERBYTE1
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 31
+
+
+      000000FEH   SYMBOL    NUMBER   ---       TESTCOUNTERBYTE2
+      000000FFH   SYMBOL    NUMBER   ---       TESTCOUNTERBYTE3
+      000000F1H   SYMBOL    NUMBER   ---       TESTCOUNTERBYTE4
+      0000009AH   SYMBOL    NUMBER   ---       TEST_CTL
+      000000B7H   SYMBOL    NUMBER   ---       TIMERHB
+      000000B5H   SYMBOL    NUMBER   ---       TIMERLB
+      000000B6H   SYMBOL    NUMBER   ---       TIMERMB
+      00000090H   SYMBOL    NUMBER   ---       UART_BR
+      00000092H   SYMBOL    NUMBER   ---       UART_CTL
+      00000098H   SYMBOL    NUMBER   ---       UART_DEBUG
+      00000093H   SYMBOL    NUMBER   ---       UART_DRQ
+      00000091H   SYMBOL    NUMBER   ---       UART_MODE
+      00000097H   SYMBOL    NUMBER   ---       UART_RXDAT
+      00000094H   SYMBOL    NUMBER   ---       UART_STA
+      00000095H   SYMBOL    NUMBER   ---       UART_TXDAT
+      00000681H   SYMBOL    BIT      ---       UD
+      00000086H   SYMBOL    NUMBER   ---       UDMAM
+      000000CBH   SYMBOL    NUMBER   ---       USBCTRL_STUS
+      000000EBH   SYMBOL    NUMBER   ---       USBEIRQ
+      000000AEH   SYMBOL    NUMBER   ---       USBIEN_HCUSBIEN
+      000000ADH   SYMBOL    NUMBER   ---       USBIRQ_HCUSBIRQ
+      00000093H   SYMBOL    NUMBER   ---       USBSTATUS
+      000000F7H   SYMBOL    NUMBER   ---       USB_EFUSE_REF
+      00000095H   SYMBOL    NUMBER   ---       USB_PHYCTRL
+      000000EFH   SYMBOL    NUMBER   ---       VDCTRL
+      00000099H   SYMBOL    NUMBER   ---       VDD_RESERVED
+      000000F1H   SYMBOL    NUMBER   ---       VDSTAT
+      000000BBH   SYMBOL    NUMBER   ---       VIRTUALADDRH
+      000000BCH   SYMBOL    NUMBER   ---       VIRTUALADDRL
+      00000089H   SYMBOL    NUMBER   ---       VOUT_CTL
+      000000B5H   SYMBOL    NUMBER   ---       WAVBLOCKNUMH
+      000000B7H   SYMBOL    NUMBER   ---       WAVBLOCKNUML
+      000000B6H   SYMBOL    NUMBER   ---       WAVBLOCKNUMM
+      000000B2H   SYMBOL    NUMBER   ---       WAVCTIMEH
+      000000B3H   SYMBOL    NUMBER   ---       WAVCTIMEM
+      000000B4H   SYMBOL    NUMBER   ---       WAVCTIMES
+      000000ABH   SYMBOL    NUMBER   ---       WAVCTL
+      000000ABH   SYMBOL    NUMBER   ---       WAVENCCTL
+      000000ACH   SYMBOL    NUMBER   ---       WAVENCINFO
+      000000ACH   SYMBOL    NUMBER   ---       WAVHEADERINFO1
+      000000ADH   SYMBOL    NUMBER   ---       WAVHEADERINFO2
+      000000A9H   SYMBOL    NUMBER   ---       WAVIE
+      000000AAH   SYMBOL    NUMBER   ---       WAVIP
+      000000AFH   SYMBOL    NUMBER   ---       WAVTTIMEH
+      000000B0H   SYMBOL    NUMBER   ---       WAVTTIMEM
+      000000B1H   SYMBOL    NUMBER   ---       WAVTTIMES
+      000000B8H   SYMBOL    NUMBER   ---       WDCTL
+      000000ADH   SYMBOL    NUMBER   ---       WMABITRATEH
+      000000AEH   SYMBOL    NUMBER   ---       WMABITRATEL
+      000000B2H   SYMBOL    NUMBER   ---       WMACTIMEH
+      000000B3H   SYMBOL    NUMBER   ---       WMACTIMEM
+      000000B4H   SYMBOL    NUMBER   ---       WMACTIMES
+      000000ABH   SYMBOL    NUMBER   ---       WMACTL
+      000000ACH   SYMBOL    NUMBER   ---       WMAHEADERINFO
+      000000A9H   SYMBOL    NUMBER   ---       WMAIE
+      000000AAH   SYMBOL    NUMBER   ---       WMAIP
+      000000B5H   SYMBOL    NUMBER   ---       WMAPACKNUMH
+      000000B7H   SYMBOL    NUMBER   ---       WMAPACKNUML
+      000000B6H   SYMBOL    NUMBER   ---       WMAPACKNUMM
+      000000B8H   SYMBOL    NUMBER   ---       WMAPACKSIZEH
+      000000BAH   SYMBOL    NUMBER   ---       WMAPACKSIZEL
+      000000B9H   SYMBOL    NUMBER   ---       WMAPACKSIZEM
+      000000AFH   SYMBOL    NUMBER   ---       WMATTIMEH
+      000000B0H   SYMBOL    NUMBER   ---       WMATTIMEM
+      000000B1H   SYMBOL    NUMBER   ---       WMATTIMES
+L251 LINKER/LOCATER V4.25                                                             12/26/2012  14:07:03  PAGE 32
+
+
+
+Program Size: data=0.0 edata+hdata=0 xdata=0 const=38 code=566
+L251 RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

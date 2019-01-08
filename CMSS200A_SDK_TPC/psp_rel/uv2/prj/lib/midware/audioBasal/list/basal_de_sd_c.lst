@@ -1,0 +1,116 @@
+C251 COMPILER V4.55,  basal_de_sd_c                                                        13/12/18  16:27:23  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE basal_de_sd_c
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\basal\basal_de_sd_c.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\audioBasal\basal_de_sd_c.c XSMALL FUNCTIONS
+                    -(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) INCDIR(..\..\..\..\..\inc) DEBUG PRINT(.\list\basal_de_sd_c.lst) OBJECT(..\..\..
+                    -\..\obj\lib\basal\basal_de_sd_c.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              USDK 5102
+    3           *                            Module: POWER MANAGER
+    4           *                 Copyright(c) 2001-2009 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *    wuyueqian     2009-9-07 9:42     1.0             build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * file
+   13           * brief
+   14           * Author   wuyueqian
+   15           * par
+   16           *
+   17           *      Copyright(c) 2001-2007 Actions Semiconductor, All Rights Reserved.
+   18           *
+   19           * version 1.0
+   20           * date  2008/6/12
+   21           *******************************************************************************/
+   22          #include <basal.h>
+   23          #include <decC.h>
+   24          
+   25          #pragma name(MW_BS_AD_CMD2_SD)
+   26          
+   27          extern HANDLE m_deSd_Fp;
+   28          extern Open_param_t *m_deSdOpenparam; //参数表地址
+   29          
+   30          //extern uint32 deSdApointerSave;
+   31          //extern uint32 deSdBpointerSave;
+   32          extern uint32 deSdBreakPointSave;
+   33          //extern decBreakPointInfor_t m_SdbreakPointInfo;
+   34          //extern BYTE m_Sdbackupmode;
+   35          
+   36          #pragma renamecode(MW_BS_AD_CMD2_SD)
+   37          /*
+   38           void reserve_function(void)
+   39           {
+   40          
+   41           }
+   42           */
+   43          bool SdBackupCommand(void)
+   44          {
+   45   1          //    m_deSdOpenparam->BreakPTSave->ApointSave = deSdApointerSave;
+   46   1          //    m_deSdOpenparam->BreakPTSave->BpointSave = deSdBpointerSave;
+   47   1          m_deSdOpenparam->BreakPTSave->breakPT = deSdBreakPointSave;
+   48   1          //    if (m_Sdbackupmode == 0)//断点续播备份
+   49   1          //    {
+   50   1          //        memcpy(&(m_deSdOpenparam->BreakPTSave->breakPointInfor), &g_decBreakPointInfor, sizeof(decB
+             -reakPointInfor_t));
+   51   1          //    }
+   52   1          //    else//AB 复读过程中的断点不保存，只是保存A点，以后断点续播从A点开始
+   53   1          //    {
+   54   1          //        memcpy(&(m_deSdOpenparam->BreakPTSave->breakPointInfor), &m_SdbreakPointInfo, sizeof(decBre
+             -akPointInfor_t));
+   55   1          //    }
+C251 COMPILER V4.55,  basal_de_sd_c                                                        13/12/18  16:27:23  PAGE 2   
+
+   56   1          return TRUE;
+   57   1      }
+   58          
+   59          bool SdRestoreCommand(void)
+   60          {
+   61   1          //    deSdApointerSave = m_deSdOpenparam->BreakPTSave->ApointSave;
+   62   1          //    deSdBpointerSave = m_deSdOpenparam->BreakPTSave->BpointSave;
+   63   1          deSdBreakPointSave = m_deSdOpenparam->BreakPTSave->breakPT;
+   64   1          //    memcpy(&m_SdbreakPointInfo, &(m_deSdOpenparam->BreakPTSave->breakPointInfor), sizeof(decBreakPo
+             -intInfor_t));
+   65   1          return TRUE;
+   66   1      }
+   67          
+   68          //bool SdAPointPlayCommand(void)
+   69          //{
+   70          //    g_decControlInfor.PlayMode = PLAY_MODE_BREAK;
+   71          //    memcpy(&g_decBreakPointInfor, &m_SdbreakPointInfo, sizeof(decBreakPointInfor_t));
+   72          //    SD_FSeek(0, FS_SEEK_FFROMSTART, m_deSd_Fp);
+   73          //    decInit();//计算时间不淡入
+   74          //    decstart();
+   75          //    return TRUE;
+   76          //}
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =        54     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

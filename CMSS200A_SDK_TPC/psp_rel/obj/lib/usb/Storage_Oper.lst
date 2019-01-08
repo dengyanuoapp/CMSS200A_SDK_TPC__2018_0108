@@ -1,0 +1,476 @@
+C251 COMPILER V4.55,  Storage_Oper                                                         15/07/16  16:03:49  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE Storage_Oper
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usb\Storage_Oper.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usb\Storage_Oper.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) 
+                    -INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usb\Storage_Oper.lst) OBJECT(..\..\..\obj\lib\usb\Storage_Ope
+                    -r.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************************************
+             -*
+    3           *                                       ACTOS GL3976
+    4           *
+    5           *
+    6           *                           (c) Copyright 2002-2007, Actions Co,Ld.
+    7           *                                   All Right Reserved
+    8           *
+    9           * File   : storage_Oper.msa
+   10           * By     : zhouxl
+   11           * Version: v1.02     first version     2004-12-16 18:37
+   12           ********************************************************************************************************
+             -*
+   13           */
+   14          
+   15          #include "udisklib.h"
+   16          
+   17          #pragma name(STORAGE_C)
+   18          uint8 Is_ADFURW_illegal(void);
+   19          uint8 Is_BulkRW_illegal(void);
+   20          void Udisk_Mbr_Check(void);
+   21          uint8 Check_Dbr_Data(uint8 *DBRAddr);
+   22          
+   23          #pragma renamecode(?PR?STORAGE_C)
+   24          /*
+   25           ********************************************************************************************************
+             -*
+   26           *                                           sFlash_Lgcl_Wrts
+   27           *
+   28           * Description: 写Flash逻辑扇区.
+   29           *
+   30           * Arguments  : ix: data Address; hlde: 起始扇区;
+   31           *
+   32           * Returns    : None.
+   33           *
+   34           * Note(s)    : None.
+   35           ********************************************************************************************************
+             -*
+   36           */
+   37          void sFlash_Wrts(uint8 rw_type, uint32 lba_addr, uint8 *dst_buffer)
+   38          {
+   39   1          uint8 tmp;
+   40   1          if (rw_type == RW_DYNAMIC)
+   41   1          {
+   42   2              tmp = (uint8) sectors_trans_once;
+   43   2          }
+   44   1          else
+   45   1          {
+   46   2              //判断是否是SPINor
+   47   2              if (flash_type == 0x02)
+   48   2              {
+   49   3                  return;
+   50   3              }
+   51   2              tmp = 1;
+   52   2          }
+   53   1      
+C251 COMPILER V4.55,  Storage_Oper                                                         15/07/16  16:03:49  PAGE 2   
+
+   54   1          SD_UDRWStruct.lba = lba_addr;
+   55   1          SD_UDRWStruct.sectornum = tmp;
+   56   1          SD_UDRWStruct.dstaddr = (uint16) dst_buffer;
+   57   1      
+   58   1          if (illegalLBAFlag == 0x00)
+   59   1          {
+   60   2              UD_SectorWrite((UD_RW *) &SD_UDRWStruct);
+   61   2          }
+   62   1      }
+   63          
+   64          /*
+   65           ********************************************************************************************************
+             -*
+   66           *                                           sFlash_Lgcl_Rds
+   67           *
+   68           * Description: 读Flash.
+   69           *
+   70           * Arguments  : ix: data Address; hlde: 起始扇区;
+   71           *
+   72           * Returns    : None.
+   73           *
+   74           * Note(s)    : None.
+   75           ********************************************************************************************************
+             -*
+   76           */
+   77          void sFlash_Rds(uint8 rw_type, uint32 lba_addr, uint8 *dst_buffer)
+   78          {
+   79   1          uint8 tmp;
+   80   1          if (rw_type == RW_DYNAMIC)
+   81   1          {
+   82   2              tmp = (uint8) sectors_trans_once;
+   83   2          }
+   84   1          else
+   85   1          {
+   86   2              //判断是否是SPINor
+   87   2              if (flash_type == 0x02)
+   88   2              {
+   89   3                  return;
+   90   3              }
+   91   2              tmp = 1;
+   92   2          }
+   93   1      
+   94   1          SD_UDRWStruct.lba = lba_addr;
+   95   1          SD_UDRWStruct.sectornum = tmp;
+   96   1          SD_UDRWStruct.dstaddr = (uint16) dst_buffer;
+   97   1      
+   98   1          if (illegalLBAFlag == 0x00)
+   99   1          {
+  100   2              UD_SectorRead((UD_RW *) &SD_UDRWStruct);
+  101   2          }
+  102   1      }
+  103          
+  104          /*
+  105           ********************************************************************************************************
+             -*
+  106           *                                           sCardWriteDynamic
+  107           *
+  108           * Description: 写若干扇区数据到SDCard中.
+  109           *
+  110           * Arguments  : ix: data Address;
+  111           *
+  112           * Returns    : None.
+  113           *
+  114           * Note(s)    : None.
+  115           ********************************************************************************************************
+             -*
+C251 COMPILER V4.55,  Storage_Oper                                                         15/07/16  16:03:49  PAGE 3   
+
+  116           */
+  117          void sCardWrite(uint8 *dst_buffer)
+  118          {
+  119   1          SD_UDRWStruct.lba = LBA;
+  120   1          SD_UDRWStruct.sectornum = (uint8) sectors_trans_once;
+  121   1          SD_UDRWStruct.dstaddr = (uint16) dst_buffer;
+  122   1          //返回0: 正确， 1: 不正确，
+  123   1          RWCardError = (uint8) UD_SDCardSectorWrite((UD_RW *) &SD_UDRWStruct);
+  124   1      }
+  125          
+  126          /*
+  127           ********************************************************************************************************
+             -*
+  128           *                                           sCardRead
+  129           *
+  130           * Description: 读若干扇区SDCard数据到指定Uram地址.
+  131           *
+  132           * Arguments  : ix: data Address.
+  133           *
+  134           * Returns    : None.
+  135           *
+  136           * Note(s)    : None.
+  137           ********************************************************************************************************
+             -*
+  138           */
+  139          void sCardRead(uint8 *dst_buffer)
+  140          {
+  141   1          SD_UDRWStruct.lba = LBA;
+  142   1          SD_UDRWStruct.sectornum = (uint8) sectors_trans_once;
+  143   1          SD_UDRWStruct.dstaddr = (uint16) dst_buffer;
+  144   1          //返回0: 正确， 1: 不正确，
+  145   1          RWCardError = (uint8) UD_SDCardSectorRead((UD_RW *) &SD_UDRWStruct);
+  146   1          if (RWCardError != 0x00)
+  147   1          {
+  148   2              CardExistFlag = 0;
+  149   2          }
+  150   1      }
+  151          
+  152          /*
+  153           ********************************************************************************************************
+             -*
+  154           *                                           sFlashDrvCheck
+  155           *
+  156           * Description: 是否要切换Driver.
+  157           *
+  158           * Arguments  : None.
+  159           *
+  160           * Returns    : None.
+  161           *
+  162           * Note(s)    : None.
+  163           ********************************************************************************************************
+             -*
+  164           */
+  165          void sFlashDrvCheck(void)
+  166          {
+  167   1      }
+  168          
+  169          /*
+  170           ********************************************************************************************************
+             -*
+  171           *                                           sProgramSectorsToStorage
+  172           *
+  173           * Description: 写BlockNumInUram扇区数据到Flash.
+  174           *
+  175           * Arguments  : ix: 数据源地址.
+  176           *
+C251 COMPILER V4.55,  Storage_Oper                                                         15/07/16  16:03:49  PAGE 4   
+
+  177           * Returns    : None.
+  178           *
+  179           * Note(s)    : None.
+  180           ********************************************************************************************************
+             -*
+  181           */
+  182          void sProgramSectorsToStorage(uint8 *dst_buffer)
+  183          {
+  184   1          //Flash或卡读写标志: 0,Flash; 1:Card
+  185   1          if (flashorcard_rwflag != 0)
+  186   1          {
+  187   2              //读Flash数据到Buffer不同位置,输入参数ix
+  188   2              sCardWrite(dst_buffer);
+  189   2          }
+  190   1          else
+  191   1          {
+  192   2              sFlash_Wrts(RW_DYNAMIC, LBA, dst_buffer);
+  193   2          }
+  194   1          //LBA地址累加
+  195   1          LBA = LBA + (uint32) sectors_trans_once;
+  196   1      }
+  197          
+  198          /*
+  199           ********************************************************************************************************
+             -*
+  200           *                                           sReadSectorsToBuff
+  201           *
+  202           * Description: 把数据从Flash读到Buffer.
+  203           *
+  204           * Arguments  : ix: 数据目的Ram地址.
+  205           *
+  206           * Returns    : None.
+  207           *
+  208           * Note(s)    : None.
+  209           ********************************************************************************************************
+             -*
+  210           */
+  211          void sReadSectorsToBuff(uint8 *dst_buffer)
+  212          {
+  213   1          //Flash或卡读写标志: 0,Flash; 1:Card
+  214   1          if (flashorcard_rwflag != 0)
+  215   1          {
+  216   2              //读Flash数据到Buffer不同位置
+  217   2              sCardRead(dst_buffer);
+  218   2          }
+  219   1          else
+  220   1          {
+  221   2              sFlash_Rds(RW_DYNAMIC, LBA, dst_buffer);
+  222   2          }
+  223   1          //LBA地址累加
+  224   1          LBA = LBA + (uint32) sectors_trans_once;
+  225   1      }
+  226          
+  227          /*
+  228           ********************************************************************************************************
+             -*
+  229           *                                           Compute_LBA
+  230           *
+  231           * Description: 计算Flash/Card读写地址和数据长度.
+  232           *
+  233           * Arguments  : None.
+  234           *
+  235           * Returns    : None.
+  236           *
+  237           * Note(s)    : None.
+  238           ********************************************************************************************************
+C251 COMPILER V4.55,  Storage_Oper                                                         15/07/16  16:03:49  PAGE 5   
+
+             -*
+  239           */
+  240          void Compute_LBA(void)
+  241          {
+  242   1          //Flash或卡读写标志: 0,Flash; 1:Card
+  243   1          flashorcard_rwflag = 0x00;
+  244   1      
+  245   1          //读写Flash1扇区标志,用于加密盘
+  246   1          AccessFlashPhySec1 = 0x00;
+  247   1          UdiskFSInfo.rw_dbr_flag = 0x00;
+  248   1      
+  249   1          if (IsAdfuCondition != 0x00)
+  250   1          {
+  251   2              EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[2]), 4);
+  252   2              LBA = *((uint32 *) &CBW_data_buffer._CBWCB[2]);
+  253   2              EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[7]), 2);
+  254   2              udisk_rw_sctr_num = *((uint16 *) &CBW_data_buffer._CBWCB[7]);
+  255   2              Is_ADFURW_illegal();
+  256   2          }
+  257   1          else
+  258   1          {
+  259   2              udisk_rw_sctr_num = *((uint16 *) &CBW_data_buffer._CBWCB[7]);
+  260   2              LBA = *((uint32 *) &CBW_data_buffer._CBWCB[2]);
+  261   2              //设置假容量后不再支持加密分区功能
+  262   2              if ((set_fake_ucap_flag == 0x00) && (LBA == 0x00000001))
+  263   2              {
+  264   3                  AccessFlashPhySec1 = 0x01;
+  265   3              }
+  266   2      
+  267   2              if (CBW_data_buffer._bCBWLUN == 0x00)
+  268   2              {
+  269   3                  //CDROM不响应软件的Physec0,1读
+  270   3                  AccessFlashPhySec1 = 0x00;
+  271   3                  //得到CDROM首扇区在Flash的实际扇区地址
+  272   3                  LBA = LBA * 4 + AutoRunDiskStartAddr;
+  273   3                  udisk_rw_sctr_num = udisk_rw_sctr_num * 4;
+  274   3              }
+  275   2              else if (CBW_data_buffer._bCBWLUN == 0x01)
+  276   2              {
+  277   3                  //将地址和长度还原为0x200byte单位
+  278   3                  LBA = LBA * SectorType;
+  279   3                  udisk_rw_sctr_num = udisk_rw_sctr_num * SectorType;
+  280   3      
+  281   3                  if (flash_type != 4)//卡base不做8k对齐
+  282   3                  {
+  283   4                      //check if is writing the DBR
+  284   4                      if (LBA != UdiskFSInfo.DBRStartAddress)
+  285   4                      {
+  286   5                          //check if address is >= DataAreaStartAddress.
+  287   5                          if (LBA >= UdiskFSInfo.DataAreaStartAddress)
+  288   5                          {
+  289   6                              LBA = LBA + UdiskFSInfo.DataAreaOffset;
+  290   6                          }
+  291   5                      }
+  292   4                      else
+  293   4                      {
+  294   5                          UdiskFSInfo.rw_dbr_flag = 0x01;
+  295   5                      }
+  296   4                  }
+  297   3      
+  298   3                  //判断对Flash读写是否超过Flash容量
+  299   3                  Is_BulkRW_illegal();
+  300   3      
+  301   3                  //得到MBR扇区在Flash的实际扇区地址
+  302   3                  LBA += UdiskStartAddr;
+  303   3              }
+C251 COMPILER V4.55,  Storage_Oper                                                         15/07/16  16:03:49  PAGE 6   
+
+  304   2              else if (CBW_data_buffer._bCBWLUN == 0x02)
+  305   2              {
+  306   3                  if ((EncryptFlag == 0x00) || (PasswdPassOk != 0x00))
+  307   3                  {
+  308   4                      LBA += EncryptDiskBStartAddr;
+  309   4      
+  310   4                  }
+  311   3                  else
+  312   3                  {
+  313   4                      LBA += EncryptDiskCStartAddr;
+  314   4                  }
+  315   3              }
+  316   2              else if (CBW_data_buffer._bCBWLUN == 0x03)
+  317   2              {
+  318   3                  //卡不响应工具软件的Physec1读写
+  319   3                  AccessFlashPhySec1 = 0x00;
+  320   3                  //Flash或卡读写标志: 0,Flash; 1:Card
+  321   3                  flashorcard_rwflag = 0x01;
+  322   3              }
+  323   2              else
+  324   2              {
+  325   3              }
+  326   2          }
+  327   1      }
+  328          
+  329          /*
+  330           ********************************************************************************************************
+             -*
+  331           *                                           Is_ADFURW_illegal
+  332           *
+  333           * Description: 除了对Flash SD区DIR和DRMINFO的读合法,其它读均非法,防范LFI被读出.
+  334           *
+  335           * Arguments  : None.
+  336           *
+  337           * Returns    : 地址是否合法: 0: legal;  1:illegal.
+  338           *
+  339           * Note(s)    : None.
+  340           ********************************************************************************************************
+             -*
+  341           */
+  342          uint8 Is_ADFURW_illegal(void)
+  343          {
+  344   1          uint8 ret = 1;
+  345   1      
+  346   1          if ((CBW_data_buffer._CBWCB[1] & 0x80) != 0x00)
+  347   1          {
+  348   2              if (udisk_rw_sctr_num <= 0x20)
+  349   2              {
+  350   3                  if (LBA == 0) //读Flash SD区的DIR信息
+  351   3                  {
+  352   4                      ret = 0;
+  353   4                  }
+  354   3                  //else if((LBA>=DRMINFOADDR) && (LBA <(SDDiskCap/2))) //读DRMINFO,不能读超过SD区内容
+  355   3                  else if (LBA < (SDDiskCap / 2)) //读DRMINFO,不能读超过SD区内容
+  356   3                  {
+  357   4                      ret = 0;
+  358   4                  }
+  359   3                  else
+  360   3                  {
+  361   4                      ret = 1;
+  362   4                  }
+  363   3              }
+  364   2              else
+  365   2              {
+  366   3                  //最大只能每次读0x20个扇区的SD区数据,否则认为非法
+  367   3                  ret = 1;
+C251 COMPILER V4.55,  Storage_Oper                                                         15/07/16  16:03:49  PAGE 7   
+
+  368   3              }
+  369   2          }
+  370   1          else
+  371   1          {
+  372   2              //写Flash物理区总认为是合法
+  373   2              ret = 0;
+  374   2          }
+  375   1      
+  376   1          illegalLBAFlag = ret;
+  377   1      
+  378   1          return ret;
+  379   1      }
+  380          
+  381          /*
+  382           ********************************************************************************************************
+             -*
+  383           *                                           Is_BulkRW_illegal
+  384           *
+  385           * Description: 判断对Flash读写是否超过Flash容量,防范LFI被读出.
+  386           *
+  387           * Arguments  : None.
+  388           *
+  389           * Returns    : 地址是否合法，0: legal;  1:illegal.
+  390           *
+  391           * Note(s)    : None.
+  392           ********************************************************************************************************
+             -*
+  393           */
+  394          uint8 Is_BulkRW_illegal(void)
+  395          {
+  396   1          if ((LBA + udisk_rw_sctr_num) < udisk_total_capacity)
+  397   1          {
+  398   2              illegalLBAFlag = 0x00;
+  399   2          }
+  400   1          else
+  401   1          {
+  402   2              //LBA地址越界
+  403   2              illegalLBAFlag = 0x01;
+  404   2          }
+  405   1      
+  406   1          return illegalLBAFlag;
+  407   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       735     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,41 @@
+### uVision2 Project, (C) Keil Software
+### Do not modify !
+
+ cExt (*.c)
+ aExt (*.s*; *.src; *.a*)
+ oExt (*.obj)
+ lExt (*.lib)
+ tExt (*.txt; *.h; *.inc)
+ pExt (*.plm)
+ CppX (*.cpp)
+ DaveTm { 0,0,0,0,0,0,0,0 }
+
+Target (fw_cfg), 0x0001 // Tools: 'MCS-251'
+GRPOPT 1,(cfg),0,0,0
+GRPOPT 2,(src),0,0,0
+GRPOPT 3,(lst),0,0,0
+
+OPTFFF 1,1,5,0,0,0,0,0,<.\fw_cfg.lin><fw_cfg.lin> 
+OPTFFF 1,2,5,0,0,0,0,0,<.\hextobin_cfg.bat><hextobin_cfg.bat> 
+OPTFFF 1,3,5,0,0,0,0,0,<.\fwcfg.drvl><fwcfg.drvl> 
+OPTFFF 2,4,1,0,0,0,0,0,<.\main.c><main.c> 
+OPTFFF 3,5,5,0,0,0,0,0,<.\Obj\fwcfg.MAP><fwcfg.MAP> 
+
+
+TARGOPT 1, (fw_cfg)
+ CLK251=16000000
+  OPTTT 0,1,1,0
+  OPTHX 1,65535,0,0,0
+  OPTLX 120,65,8,<.\Lst\>
+  OPTOX 16
+  OPTLT 1,1,1,0,1,1,0,1,0,0,0,0
+  OPTXL 1,1,1,1,1,1,1,0,0
+  OPTFL 0,0,1
+  OPTAX 0
+  OPTDL (S251.DLL)(-Flip251)(DP51.DLL)(-p251S -dactsim)(S251.DLL)()(TP51.DLL)(-p251S)
+  OPTDBG 48125,-1,()()()()()()()()()() ()()()()
+  OPTDF 0x0
+  OPTLE <>
+  OPTLC <>
+EndOpt
+

@@ -1,0 +1,1 @@
+"usound_rec.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) OPTIMIZE (9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 ORDER DEFINE (USOUND_AP) DEBUG PRINT(.\list\usound_rec.lst) OBJECT(.\obj\usound_rec.obj)

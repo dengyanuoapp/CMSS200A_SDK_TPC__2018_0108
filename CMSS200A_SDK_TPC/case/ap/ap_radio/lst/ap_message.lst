@@ -1,0 +1,236 @@
+C251 COMPILER V4.55,  ap_message                                                           23/05/16  10:42:11  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE ap_message
+OBJECT MODULE PLACED IN .\obj\ap_message.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\common\ap_message.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,S
+                    -PEED) BROWSE ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE(CHECKALARM) DEBUG PRINT(.\lst\ap_messag
+                    -e.lst) OBJECT(.\obj\ap_message.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        ap common lib message file, realtime part
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: ap_message.c,v 1.1.1.1 2006/05/22 03:23:59 selina Exp $
+   10           *******************************************************************************
+   11           */
+   12          //
+   13          
+   14          #include "ap_common.h"
+   15          
+   16          //#define linein_min_adcval   0x34
+   17          //#define linein_max_adcval   0x3f
+   18          
+   19          
+   20          #pragma name(COM_MSG)
+   21          uint8 deal_RTC_msg(void);
+   22          uint8 check_ararm_msg(void);
+   23          /*
+   24           ********************************************************************************
+   25           * Description : 处理系统消息, 返回按键消息, 同时负责开/关背光
+   26           ap_get_message_core() 的入口
+   27           *
+   28           * Arguments   :
+   29           *
+   30           * Returns     : 返回ap能够识别的消息, 如果没有系统消息, 返回 AP_KEY_NULL
+   31           *
+   32           * Notes       :
+   33           ********************************************************************************
+   34           */
+   35          
+   36          uint8 ap_get_message(void)
+   37          {
+   38   1          uint8 key;
+   39   1      #ifdef Msg_CTC2HZ
+   40   1          do
+   41   1          {
+   42   2              key = GetSysMsg();
+   43   2              ClearWatchDog();
+   44   2          }
+   45   1          while(key == MSG_RTC2HZ);
+   46   1          if(key == Msg_HalfSecond)
+   47   1          {
+   48   2              key = MSG_RTC2HZ;
+   49   2          }
+   50   1      #else
+                   key = GetSysMsg();
+               #endif
+   53   1          if (key == Msg_KeyNull)
+   54   1          {
+   55   2              return AP_KEY_NULL;
+   56   2          }
+   57   1          else
+C251 COMPILER V4.55,  ap_message                                                           23/05/16  10:42:11  PAGE 2   
+
+   58   1          {
+   59   2              if (key == MSG_RTC2HZ)
+   60   2              {
+   61   3                  return deal_RTC_msg();
+   62   3              }
+   63   2              key = ap_get_message_core(key);
+   64   2              if (DealLongKey(key) == 0)
+   65   2              {
+   66   3                  return AP_KEY_NULL;
+   67   3              }
+   68   2              else
+   69   2              {
+   70   3                  return key;
+   71   3              }
+   72   2          }
+   73   1      }
+   74          
+   75          /*
+   76           ********************************************************************************
+   77           * Description : 处理热键消息, 返回结果消息
+   78           ap_handle_hotkey_core() 的入口
+   79           *
+   80           * Arguments   : key, 按键消息
+   81           *
+   82           * Returns     : 如果有可识别的热键消息,  返回结果消息
+   83           如果没有可识别的热键消息,  返回0
+   84           *
+   85           * Notes       :
+   86           *
+   87           ********************************************************************************
+   88           */
+   89          uint8 ap_handle_hotkey(uint8 key)
+   90          {
+   91   1          if (key == AP_KEY_NULL)
+   92   1          {
+   93   2              return 0;
+   94   2          }
+   95   1          else
+   96   1          {
+   97   2              return ap_handle_hotkey_core(key);
+   98   2          }
+   99   1      }
+  100          
+  101          /********************************************************************************
+  102           * Description :处理长按PLAY键关机，或长按Play键关机的消息
+  103           *
+  104           * Arguments  :
+  105           *
+  106           * Returns     :
+  107           *            无
+  108           * Notes       :
+  109           如果对相应的长按键要进行处理时，必须先将longkey_flag置为1.否则不进行特别处理。
+  110           *                      由于RTC中断会不断发出来，所以在检测长按消息时，要过滤掉RTC消息。
+  111           ********************************************************************************/
+  112          uint8 DealLongKey(uint8 key)
+  113          {
+  114   1          if (longkey_flag == 0)
+  115   1          {
+  116   2              return 1;
+  117   2          }
+  118   1          return check_longkey_msg(key);
+  119   1      }
+  120          uint8 deal_RTC_msg(void)
+  121          {
+  122   1          uint8 retval;
+  123   1          g_rtc_counter++;
+C251 COMPILER V4.55,  ap_message                                                           23/05/16  10:42:11  PAGE 3   
+
+  124   1          /*2HZ计时进入省电模式*/
+  125   1          if (g_comval.SleepTime != 0) //自动关机
+  126   1          {
+  127   2              g_standby_time++;
+  128   2              if (g_standby_time == g_comval.SleepTime * 120)
+  129   2              {
+  130   3                  g_standby_time = 0;
+  131   3                  g_comval.SleepTime = 0;
+  132   3                  return AP_MSG_STANDBY;
+  133   3              }
+  134   2          }
+  135   1          /*2HZ计时无操作返回*/
+  136   1          if ((g_rtc_counter % 6) == 0)
+  137   1          {
+  138   2              return AP_MSG_WAIT_TIMEOUT;
+  139   2          }
+  140   1          //检测闹钟消息
+  141   1          if (alarmtimerflag == 1)
+  142   1          {
+  143   2              alarmtimerflag = 0;
+  144   2              if (g_comval.g_alarm.AlarmEnable != 0)
+  145   2              {
+  146   3                  return AP_MSG_ALARM; //闹钟关闭
+  147   3              }
+  148   2          }
+  149   1      #if 0
+                   retval = check_hard_switch();
+                   if(retval != 0)
+                   {
+                       return retval;
+                   }
+               #endif
+  156   1          retval = check_plug_device_msg(&usb_on_flag, USB_IN);
+  157   1          if(retval != AP_MSG_RTC)
+  158   1          {
+  159   2              return retval;
+  160   2          }
+  161   1          return check_plug_device_msg(&linein_status, LINEIN);
+  162   1      }
+  163          
+  164          /********************************************************************************
+  165           * Description :假硬开关检测
+  166           *
+  167           * Arguments  :
+  168           *
+  169           * Returns     :
+  170           *            无
+  171           * Notes       :TEST_CTL bit1为1是，表示硬开关关闭动作
+  172           *
+  173           ********************************************************************************/
+  174          
+  175          uint8 check_hard_switch(void)
+  176          {
+  177   1          uint8 sfr_bak, retval = NULL, tmp_val;
+  178   1          uint8 fake_onoff;
+  179   1          sfr_bak = SFR_BANK;
+  180   1          SFR_BANK = BANK_PMU;
+  181   1          tmp_val = TEST_CTL & 0x02;
+  182   1          fake_onoff = SYSTEM_ONOFF & 0x10;
+  183   1          SFR_BANK = sfr_bak;
+  184   1          if((tmp_val != 0) || (fake_onoff == 0x10))
+  185   1          {
+  186   2              if(tmp_val != 0)
+  187   2              {
+  188   3                  power_on_flag = 1;
+  189   3              }
+C251 COMPILER V4.55,  ap_message                                                           23/05/16  10:42:11  PAGE 4   
+
+  190   2              //        retval = deal_standby_msg();
+  191   2          }
+  192   1          return retval;
+  193   1      }
+  194          
+  195          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       260     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

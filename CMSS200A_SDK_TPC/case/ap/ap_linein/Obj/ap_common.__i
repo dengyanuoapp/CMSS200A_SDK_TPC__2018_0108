@@ -1,0 +1,1 @@
+"..\common\ap_common.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) OPTIMIZE (9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\ap_common.lst) OBJECT(.\Obj\ap_common.obj)

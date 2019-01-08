@@ -1,0 +1,466 @@
+C251 COMPILER V4.55,  fmdrv_bank                                                           23/05/16  10:42:15  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE fmdrv_bank
+OBJECT MODULE PLACED IN .\obj\fmdrv_bank.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE FM_QN8035\fmdrv_bank.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,S
+                    -PEED) BROWSE ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE(CHECKALARM) DEBUG PRINT(.\lst\fmdrv_ban
+                    -k.lst) OBJECT(.\obj\fmdrv_bank.obj) 
+
+stmt  level    source
+
+    1          /*******************************************************************************
+    2           *                              AS260A
+    3           *                            Module: fm drvier for qn8035
+    4           *                 Copyright(c) 2003-2011 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>        <time>           <version >            <desc>
+    9           *     mikeyang     2011-11-03 15:00     1.0             build this file
+   10           *******************************************************************************/
+   11          
+   12          #include "fm_drv.h"
+   13          
+   14          #pragma name(FM_DRV_BANK)
+   15          
+   16          /**********************************************************************
+   17           Description: set to SNR based MPX control. Call this function before
+   18           tune to one specific channel
+   19          
+   20           Parameters:
+   21           None
+   22           Return Value:
+   23           None
+   24           **********************************************************************/
+   25          void QNF_RXInit(void)
+   26          {
+   27   1          QNF_SetRegBit(0x1B, 0x08, 0x00); //Let NFILT adjust freely
+   28   1          QNF_SetRegBit(0x2C, 0x3F, 0x12); //When SNR<ccth31, ccfilt3 will work
+   29   1          QNF_SetRegBit(0x1D, 0x40, 0x00);//Let ccfilter3 adjust freely
+   30   1          QNF_SetRegBit(0x41, 0x0F, 0x0A);//Set a hcc index to trig ccfilter3's adjust
+   31   1          QND_WriteReg(0x45, 0x50);//Set aud_thrd will affect ccfilter3's tap number
+   32   1          QNF_SetRegBit(0x40, 0x70, 0x70); //snc/hcc/sm snr_rssi_sel; snc_start=0x40; hcc_start=0x30; sm_start=
+             -0x20
+   33   1          QNF_SetRegBit(0x19, 0x80, 0x80); //Use SNR for ccfilter selection criterion
+   34   1          QNF_SetRegBit(0x3E, 0x80, 0x80); //it is decided by programming this register
+   35   1          QNF_SetRegBit(0x41, 0xE0, 0xC0);//DC notching High pass filter bandwidth; remove low freqency dc sign
+             -als
+   36   1          QNF_SetRegBit(0x42, 0x10, 0x10);//disable the vtune monitor
+   37   1          QNF_SetRegBit(0x34, 0x7F, SMSTART_VAL); //set SNCSTART
+   38   1          QNF_SetRegBit(0x35, 0x7F, SNCSTART_VAL); //set SNCSTART
+   39   1          QNF_SetRegBit(0x36, 0x7F, HCCSTART_VAL); //set HCCSTART
+   40   1      }
+   41          
+   42          /**********************************************************************
+   43           void QND_TuneToCH(uint16 ch)
+   44           **********************************************************************
+   45           Description: Tune to the specific channel. call QND_SetSysMode() before
+   46           call this function
+   47           Parameters:
+   48           ch
+   49           Set the frequency (10kHz) to be tuned,
+   50           eg: 101.30MHz will be set to 10130.
+   51           Return Value:
+   52           None
+   53           **********************************************************************/
+   54          void QND_TuneToCH(uint16 ch)
+   55          {
+C251 COMPILER V4.55,  fmdrv_bank                                                           23/05/16  10:42:15  PAGE 2   
+
+   56   1      
+   57   1          uint8 reg;
+   58   1          QNF_RXInit();
+   59   1          if ((ch == 8430) || (ch == 7290) || (ch == 6910))
+   60   1          {
+   61   2              QNF_SetRegBit(CCA, IMR, IMR);
+   62   2          }
+   63   1          else
+   64   1          {
+   65   2              QNF_SetRegBit(CCA, IMR, 0x00);
+   66   2          }
+   67   1          QNF_ConfigScan(ch, ch, 1);
+   68   1          QNF_SetCh(ch);
+   69   1          QNF_SetRegBit(0x00, 0x03, 0x03); //Enter CCA mode. This speed up the channel locking.
+   70   1          //Auto tuning
+   71   1          QND_WriteReg(0x4F, 0x80);
+   72   1          reg = QND_ReadReg(0x4F);
+   73   1          reg >>= 1;
+   74   1          QND_WriteReg(0x4F, reg);
+   75   1          TM_DelayMS(200);//avoid the noise which are "POP" and "sha sha" noise.
+   76   1      }
+   77          
+   78          /*
+   79           ********************************************************************************
+   80           *             uint8 FMdrv_setfreq(uint16 Freq)
+   81           *
+   82           * Description : 设置频点,进行tune操作
+   83           *
+   84           * Arguments   : 需设置的频点值, 以100khz 为单位
+   85          
+   86           * Returns     : 设置频点是否成功,若成功,返回1
+   87           *                                        否则,返回0
+   88           * Notes       :
+   89           *
+   90           ********************************************************************************
+   91           */
+   92          uint8 FMdrv_setfreq(uint16 Freq)
+   93          {
+   94   1          //QND_TuneToCH(Freq * 10);
+   95   1          //FMdrv_mute(SetMUTE);
+   96   1          QND_TuneToCH(Freq * 10);
+   97   1          //FMdrv_mute(releaseMUTE);
+   98   1          return 1;
+   99   1      }
+  100          
+  101          /*
+  102           ********************************************************************************
+  103           *             uint8 FMdrv_getfreq(uint16 *pfreq)
+  104           *
+  105           * Description : 获取当前播放电台的频率值
+  106           *
+  107           * Arguments   : pfreq, 保存返回频率值的指针
+  108          
+  109           * Returns     : 成功获取, 返回1
+  110           *                                        否则,返回0
+  111           * Notes       :
+  112           *
+  113           ********************************************************************************
+  114           */
+  115          uint8 FMdrv_getfreq(uint16 *pfreq)
+  116          {
+  117   1          uint8 tCh;
+  118   1          uint8 tStep;
+  119   1          uint16 ch = 0;
+  120   1          uint16 freq10k;
+  121   1      
+C251 COMPILER V4.55,  fmdrv_bank                                                           23/05/16  10:42:15  PAGE 3   
+
+  122   1          // set to reg: CH_STEP
+  123   1          tStep = QND_ReadReg(CH_STEP);
+  124   1          tStep &= CH_CH;
+  125   1          ch = tStep;
+  126   1          tCh = QND_ReadReg(CH);
+  127   1          ch = (ch << 8) + tCh;
+  128   1          freq10k = ChanToFreq(ch);
+  129   1      
+  130   1          //转成以100khz为单位
+  131   1          *pfreq = freq10k / 10;
+  132   1          return 1;
+  133   1      }
+  134          
+  135          /*
+  136           ********************************************************************************
+  137           *       uint8 FMdrv_search(uint16 Freq, uint8 SeekDirect)
+  138           *
+  139           * Description : FM搜台
+  140           *
+  141           * Arguments   :
+  142           param1:  软件搜台方式,需设置的频率值,以100kHz 为单位
+  143           param2:  搜索方向
+  144           * Returns     :   如果搜到的电台为真台,则返回1;否则,返回0
+  145           *
+  146           * Notes       :   用软件搜台做半自动搜台
+  147           *
+  148           ********************************************************************************
+  149           */
+  150          uint8 FMdrv_search(uint16 Freq, uint8 SeekDirect)
+  151          {
+  152   1          uint8 result;
+  153   1      
+  154   1          SeekDirect = SeekDirect;
+  155   1          result = QND_RXValidCH(Freq * 10, QND_FSTEP_100KHZ);
+  156   1      
+  157   1          return result;
+  158   1      }
+  159          
+  160          /*
+  161           ********************************************************************************
+  162           *             uint8 FMdrv_setband(radio_band_e band)
+  163           *
+  164           * Description : FM波段设置
+  165           *
+  166           * Arguments   : 普通频段/日本频段
+  167           *
+  168           * Returns     : 若设置成功,则返回1,否则,返回0
+  169           *
+  170           * Notes       : QN8035 没有波段设置寄存器, 直接设置频率
+  171           *
+  172           ********************************************************************************
+  173           */
+  174          uint8 FMdrv_setband(radio_band_e band)
+  175          {
+  176   1          band = band;
+  177   1      
+  178   1          return 1;
+  179   1      }
+  180          
+  181          /*
+  182           ********************************************************************************
+  183           *             uint8 QNF_GetSM(void)
+  184           *
+  185           * Description : 获取当前电台立体声信息
+  186           *
+  187           * Arguments   : none
+C251 COMPILER V4.55,  fmdrv_bank                                                           23/05/16  10:42:15  PAGE 4   
+
+  188           *
+  189           * Returns     : 0 --- 立体声,  1--- 单声道
+  190           *
+  191           * Notes       :
+  192           *
+  193           ********************************************************************************
+  194           */
+  195          uint8 QNF_GetSM(void)
+  196          {
+  197   1          uint8 tdata;
+  198   1      
+  199   1          tdata = QND_ReadReg(STATUS1);
+  200   1          tdata &= 0x01;
+  201   1      
+  202   1          return tdata;
+  203   1      }
+  204          
+  205          /*
+  206           ********************************************************************************
+  207           *            uint8 FMdrv_seek(uint16 startfreq, uint16 endfreq, uint8 step)
+  208           *
+  209           * Description : 启动FM 硬件搜台过程
+  210           *
+  211           * Arguments :
+  212           param1: 硬件搜台方式，搜台起始频点, 以100kHz 为单位
+  213           param2: 设置结束频点,以100khz为单位
+  214           param3: step=0  搜台步长50khz
+  215           step=1  搜台步长100khz
+  216           step=2  搜台步长200khz
+  217           * Returns :  成功启动硬件搜台，返回1；否则返回0
+  218           *
+  219           * 用硬件搜台做全频段的seek(全自动搜台), 固定从低到高
+  220           ********************************************************************************
+  221           */
+  222          uint8 FMdrv_seek(uint16 startfreq, uint16 endfreq, uint8 step)
+  223          {
+  224   1          uint8 result;
+  225   1          //uint8 temp;
+  226   1          uint16 start, end;
+  227   1      
+  228   1          //默认硬件seek  尚未启动
+  229   1          hardseek_flag = 1;
+  230   1      
+  231   1          start = startfreq * 10;
+  232   1          end = endfreq * 10;
+  233   1          //设置起始频点,结束频点和步长:100khz
+  234   1          QNF_ConfigScan(start, end, step);
+  235   1      
+  236   1          //设置搜台门限
+  237   1          //QND_RXSetTH();
+  238   1      
+  239   1          //CCA_CH_DIS=0, select CCA result
+  240   1          result = QNF_SetRegBit(SYSTEM1, 0x01, 0x00);
+  241   1          //set CHSC to enable CCA
+  242   1          result = QNF_SetRegBit(SYSTEM1, 0x02, 0x02);
+  243   1          //enter receive mode
+  244   1          result = QNF_SetRegBit(SYSTEM1, 0x30, 0x10);
+  245   1      
+  246   1          if (result != 0)
+  247   1          {
+  248   2              //硬件seek 已启动，未完成
+  249   2              hardseek_flag = 0;
+  250   2          }
+  251   1      
+  252   1          return result;
+  253   1      }
+C251 COMPILER V4.55,  fmdrv_bank                                                           23/05/16  10:42:15  PAGE 5   
+
+  254          
+  255          /*
+  256           ********************************************************************************
+  257           *             uint8 FMdrv_breakseek(void)
+  258           *
+  259           * Description : 硬件seek 过程中，手动停止seek 过程
+  260           *
+  261           * Arguments :  NULL
+  262           *
+  263           * Returns : 成功停止，返回1;否则,返回0
+  264           *
+  265           * Notes :
+  266           *
+  267           ********************************************************************************
+  268           */
+  269          uint8 FMdrv_breakseek(void)
+  270          {
+  271   1          uint8 result = 0;
+  272   1          uint8 rdata;
+  273   1      
+  274   1          rdata = QND_ReadReg(SYSTEM1);
+  275   1      
+  276   1          if ((rdata & CHSC) != 0)
+  277   1          {
+  278   2              //仍处于硬件seek 过程中, CHSC=0 to disable CCA
+  279   2              result = QNF_SetRegBit(SYSTEM1, 0x02, 0x00);
+  280   2              if (result != 0)
+  281   2              {
+  282   3                  //成功退出seek
+  283   3                  hardseek_flag = 1;
+  284   3                  result = 1;
+  285   3              }
+  286   2          }
+  287   1          //已经不处于硬件seek 过程，直接返回停止成功
+  288   1          else
+  289   1          {
+  290   2              result = 1;
+  291   2          }
+  292   1          return result;
+  293   1      }
+  294          
+  295          /*
+  296           ********************************************************************************
+  297           *             uint8 FMdrv_getstatus(fm_status_t *pBuf)
+  298           *
+  299           * Description : 获取当前电台的信息
+  300           *
+  301           * Arguments   :          保存电台信息的结构体指针
+  302           *
+  303           * Returns     :                //是否读取状态成功,如果读取成功,则返回值为1
+  304           *                                             否则,返回0
+  305           * Notes       :
+  306           *
+  307           ********************************************************************************
+  308           */
+  309          uint8 FMdrv_getstatus(fm_status_t *pBuf)
+  310          {
+  311   1          //获取频率信息
+  312   1          FMdrv_getfreq((uint16 *) (&(pBuf->freq)));
+  313   1      
+  314   1          //获取立体声状态
+  315   1          pBuf->stereo_status = (FM_Audio_e) QNF_GetSM();
+  316   1          return 1;
+  317   1      }
+  318          
+  319          /*
+C251 COMPILER V4.55,  fmdrv_bank                                                           23/05/16  10:42:15  PAGE 6   
+
+  320           ********************************************************************************
+  321           *             uint8 FMdrv_getseekflag(uint8* flag)
+  322           *
+  323           * Description : 获取硬件seek 过程是否结束标志
+  324           *
+  325           * Arguments : 保存结束标志的指针
+  326           *
+  327           * Returns : 若获取成功，返回1;否则,返回0
+  328           *
+  329           * Notes :   flag :  bit0  此轮硬件seek 是否结束    1:  已结束   0:  未结束
+  330           *                       bit1  此轮硬件seek 找到的是否有效台   1:  有效台
+  331           ********************************************************************************
+  332           */
+  333          uint8 FMdrv_getseekflag(uint8 *flag)
+  334          {
+  335   1          uint8 result;
+  336   1          uint8 rdata;
+  337   1          uint8 *stc_flag;
+  338   1      
+  339   1          stc_flag = flag;
+  340   1          rdata = QND_ReadReg(SYSTEM1);
+  341   1      
+  342   1          if ((rdata & CHSC) == 0)
+  343   1          {
+  344   2              //本轮seek过程结束
+  345   2              hardseek_flag = 0x01;
+  346   2              *stc_flag = 0x01;
+  347   2      
+  348   2              rdata = QND_ReadReg(STATUS1);
+  349   2              if ((rdata & 0x08) == 0)
+  350   2              {
+  351   3                  //找到有效台
+  352   3                  *stc_flag |= (0x01 << 1);
+  353   3              }
+  354   2          }
+  355   1          //seek 过程未结束
+  356   1          else
+  357   1          {
+  358   2              *stc_flag = 0;
+  359   2          }
+  360   1          result = 1;
+  361   1      
+  362   1          return result;
+  363   1      
+  364   1      }
+  365          
+  366          /*
+  367           ********************************************************************************
+  368           *             uint8 FMdrv_getintensity(uint8 *pvalue)
+  369           *
+  370           * Description : 获取当前电台信号强度
+  371           *
+  372           * Arguments   : pvalue
+  373           *
+  374           * Returns     : 若获取成功,则返回1,否则,返回0
+  375           *
+  376           * Notes       :
+  377           *
+  378           ********************************************************************************
+  379           */
+  380          uint8 FMdrv_getintensity(uint8 *pvalue)
+  381          {
+  382   1          uint8 *ptr = pvalue;
+  383   1      
+  384   1          *ptr = QND_ReadReg(RSSISIG);
+  385   1          return 1;
+C251 COMPILER V4.55,  fmdrv_bank                                                           23/05/16  10:42:15  PAGE 7   
+
+  386   1      }
+  387          
+  388          /*
+  389           ********************************************************************************
+  390           *             uint8 FMdrv_mute(FM_MUTE_e mode)
+  391           *
+  392           * Description : FM静音设置
+  393           *
+  394           * Arguments   : 是否静音,0为取消静音,1为静音
+  395           *
+  396           * Returns     : 若设置静音控制成功,则返回1,否则,返回0
+  397           *
+  398           * Notes       :
+  399           *
+  400           ********************************************************************************
+  401           */
+  402          uint8 FMdrv_mute(FM_MUTE_e mode)
+  403          {
+  404   1          uint8 result;
+  405   1      
+  406   1          if (mode != releaseMUTE)
+  407   1          {
+  408   2              result = QNF_SetRegBit(REG_DAC, 0x0B, 0x0B);
+  409   2      
+  410   2          }
+  411   1          else
+  412   1          {
+  413   2              result = QNF_SetRegBit(REG_DAC, 0x0B, 0x00);
+  414   2          }
+  415   1          return result;
+  416   1      }
+  417          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       600     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

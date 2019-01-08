@@ -1,0 +1,71 @@
+C251 COMPILER V4.55,  enhanced_tag3                                                        13/12/18  16:27:43  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE enhanced_tag3
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\enhanced\enhanced_tag3.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\enhanced\id3\enhanced_tag3.c XSMALL INTR2 F
+                    -UNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) INCDIR(..\..\..\..\..\inc) DEBUG PRINT(..\..\..\..\obj\lib\enhanced\enha
+                    -nced_tag3.lst) OBJECT(..\..\..\..\obj\lib\enhanced\enhanced_tag3.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              USDK 5102
+    3           *                            Module: POWER MANAGER
+    4           *                 Copyright(c) 2001-2009 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *    wuyueqian     2009-9-07 9:42     1.0             build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * file
+   13           * brief
+   14           * Author   wuyueqian
+   15           * par
+   16           *
+   17           *      Copyright(c) 2001-2007 Actions Semiconductor, All Rights Reserved.
+   18           *
+   19           * version 1.0
+   20           * date  2008/6/12
+   21           *******************************************************************************/
+   22          
+   23          #include <actos.h>
+   24          #include <enhanced.h>
+   25          #include <stringH.h>
+   26          
+   27          #pragma name(MW_EH_ID33)
+   28          
+   29          #define ID3_BUFFER 0x0d80//0x1800
+   30          uint8 far reserveFarData3;
+   31          const uint8 reserveHCData3 = 0;
+   32          
+   33          #pragma renamecode(MW_EH_ID33)
+   34          void reserveFunID33(void)
+   35          {
+   36   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =         1     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =         1     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =         1     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,236 @@
+C251 COMPILER V4.55,  enhanced_selector_sub                                                13/12/18  16:27:39  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE enhanced_selector_sub
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\enhanced\enhanced_selector_sub.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\enhanced\fsel\enhanced_selector_sub.c XSMAL
+                    -L INTR2 FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) ORDER INCDIR(..\..\..\..\..\inc) DEFINE(_ACTIVE_USERPL,_ACTIVE_
+                    -SHUFFLE,_ACTIVE_DIRL) DEBUG PRINT(..\..\..\..\obj\lib\enhanced\enhanced_selector_sub.lst) OBJECT(..\..\..\..\obj\lib\enh
+                    -anced\enhanced_selector_sub.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                File selector
+    4           *            enhanced library
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *******************************************************************************
+   10           */
+   11          #include <actos.h>
+   12          #include <enhanced.h>
+   13          #include <stringH.h>
+   14          #include <sysdef.h>
+   15          
+   16          
+   17          #pragma name(MW_EH_FSEL_PREV1)
+   18          
+   19          extern uint8 fselMode; //Mode of select, Sequence, repeat one ...
+   20          extern uint8 fselPLOrCommonDir; //playlist or common operation
+   21          extern uint8 fselType; //Type of select,  Music or voice.
+   22          extern uint8 fselError; // store error id;
+   23          extern int8 fselDiskLetter;
+   24          extern int8 fselDirLayer; //dir  layer
+   25          extern uint16 fselFileNoInDisk;// 文件在全盘的序号
+   26          extern uint16 fselTotalInDisk;// 全盘文件总数
+   27          extern bool select_file_begin_flag;
+   28          extern uint16 fselDirNoInDisk;
+   29          
+   30          extern uint16 GetFileTotalCur(void);
+   31          extern uint16 GetFileTotal(uint8 *strDir, bool bCheckValidDir);
+   32          extern uint8 GetExtSize_Prev(void);
+   33          extern bool SelectNext_8Layer(uint8 *strFile);
+   34          
+   35          const int8 dirExtLocation[4] =
+   36          { "*  " };
+   37          
+   38          const int8 ExtMusicPrev1[][4] =
+   39          { "MP3", "WMA", "WAV", "MP1", "MP2" };
+   40          const int8 ExtVoicePrev1[][4] =
+   41          { "WAV" };
+   42          const int8 IgnoreExtPrev1[4] =
+   43          { "*  " };
+   44          const int8 ExtAll11[][4] =
+   45          { "*  " };
+   46          
+   47          #pragma renamecode(MW_EH_FSEL_PREV1)
+   48          
+   49          extern uint16 GetNumByLocation(file_location_t *location);
+   50          
+   51          /********************************************************************************
+   52           * Description : Set the selected location which is specified by location.
+   53           *
+   54           * Arguments  :
+   55           *            location:     store drive name, path name, file name.
+   56           * Returns     :
+C251 COMPILER V4.55,  enhanced_selector_sub                                                13/12/18  16:27:39  PAGE 2   
+
+   57           *            TRUE:    Successful
+   58           *            FALSE:    Fail, detail information in fselError
+   59           * Notes       :  Should select path in the case of only file name is invalid
+   60           *
+   61           ********************************************************************************/
+   62          uint8 fselSetLocationC(file_location_t *location)
+   63          {
+   64   1          char m_szTemp1[12];
+   65   1          uint8 dir_buf[74];
+   66   1          ClearWatchDog();
+   67   1      
+   68   1          /*加入驱动初始化代码，解决插卡拔出时调用接口死机的问题*/
+   69   1          if (!DRV_ActiveDrive(location->disk, 1))
+   70   1          {
+   71   2              fselError = FSEL_ERR_DISK;
+   72   2              return FALSE;
+   73   2          }
+   74   1          if(FALSE == FS_CD(":")) //避免处于最后的目录项时调用FS_SetCurDir出错
+   75   1          {
+   76   2              fselError = FSEL_ERR_SETDIR;
+   77   2              return FALSE;
+   78   2          }
+   79   1          fselDiskLetter = location->disk;
+   80   1          if(fselDiskLetter == 'U')
+   81   1          {
+   82   2              VMRead(dir_buf, VM_EXFAT_INFO_UH, 74);
+   83   2          }
+   84   1          else
+   85   1          {
+   86   2              VMRead(dir_buf, VM_EXFAT_INFO_CARD, 74);
+   87   2          }
+   88   1          FS_SetCurDir_layer(dir_buf);
+   89   1      
+   90   1          //已经设置好文件夹的路径了
+   91   1          if (!FS_SetCurDir(location->ClusterNo))
+   92   1          {
+   93   2              fselError = FSEL_ERR_SETDIR;
+   94   2              return FALSE;
+   95   2          }
+   96   1          if (FALSE == FS_SetCurDirEntry(location->DirEntry))
+   97   1          {
+   98   2              fselError = FSEL_ERR_SETDIR;
+   99   2              return FALSE;
+  100   2          }
+  101   1          if (!FS_GetName(m_szTemp1, 0))
+  102   1          {
+  103   2              fselError = FSEL_ERR_SETFILE;
+  104   2              return FALSE;
+  105   2          }
+  106   1          else
+  107   1          {
+  108   2              if (memcmp(m_szTemp1, location->filename, 11) != 0)
+  109   2              {
+  110   3                  fselError = FSEL_ERR_SETFILE;
+  111   3                  return FALSE;
+  112   3              }
+  113   2          }
+  114   1          fselDirNoInDisk = location->fselDirNoInDisk;
+  115   1          fselFileNoInDisk = location->fselFileNoInDisk;
+  116   1          if(fselFileNoInDisk == 0xffff)
+  117   1          {
+  118   2              GetNumByLocation(location);
+  119   2              fselFileNoInDisk = fselFileNoInDisk + location->fselFileNo;
+  120   2              FS_SetCurDirEntry(location->DirEntry);  //回到刚才的文件
+  121   2          }
+  122   1      
+C251 COMPILER V4.55,  enhanced_selector_sub                                                13/12/18  16:27:39  PAGE 3   
+
+  123   1          select_file_begin_flag = FALSE;     //断点存在则不从第一首开始播
+  124   1          return TRUE;
+  125   1      }
+  126          
+  127          /********************************************************************************
+  128           * Description : Get the selected location
+  129           *
+  130           * Arguments  :
+  131           *            location:    the buffer to store location
+  132           * Returns     :
+  133           *            TRUE: Successful
+  134           *            FALSE: Fail, detail information in fselError.
+  135           * Notes       :  None
+  136           *
+  137           ********************************************************************************/
+  138          
+  139          bool fselGetLocationC(file_location_t *location)
+  140          {
+  141   1          ClearWatchDog();
+  142   1      
+  143   1          location->disk = fselDiskLetter;
+  144   1          location->ClusterNo = FS_GetCurDir();//当前目录项在文件系统中的偏移
+  145   1          location->DirEntry = FS_GetCurDirEntry();//文件项在当前目录项中的偏移
+  146   1      
+  147   1          if (!FS_GetName(location->filename, 0)) //获取8+3短名
+  148   1          {
+  149   2              return FALSE;
+  150   2          }
+  151   1          location->fselDirNoInDisk = fselDirNoInDisk;
+  152   1          location->fselFileNoInDisk = fselFileNoInDisk;
+  153   1          return TRUE;
+  154   1      }
+  155          
+  156          bool fselGetLocationC_Switch(file_location_t *location)
+  157          {
+  158   1          ClearWatchDog();
+  159   1      
+  160   1          location->disk = fselDiskLetter;
+  161   1          location->ClusterNo = FS_GetCurDir();//当前目录项在文件系统中的偏移
+  162   1          location->DirEntry = FS_GetCurDirEntry();//文件项在当前目录项中的偏移
+  163   1      
+  164   1          if (!FS_GetName(location->filename, 0)) //获取8+3短名
+  165   1          {
+  166   2              return FALSE;
+  167   2          }
+  168   1          location->fselDirNoInDisk = fselDirNoInDisk;
+  169   1          location->fselFileNoInDisk = fselFileNoInDisk;
+  170   1          return TRUE;
+  171   1      }
+  172          uint16 GetNumByLocation(file_location_t *location)
+  173          {
+  174   1          uint8 fileNameTmp[12];
+  175   1      
+  176   1          fselFileNoInDisk = 0;
+  177   1          if(FALSE == FS_CD(":"))
+  178   1          {
+  179   2              return FALSE;
+  180   2          }
+  181   1      
+  182   1          while(FALSE != SelectNext_8Layer(fileNameTmp))
+  183   1          {
+  184   2              if(FS_GetCurDir() == location->ClusterNo)
+  185   2              {
+  186   3                  break;
+  187   3              }
+  188   2              fselFileNoInDisk++;
+C251 COMPILER V4.55,  enhanced_selector_sub                                                13/12/18  16:27:39  PAGE 4   
+
+  189   2          }
+  190   1      
+  191   1          return fselFileNoInDisk;
+  192   1      
+  193   1      }
+  194          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       599     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        38     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

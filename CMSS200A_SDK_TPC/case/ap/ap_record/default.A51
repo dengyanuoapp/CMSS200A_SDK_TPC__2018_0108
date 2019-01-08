@@ -1,0 +1,23 @@
+ 
+
+$include (reg251s.inc)
+
+		PUBLIC	?C_STARTUP?
+		PUBLIC	?C?STARTUP?
+		PUBLIC		 ?C?INITEDATA
+ 
+NAME	?C_START??
+
+
+ 
+
+
+?C_C51STARTUP	SEGMENT     CODE
+RSEG	?C_C51STARTUP
+
+?C?STARTUP?:
+?C_STARTUP?:
+ 
+?C?INITEDATA:
+		eret   
+		END

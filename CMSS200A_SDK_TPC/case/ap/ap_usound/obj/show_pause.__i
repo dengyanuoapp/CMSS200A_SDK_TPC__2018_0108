@@ -1,0 +1,1 @@
+"show_pause.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) OPTIMIZE (9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 ORDER DEFINE (USOUND_AP) DEBUG PRINT(.\list\show_pause.lst) OBJECT(.\obj\show_pause.obj)

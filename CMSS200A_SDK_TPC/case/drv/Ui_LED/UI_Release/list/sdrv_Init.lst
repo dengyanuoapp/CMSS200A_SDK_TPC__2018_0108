@@ -1,0 +1,66 @@
+C251 COMPILER V4.55,  sdrv_Init                                                            23/07/16  20:31:14  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE sdrv_Init
+OBJECT MODULE PLACED IN .\UI_Release\obj\sdrv_Init.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE sdrv_Init.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) BROWSE INCDIR(..\..\..\
+                    -psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\UI_Release\list\sdrv_Init.lst) OBJECT(.\UI_Release\obj\sdrv_Init.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************
+    3           *                       ACTOS
+    4           *                  UI Init function
+    5           *
+    6           *                (c) Copyright 2002-2008, Actions Co,Ld.
+    7           *                        All Right Reserved
+    8           *
+    9           * File   : Sdrv_Init.c
+   10           * By     : fiona
+   11           * Version: 1> v1.00     first version     2010/10/13  14:00
+   12           * Description: support unicode font
+   13           ********************************************************************************
+   14           */
+   15          
+   16          #include "drv_led.h"
+   17          
+   18          #pragma name(BBC_INIT)
+   19          
+   20          bool Sdrv_Init(uint8 api_no)
+   21          {
+   22   1          api_no = api_no;
+   23   1          //Hdrv_HardInit();
+   24   1          //Sdrv_ClearScreen(0);
+   25   1          return 1;
+   26   1      }
+   27          
+   28          void Sdrv_Exit(uint8 api_no)
+   29          {
+   30   1          api_no = api_no;
+   31   1          return;
+   32   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =         4     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

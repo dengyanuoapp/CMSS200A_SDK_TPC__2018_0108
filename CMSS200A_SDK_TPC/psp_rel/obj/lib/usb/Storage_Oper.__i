@@ -1,0 +1,1 @@
+"..\..\..\libsrc\usb\Storage_Oper.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usb\Storage_Oper.lst) OBJECT(..\..\..\obj\lib\usb\Storage_Oper.obj)

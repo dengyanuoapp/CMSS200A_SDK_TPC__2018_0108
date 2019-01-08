@@ -1,0 +1,1 @@
+"..\..\..\libsrc\usb\UsbInitExitFun.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usb\UsbInitExitFun.lst) OBJECT(..\..\..\obj\lib\usb\UsbInitExitFun.obj)

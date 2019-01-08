@@ -1,0 +1,766 @@
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE ADFUFunc
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usb\ADFUFunc.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usb\ADFUFunc.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) INCD
+                    -IR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\ADFUFunc.lst) OBJECT(..\..\..\obj\lib\usb\ADFUFunc.obj) 
+
+stmt  level    source
+
+    1          #include "udisklib.h"
+    2          
+    3          #pragma name(AUCODE_C)
+    4          
+    5          #pragma ROM(HUGE)
+    6          static uint8 MBREC_Write_AndCheck(void);
+    7          static uint8 BREC_Write_AndCheck(void);
+    8          static uint8 Calculate_BREC_Checksum(void);
+    9          static void sFlash_Phy_Write(uint8 *dst_buffer);
+   10          static void sFlash_Phy_Read(uint8 *dst_buffer);
+   11          static uint16 Caculate_CheckSum(uint16 *addr, uint16 length);
+   12          #pragma ROM(HUGE)
+   13          
+   14          #pragma renamecode(?PR?AUCODE_C)
+   15          #pragma ROM(HUGE)
+   16          /*
+   17           ********************************************************************************************************
+             -*
+   18           *                                           Access_Internal_RAM_Command
+   19           *
+   20           * Description: ADFU protocol handle, read or write internal sram.
+   21           *
+   22           * Arguments  : None.
+   23           *
+   24           * Returns    : None.
+   25           *
+   26           * Note(s)    : None.
+   27           ********************************************************************************************************
+             -*
+   28           */
+   29          void Access_Internal_RAM_Command(void)
+   30          {
+   31   1          //读取还是写入 0:写入  01:读取
+   32   1          if ((CBW_data_buffer._CBWCB[1] & 0x80) == 0)
+   33   1          {
+   34   2              Write_Internal_RAM();
+   35   2          }
+   36   1          else
+   37   1          {
+   38   2              Read_Internal_RAM();
+   39   2          }
+   40   1      
+   41   1          ReportCSW(0);
+   42   1      }
+   43          
+   44          /*
+   45           ********************************************************************************************************
+             -*
+   46           *                                           Access_Nand_Flash_Command
+   47           *
+   48           * Description: ADFU protocol handle, read or write nand flash.
+   49           *
+   50           * Arguments  : None.
+   51           *
+   52           * Returns    : None.
+   53           *
+   54           * Note(s)    : None.
+   55           ********************************************************************************************************
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 2   
+
+             -*
+   56           */
+   57          void Access_Nand_Flash_Command(void)
+   58          {
+   59   1          uint8 tmp;
+   60   1          LogicOrPhy = CBW_data_buffer._CBWCB[0];
+   61   1      
+   62   1          //判断是否是SPINor
+   63   1          if (flash_type != 0x02)
+   64   1          {
+   65   2              //因量产工具对同一设备的不同LUN均发送读写命令,而ADFU下又没有去区分LUN号
+   66   2              //工具对于每个LUN的读写均是操作Flash,导致对Flash进行多次同一sector号的读写
+   67   2              //ADFU下只认为对LUN=1(Flash盘)的读写合法,对其他LUN非零的读写作不作反应;
+   68   2              illegalLBAFlag = CBW_data_buffer._bCBWLUN - 1;
+   69   2          }
+   70   1      
+   71   1          //DIR
+   72   1          if ((CBW_data_buffer._CBWCB[1] & 0x80) != 0)
+   73   1          {
+   74   2              CMD_Read10_();
+   75   2      
+   76   2          }
+   77   1          else
+   78   1          {
+   79   2              AccessFlash = 1;
+   80   2      
+   81   2              if ((LogicOrPhy & 0x01) == 0)
+   82   2              {
+   83   3                  //for logical write
+   84   3                  CMD_Write10_();
+   85   3              }
+   86   2              else
+   87   2              {
+   88   3                  sectors_trans_once = 1;
+   89   3      
+   90   3                  //DIR & BREC type: 0:MBREC; 1:BREC
+   91   3                  if ((CBW_data_buffer._CBWCB[1] & 0x0f) != 0)
+   92   3                  {
+   93   4                      tmp = BREC_Write_AndCheck();
+   94   4                  }
+   95   3                  else
+   96   3                  {
+   97   4                      tmp = MBREC_Write_AndCheck();
+   98   4                  }
+   99   3      
+  100   3                  CSWBuffer._bCSWStatus = tmp;
+  101   3      
+  102   3                  ReportCSW(0);
+  103   3              }
+  104   2          }
+  105   1      }
+  106          
+  107          /*
+  108           ********************************************************************************************************
+             -*
+  109           *                                           Switch_Firmware_Command
+  110           *
+  111           * Description: ADFU protocol handle, switch pc.
+  112           *
+  113           * Arguments  : None.
+  114           *
+  115           * Returns    : None.
+  116           *
+  117           * Note(s)    : None.
+  118           ********************************************************************************************************
+             -*
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 3   
+
+  119           */
+  120          void Switch_Firmware_Command(void)
+  121          {
+  122   1          ReportCSW(0);
+  123   1      }
+  124          
+  125          /*
+  126           ********************************************************************************************************
+             -*
+  127           *                                           Detach_Device_Command
+  128           *
+  129           * Description: ADFU protocol handle, disconnect usb device.
+  130           *
+  131           * Arguments  : None.
+  132           *
+  133           * Returns    : None.
+  134           *
+  135           * Note(s)    : None.
+  136           ********************************************************************************************************
+             -*
+  137           */
+  138          void Detach_Device_Command(void)
+  139          {
+  140   1          PullLineFlag = 1;
+  141   1      
+  142   1          ReportCSW(0);
+  143   1      }
+  144          
+  145          /*
+  146           ********************************************************************************************************
+             -*
+  147           *                                           Polling_Ready_Command
+  148           *
+  149           * Description: ADFU protocol handle, get status length.
+  150           *
+  151           * Arguments  : None.
+  152           *
+  153           * Returns    : None.
+  154           *
+  155           * Note(s)    : None.
+  156           ********************************************************************************************************
+             -*
+  157           */
+  158          void Polling_Ready_Command(void)
+  159          {
+  160   1          //把标志上传
+  161   1          CBW_data_buffer._dCBWDataTransferLength = 2;
+  162   1          Send_Data_To_PC((uint8 *) &StatusLength, CBW_data_buffer._dCBWDataTransferLength);
+  163   1      
+  164   1          ReportCSW(0);
+  165   1      }
+  166          
+  167          /*
+  168           ********************************************************************************************************
+             -*
+  169           *                                           Get_Status_Command
+  170           *
+  171           * Description: ADFU protocol handle, get status.
+  172           *
+  173           * Arguments  : None.
+  174           *
+  175           * Returns    : None.
+  176           *
+  177           * Note(s)    : None.
+  178           ********************************************************************************************************
+             -*
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 4   
+
+  179           */
+  180          void Get_Status_Command(void)
+  181          {
+  182   1          //把状态上传,要传输的数据长度
+  183   1          CBW_data_buffer._dCBWDataTransferLength = *((uint16 *) &CBW_data_buffer._CBWCB[7]);
+  184   1          EndianReverse((uint8 *) (&CBW_data_buffer._dCBWDataTransferLength), 4);
+  185   1      
+  186   1          Send_Data_To_PC((uint8 *) &CallingTaskResult, CBW_data_buffer._dCBWDataTransferLength);
+  187   1      }
+  188          
+  189          /*
+  190           ********************************************************************************************************
+             -*
+  191           *                                           Calling_Entry_Command
+  192           *
+  193           * Description: ADFU protocol handle, call the address.
+  194           *
+  195           * Arguments  : None.
+  196           *
+  197           * Returns    : None.
+  198           *
+  199           * Note(s)    : None.
+  200           ********************************************************************************************************
+             -*
+  201           */
+  202          void Calling_Entry_Command(void)
+  203          {
+  204   1          uint8 tmp;
+  205   1      
+  206   1          //CallingTask起始地址
+  207   1          tmp = *((uint8 *) &CBW_data_buffer._CBWCB[2]);
+  208   1      
+  209   1          if (tmp < 0x90)
+  210   1          {
+  211   2              CallingTaskFlag = 1;
+  212   2      
+  213   2              EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[1]), 2);
+  214   2              CallingTaskAdd = (uint32) (*((uint16 *) &CBW_data_buffer._CBWCB[1])) + 0xff0000; //转为程序地址
+  215   2          }
+  216   1          else if (tmp == 0x90) //9000h
+  217   1          {
+  218   2              TransferFlag = 0x21; //显示DownLoad
+  219   2          }
+  220   1          else if (tmp == 0x91) //9100h
+  221   1          {
+  222   2              //prints("callentry exit-");
+  223   2              detach_cmd_rcv = 1; //完成升级并收到detach命令
+  224   2              TransferFlag = 0x41; //显示Succ
+  225   2          }
+  226   1          else if (tmp == 0x92) //9200h
+  227   1          {
+  228   2              TransferFlag = 0x31; //显示UpLoad
+  229   2          }
+  230   1          else if (tmp == 0x93) //9300h
+  231   1          {
+  232   2              FWOpStatus = 2;
+  233   2              TransferFlag = 0x41; //显示Succ
+  234   2          }
+  235   1          else if (tmp == 0x95) //9500h
+  236   1          {
+  237   2              TransferFlag = 0x11; //显示Commu
+  238   2          }
+  239   1          else //9600h
+  240   1          {
+  241   2              TransferFlag = 0x51; //显示Ready
+  242   2          }
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 5   
+
+  243   1      
+  244   1          ReportCSW(0);
+  245   1      }
+  246          
+  247          /*
+  248           ********************************************************************************************************
+             -*
+  249           *                                   Write_Internal_RAM
+  250           *
+  251           * Description: Recieve data from USB host, and write it to ram.
+  252           *
+  253           * Arguments  : None.
+  254           *
+  255           * Returns    : None.
+  256           *
+  257           * Note(s)    : None.
+  258           ********************************************************************************************************
+             -*
+  259           */
+  260          void Write_Internal_RAM(void)
+  261          {
+  262   1          uint16 sendLength;
+  263   1          uint16 count;
+  264   1          DMA_DT_Trnsfr_t dma_transfer;
+  265   1      
+  266   1          EPB_OutRdy_FIFOFullNAK();
+  267   1      
+  268   1          //要传输的数据长度
+  269   1          EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[7]), 2);
+  270   1          sendLength = *((uint16 *) &CBW_data_buffer._CBWCB[7]);
+  271   1      
+  272   1          while (sendLength != 0)
+  273   1          {
+  274   2              count = (sendLength >= max_pkt_size) ? max_pkt_size : sendLength;
+  275   2      
+  276   2              dma_transfer.source_addr = URAMSTARTADDR;
+  277   2              dma_transfer.dst_addr = DATABUFFER;
+  278   2              dma_transfer.length = count * 0x200;
+  279   2              dma_transfer.pagenum = USBFIFO_TO_DRAM;
+  280   2              DMA_Data_Transfer(&dma_transfer);
+  281   2              Wait_PrevDMA_TransEnd();
+  282   2      
+  283   2              sendLength = sendLength - count;
+  284   2          }
+  285   1      }
+  286          
+  287          /*
+  288           ********************************************************************************************************
+             -*
+  289           *                                   Read_Internal_RAM
+  290           *
+  291           * Description: Upload data to USB host.
+  292           *
+  293           * Arguments  : None.
+  294           *
+  295           * Returns    : None.
+  296           *
+  297           * Note(s)    : 命令中读数据个数不能超过0xC0.
+  298           ********************************************************************************************************
+             -*
+  299           */
+  300          static void Read_Internal_RAM(void)
+  301          {
+  302   1          uint8 i;
+  303   1          ADFU_SysInfo_t *adfuSysInfo;
+  304   1      
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 6   
+
+  305   1          EPA_In_Rdy();
+  306   1      
+  307   1          EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[2]), 2);
+  308   1          EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[7]), 2);
+  309   1      
+  310   1          adfuSysInfo = (ADFU_SysInfo_t *) URAMYADDR;
+  311   1          //要传输的数据长度只能从Ram中最多读512字节个真数据,否则为伪数据,要传输的数据起始地址只能是data空间的0
+             -x800的位置
+  312   1          if ((*((uint16 *) &CBW_data_buffer._CBWCB[7]) <= 0x200) && (*((uint16 *) &CBW_data_buffer._CBWCB[2]) 
+             -== 0x800))
+  313   1          {
+  314   2              //don't use URAMXADDR for buffer,because when calling SD_READ,need use it
+  315   2              GetSysInfo((ADFU_SysInfo_t *) URAMYADDR);
+  316   2      
+  317   2              adfu_flag = 1;
+  318   2              phy_block_addr = BREC_START_BLOCK; //BREC第一份在Flash 物理block 4
+  319   2              sectors_trans_once = 1;
+  320   2      
+  321   2              //总共4份BREC,找到校验和正确的那一份,读出其ID表和Downgrade信息
+  322   2              for (i = 1; i <= 1; i++)
+  323   2              {
+  324   3                  //Return: BREC校验和,会用到DATABUFFER作数据buffer来计算校验和
+  325   3                  if (Calculate_BREC_Checksum() == 0)
+  326   3                  {
+  327   4                      break;
+  328   4                  }
+  329   3                  phy_block_addr++;
+  330   3              }
+  331   2      
+  332   2              //判断是否是SPINor,对于Nor Base方案每次均更新MBREC,BREC
+  333   2              if (flash_type == 0x02)
+  334   2              {
+  335   3                  adfuSysInfo->adfu_fwscaninfo.BrecCheckSum[1] = 0;
+  336   3              }
+  337   2              else
+  338   2              {
+  339   3                  //DATABUFFER + 0x1FE:brec checksum
+  340   3                  adfuSysInfo->adfu_fwscaninfo.BrecCheckSum[1] = *((uint16 *) ((uint8 *) DATABUFFER + 0x1FE));
+  341   3              }
+  342   2      
+  343   2              adfuSysInfo->adfu_fwscaninfo.Logical_cap = flash_capacity;
+  344   2      
+  345   2              if (flash_type == 0x04)
+  346   2              {
+  347   3                  adfuSysInfo->adfu_hwscaninfo.BootDiskType[0] = 0xf6;
+  348   3                  adfuSysInfo->adfu_hwscaninfo.BootDiskType[1] = 0x48;
+  349   3                  adfuSysInfo->adfu_hwscaninfo.BootDiskType[2] = 0xf6;
+  350   3                  adfuSysInfo->adfu_hwscaninfo.BootDiskType[3] = 0x48;
+  351   3                  adfuSysInfo->adfu_hwscaninfo.BootDiskType[4] = 0xf6;
+  352   3                  adfuSysInfo->adfu_hwscaninfo.BootDiskType[5] = 0x48;
+  353   3                  adfuSysInfo->adfu_hwscaninfo.BootDiskType[6] = 0xf6;
+  354   3                  adfuSysInfo->adfu_hwscaninfo.BootDiskType[7] = 0x48;
+  355   3              }
+  356   2              //BREC最后一个扇区的头64byte是Flash ID表信息,之后32byte是Downgrade信息
+  357   2              //memcpy(URAMYADDR+160, DATABUFFER, 64);
+  358   2              //memcpy(URAMYADDR+160+64, DATABUFFER+64, 32);
+  359   2      
+  360   2              //u盘下小飞机升级时,工具分析固件信息机产品及设备信息时按z80平台的数据结构获取
+  361   2              //故小机端判断到是工具在读取信息时,填写相应位置送给工具.
+  362   2              if (CBW_data_buffer._dCBWDataTransferLength == 0xc0)
+  363   2              {
+  364   3                  memcpy(&adfuSysInfo->SysinfoFlag[0] + 8 + 64 + 6, &adfuSysInfo->adfu_fwscaninfo.FirmwareVersi
+             -on,
+  365   3                         sizeof(adfuSysInfo->adfu_fwscaninfo.FirmwareVersion));
+  366   3                  memcpy(&adfuSysInfo->SysinfoFlag[0] + 8 + 64 + 12, &adfuSysInfo->adfu_fwscaninfo.Productor[0]
+             -, 32);
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 7   
+
+  367   3                  memcpy(&adfuSysInfo->SysinfoFlag[0] + 8 + 64 + 44, &adfuSysInfo->adfu_fwscaninfo.DeviceName[0
+             -], 32);
+  368   3              }
+  369   2          }
+  370   1      
+  371   1          Send_Data_To_PC(URAMYADDR, CBW_data_buffer._dCBWDataTransferLength);
+  372   1      }
+  373          
+  374          /*
+  375           ********************************************************************************************************
+             -*
+  376           *                                   MBREC_Write_AndCheck
+  377           *
+  378           * Description: Write MBREC to flash physical area, then check if it success.
+  379           *
+  380           * Arguments  : None.
+  381           *
+  382           * Returns    : a: if write and verify success: 0: yes; 1:no.
+  383           *
+  384           * Note(s)    : None.
+  385           ********************************************************************************************************
+             -*
+  386           */
+  387          static uint8 MBREC_Write_AndCheck(void)
+  388          {
+  389   1          uint8 i;
+  390   1          uint8 count;
+  391   1          uint8 ret;
+  392   1          DMA_DT_Trnsfr_t dma_transfer;
+  393   1      
+  394   1          ret = 0;
+  395   1      
+  396   1          //prints("mrec enter-");
+  397   1          //ak211x big endian,need convert
+  398   1          EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[7]), 2);
+  399   1          udisk_rw_sctr_num = *((uint16 *) &CBW_data_buffer._CBWCB[7]);
+  400   1      
+  401   1          EPB_OutRdy_FIFOFullNAK();
+  402   1      
+  403   1          //prints("mrec received 0-");
+  404   1          dma_transfer.source_addr = URAMSTARTADDR;
+  405   1          dma_transfer.dst_addr = DATABUFFER;
+  406   1          dma_transfer.length = udisk_rw_sctr_num * 512;
+  407   1          dma_transfer.pagenum = USBFIFO_TO_DRAM;
+  408   1          DMA_Data_Transfer(&dma_transfer);
+  409   1          Wait_PrevDMA_TransEnd();
+  410   1      
+  411   1          memcpy(URAMYADDR, DATABUFFER, udisk_rw_sctr_num * 512);
+  412   1      
+  413   1          phy_block_addr = 0;
+  414   1          LBA = 0;
+  415   1      
+  416   1          if ((flash_type == 3) || (flash_type == 4))//card base or lba nand
+  417   1          {
+  418   2              sFlash_Phy_Read(DATABUFFER);
+  419   2              if (memcmp(DATABUFFER, URAMYADDR, udisk_rw_sctr_num * 512) != 0)
+  420   2              {
+  421   3                  //prints("mrec err-");
+  422   3                  //写MBREC份数
+  423   3                  count = 4;
+  424   3              }
+  425   2              else
+  426   2              {
+  427   3                  //prints("mrec OK-");
+  428   3                  count = 0;
+  429   3                  ret = 0;
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 8   
+
+  430   3              }
+  431   2          }
+  432   1          else if (flash_type == 2)//spi nor base
+  433   1          {
+  434   2              //是否Snor,Nor方案每次均更新MBREC,用于擦除整片Nor,SPI NorFlash只写一份MBREC和BREC
+  435   2              //且因SPI Nor整片擦除,所以总需写MBREC和BREC
+  436   2              count = 1;
+  437   2          }
+  438   1          else
+  439   1          {
+  440   2              //prints("mrec received 1-");
+  441   2              //nand flash mrec is 1K,saved and write together;
+  442   2              dma_transfer.source_addr = URAMSTARTADDR;
+  443   2              dma_transfer.dst_addr = DATABUFFER;
+  444   2              dma_transfer.length = udisk_rw_sctr_num * 512;
+  445   2              dma_transfer.pagenum = USBFIFO_TO_DRAM;
+  446   2              DMA_Data_Transfer(&dma_transfer);
+  447   2              Wait_PrevDMA_TransEnd();
+  448   2              memcpy(URAMYADDR + 0x200, DATABUFFER, 0x200);
+  449   2      
+  450   2              sFlash_Phy_Read(DATABUFFER);
+  451   2              if ((memcmp(DATABUFFER, URAMYADDR, 0x1e0) != 0) || (memcmp(DATABUFFER + 0x200, URAMYADDR + 0x200,
+             - 0x200) != 0))
+  452   2              {
+  453   3                  //prints("flash mrec err-");
+  454   3                  //写MBREC份数
+  455   3                  count = 4;
+  456   3              }
+  457   2              else
+  458   2              {
+  459   3                  //prints("flash mrec OK-");
+  460   3                  count = 0;
+  461   3                  ret = 0;
+  462   3              }
+  463   2      
+  464   2          }
+  465   1      
+  466   1          //write MBREC
+  467   1          if (count != 0)
+  468   1          {
+  469   2              //prints("mrec write-");
+  470   2              for (i = 0; i < count; i++)
+  471   2              {
+  472   3                  sFlash_Phy_Write(URAMYADDR);
+  473   3                  phy_block_addr++;
+  474   3              }
+  475   2      
+  476   2              //写完后再重校验block0中 MBREC写入是否正确
+  477   2              phy_block_addr = 0;
+  478   2              sFlash_Phy_Read(DATABUFFER);
+  479   2      
+  480   2              ClearWatchdog();
+  481   2      
+  482   2              if ((flash_type == 0x02) || (flash_type == 0x03) || (flash_type == 0x04))
+  483   2              {
+  484   3                  ret = (uint8) memcmp(DATABUFFER, URAMYADDR, udisk_rw_sctr_num * 512);
+  485   3              }
+  486   2              else
+  487   2              {
+  488   3                  ret = (memcmp(DATABUFFER, URAMYADDR, 0x1e0)) || (memcmp(DATABUFFER + 0x200, URAMYADDR + 0x200
+             -, 0x200));
+  489   3              }
+  490   2          }
+  491   1      
+  492   1          return ret;
+  493   1      }
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 9   
+
+  494          
+  495          /*
+  496           ********************************************************************************************************
+             -*
+  497           *                                   BREC_Write_AndCheck
+  498           *
+  499           * Description: Write BREC to flash physical area, then check if it success.
+  500           *
+  501           * Arguments  : None.
+  502           *
+  503           * Returns    : a: if write and verify success: 0: yes; 1:no.
+  504           *
+  505           * Note(s)    : None.
+  506           ********************************************************************************************************
+             -*
+  507           */
+  508          static uint8 BREC_Write_AndCheck(void)
+  509          {
+  510   1          uint8 ret;
+  511   1          ADFU_BrecHead_t *brecHead_p;
+  512   1          DMA_DT_Trnsfr_t dma_transfer;
+  513   1      
+  514   1          //prints("brec enter-");
+  515   1      
+  516   1          ret = 0;
+  517   1      
+  518   1          EPB_OutRdy_FIFOFullNAK();
+  519   1      
+  520   1          //ak211x big endian,need convert
+  521   1          EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[2]), 2);
+  522   1          LBA = *((uint16 *) &CBW_data_buffer._CBWCB[2]);
+  523   1          EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[7]), 2);
+  524   1          udisk_rw_sctr_num = *((uint16 *) &CBW_data_buffer._CBWCB[7]);
+  525   1      
+  526   1          brecHead_p = DATABUFFER;
+  527   1          phy_block_addr = BREC_START_BLOCK;
+  528   1          //write brec
+  529   1          while (udisk_rw_sctr_num != 0)
+  530   1          {
+  531   2              dma_transfer.source_addr = URAMSTARTADDR;
+  532   2              dma_transfer.dst_addr = DATABUFFER;
+  533   2              dma_transfer.length = 0x200;
+  534   2              dma_transfer.pagenum = USBFIFO_TO_DRAM;
+  535   2              DMA_Data_Transfer(&dma_transfer);
+  536   2              Wait_PrevDMA_TransEnd();
+  537   2      
+  538   2              sFlash_Phy_Write((uint8 *) DATABUFFER);
+  539   2              LBA = LBA + (uint32) sectors_trans_once;
+  540   2      
+  541   2              udisk_rw_sctr_num--;
+  542   2          }
+  543   1      
+  544   1          //Return: BREC校验和,并对其作校验: 0:一致; 1:不一致.
+  545   1          ret = Calculate_BREC_Checksum();
+  546   1      
+  547   1          return ret;
+  548   1      }
+  549          
+  550          /*
+  551           ********************************************************************************************************
+             -*
+  552           *                                   Calculate_BREC_Checksum
+  553           *
+  554           * Description: Calculate the checksum of BREC.
+  555           *
+  556           * Arguments  : None.
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 10  
+
+  557           *
+  558           * Returns    : a: if BREC verify success: 0: yes; 1:no; hl: Brec checksum;
+  559           *
+  560           * Note(s)    : 注意phy_block_addr参数值,表示Flash物理block地址.
+  561           ********************************************************************************************************
+             -*
+  562           */
+  563          static uint8 Calculate_BREC_Checksum(void)
+  564          {
+  565   1          uint8 ret = 1;
+  566   1          uint8 brecCount;
+  567   1      
+  568   1          LBA = 0;
+  569   1          brec_check_sum = 0;
+  570   1      
+  571   1          brecCount = 32; // BREC is  16kb
+  572   1      
+  573   1          //read brec,and add brec checksum
+  574   1          while (brecCount != 0)
+  575   1          {
+  576   2              sFlash_Phy_Read(DATABUFFER);
+  577   2              brec_check_sum += Caculate_CheckSum(DATABUFFER, 0x200);
+  578   2              LBA = LBA + (uint32) sectors_trans_once;
+  579   2              brecCount--;
+  580   2          }
+  581   1      
+  582   1          //校验和多加了最后两个byte(最后两个byte是原有的校验和)
+  583   1          if (*((uint16 *) ((uint8 *) DATABUFFER + 0x1fc)) == 0xaa55)
+  584   1          {
+  585   2              if (brec_check_sum == (*((uint16 *) ((uint8 *) DATABUFFER + 0x1fe)) * 2))
+  586   2              {
+  587   3                  //ret 0,brec check success
+  588   3                  ret = 0;
+  589   3      
+  590   3                  //prints("brec check OK-");
+  591   3              }
+  592   2          }
+  593   1      
+  594   1          return ret;
+  595   1      }
+  596          
+  597          /*
+  598           ********************************************************************************************************
+             -*
+  599           *                                           sFlash_Phy_Write
+  600           *
+  601           * Description: 将Buffer中一个扇区数据写入Flash物理空间.
+  602           *
+  603           * Arguments  : ix: Uram Address.
+  604           *
+  605           * Returns    : None.
+  606           *
+  607           * Note(s)    : None.
+  608           ********************************************************************************************************
+             -*
+  609           */
+  610          static void sFlash_Phy_Write(uint8 *dst_buffer)
+  611          {
+  612   1          SD_UDRWStruct.lba = LBA + (uint32) phy_block_addr;
+  613   1          SD_UDRWStruct.sectornum = 1;
+  614   1          SD_UDRWStruct.dstaddr = (uint16) dst_buffer;
+  615   1      
+  616   1          UD_Update();
+  617   1          SD_Bre_SectorWrite((SD_RW *) &SD_UDRWStruct); // need fix ???
+  618   1      }
+  619          
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 11  
+
+  620          /*
+  621           ********************************************************************************************************
+             -*
+  622           *                                           sFlash_Phy_Read
+  623           *
+  624           * Description: 把一个扇区数据从Flash物理区读到Buffer去.
+  625           *
+  626           * Arguments  : ix: Uram Address.
+  627           *
+  628           * Returns    : None.
+  629           *
+  630           * Note(s)    : None.
+  631           ********************************************************************************************************
+             -*
+  632           */
+  633          void sFlash_Phy_Read(uint8 *dst_buffer)
+  634          {
+  635   1          SD_UDRWStruct.lba = LBA + (uint32) phy_block_addr;
+  636   1          SD_UDRWStruct.sectornum = 1;
+  637   1          SD_UDRWStruct.dstaddr = (uint16) dst_buffer;
+  638   1      
+  639   1          UD_Update();
+  640   1          SD_Bre_SectorRead((SD_RW *) &SD_UDRWStruct); // need fix ???
+  641   1      }
+  642          
+  643          /*
+  644           ********************************************************************************************************
+             -*
+  645           *             Caculate_CheckSum
+  646           *
+  647           * Description : 计算zram内指定地址开始处指定长度数据的校验和(2byte add)
+  648           *
+  649           * Arguments   : de: data start address; bc: data length
+  650           *
+  651           * Returns     : hl: the checksum
+  652           *
+  653           * Notes       : None.
+  654           *
+  655           ********************************************************************************************************
+             -*
+  656           */
+  657          static uint16 Caculate_CheckSum(uint16 *addr, uint16 length)//length按两字节为一单位
+  658          {
+  659   1          uint16 tmp, checksum = 0;
+  660   1      
+  661   1          while (length != 0)
+  662   1          {
+  663   2              tmp = *addr;
+  664   2              addr++;
+  665   2              length -= 2;
+  666   2              checksum += tmp;
+  667   2          }
+  668   1      
+  669   1          ClearWatchdog();
+  670   1      
+  671   1          return checksum;
+  672   1      }
+  673          #pragma ROM(HUGE)
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1685     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  15:45:42  PAGE 12  
+
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

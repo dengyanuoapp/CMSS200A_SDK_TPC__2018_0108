@@ -1,0 +1,1 @@
+"Sdrv_LEDDisplay.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\UI_Release\list\Sdrv_LEDDisplay.lst) OBJECT(.\UI_Release\obj\Sdrv_LEDDisplay.obj)

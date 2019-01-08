@@ -1,0 +1,1 @@
+"..\common\deal_EQTool_save.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) OPTIMIZE (9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\deal_EQTool_save.lst) OBJECT(.\Obj\deal_EQTool_save.obj)

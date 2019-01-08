@@ -1,0 +1,229 @@
+C251 COMPILER V4.55,  alarm_main                                                           23/05/16  10:41:31  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE alarm_main
+OBJECT MODULE PLACED IN .\Obj\alarm_main.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE alarm_main.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPE
+                    -ED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\alarm_main.lst) OBJECT(.\Obj\alarm_main.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        system setting ap of sdk 3.0
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: main.c,v 1.1 2008/10/12 09:40:36 stevenluo Exp $
+   10           *******************************************************************************
+   11           */
+   12          #include "actos.h"
+   13          #include "enhanced.h"
+   14          #include "ap_common.h"
+   15          #include "uhdrv.h"
+   16          
+   17          #include "ui_alarm.h"
+   18          
+   19          #pragma name(ALARM_MAIN)
+   20          const uint8 ExtAlarmstr1[3][4] =
+   21          { "MP3", "WMA", "WAV" };//文件后缀数组
+   22          const uint8 ExtNext[4] =
+   23          { "*  " };
+   24          uint8 key;
+   25          uint8 playing_flag = FALSE;//播放状态0-停止状态，1-暂停状态2-播放状态
+   26          uint16 playing_count;
+   27          Music_type_a g_currentMusicType;
+   28          Open_param_t g_Openparam;
+   29          uint8 play_times;//播放次数
+   30          uint8 g_TagInfoBuf[92];//用于放TAG信息的BUF
+   31          uint8 SearchAlarmFile(void);
+   32          extern uint8 play_alarm_music(uint8 type);
+   33          int16 main(int16 param)
+   34          {
+   35   1          uint8 result;
+   36   1          uint8 uhost_ok = FALSE;
+   37   1          uint8 card_ok = FALSE;
+   38   1          param = param;
+   39   1          VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval));
+   40   1          if (USBH_Check_Udisk())
+   41   1          {
+   42   2              if (DRV_ActiveDrive('U', MODE_SLOW) != 0)
+   43   2              {
+   44   3                  result = SearchAlarmFile();
+   45   3                  if (result != 0)
+   46   3                  {
+   47   4                      g_comval.g_alarm.location.disk = 'U';
+   48   4                      uhost_ok = TRUE;
+   49   4                  }
+   50   3              }
+   51   2          }
+   52   1          if (uhost_ok == FALSE)
+   53   1          {
+   54   2              if (DRV_DetectUD(1) == 0x20)
+   55   2              {
+   56   3                  if (DRV_ActiveDrive('H', MODE_SLOW))
+   57   3                  {
+   58   4                      result = SearchAlarmFile();
+C251 COMPILER V4.55,  alarm_main                                                           23/05/16  10:41:31  PAGE 2   
+
+   59   4                      if (result != 0)
+   60   4                      {
+   61   5                          g_comval.g_alarm.location.disk = 'H';
+   62   5                          card_ok = TRUE;
+   63   5                      }
+   64   4      
+   65   4                  }
+   66   3              }
+   67   2          }
+   68   1          g_comval.g_alarm.volume = g_comval.volume;
+   69   1          g_Openparam.filename = g_comval.g_alarm.location.filename;
+   70   1          g_Openparam.BreakPTSave = NULL;
+   71   1          if ((uhost_ok != 0) || (card_ok != 0))
+   72   1          {
+   73   2              memcpy(g_comval.g_alarm.location.filename, file_name, 12);
+   74   2              g_currentMusicType = ALARMCheckMusicType(g_comval.g_alarm.location.filename);
+   75   2              if (g_currentMusicType != Music_NON)
+   76   2              {
+   77   3                  AlarmGetInfo();
+   78   3                  result = play_alarm_music(0);
+   79   3              }
+   80   2              else
+   81   2              {
+   82   3                  strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //使用内部alarm文件
+   83   3                  g_comval.g_alarm.location.disk = 'S';
+   84   3                  g_Openparam.typeerror = 0;
+   85   3                  g_Openparam.musicframeoffset = 0x0000;
+   86   3                  result = play_alarm_music(1);
+   87   3              }
+   88   2          }
+   89   1          else
+   90   1          {
+   91   2              strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //使用内部alarm文件
+   92   2              g_comval.g_alarm.location.disk = 'S';
+   93   2              g_Openparam.typeerror = 0;
+   94   2              g_Openparam.musicframeoffset = 0x0000;
+   95   2              g_Openparam.filename = g_comval.g_alarm.location.filename;
+   96   2              result = play_alarm_music(1);
+   97   2          }
+   98   1          if (result == RESULT_MAIN)
+   99   1          {
+  100   2              return NULL;
+  101   2          }
+  102   1          else
+  103   1          {
+  104   2              return result;
+  105   2          }
+  106   1      }
+  107          
+  108          /********************************************************************************
+  109           * Description :查找根目录下是否存入alarm文件夹，如果存在则看里面是否存入可播放歌曲。
+  110           *
+  111           * Arguments  :
+  112           *
+  113           * Returns     :
+  114           *            无
+  115           * Notes       :
+  116          
+  117           *
+  118           ********************************************************************************/
+  119          uint8 SearchAlarmFile(void)
+  120          {
+  121   1          uint8 result;
+  122   1          uint8 NameBuf[50];
+  123   1          uint8 name_count, i, tmp_char;
+  124   1          uint8 dir_type = FS_DIR_DIR;
+C251 COMPILER V4.55,  alarm_main                                                           23/05/16  10:41:31  PAGE 3   
+
+  125   1          if (FS_CD(":") == FALSE)
+  126   1          {
+  127   2              return 0;
+  128   2          }
+  129   1          while (1)
+  130   1          {
+  131   2              ClearWatchDog();
+  132   2              if (FS_Dir(file_name, ExtNext, dir_type, 1) != 0)
+  133   2              {
+  134   3                  //对于exfat文件系统，需要获取长名，然后再跟转换成短名进行比较
+  135   3                  if (file_name[11] == 0xfe)
+  136   3                  {
+  137   4                      NameBuf[0] = 0x20;
+  138   4                      name_count = FS_GetName(NameBuf, 24);
+  139   4                      if (name_count != 5)
+  140   4                      {
+  141   5                          dir_type = FS_DIR_DIR_CONT;
+  142   5                          continue;
+  143   5                      }
+  144   4                      memset(file_name, 0x0, 12);
+  145   4                      for (i = 0; i < name_count; i++)
+  146   4                      {
+  147   5                          tmp_char = NameBuf[i * 2];
+  148   5                          if ((tmp_char >= 0x80) || (NameBuf[i * 2 + 1] != 0))
+  149   5                          {
+  150   6                              break;
+  151   6                          }
+  152   5                          else if ((tmp_char >= 'a') && (tmp_char <= 'z'))
+  153   5                          {
+  154   6                              tmp_char -= 0x20;
+  155   6                          }
+  156   5                          file_name[i] = tmp_char;
+  157   5                      }
+  158   4                      if (i < name_count)
+  159   4                      {
+  160   5                          continue;
+  161   5                      }
+  162   4                  }
+  163   3                  if (strncmp(file_name, "ALARM", 5) == 0)
+  164   3                  {
+  165   4                      if (FALSE == FS_CD(FS_CD_SON))
+  166   4                      {
+  167   5                          result = 0;
+  168   5                          break;
+  169   5                      }
+  170   4                      if (FS_Dir(file_name, (const int8 *) ExtAlarmstr1, FS_DIR_FILE, 3) == 0)
+  171   4                      {
+  172   5                          result = 0;
+  173   5                          break;
+  174   5                      }
+  175   4                      memcpy(g_comval.g_alarm.location.filename, file_name, 12);
+  176   4                      result = 1;
+  177   4                      break;
+  178   4                  }
+  179   3                  dir_type = FS_DIR_DIR_CONT;
+  180   3              }
+  181   2              else
+  182   2              {
+  183   3                  result = 0;
+  184   3                  break;
+  185   3              }
+  186   2          }
+  187   1          return result;
+  188   1      }
+  189          
+
+C251 COMPILER V4.55,  alarm_main                                                           23/05/16  10:41:31  PAGE 4   
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       627     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =       118     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        41     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

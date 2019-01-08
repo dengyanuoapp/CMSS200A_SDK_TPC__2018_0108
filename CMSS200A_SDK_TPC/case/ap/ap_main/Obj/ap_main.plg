@@ -1,0 +1,45 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_main\ap_main.uv2
+Project File Date:  07/25/2016
+
+<h2>Output:</h2>
+Build target 'main'
+User command #1: .\buildapl.bat
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_main>..\..\..\psp_rel\tools\LinkfileParse.exe ap_main.apl ap_main.lin ap_main.apc 
+第30行编译异常：警告：未定义段结束地址!
+第31行编译异常：警告：未定义段结束地址!
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_main>pause
+请按任意键继续. . . 
+compiling main.c...
+compiling system_time_init.c...
+compiling ap_exec_loop.c...
+compiling ap_report.c...
+compiling ap_common.c...
+compiling ap_common2.c...
+compiling ap_message.c...
+compiling ap_message2.c...
+compiling ui_clock.c...
+compiling ui_clock_1.c...
+linking...
+Program Size: data=8.0 edata+hdata=960 xdata=0 const=250 code=8405
+creating hex file from ".\Obj\ap_main"...
+User command #1: .\buildap.bat
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_main>..\..\..\psp_rel\tools\apbuilder.exe -c ap_main.apc           
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_main>copy .\Obj\ap_main.map ap_main.map 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_main>copy .\Obj\ap_main.hex ap_main.hex 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_main>copy .\Obj\ap_main ap_main 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_main>..\..\..\psp_rel\tools\GenAPBank.exe ap_main.hex ap_main_bank.hex 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_main>..\..\..\psp_rel\tools\segcheck ap_main.map ap_main.lin ap_main.apc 
+--------------------check map file and lin file--------------------------
+Warning! segment=API30_PSP in mapfile can't be found in lin file!
+--------------------check apc file and lin file--------------------------
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_main>copy main.ap ..\..\fwpkg\ 
+已复制         1 个文件。
+".\Obj\ap_main" - 0 Error(s), 0 Warning(s).

@@ -1,0 +1,11 @@
+hexfile=.\Obj\ap_utest.hex
+mask=0x0
+hextype=intel
+mapfile=.\Obj\ap_utest.map
+apfile=.\utest.ap
+entry=main
+seg_text=?PR?RCODE,?PR?BULKCMD_C,?PR?BULkFUN_C,?HC?RDATA?UDISKDATA,?HC?FDATA?UDISKDATA
+seg_text=?C_INITEDATA
+seg_text=?C_C51STARTUP
+seg_data=?ED?RDATA?UDISKDATA
+seg_bank=?PR?SETUPPKT_C,?PR?AP_MAIN,?PR?CONTROLFUN_C,?PR?INITEXITFUN_C

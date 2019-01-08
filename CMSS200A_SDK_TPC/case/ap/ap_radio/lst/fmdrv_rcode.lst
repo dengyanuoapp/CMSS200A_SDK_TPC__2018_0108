@@ -1,0 +1,401 @@
+C251 COMPILER V4.55,  fmdrv_rcode                                                          23/05/16  10:42:15  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE fmdrv_rcode
+OBJECT MODULE PLACED IN .\obj\fmdrv_rcode.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE FM_QN8035\fmdrv_rcode.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,
+                    -SPEED) BROWSE ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE(CHECKALARM) DEBUG PRINT(.\lst\fmdrv_rc
+                    -ode.lst) OBJECT(.\obj\fmdrv_rcode.obj) 
+
+stmt  level    source
+
+    1          /*******************************************************************************
+    2           *                              AS260A
+    3           *                            Module: fm drvier for qn8035
+    4           *                 Copyright(c) 2003-2011 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>        <time>           <version >            <desc>
+    9           *     mikeyang     2011-11-03 15:00     1.0             build this file
+   10           *******************************************************************************/
+   11          
+   12          #include  "fm_drv.h"
+   13          
+   14          #pragma name(FM_DRV_RCODE)
+   15          
+   16          //uint16 DelayTime;
+   17          
+   18          uint8 qnd_R16;
+   19          uint8 qnd_R17;
+   20          uint8 qnd_R46;
+   21          
+   22          uint8 FM_Slevel; //搜台门限
+   23          
+   24          //uint16 Freq_RF;
+   25          /* 硬件seek 状态标识*/
+   26          uint8 hardseek_flag;
+   27          
+   28          /*
+   29           ********************************************************************************
+   30           *             uint8 QNF_SetCh(uint16 freq)
+   31           *
+   32           * Description : 设置频点,进行tune操作
+   33           *
+   34           * Arguments   : 需设置的频点值, 以10khz 为单位
+   35          
+   36           * Returns     : 设置频点是否成功,若成功,返回1
+   37           *                                        否则,返回0
+   38           * Notes       :
+   39           *
+   40           ********************************************************************************
+   41           */
+   42          uint8 QNF_SetCh(uint16 freq)
+   43          {
+   44   1          // calculate ch parameter used for register setting
+   45   1          uint8 tStep;
+   46   1          uint8 tCh;
+   47   1          uint16 f;
+   48   1      #if 0
+                   uint16 pll_dlt;
+                   if ((freq == 8540) || (freq == 8550) || (freq == 8560))
+                   {
+                       pll_dlt = (uint16) qnd_R16 >> 3;
+                       pll_dlt |= (uint16) qnd_R17 << 5;
+                       pll_dlt -= 1039;
+                       QND_WriteReg(0x16, (uint8) pll_dlt << 3);
+                       QND_WriteReg(0x17, (uint8) (pll_dlt >> 5));
+                       if (freq == 8540)
+C251 COMPILER V4.55,  fmdrv_rcode                                                          23/05/16  10:42:15  PAGE 2   
+
+                       {
+                           QND_WriteReg(0x46, 0x9D);
+                       }
+                       else if (freq == 8550)
+                       {
+                           QND_WriteReg(0x46, 0x69);
+                       }
+                       else
+                       {
+                           QND_WriteReg(0x46, 0x34);
+                       }
+                       freq = 8570;
+                   }
+                   else
+               #endif
+   73   1          {
+   74   2              QND_WriteReg(0x16, qnd_R16);
+   75   2              QND_WriteReg(0x17, qnd_R17);
+   76   2              QND_WriteReg(0x46, qnd_R46);
+   77   2          }
+   78   1      
+   79   1          f = FreqToChan(freq);
+   80   1          // set to reg: CH
+   81   1          tCh = (uint8) f;
+   82   1          QND_WriteReg(CH, tCh);
+   83   1          // set to reg: CH_STEP
+   84   1          tStep = QND_ReadReg(CH_STEP);
+   85   1          tStep &= ~CH_CH;
+   86   1          tStep |= ((uint8) (f >> 8) & CH_CH);
+   87   1          QND_WriteReg(CH_STEP, tStep);
+   88   1          return 1;
+   89   1      }
+   90          
+   91          /*
+   92           ********************************************************************************
+   93           *        uint8 QNF_SetRegBit(uint8 RegAddr, uint8 bitMask, uint8 data_val)
+   94           *
+   95           * Description : 将指定寄存器的指定bit设置为指定的值
+   96           *
+   97           * Arguments   : RegAddr -- 寄存器地址
+   98           *               bitMask -- 需设置的bit位
+   99           *               data_val -- 设置值
+  100           *
+  101           * Returns     : 成功,则返回值为1
+  102           *                          否则,返回0
+  103           * Notes       :
+  104           *
+  105           ********************************************************************************
+  106           */
+  107          uint8 QNF_SetRegBit(uint8 RegAddr, uint8 bitMask, uint8 data_val)
+  108          {
+  109   1          uint8 result;
+  110   1          result = QND_ReadReg(RegAddr);
+  111   1          result &= (uint8) (~bitMask);
+  112   1          result |= (data_val & bitMask);
+  113   1          return QND_WriteReg(RegAddr, result);
+  114   1      }
+  115          /*
+  116           ********************************************************************************
+  117           *          void QNF_ConfigScan(uint16 start, uint16 stop, uint8 step)
+  118           *
+  119           * Description : 扫描前配置起始频率, 结束频率及步长
+  120           *
+  121           * Arguments   : start --- 起始频率, 10khz为单位
+  122           *               stop --- 结束频率, 10khz为单位
+  123           *               step --- 步长    1: 100khz    2: 200khz   0: 50khz
+C251 COMPILER V4.55,  fmdrv_rcode                                                          23/05/16  10:42:15  PAGE 3   
+
+  124           * Returns     : none
+  125           *
+  126           * Notes       :
+  127           *
+  128           ********************************************************************************
+  129           */
+  130          void QNF_ConfigScan(uint16 start, uint16 stop, uint8 step)
+  131          {
+  132   1          uint8 tStep = 0;
+  133   1          uint8 tS;
+  134   1          uint16 fStart;
+  135   1          uint16 fStop;
+  136   1      
+  137   1          //最低2bit保持不变,ch[9],ch[8]
+  138   1          //tStep = QND_ReadReg(CH_STEP);
+  139   1          //tStep &= CH_CH;
+  140   1      
+  141   1          fStart = FreqToChan(start);
+  142   1          fStop = FreqToChan(stop);
+  143   1          // set to reg: CH_START
+  144   1          tS = (uint8) (fStart & 0xff);
+  145   1          QND_WriteReg(CH_START, tS);
+  146   1          tStep |= ((uint8) (fStart >> 6) & CH_CH_START);
+  147   1          // set to reg: CH_STOP
+  148   1          tS = (uint8) (fStop & 0xff);
+  149   1          QND_WriteReg(CH_STOP, tS);
+  150   1          tStep |= ((uint8) (fStop >> 4) & CH_CH_STOP);
+  151   1          // set to reg: CH_STEP
+  152   1          tStep |= step << 6;
+  153   1          QND_WriteReg(CH_STEP, tStep);
+  154   1          return;
+  155   1      }
+  156          /*
+  157           ********************************************************************************
+  158           *         uint8 QND_RXValidCH(uint16 freq, uint8 step)
+  159           *
+  160           * Description : 判断设置的频率是否是有效电台
+  161           *
+  162           * Arguments :  freq:要写的频率, 10khz 为单位
+  163           step:步进100KHZ
+  164           * Returns :    是否有效电台的标志
+  165           *
+  166           * Notes :
+  167           *
+  168           ********************************************************************************
+  169           */
+  170          uint8 QND_RXValidCH(uint16 freq, uint8 step)
+  171          {
+  172   1          uint8 regValue;
+  173   1          uint8 timeOut = 200;
+  174   1          uint8 isValidChannelFlag = 0;
+  175   1      #ifdef PILOT_CCA
+  176   1          uint8 snr;
+  177   1          uint8 readCnt = 0, stereoCount = 0;
+  178   1      #endif
+  179   1          QNF_ConfigScan(freq, freq, step);
+  180   1      
+  181   1          //QNF_SetRegBit(CCA, 0x3F, 0);  //setting RSSI threshold for CCA
+  182   1      
+  183   1          //enter CCA mode,channel index is decided by internal CCA
+  184   1          QNF_SetRegBit(SYSTEM1, 0x03, 0x02);
+  185   1          do
+  186   1          {
+  187   2              regValue = QND_ReadReg(SYSTEM1);
+  188   2              TM_DelayMS(5); //delay 5ms
+  189   2              timeOut--;
+C251 COMPILER V4.55,  fmdrv_rcode                                                          23/05/16  10:42:15  PAGE 4   
+
+  190   2          }
+  191   1          while ((regValue & CHSC) && timeOut);  //when seeking a channel or time out,be quited the loop
+  192   1          //read out the rxcca_fail flag of RXCCA status
+  193   1          regValue = QND_ReadReg(STATUS1) & 0x08;
+  194   1          if (regValue != 0)
+  195   1          {
+  196   2              isValidChannelFlag = 0;
+  197   2          }
+  198   1          else
+  199   1          {
+  200   2              isValidChannelFlag = 1;
+  201   2          }
+  202   1      #ifdef PILOT_CCA       //special search  handle ways
+  203   1          if(isValidChannelFlag != 0)
+  204   1          {
+  205   2              snr = QND_ReadReg(SNR);
+  206   2              TM_DelayMS(60);
+  207   2              if(snr <= 25)
+  208   2              {
+  209   3                  isValidChannelFlag = 0;
+  210   3                  for(readCnt = 0; readCnt < 10; readCnt++)
+  211   3                  {
+  212   4                      TM_DelayMS(2);
+  213   4                      stereoCount += ((QND_ReadReg(STATUS1) & 0x01) ? 0 : 1);
+  214   4                      if(stereoCount >= 3)
+  215   4                      {
+  216   5                          isValidChannelFlag = 1;
+  217   5                          break;
+  218   5                      }
+  219   4                  }
+  220   3              }
+  221   2          }
+  222   1      #endif
+  223   1          return isValidChannelFlag;
+  224   1      }
+  225          
+  226          /*
+  227           ********************************************************************************
+  228           *          uint8 QND_WriteReg(uint8 RegAddr, uint8 Data)
+  229           *
+  230           * Description : 写寄存器
+  231           *
+  232           * Arguments :  RegAddr:要写的寄存器
+  233           *              Data: 要写入的寄存器值
+  234           * Returns :    成功/失败
+  235           *
+  236           * Notes :   设置模组某个指定寄存器的值
+  237           *
+  238           ********************************************************************************
+  239           */
+  240          uint8 QND_WriteReg(uint8 RegAddr, uint8 Data)
+  241          {
+  242   1          uint8 i, result;
+  243   1          uint8 WriteBuffer[3];
+  244   1          //写操作设备地址
+  245   1          WriteBuffer[0] = 0x20;
+  246   1          WriteBuffer[1] = RegAddr;
+  247   1          WriteBuffer[2] = Data;
+  248   1      
+  249   1          //disable_interrupt(); //禁止中断
+  250   1          romDI();
+  251   1          for (i = 0; i < 5; i++)
+  252   1          {
+  253   2              ClearWatchDog();
+  254   2              result = I2C_Trans_Bytes(WriteBuffer, 3);
+  255   2              if (result != 0)
+C251 COMPILER V4.55,  fmdrv_rcode                                                          23/05/16  10:42:15  PAGE 5   
+
+  256   2              {
+  257   3                  //enable_interrupt(); //开中断
+  258   3                  romEI();
+  259   3                  return 1;
+  260   3              }
+  261   2          }
+  262   1          //enable_interrupt(); //开中断
+  263   1          romEI();
+  264   1          return 0;
+  265   1      }
+  266          
+  267          /*
+  268           ********************************************************************************
+  269           *           uint8 QND_ReadReg(uint8 RegAddr)
+  270           *
+  271           * Description : 读寄存器的值
+  272           *
+  273           * Arguments :  RegAddr:要读的寄存器
+  274           *
+  275           * Returns :    读取到的寄存器的值
+  276           *
+  277           * Notes :
+  278           *
+  279           ********************************************************************************
+  280           */
+  281          uint8 QND_ReadReg(uint8 RegAddr)
+  282          {
+  283   1          uint8 Data, ret;
+  284   1          uint8 buf[4];
+  285   1          uint8 i;
+  286   1      
+  287   1          //disable_interrupt(); //禁止中断
+  288   1          romDI();
+  289   1          ClearWatchDog();
+  290   1      
+  291   1          while (1)
+  292   1          {
+  293   2              for (i = 0; i < 4; i++)
+  294   2              {
+  295   3                  ret = I2C_Recev_Bytes(&buf[i], RegAddr, 1);
+  296   3                  if (ret == 0)
+  297   3                  {
+  298   4                      //read fail
+  299   4                      buf[i] = 0;
+  300   4                  }
+  301   3              }
+  302   2              if ((buf[0] == buf[1]) && (buf[1] == buf[2]) && (buf[2] == buf[3]))
+  303   2              {
+  304   3                  break;
+  305   3              }
+  306   2          }
+  307   1          Data = buf[0];
+  308   1      
+  309   1          //enable_interrupt(); //开中断
+  310   1          romEI();
+  311   1          return Data;
+  312   1      }
+  313          /*
+  314           ********************************************************************************
+  315           *           uint16 ChanToFreq(uint16 chan)
+  316           *
+  317           * Description : 将读出的寄存器电台值转换成实际的频点
+  318           *
+  319           * Arguments :  chan:读出的电台值
+  320           *
+  321           * Returns :       转换出来的实际频点值, 以10khz 为单位
+C251 COMPILER V4.55,  fmdrv_rcode                                                          23/05/16  10:42:15  PAGE 6   
+
+  322           *
+  323           * Notes :
+  324           *
+  325           ********************************************************************************
+  326           */
+  327          uint16 ChanToFreq(uint16 chan)
+  328          {
+  329   1          uint16 Freq;
+  330   1          Freq = chan * 5;
+  331   1          Freq += 6000;
+  332   1          return Freq;
+  333   1      
+  334   1      }
+  335          
+  336          /*
+  337           ********************************************************************************
+  338           *           uint16 FreqToChan(uint16 freq)
+  339           *
+  340           * Description : 将频点转换成写寄存器的值
+  341           *
+  342           * Arguments :  freq:要写入的频点, 以10khz 为单位
+  343           *
+  344           * Returns :       转换出来的要写入寄存器的电台值Channel Index
+  345           *
+  346           * Notes :
+  347           *
+  348           ********************************************************************************
+  349           */
+  350          uint16 FreqToChan(uint16 freq)
+  351          {
+  352   1          uint16 Chan;
+  353   1          Chan = freq - 6000;
+  354   1          Chan /= 5;
+  355   1          return Chan;
+  356   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       605     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =         5     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

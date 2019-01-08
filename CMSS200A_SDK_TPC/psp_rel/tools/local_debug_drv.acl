@@ -1,0 +1,226 @@
+#全局变量
+set bank_no 0xFF
+set ap_name 0
+set bank_type 0
+set bank_a_offset 0x16
+set bank_b_offset 0x1a
+set bank_function 0
+#设置变量地址
+set debug_flag 0x549
+set debug_lba 0xC9
+set debug_loop_flag 0xCA
+set debug_bank 0xBC
+set debug_name_addr 0xBD
+set debug_code_addr 0xff5000
+set debug_code_len 0x400
+set exchange_buf_addr 0xff2000
+set exchange_buf_len 0x2000
+
+#***************函数声明*************
+# para in:file_name 待搜索文件名(包括路径)
+#         key_word  匹配关键字
+# 返回值:-1 未找到匹配值 
+#        其它 搜索结果
+#
+proc file_search {file_name key_word} {
+    if {[file exist $file_name]} {
+        set fh [open $file_name r]
+        while {[gets $fh line] != -1} {
+            set line [split $line =]
+            set temp [lindex $line 0]
+            if {[string match "$key_word" $temp] == 1} {
+                set target_str [lindex $line 1]
+                break
+            }
+        }
+    } else {
+        puts "file not exist ..."
+        return -1
+    }
+    return $target_str
+}
+
+#***************函数声明*************
+# para in:hex_num 十六进制数
+# 返回值:对应的十进制数
+#        
+#
+proc h2d {{hex_num 0}} {
+  set tmp1 0x
+  append tmp1 $hex_num
+  set tmp2 [format "%d" $tmp1]
+  return $tmp2
+}
+
+#***************函数声明*************
+#读取消息框
+proc read_confige_msg {} {
+    global bank_no
+    global ap_name
+    msg "请输入替换类型(ap or bank)"
+    set debug_type [getmsginfo]
+    msg "请输入ap名字(如main.ap)"
+    set ap_name [getmsginfo]
+    if {$debug_type == "bank"} {
+         msg "请输入bank号(0、1、2...)"
+         set bank_no [getmsginfo]
+    }    
+    return $debug_type
+}
+
+#***************函数声明*************
+#读取配置文件
+proc read_confige_doc {} {
+    global bank_no
+    global ap_name
+    global bank_type
+    global bank_function
+    
+    set debug_type [file_search "local_debug_drv.cfg" "debug_type"]
+    set ap_name [file_search "local_debug_drv.cfg" "drv_name"]   
+    if {$debug_type == "bank"} {       
+        set bank_function [file_search "local_debug_drv.cfg" "bank_function"]       
+        set bank_type [expr $bank_function >> 21]
+        set bank_type [expr $bank_type & 0x1]
+        set bank_no [file_search "local_debug_drv.cfg" "bank_number"]       
+    }    
+    return $debug_type
+}
+
+#***************函数声明*************
+# para in:
+# 返回值:
+# 生成bank下载文件       
+# 从.ap中提取bank头和bank内容
+proc build_bank_file {} {
+    global ap_name
+    global bank_no
+    global bank_type
+    global bank_a_offset
+    global bank_b_offset
+    set file_handle_src [open $ap_name r]
+    fconfigure $file_handle_src -translation binary -encoding binary
+    if {$bank_type == 0} {
+        seek $file_handle_src $bank_a_offset        
+        set bank_size 0x200
+    } else {
+        seek $file_handle_src $bank_b_offset
+        set bank_size 0x800
+    }
+    set bank_offset [read $file_handle_src 4]
+    binary scan $bank_offset H* var
+    set bank_base [h2d $var]
+    set bank_offset [expr $bank_no * $bank_size + $bank_base]
+    seek $file_handle_src $bank_offset 
+    set bankbuf [read $file_handle_src $bank_size]
+
+    set file_handle_obj [open bank.bin w]
+    fconfigure $file_handle_obj -translation binary -encoding binary
+    puts -nonewline $file_handle_obj $bankbuf
+    close $file_handle_obj
+    close $file_handle_src
+    return bank.bin
+}
+
+#########################主程序######################3
+opendev
+
+#清空lba变量
+set temp1 [mread $debug_lba 1]
+set temp2 [expr $temp1 & 0xffffff00]
+mwrite $debug_lba $temp2 1
+#清空debugflag变量
+set temp1 [mread $debug_loop_flag 1]
+set temp2 [expr $temp1 & 0xffffff00]
+mwrite $debug_loop_flag $temp2 1
+
+#保存上下文
+for {set n 0} {$n<15} {incr n} {
+set valreg($n) [rread $n]
+}
+set buffer_backup [aclmalloc $exchange_buf_len]
+upbuff $buffer_backup $exchange_buf_len $exchange_buf_addr
+set buffer_backup1 [aclmalloc $debug_code_len]
+upbuff $buffer_backup1 $debug_code_len $debug_code_addr
+
+#获取配置信息
+set debug_type [read_confige_doc] 
+
+#打开替换代码
+if {$debug_type == "drv"} {
+    #下载要替换的ap的名字
+    puts "write ap content"
+    set file_handle [open local_debug_index.bin w]
+    puts -nonewline $file_handle $ap_name
+    close $file_handle
+    download local_debug_index.bin $debug_name_addr
+    file delete local_debug_index.bin
+    set temp1 [mread $debug_flag 1]
+    set temp2 [expr $temp1 & 0xffffff00]
+    set temp2 [expr $temp2 | 3]
+    mwrite $debug_flag $temp2 1
+    set file_handle [aclopen $ap_name rb]
+} else {
+    #下载要替换的bank号
+    set bank_function [expr $bank_function >> 14]
+    set bank_function [expr $bank_function & 0xff]
+    set temp1 [mread $debug_bank 1]
+    set temp2 [expr $temp1 & 0xffffff00]
+    set temp2 [expr $temp2 | $bank_function]
+    mwrite $debug_bank $temp2 1
+    set temp1 [mread $debug_flag 1]
+    set temp2 [expr $temp1 & 0xffffff00]
+    set temp2 [expr $temp2 | 2]
+    mwrite $debug_flag $temp2 1
+    set bank_file_name [build_bank_file]
+    set file_handle [aclopen $bank_file_name rb]
+}
+set buffer_handle [aclmalloc $exchange_buf_len]
+
+#下载debug运行代码
+download debug.bin $debug_code_addr
+
+while {1} {
+#下载代码到ram
+    set file_len [aclread  $file_handle  $exchange_buf_len  $buffer_handle]
+    puts $file_len
+    puts "down buffer"
+    downbuff  $buffer_handle  $exchange_buf_len  $exchange_buf_addr
+
+    #从ram写代码到nor
+    run2 $debug_code_addr
+
+    #等待写nor结束
+    while {1} {
+        delay 100
+        halt
+        set temp1 [mread $debug_loop_flag 1]
+        run2
+        set temp2 [expr $temp1 & 0xff]
+        if {$temp2 == 1} {
+            break
+        }
+    }
+     
+    halt
+
+    #判断下载文件是否结束
+    if {$file_len < $exchange_buf_len} {
+        break}
+}
+
+#恢复上下文
+for {set n 0} {$n<15} {incr n} {
+rwrite $n $valreg($n)
+}
+downbuff  $buffer_backup1  $debug_code_len  $debug_code_addr
+downbuff  $buffer_backup  $exchange_buf_len  $exchange_buf_addr
+
+puts "finish download"
+aclfree $buffer_handle
+aclfree $buffer_backup
+aclclose $file_handle 
+if {$debug_type == "bank"} {
+    file delete bank.bin
+}
+#msg "替换完成"

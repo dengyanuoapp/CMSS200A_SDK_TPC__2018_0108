@@ -1,0 +1,435 @@
+C251 COMPILER V4.55,  ui_clock_1                                                           23/05/16  10:42:45  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE ui_clock_1
+OBJECT MODULE PLACED IN .\Obj\ui_clock_1.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\common\ui_clock_1.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTI
+                    -MIZE(9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\ui_clock_1.lst) OBJECT(.\Obj\ui_clock_1
+                    -.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ******************************************************************************
+    3           *                               AS211A
+    4           *                            Module: music
+    5           *                 Copyright(c) 2002-2010 Actions Semiconductor,
+    6           *                            All Rights Reserved.
+    7           *
+    8           * Descripton: sub functions 2 of music
+    9           *
+   10           * History:
+   11           *      <author>    <time>           <version >             <desc>
+   12           *       xusong    2010-07-15 15:00     1.0             build this file
+   13           ******************************************************************************
+   14           */
+   15          #include "ap_common.h"
+   16          
+   17          #pragma name(AP_CLOCK_1)
+   18          const uint8 month_days[] = //一年12个月每个月对应的基本天数
+   19          { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+   20          
+   21          void init_alarm_setting(void)
+   22          {
+   23   1          SetCurUI_Type(AlarmSet_UI);
+   24   1          //    VMRead(&g_alarm, VM_ALARM, sizeof(alarm_vars_t));
+   25   1          memcpy(&time, &g_comval.g_alarm.alarmTime, sizeof(time_t));
+   26   1          //闹钟设置时，从第2项开始设置以便和时间设置统一
+   27   1          set_what = 2;
+   28   1          longkey_flag = TRUE;
+   29   1      }
+   30          
+   31          /********************************************************************************
+   32           * Description : 将BUF中的数值转换成现实可用的数字。
+   33           *
+   34           * Arguments  :
+   35           *
+   36           * Returns     :
+   37           *            无
+   38           * Notes       :
+   39           例如:DigitalCount=3,DigitalBuf[]={3,7,8},转换成实现可能的数字就是DigitalNum=378；
+   40           *
+   41           ********************************************************************************/
+   42          uint16 DigitalSwitchToRealNum(void)
+   43          {
+   44   1          uint16 DigitalNum = 0;
+   45   1          uint8 i;
+   46   1          uint16 CurBitNum = 1;
+   47   1          for (i = 1; i < DigitalCount; i++)
+   48   1          {
+   49   2              CurBitNum = CurBitNum * 10;
+   50   2          }
+   51   1          for (i = DigitalCount; i > 0; i--)
+   52   1          {
+   53   2              DigitalNum = DigitalNum + DigitalBuf[DigitalCount - i] * CurBitNum;
+   54   2              CurBitNum = CurBitNum / 10;
+   55   2          }
+   56   1          return DigitalNum;
+   57   1      }
+C251 COMPILER V4.55,  ui_clock_1                                                           23/05/16  10:42:45  PAGE 2   
+
+   58          
+   59          /********************************************************************************
+   60           * Description : 实现通过数字值调整日期，时间的功能
+   61           *
+   62           * Arguments  :
+   63           *
+   64           * Returns     :
+   65           *            无
+   66           * Notes       :
+   67          
+   68           *
+   69           ********************************************************************************/
+   70          void DigitalAdjustTime(void)
+   71          {
+   72   1          uint16 realNum = 0;
+   73   1          uint8 days;
+   74   1          realNum = DigitalSwitchToRealNum();
+   75   1          switch (set_what)
+   76   1          {
+   77   2          case 0: //year
+   78   2              if ((realNum <= 2098) && (realNum >= 2000))
+   79   2              {
+   80   3                  date.year = realNum;
+   81   3              }
+   82   2              break;
+   83   2          case 1: //month
+   84   2              if ((realNum <= 12) && (realNum > 0))
+   85   2              {
+   86   3                  date.month = (uint8) realNum;
+   87   3              }
+   88   2              break;
+   89   2          case 2: //day
+   90   2              days = month_days[date.month - 1]; //本月天数
+   91   2              if (((date.year % 4) == 0) && (date.month == 2))
+   92   2              {
+   93   3                  days++; //闰年+1
+   94   3              }
+   95   2              if ((realNum <= days) && (realNum > 0))
+   96   2              {
+   97   3                  date.day = (uint8) realNum;
+   98   3              }
+   99   2              break;
+  100   2          case 3: //hour
+  101   2              if (realNum <= 23)
+  102   2              {
+  103   3                  time.hour = (uint8) realNum;
+  104   3              }
+  105   2              break;
+  106   2          case 4: //min
+  107   2              if (realNum <= 59)
+  108   2              {
+  109   3                  time.minute = (uint8) realNum;
+  110   3              }
+  111   2              break;
+  112   2          default: //no in setting
+  113   2              break;
+  114   2          } //set_what
+  115   1          need_draw = TRUE;
+  116   1      }
+  117          void deal_clock_next_prev(uint8 key)
+  118          {
+  119   1          if (CurUI_Type == Clock_UI)
+  120   1          {
+  121   2              return;
+  122   2          }
+  123   1          if (CurUI_Type == Volume_UI)
+C251 COMPILER V4.55,  ui_clock_1                                                           23/05/16  10:42:45  PAGE 3   
+
+  124   1          {
+  125   2              deal_vol_msg(key, Clock_UI);
+  126   2              return;
+  127   2          }
+  128   1          if (CurUI_Type == STANDBY_UI)
+  129   1          {
+  130   2              set_autosleep_time(key);
+  131   2              return;
+  132   2          }
+  133   1          disable_flicker();
+  134   1          if (CurUI_Type == AlarmSet_UI && set_what == 2)
+  135   1          {
+  136   2              g_comval.g_alarm.AlarmEnable = !g_comval.g_alarm.AlarmEnable;
+  137   2          }
+  138   1          //上下调节年份，日期，时间
+  139   1          KeyAdjustTime(key);
+  140   1      }
+  141          /********************************************************************************
+  142           * Description :根据按键值上下调整当前的日期或时间
+  143           *
+  144           * Arguments  :
+  145           *           key：相应按键值
+  146           * Returns     :
+  147           *            无
+  148           * Notes       :
+  149           *
+  150           ********************************************************************************/
+  151          void KeyAdjustTime(uint8 key)
+  152          {
+  153   1          uint8 days;
+  154   1          if (key == Key_Next)
+  155   1          {
+  156   2              switch (set_what)
+  157   2              {
+  158   3              case 0: //year
+  159   3                  if (date.year < 2098)
+  160   3                  {
+  161   4                      date.year++;
+  162   4                  }
+  163   3                  else
+  164   3                  {
+  165   4                      date.year = 2000;
+  166   4                  }
+  167   3                  break;
+  168   3              case 1: //month
+  169   3                  if (date.month < 12)
+  170   3                  {
+  171   4                      date.month++;
+  172   4                  }
+  173   3                  else
+  174   3                  {
+  175   4                      date.month = 1;
+  176   4                  }
+  177   3                  break;
+  178   3              case 2: //day
+  179   3                  days = month_days[date.month - 1]; //本月天数
+  180   3                  if (((date.year % 4) == 0) && (date.month == 2))
+  181   3                  {
+  182   4                      days++; //闰年+1
+  183   4                  }
+  184   3                  if (date.day < days)
+  185   3                  {
+  186   4                      date.day++;
+  187   4                  }
+  188   3                  else
+  189   3                  {
+C251 COMPILER V4.55,  ui_clock_1                                                           23/05/16  10:42:45  PAGE 4   
+
+  190   4                      date.day = 1;
+  191   4                  }
+  192   3                  break;
+  193   3              case 3: //hour
+  194   3                  if (time.hour < 23)
+  195   3                  {
+  196   4                      time.hour++;
+  197   4                  }
+  198   3                  else
+  199   3                  {
+  200   4                      time.hour = 0;
+  201   4                  }
+  202   3                  break;
+  203   3              case 4: //min
+  204   3                  if (time.minute < 59)
+  205   3                  {
+  206   4                      time.minute++;
+  207   4                  }
+  208   3                  else
+  209   3                  {
+  210   4                      time.minute = 0;
+  211   4                  }
+  212   3                  break;
+  213   3              default: //no in setting
+  214   3                  break;
+  215   3              } //set_what
+  216   2          }
+  217   1          else
+  218   1          {
+  219   2              switch (set_what)
+  220   2              {
+  221   3              case 0: //year
+  222   3                  if (date.year > 2000)
+  223   3                  {
+  224   4                      date.year--;
+  225   4                  }
+  226   3                  else
+  227   3                  {
+  228   4                      date.year = 2098;
+  229   4                  }
+  230   3                  break;
+  231   3              case 1: //month
+  232   3                  if (date.month > 1)
+  233   3                  {
+  234   4                      date.month--;
+  235   4                  }
+  236   3                  else
+  237   3                  {
+  238   4                      date.month = 12;
+  239   4                  }
+  240   3                  break;
+  241   3              case 2: //day
+  242   3                  days = month_days[date.month - 1]; //本月天数
+  243   3                  if (((date.year % 4) == 0) && (date.month == 2))
+  244   3                  {
+  245   4                      days++; //闰年+1
+  246   4                  }
+  247   3                  if (date.day > 1)
+  248   3                  {
+  249   4                      date.day--;
+  250   4                  }
+  251   3                  else
+  252   3                  {
+  253   4                      date.day = days;
+  254   4                  }
+  255   3                  break;
+C251 COMPILER V4.55,  ui_clock_1                                                           23/05/16  10:42:45  PAGE 5   
+
+  256   3              case 3: //hour
+  257   3                  if (time.hour > 0)
+  258   3                  {
+  259   4                      time.hour--;
+  260   4                  }
+  261   3                  else
+  262   3                  {
+  263   4                      time.hour = 23;
+  264   4                  }
+  265   3                  break;
+  266   3              case 4: //min
+  267   3                  if (time.minute > 0)
+  268   3                  {
+  269   4                      time.minute--;
+  270   4                  }
+  271   3                  else
+  272   3                  {
+  273   4                      time.minute = 59;
+  274   4                  }
+  275   3                  break;
+  276   3              default: //no in setting
+  277   3                  break;
+  278   3              } //set_what
+  279   2          }
+  280   1          need_draw = TRUE;
+  281   1      }
+  282          uint8 deal_clock_digital_key(uint8 key)
+  283          {
+  284   1          uint8 key_val;
+  285   1          uint8 maxcount;
+  286   1          //光标停留在闹钟开关选项时，按数字键无效
+  287   1          if (CurUI_Type == Clock_UI)
+  288   1          {
+  289   2              return NULL;
+  290   2          }
+  291   1          disable_flicker();
+  292   1          if ((CurUI_Type == AlarmSet_UI) && (set_what == 2))
+  293   1          {
+  294   2              return NULL;
+  295   2          }
+  296   1      
+  297   1          if (set_what == 0) //年份占四位显示
+  298   1          {
+  299   2              maxcount = 4;
+  300   2          }
+  301   1          else //月，日，时，分，秒占两位显示
+  302   1          {
+  303   2              maxcount = 2;
+  304   2          }
+  305   1          if ((DigitalCount >= maxcount) || (DigitalCount == 0))
+  306   1          {
+  307   2              SetCurUI_Type(CurUI_Type);
+  308   2          }
+  309   1          key_val = (key & ~AP_KEY_UP) - AP_KEY_NUM0;//将数字按键消息转换成数字
+  310   1          DigitalBuf[DigitalCount] = key_val;
+  311   1          DigitalCount++;
+  312   1          need_draw = TRUE;
+  313   1          return NULL;
+  314   1      }
+  315          void deal_clock_mode_msg(void)
+  316          {
+  317   1          enable_flicker();
+  318   1          if (CurUI_Type == Clock_UI)
+  319   1          {
+  320   2              SetCurUI_Type(TimeSet_UI);
+  321   2              return;
+C251 COMPILER V4.55,  ui_clock_1                                                           23/05/16  10:42:45  PAGE 6   
+
+  322   2          }
+  323   1          else
+  324   1          {
+  325   2              if (DigitalCount != 0)
+  326   2              {
+  327   3                  DigitalAdjustTime();
+  328   3                  DigitalCount = 0;
+  329   3                  memset(DigitalBuf, 0, 4);
+  330   3              }
+  331   2              //当切换到最后一项时，保存当前的设置
+  332   2              if (set_what >= 4)
+  333   2              {
+  334   3                  set_what = 3;
+  335   3                  show_what = 1;
+  336   3                  if (CurUI_Type == TimeSet_UI)
+  337   3                  {
+  338   4                      time.second = 1;
+  339   4                      TM_SetDate(&date);
+  340   4                      TM_SetTime(&time);
+  341   4                  }
+  342   3                  else
+  343   3                  {
+  344   4                      memcpy(&g_comval.g_alarm.alarmTime, &time, sizeof(time_t));
+  345   4                      if (g_comval.g_alarm.AlarmEnable != 0)
+  346   4                      {
+  347   5                          TM_SetAlarmTime(&g_comval.g_alarm.alarmTime);
+  348   5                      }
+  349   4                      else
+  350   4                      {
+  351   5                          disable_alarm();
+  352   5                      }
+  353   4                      VMWrite(&g_comval, VM_SYSTEM, sizeof(alarm_vars_t));
+  354   4                  }
+  355   3                  SetCurUI_Type(Clock_UI);
+  356   3              }
+  357   2              else
+  358   2              {
+  359   3                  set_what++;
+  360   3              }
+  361   2          }
+  362   1      }
+  363          //使用设置项闪烁效果
+  364          void enable_flicker(void)
+  365          {
+  366   1          show_ui_flag = 1;
+  367   1          show_count = 0;
+  368   1          need_draw = TRUE;
+  369   1      }
+  370          //取消设置项闪烁效果
+  371          void disable_flicker(void)
+  372          {
+  373   1          show_ui_flag = 0;
+  374   1          show_count = 0;
+  375   1          show_what = 1;
+  376   1          need_draw = TRUE;
+  377   1      }
+  378          //取消系统闹钟
+  379          void disable_alarm(void)
+  380          {
+  381   1          uint8 sfr_bak;
+  382   1          sfr_bak = SFR_BANK;
+  383   1          SFR_BANK = BANK_RTC;
+  384   1          RTC_CTL0 &= 0xBF;
+  385   1          RTC_CTL0 |= 0x01;
+  386   1          SFR_BANK = sfr_bak;
+  387   1      }
+C251 COMPILER V4.55,  ui_clock_1                                                           23/05/16  10:42:45  PAGE 7   
+
+  388          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1035     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        12     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

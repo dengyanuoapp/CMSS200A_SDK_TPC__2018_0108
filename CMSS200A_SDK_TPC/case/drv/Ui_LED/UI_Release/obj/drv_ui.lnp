@@ -1,0 +1,19 @@
+"..\..\..\psp_rel\lib\actos30api.LIB",
+"..\..\..\psp_rel\lib\LIBC.LIB",
+"..\..\..\psp_rel\lib\DrvDftSeg.LIB"(?C_START??),
+".\UI_Release\obj\Hdrv_HardDeal.obj",
+".\UI_Release\obj\Hdrv_HardInit.obj",
+".\UI_Release\obj\Sdrv_ClrScreen.obj",
+".\UI_Release\obj\sdrv_Init.obj",
+".\UI_Release\obj\Sdrv_LEDDisplay.obj",
+".\UI_Release\obj\Drv_header.obj",
+".\UI_Release\obj\LED_apitable.obj" 
+TO ".\UI_Release\obj\drv_ui"
+NOOVERLAY 
+NOJMPTAB
+NODEFAULTLIBRARY
+CLASSES(ECODE(0x800000-0xFFFFFF))
+CLASSES(HCONST(0x800000-0xFFFFFF))
+SEGMENTS(LED_APITABLE(0xFF1200),?PR?SDRV_CLRS,?HC?SDRV_DISPLAY,?PR?SDRV_DISPLAY,?PR?HARD_DEAL,C_RESERVE0(^0xFF15FF))
+SEGMENTS(?PR?BBC_INIT(0xED5600),?PR?HARD_INIT            ,C_RESERVE1(^0xED5DFF))
+SEGMENTS(UI_INFO(0xFF0000))

@@ -1,0 +1,35 @@
+### uVision2 Project, (C) Keil Software
+### Do not modify !
+
+ cExt (*.c)
+ aExt (*.s*; *.src; *.a*)
+ oExt (*.obj)
+ lExt (*.lib)
+ tExt (*.txt; *.h; *.inc)
+ pExt (*.plm)
+ CppX (*.cpp)
+ DaveTm { 0,0,0,0,0,0,0,0 }
+
+Target (CODEC), 0x0001 // Tools: 'MCS-251'
+GRPOPT 1,(codec),0,0,0
+
+OPTFFF 1,1,1,0,0,0,0,0,<..\..\..\..\..\..\..\fwsp\libsrc\midware\audioCodec\pitch.c><pitch.c> 
+
+
+TARGOPT 1, (CODEC)
+ CLK251=16000000
+  OPTTT 0,1,1,0
+  OPTHX 1,65535,0,0,0
+  OPTLX 120,65,8,<.\>
+  OPTOX 16
+  OPTLT 1,1,1,0,1,1,0,1,0,0,0,0
+  OPTXL 1,1,1,1,1,1,1,0,0
+  OPTFL 0,0,1
+  OPTAX 0
+  OPTDL (S251.DLL)(-Flip251)(DP51.DLL)(-p251S)(S251.DLL)()(TP51.DLL)(-p251S)
+  OPTDBG 48125,-1,()()()()()()()()()() ()()()()
+  OPTDF 0x0
+  OPTLE <>
+  OPTLC <>
+EndOpt
+

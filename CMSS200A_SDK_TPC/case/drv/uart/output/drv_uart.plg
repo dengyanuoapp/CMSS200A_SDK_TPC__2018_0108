@@ -1,0 +1,31 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\uart\uart.uv2
+Project File Date:  07/26/2016
+
+<h2>Output:</h2>
+Build target 'uart'
+User command #1: .\buildlin.bat
+第53行编译异常：警告：未定义段结束地址!
+compiling uart_msg.c...
+compiling uart.c...
+compiling uart_rcode.c...
+linking...
+*** WARNING L9: EMPTY SEGMENTS ENCOUNTERED
+Program Size: data=8.0 edata+hdata=116 xdata=0 const=37 code=2731
+creating hex file from ".\output\drv_uart"...
+User command #1: .\builddrv.bat
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\uart>copy .\output\drv_uart.map drv_uart.map 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\uart>copy .\output\drv_uart drv_uart 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\uart>..\..\..\psp_rel\tools\builddriver51 .\output\drv_uart.hex  .\drv_uart.drvl .\output 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\uart>copy .\output\drv_uart.drv  ..\..\fwpkg\ 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\uart>IF {} == {} goto nocopy 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\uart>echo build end  
+build end 
+".\output\drv_uart" - 0 Error(s), 1 Warning(s).

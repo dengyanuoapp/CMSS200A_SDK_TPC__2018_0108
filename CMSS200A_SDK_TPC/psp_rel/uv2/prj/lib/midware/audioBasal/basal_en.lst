@@ -1,0 +1,762 @@
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE basal_en
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\basal\basal_en.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\audioBasal\basal_en.c XSMALL FUNCTIONS(REEN
+                    -TRANT) ROM(HUGE) OPTIMIZE(9,SPEED) INCDIR(..\..\..\..\..\inc;..\..\..\..\..\..\..\fwsp\include) DEBUG PRINT(.\basal_en.l
+                    -st) OBJECT(..\..\..\..\obj\lib\basal\basal_en.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              USDK 5102
+    3           *                            Module: POWER MANAGER
+    4           *                 Copyright(c) 2001-2009 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *    wuyueqian     2009-9-07 9:42     1.0             build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * file
+   13           * brief
+   14           * Author   wuyueqian
+   15           * par
+   16           *
+   17           *      Copyright(c) 2001-2007 Actions Semiconductor, All Rights Reserved.
+   18           *
+   19           * version 1.0
+   20           * date  2008/6/12
+   21           *******************************************************************************/
+   22          #include <actos.h>
+   23          #include <basal.h>
+   24          #include <encC.h>
+   25          #include <codec.h>
+   26          #include <stringH.h>
+   27          
+   28          #pragma name(MW_BS_AD_EN)
+   29          
+   30          #define RECORDING_OPEN    0x20
+   31          #define RECORDING_LOAD    0x21
+   32          
+   33          #define READ_ADDRESS        0x0201
+   34          #define VOR_TIME_OUT      0x01
+   35          #define RECORD_BUFFER_ADDRESS 0x0d80//0xc000
+   36          #define RECORD_BUFFER_SIZE 512
+   37          
+   38          #define WRITE_NONE_PAGE 0
+   39          #define WRITE_PAGE 1
+   40          //#define WRITE_HEAD 2
+   41          #define ONE_PAGE_BITNUM 9
+   42          #define INPUT_MIC 0x08
+   43          #define INPUT_LINEIN 0x40
+   44          #define INPUT_FM 0x02
+   45          #define INPUT_DAC 0x01
+   46          #define ADPCM 0
+   47          #define PCM 1
+   48          #define AVR_TURN_OFF 0
+   49          #define AVR_TURN_ON_VOICE 1
+   50          #define AVR_TURN_ON_SONG 2
+   51          
+   52          #define AK211X_SUPPORT_WAV_ONLY
+   53          
+   54          BYTE far m_wavRecStatus;// = RECORDING_WAITING;      //当前状态
+   55          handle far m_wavRecFileHandle;// = NULL;    //打开语音文件的句柄
+   56          uint8 far m_wavRecOldTimerNum; //timer isr 使用的timer号码
+   57          uint16 far m_wavRecOldDspIsr; //保存旧的hip isr
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 2   
+
+   58          uint16 far m_wavRecOldDMAIsr; //保存旧的ADC isr
+   59          
+   60          char far m_wavRecFileName[12];
+   61          
+   62          void encode_setAudioFormat(void *param);
+   63          bool encode_getNewFileHandle(void *param);
+   64          void encode_initAudioFormat(BYTE music_type);
+   65          void encode_getAudioFormat(void *param);
+   66          void ch_bit_rate(char *tmp);
+   67          int8 parse_bit_rate(uint8 *ch);
+   68          void setRecordBufferClock(void);
+   69          
+   70          #pragma renamecode(MW_BS_AD_EN)
+   71          
+   72          /*******************************************************************************
+   73           * Function:       Wav2rProceed
+   74           * Description:    wav 录音编码写入文件
+   75           * Input：
+   76           * Output：        0:没有写, 1:写一个扇区, 8:已写了WAV头文件
+   77           *                 -1:出错,用wavrSendCommand(MC_GETSTATUS,mp3_rec_status_t *)获取详细信息
+   78           * Other：         一次写一个扇区(512 bytes),
+   79           *******************************************************************************/
+   80          #ifdef PC
+               retWavrProceed_e srProceed(void)
+               #else
+   83          retWavrProceed_e rProceed(void)
+   84          #endif
+   85          //retWavrProceed_e srProceed(void)
+   86          {
+   87   1          uchar status;
+   88   1          BOOL result;
+   89   1          status = encGetBitstream();//查询enc的数据编码
+   90   1          if (WRITE_PAGE == status)
+   91   1          {
+   92   2              result = FS_FWrite((const char *) g_encWriteFilePara.WriteFileBuffAddr,
+   94   2                                 (char)(g_encWriteFilePara.WriteFileCurSize >> ONE_PAGE_BITNUM),    //风险，从1
+             -6位变8位
+   94   2                                 m_wavRecFileHandle);
+   95   2              if (result == 1)
+   96   2              {
+   97   3                  g_encWriteFilePara.FileLen += g_encWriteFilePara.WriteFileCurSize;
+   98   3                  return WRITE_PAGE;
+   99   3              }
+  100   2              else
+  101   2              {
+  102   3                  encStop();
+  103   3                  encExit();
+  104   3                  IRQ_Release(m_wavRecOldDspIsr, IRQ_DSP);
+  105   3                  //IRQ_Release(m_wavRecOldDMAIsr, IRQ_DMA2);
+  106   3      
+  107   3                  if(m_wavRecOldTimerNum)
+  108   3                  {
+  109   4                      TM_KillTimer(m_wavRecOldTimerNum);
+  110   4                      m_wavRecOldTimerNum = 0;
+  111   4                  }
+  112   3                  FS_FClose(m_wavRecFileHandle);
+  113   3                  m_wavRecStatus = RECORDING_DISK_ERROR;
+  114   3                  //文件已关闭
+  115   3                  m_wavRecFileHandle = NULL;
+  116   3                  return WRITE_WRONG;
+  117   3              }
+  118   2          }
+  119   1          else if (status == 0x02)// 是文件头写入WAV文件
+  120   1          {
+  121   2              encExit();
+  122   2              IRQ_Release(m_wavRecOldDspIsr, IRQ_DSP);
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 3   
+
+  123   2              //              IRQ_Release(m_wavRecOldDMAIsr, IRQ_DMA2);
+  124   2              if(m_wavRecOldTimerNum)
+  125   2              {
+  126   3                  TM_KillTimer(m_wavRecOldTimerNum);
+  127   3                  m_wavRecOldTimerNum = 0;
+  128   3              }
+  129   2              result = FS_FClose(m_wavRecFileHandle);
+  130   2              if (!result)
+  131   2              {
+  132   3                  m_wavRecStatus = RECORDING_DISK_ERROR;
+  133   3                  return WRITE_WRONG;
+  134   3              }
+  135   2              //      if(g_encControlInfor.SongType!=0)
+  136   2              //      {
+  137   2              m_wavRecFileHandle = FS_FOpen(m_wavRecFileName, 0x02);
+  138   2              if (NULL == m_wavRecFileHandle)
+  139   2              {
+  140   3                  return WRITE_NONE;
+  141   3              }
+  142   2      #ifndef PC
+  143   2              //write head
+  144   2              result = FS_FWrite((const char *) g_encWriteFilePara.WriteFileBuffAddr,
+  146   2                                 (char)(g_encWriteFilePara.WriteFileCurSize >> ONE_PAGE_BITNUM),
+  146   2                                 m_wavRecFileHandle);
+  147   2      #endif
+  148   2              m_wavRecStatus = RECORDING_STOP;
+  149   2              if (result == 1)
+  150   2              {
+  151   3                  return WRITE_HEAD;
+  152   3              }
+  153   2              else
+  154   2              {
+  155   3                  m_wavRecStatus = RECORDING_DISK_ERROR;
+  156   3                  return WRITE_WRONG;
+  157   3              }
+  158   2              //      }
+  159   2              //      else
+  160   2              //      {
+  161   2              //已经成功关闭文件
+  162   2              //         m_wavRecFileHandle = NULL;
+  163   2              //         m_wavRecStatus = RECORDING_STOP;
+  164   2              //         return WRITE_HEAD;
+  165   2              //      }
+  166   2          }
+  167   1          else
+  168   1          {
+  169   2              return WRITE_NONE;
+  170   2          }
+  171   1      }
+  172          /*******************************************************************************
+  173           * Function:       wavrSendCommand
+  174           * Description:    wav encode modual entry
+  175           * Input：
+  176           * Output：
+  177           * Other：         // 发送MC_STOP之后,需要等到wav2rProceed()返回8才可以发送MC_CLOSE
+  178           *******************************************************************************/
+  179          #ifdef PC
+               BOOL srSendCommand(BYTE cmd, BYTE music_type, void *param)
+               #else
+  182          BOOL rSendCommand(BYTE cmd, BYTE music_type, void *param)
+  183          #endif
+  184          //BOOL srSendCommand(BYTE cmd, BYTE music_type, void* param)
+  185          {
+  186   1          mp3_rec_status_t *wav_rec_status; // AP 层
+  187   1          time_t *pTime;
+  188   1          BOOL result;
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 4   
+
+  189   1      
+  190   1          switch (cmd)
+  191   1          {
+  192   2          case MC_OPEN:
+  193   2              encode_initAudioFormat(music_type);
+  194   2              break;
+  195   2      
+  196   2          case MC_CLOSE:
+  197   2              if(m_wavRecOldTimerNum)
+  198   2              {
+  199   3                  TM_KillTimer(m_wavRecOldTimerNum);
+  200   3                  m_wavRecOldTimerNum = 0;
+  201   3              }
+  202   2              if ((m_wavRecStatus == RECORDING_STOP))// && (m_wavRecFileHandle != NULL))
+  203   2              {
+  204   3                  if (NULL != m_wavRecFileHandle)
+  205   3                  {
+  206   4      #ifdef PC
+                               WriteWavDataPC(m_wavRecFileHandle);
+               #endif
+  209   4                      FS_FClose(m_wavRecFileHandle);
+  210   4                      m_wavRecFileHandle = NULL;
+  211   4                  }
+  212   3                  else
+  213   3                  {
+  214   4                      m_wavRecStatus = RECORDING_EXCEPTION;
+  215   4                      return FALSE;
+  216   4                  }
+  217   3              }
+  218   2              else
+  219   2              {
+  220   3                  m_wavRecStatus = RECORDING_EXCEPTION;
+  221   3                  return FALSE;
+  222   3              }
+  223   2      
+  224   2              break;
+  225   2      
+  226   2          case MC_LOAD:
+  227   2              result = encode_getNewFileHandle(param);
+  228   2              if (!result)
+  229   2              {
+  230   3                  return FALSE;
+  231   3              }
+  232   2              // UI Simulator 不需要写录音文件头
+  233   2      
+  234   2              //        if(g_encControlInfor.SongType!=0)
+  235   2              //        {
+  236   2      #ifndef PC
+  237   2              FS_FWrite((const char *) g_encWriteFilePara.WriteFileBuffAddr, 1, m_wavRecFileHandle);
+  238   2      #endif
+  239   2              g_encWriteFilePara.FileLen += 512;
+  240   2              //        }
+  241   2              encInit();
+  242   2              m_wavRecStatus = RECORDING_WAITING;
+  243   2              //BankSwitch(0xc7);
+  244   2              //BankSwitch(BYTE2_OF(encAudioIntSub));
+  245   2              break;
+  246   2      
+  247   2          case MC_RECORD:
+  248   2              if ((m_wavRecStatus == RECORDING_WAITING) && (m_wavRecFileHandle != NULL))
+  249   2              {
+  250   3                  m_wavRecOldTimerNum = TM_SetTimer((uint32) encTimerIntSub, 2);
+  251   3                  if (m_wavRecOldTimerNum == 0)
+  252   3                  {
+  253   4                      m_wavRecStatus = RECORDING_DISK_ERROR;
+  254   4                      return FALSE;
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 5   
+
+  255   4                  }
+  256   3                  //m_wavRecOldDspIsr = IRQ_Intercept((uint16) encAudioIntSub, IRQ_DSP);
+  257   3                  //m_wavRecOldDMAIsr = IRQ_Intercept((int)encDMAIntSub, IRQ_DMA2);
+  258   3      
+  259   3                  encStart();
+  260   3              }
+  261   2              else
+  262   2              {
+  263   3                  // 继续录音
+  264   3                  if (m_wavRecStatus == RECORDING_PAUSE)
+  265   3                  {
+  266   4                      encContinue();
+  267   4                  }
+  268   3                  else
+  269   3                  {
+  270   4                      m_wavRecStatus = RECORDING_EXCEPTION;
+  271   4                      return FALSE;
+  272   4                  }
+  273   3              }
+  274   2              m_wavRecStatus = RECORDING_RECORDING;
+  275   2              break;
+  276   2      
+  277   2          case MC_PAUSE:
+  278   2              if (m_wavRecStatus == RECORDING_RECORDING)
+  279   2              {
+  280   3                  encPause();
+  281   3              }
+  282   2              else
+  283   2              {
+  284   3                  m_wavRecStatus = RECORDING_EXCEPTION;
+  285   3                  return FALSE;
+  286   3              }
+  287   2              m_wavRecStatus = RECORDING_PAUSE;
+  288   2              break;
+  289   2      
+  290   2          case MC_STOP:
+  291   2              encStop();//codec prepare the head data for writing
+  292   2              break;
+  293   2      
+  294   2          case MC_SETGAIN:
+  295   2              g_encControlInfor.InputGain = (BYTE) param;
+  296   2              break;
+  297   2      
+  298   2          case MC_SETGAIN_DSP:
+  299   2              if ((((BYTE) param) < 2))// && (((BYTE) param) >= 0))
+  300   2              {
+  301   3                  g_encControlInfor.DSPGain = (BYTE) param;
+  302   3              }
+  303   2              break;
+  304   2          case MC_SETGAIN_ADC:
+  305   2              if ((((BYTE) param) < 4))// && (((BYTE) param) >= 0))
+  306   2              {
+  307   3                  g_encControlInfor.ADCGain = (BYTE) param;
+  308   3              }
+  309   2              break;
+  310   2      
+  311   2          case MC_SET_RECORD_DELAY:
+  312   2              g_encControlInfor.DelayTime = (BYTE) param;
+  313   2      
+  314   2          case MC_SETAVRFLAG:
+  315   2              if ((((BYTE) param) < 3))// && (((BYTE) param) >= 0))
+  316   2              {
+  317   3                  g_encControlInfor.AVRFlag = (BYTE) param;
+  318   3              }
+  319   2              break;
+  320   2          case MC_SETAVRLEVEL:
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 6   
+
+  321   2              g_encControlInfor.AVRLevel = (WORD) param;
+  322   2              break;
+  323   2          case MC_SETAVRDELAY:
+  324   2              g_encControlInfor.AVRDelay = (BYTE) param;
+  325   2              break;
+  326   2      
+  327   2          case MC_SET_SONG_TYPE:
+  328   2              g_encControlInfor.SongType = (BYTE) param;
+  329   2              break;
+  330   2      
+  331   2          case MC_RECODEMODE:
+  332   2              g_encControlInfor.EncodeMode = (BYTE) param;
+  333   2              break;
+  334   2      
+  335   2          case MC_SETSOURCE:
+  336   2              g_encControlInfor.InputSel = ((resource_t *) param)->input;
+  337   2              //memcpy(&(g_encControlInfor.InputSel), &(((resource_t *)param)->input), sizeof(input_t));
+  338   2              break;
+  339   2      
+  340   2          case MC_SETAUDIOFMT:
+  341   2              encode_setAudioFormat(param);
+  342   2              break;
+  343   2      
+  344   2          case MC_GETTIME:
+  345   2              pTime = (time_t *) param;
+  346   2              memcpy(pTime, &(g_encStatus.CurTime.TimeHour), sizeof(time_t));
+  347   2              break;
+  348   2      
+  349   2          case MC_GETSTATUS:
+  350   2              wav_rec_status = (mp3_rec_status_t *) param;
+  351   2              if (g_encStatus.Status != 0x0)
+  352   2              {
+  353   3                  wav_rec_status->status = g_encStatus.Status;
+  354   3              }
+  355   2              else
+  356   2              {
+  357   3                  wav_rec_status->status = m_wavRecStatus;
+  358   3              }
+  359   2              wav_rec_status->gain = g_encControlInfor.InputGain;
+  360   2              wav_rec_status->avrDelay = g_encControlInfor.AVRDelay;
+  361   2              wav_rec_status->avrLevel = g_encControlInfor.AVRLevel;
+  362   2              memcpy(&(wav_rec_status->source.input), &(g_encControlInfor.InputSel), sizeof(input_t));
+  363   2              memcpy(&(wav_rec_status->total_time.hour), &(g_encStatus.CurTime.TimeHour), sizeof(time_t));
+  364   2              break;
+  365   2      
+  366   2          case MC_GETAUDIOFMT:
+  367   2              encode_getAudioFormat(param);
+  368   2              break;
+  369   2      
+  370   2          default:
+  371   2              return FALSE;
+  372   2              //break;
+  373   2          }//switch(cmd)
+  374   1      
+  375   1          return TRUE;
+  376   1      }
+  377          
+  378          void setRecordBufferClock(void)
+  379          {
+  380   1          //    uint8 sfr_save;
+  381   1          //    sfr_save = SFR_BANK;
+  382   1          //    SFR_BANK = BANK_CMU_RMU;
+  383   1          //    MCSR7 &= 0xE3;
+  384   1          //    MCSR7 |= 0x08;
+  385   1          //    SFR_BANK = sfr_save;
+  386   1      }
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 7   
+
+  387          
+  388          /*******************************************************************************
+  389           * Function:       encode_initAudioFormat
+  390           * Description:    初始化录音参数
+  391           * Input：
+  392           * Output：
+  393           * Other：         对应 MC_OPEN
+  394           *******************************************************************************/
+  395          
+  396          void encode_initAudioFormat(BYTE music_type)
+  397          {
+  398   1          g_encControlInfor.InputSel = ENC_MIC;
+  399   1      
+  400   1          //music_type = music_type;
+  401   1          g_encControlInfor.SongType = music_type;
+  402   1          g_encControlInfor.FsIndex = _FS_8K;
+  403   1          g_encControlInfor.ChannelNum = SINGLE_CH;//default is 32kbps
+  404   1          //g_encControlInfor.BitDepth = 16;
+  405   1          g_encControlInfor.BTIndex = 1;
+  406   1          g_encControlInfor.EncodeMode = (BYTE) ADPCM;
+  407   1          g_encControlInfor.InputGain = 5;
+  408   1          g_encControlInfor.ADCGain = 2;
+  409   1          g_encControlInfor.DSPGain = 0;
+  410   1          g_encControlInfor.DelayTime = 15;//20*15 =300MS
+  411   1          g_encControlInfor.EnergyOut = 0;//disable
+  412   1          g_encControlInfor.AVRFlag = AVR_TURN_OFF;//disable
+  413   1          g_encControlInfor.AVRDelay = 3;
+  414   1          g_encControlInfor.AVRLevel = 700;
+  415   1          //g_encControlInfor.LeftOffset = reserved;
+  416   1          //g_encControlInfor.RightOffset = reserved;
+  417   1      
+  418   1          //setRecordBufferClock();
+  419   1          g_encWriteFilePara.WriteFileBuffAddr = RECORD_BUFFER_ADDRESS;
+  420   1          g_encWriteFilePara.WriteFileCurSize = RECORD_BUFFER_SIZE;
+  421   1          g_encWriteFilePara.FileLen = 0;
+  422   1          //g_encWriteFilePara.WriteFileHandle 在MC_LOAD中初始化
+  423   1      
+  424   1          m_wavRecStatus = RECORDING_WAITING;
+  425   1      }
+  426          
+  427          /*******************************************************************************
+  428           * Function:       encode_getNewFileHandle
+  429           * Description:    检查文件是否存在,不存在,创建该文件.
+  430           * Input：
+  431           * Output：
+  432           * Other：         对应 MC_LOAD
+  433           *******************************************************************************/
+  434          BOOL encode_getNewFileHandle(void *param)
+  435          {
+  436   1          memcpy(m_wavRecFileName, (char *) param, 11);
+  437   1          m_wavRecFileName[11] = '\0';
+  438   1      
+  439   1          m_wavRecFileHandle = NULL;
+  440   1          m_wavRecFileHandle = FS_FOpen(m_wavRecFileName, 0);
+  441   1          if ((m_wavRecFileHandle != NULL) || (m_wavRecStatus != RECORDING_WAITING))
+  442   1          {
+  443   2              m_wavRecStatus = RECORDING_EXCEPTION;
+  444   2              m_wavRecFileHandle = NULL;
+  445   2              return FALSE;
+  446   2          }
+  447   1          //recording_waiting and m_wavRecFileHandle == null
+  448   1          m_wavRecFileHandle = FS_FCreate(m_wavRecFileName);
+  449   1          if (m_wavRecFileHandle == NULL)
+  450   1          {
+  451   2              m_wavRecStatus = RECORDING_DISK_ERROR;
+  452   2              return FALSE;
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 8   
+
+  453   2          }
+  454   1          g_encWriteFilePara.WriteFileHandle = m_wavRecFileHandle;
+  455   1          return TRUE;
+  456   1      }
+  457          
+  458          /*******************************************************************************
+  459           * Function:       parse_bit_rate
+  460           * Description:    转换 AP层的 BIT RATE 到 CODE层的BIT RATE
+  461           * Input：
+  462           * Output：
+  463           * Other：         //
+  464           *******************************************************************************/
+  465          int8 parse_bit_rate(uint8 *ch)
+  466          {
+  467   1          int tmp;
+  468   1          tmp = (*(ch) - '0') * 100 + (*(ch + 1) - '0') * 10 + (*(ch + 2) - '0');
+  469   1      #if 0
+                   switch (tmp)
+                   {
+                   case 8:
+                       return _BT_8K;
+               
+                   case 16:
+                       return _BT_16K;
+               
+                   case 24:
+                       return _BT_24K;
+               
+                   case 32:
+                       return _BT_32K;
+               
+                   case 40:
+                       return _BT_40K;
+               
+                   case 48:
+                       return _BT_48K;
+               
+                   case 56:
+                       return _BT_56K;
+               
+                   case 64:
+                       return _BT_64K;
+               
+                   case 80:
+                       return _BT_80K;
+               
+                   case 96:
+                       return _BT_96K;
+               
+                   case 112:
+                       return _BT_112K;
+               
+                   case 128:
+                       return _BT_128K;
+               
+                   case 144:
+                       return _BT_144K;
+               
+                   case 160:
+                       return _BT_160K;
+               
+                   case 192:
+                       return _BT_192K;
+               
+                   case 224:
+                       return _BT_224K;
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 9   
+
+               
+                   case 256:
+                       return _BT_256K;
+               
+                   case 320:
+                       return _BT_320K;
+               
+                   case 384:
+                       return _BT_384K;
+               #endif
+  529   1              switch (tmp)
+  530   1              {
+  531   2              case 64:
+  532   2                  return 0;
+  533   2      
+  534   2              case 128:
+  535   2                  return 1;
+  536   2      
+  537   2              case 256:
+  538   2                  return 2;
+  539   2      
+  540   2              default:
+  541   2                  return -1;
+  542   2              }
+  543   1              // return -1;
+  544   1          }
+  545          
+  546              /*******************************************************************************
+  547               * Function:       encode_setAudioFormat
+  548               * Description:    设置 CODE 层的  g_encInitPara
+  549               * Input：
+  550               * Output：
+  551               * Other：         对应 MC_SETAUDIOFMT
+  552               *******************************************************************************/
+  553              void encode_setAudioFormat(void * param)
+  554              {
+  555   1              audio_format_t *m_audio_fmt;
+  556   1              int8 result;
+  557   1              m_audio_fmt = (audio_format_t *) param;
+  558   1      
+  559   1              //#ifndef AK211X_SUPPORT_WAV_ONLY
+  560   1      #if 1
+  561   1              //int8 result;
+  562   1              result = parse_bit_rate(m_audio_fmt->bit_rate);
+  563   1              if(result >= 0)
+  564   1              {
+  565   2                  //if(g_encControlInfor.SongType==0)
+  566   2                  {
+  567   3                      g_encControlInfor.BTIndex = result;
+  568   3                  }
+  569   2              }
+  570   1      
+  571   1              g_encControlInfor.FsIndex = m_audio_fmt->sample_rate;
+  572   1              g_encControlInfor.ChannelNum = m_audio_fmt->channel;
+  573   1      
+  574   1      #else
+                       g_encControlInfor.FsIndex = m_audio_fmt->sample_rate;
+                       g_encControlInfor.ChannelNum = m_audio_fmt->channel;
+               #endif
+  578   1          }
+  579              /*******************************************************************************
+  580               * Function:       ch_bit_rate
+  581               * Description:    转换 CODE 层的 BIT RATE 到 AP 层的BIT RATE
+  582               * Input：
+  583               * Output：
+  584               * Other：         //
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 10  
+
+  585               *******************************************************************************/
+  586              void ch_bit_rate(char * tmp)
+  587              {
+  588   1              *tmp = ' ';
+  589   1              *(tmp + 1) = ' ';
+  590   1              *(tmp + 3) = 0;
+  591   1              switch (g_encControlInfor.BTIndex)
+  592   1              {
+  593   2              case _BT_8K:
+  594   2                  *(tmp + 2) = '8';
+  595   2                  break;
+  596   2      
+  597   2              case _BT_16K:
+  598   2                  *(tmp + 1) = '1';
+  599   2                  *(tmp + 2) = '6';
+  600   2                  break;
+  601   2              case _BT_24K:
+  602   2                  *(tmp + 1) = '2';
+  603   2                  *(tmp + 2) = '4';
+  604   2                  break;
+  605   2              case _BT_32K:
+  606   2                  *(tmp + 1) = '3';
+  607   2                  *(tmp + 2) = '2';
+  608   2                  break;
+  609   2              case _BT_40K:
+  610   2                  *(tmp + 1) = '4';
+  611   2                  *(tmp + 2) = '0';
+  612   2                  break;
+  613   2              case _BT_48K:
+  614   2                  *(tmp + 1) = '4';
+  615   2                  *(tmp + 2) = '8';
+  616   2                  break;
+  617   2              case _BT_56K:
+  618   2                  *(tmp + 1) = '5';
+  619   2                  *(tmp + 2) = '6';
+  620   2                  break;
+  621   2      
+  622   2              case _BT_64K:
+  623   2                  *(tmp + 1) = '6';
+  624   2                  *(tmp + 2) = '4';
+  625   2                  break;
+  626   2      
+  627   2              case _BT_80K:
+  628   2                  *(tmp + 1) = '8';
+  629   2                  *(tmp + 2) = '0';
+  630   2                  break;
+  631   2      
+  632   2              case _BT_96K:
+  633   2                  *(tmp + 1) = '9';
+  634   2                  *(tmp + 2) = '6';
+  635   2                  break;
+  636   2      
+  637   2              case _BT_112K:
+  638   2                  *tmp = '1';
+  639   2                  *(tmp + 1) = '1';
+  640   2                  *(tmp + 2) = '2';
+  641   2                  break;
+  642   2      
+  643   2              case _BT_128K:
+  644   2                  *tmp = '1';
+  645   2                  *(tmp + 1) = '2';
+  646   2                  *(tmp + 2) = '8';
+  647   2                  break;
+  648   2      
+  649   2              case _BT_144K:
+  650   2                  *tmp = '1';
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 11  
+
+  651   2                  *(tmp + 1) = '4';
+  652   2                  *(tmp + 2) = '4';
+  653   2                  break;
+  654   2      
+  655   2              case _BT_160K:
+  656   2                  *tmp = '1';
+  657   2                  *(tmp + 1) = '6';
+  658   2                  *(tmp + 2) = '0';
+  659   2                  break;
+  660   2      
+  661   2              case _BT_192K:
+  662   2                  *tmp = '1';
+  663   2                  *(tmp + 1) = '9';
+  664   2                  *(tmp + 2) = '2';
+  665   2                  break;
+  666   2      
+  667   2              case _BT_224K:
+  668   2                  *tmp = '2';
+  669   2                  *(tmp + 1) = '2';
+  670   2                  *(tmp + 2) = '4';
+  671   2                  break;
+  672   2      
+  673   2              case _BT_256K:
+  674   2                  *tmp = '2';
+  675   2                  *(tmp + 1) = '5';
+  676   2                  *(tmp + 2) = '6';
+  677   2                  break;
+  678   2      
+  679   2              case _BT_320K:
+  680   2                  *tmp = '3';
+  681   2                  *(tmp + 1) = '2';
+  682   2                  *(tmp + 2) = '0';
+  683   2                  break;
+  684   2              default:
+  685   2                  break;
+  686   2              }
+  687   1          }
+  688          
+  689              /*******************************************************************************
+  690               * Function:       encode_getAudioFormat
+  691               * Description:    获取 CODE 层 audio_format_t
+  692               * Input：
+  693               * Output：
+  694               * Other：         对应 MC_GETAUDIOFMT
+  695               *******************************************************************************/
+  696              void encode_getAudioFormat(void * param)
+  697              {
+  698   1              audio_format_t *m_audio_fmt;
+  699   1      
+  700   1              m_audio_fmt = (audio_format_t *) param;
+  701   1              m_audio_fmt->sample_rate = g_encControlInfor.FsIndex;
+  702   1              m_audio_fmt->channel = g_encControlInfor.ChannelNum;
+  703   1              ch_bit_rate(m_audio_fmt->bit_rate); //语法
+  704   1          }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1821     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+C251 COMPILER V4.55,  basal_en                                                             13/12/18  16:27:28  PAGE 12  
+
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =        20     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

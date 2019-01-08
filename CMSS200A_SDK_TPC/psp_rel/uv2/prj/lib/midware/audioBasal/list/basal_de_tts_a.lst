@@ -1,0 +1,168 @@
+C251 COMPILER V4.55,  basal_de_tts_a                                                       13/12/18  16:27:26  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE basal_de_tts_a
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\basal\basal_de_tts_a.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\audioBasal\basal_de_tts_a.c XSMALL FUNCTION
+                    -S(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) INCDIR(..\..\..\..\..\inc) DEBUG PRINT(.\list\basal_de_tts_a.lst) OBJECT(..\..\
+                    -..\..\obj\lib\basal\basal_de_tts_a.obj) 
+
+stmt  level    source
+
+    1          #include <actos.h>
+    2          #include <basal.h>
+    3          #include <decC.h>
+    4          #include <tts_lib.h>
+    5          
+    6          #pragma name(MW_BS_AD_CMD_TTS)
+    7          
+    8          BYTE mp3check(void);
+    9          
+   10          #pragma renamecode(MW_BS_AD_CMD_TTS)
+   11          
+   12          bool pSdTtsSendCommand(BYTE cmd, BYTE music_type, void *param)
+   13          {
+   14   1          play_status_t *pStatus;
+   15   1      
+   16   1          switch (cmd)
+   17   1          {
+   18   2          case MC_OPEN:
+   19   2              //            m_deTTSOpenparam = (Open_param_t *)param;
+   20   2              //            if (m_deTTSOpenparam != 0)
+   21   2              //            {
+   22   2              //                if (m_deTTSOpenparam->SoftVolumeMax != 0)
+   23   2              //                {
+   24   2              //                    g_decControlInfor.SoftVolumeMax = 40;
+   25   2              //                }
+   26   2              //                else
+   27   2              //                {
+   28   2              //                    g_decControlInfor.SoftVolumeMax = 0;
+   29   2              //                }
+   30   2              //                g_decControlInfor.FadeInTime = m_deTTSOpenparam->FadeInTime;
+   31   2              //                g_decControlInfor.FadeOutTime = 0x03;//shortest
+   32   2              //            }
+   33   2              g_decControlInfor.SoftVolumeMax = 40;
+   34   2              g_decControlInfor.FadeInTime = 0x1;
+   35   2              g_decControlInfor.FadeOutTime = 0x03;
+   36   2              break;
+   37   2      
+   38   2          case MC_LOAD:
+   39   2              return TTSLoadCommand(music_type, param);
+   40   2      
+   41   2          case MC_PLAY:
+   42   2              return TTSPlayCommand(param);
+   43   2      
+   44   2          case MC_STOP:
+   45   2              return TTSStopCommand(param);
+   46   2      
+   47   2          case MC_CLOSE:
+   48   2              if(m_de_TTS_Fp != NULL)
+   49   2              {
+   50   3                  SD_FClose(m_de_TTS_Fp);
+   51   3                  m_de_TTS_Fp = NULL;
+   52   3              }
+   53   2              if(info_TTS_Fp != NULL)
+   54   2              {
+   55   3                  SD_FClose(info_TTS_Fp);
+   56   3                  info_TTS_Fp = NULL;
+   57   3              }
+C251 COMPILER V4.55,  basal_de_tts_a                                                       13/12/18  16:27:26  PAGE 2   
+
+   58   2              break;
+   59   2      
+   60   2          case MC_SET_TTS:
+   61   2              str_ptr = 0;
+   62   2              str_buff = (char *)param;
+   63   2              break;
+   64   2      
+   65   2          case MC_GETSTATUS:
+   66   2              pStatus = (play_status_t *)param;
+   67   2              //            memcpy(&(pStatus->total_time), &m_TTSTotaltimelength, sizeof(time_t));
+   68   2              //            if((TTSplay_status.status == PLAYING_REACH_END) || (TTSplay_status.status == PLAYIN
+             -G_REACH_HEAD))
+   69   2              //            {
+   70   2              //                pStatus->status = TTSplay_status.status;
+   71   2              //                pStatus->total_time = m_TTSTotaltimelength;
+   72   2              //                break;
+   73   2              //            }
+   74   2              TTSplay_status.volume = g_decControlInfor.Volume;
+   75   2              pStatus->volume = g_decControlInfor.Volume;
+   76   2      
+   77   2              pStatus->signal = TTSplay_status.signal;
+   78   2              TTSplay_status.signal = 0;
+   79   2      
+   80   2              pStatus->status = TTSplay_status.status;
+   81   2              if(g_decCurStatus.Status >= 0xf0)
+   82   2              {
+   83   3                  TTSplay_status.status = PLAYING_ERROR;
+   84   3                  if(m_deTTSInitFlag)
+   85   3                  {
+   86   4                      m_deTTSInitFlag = 0;
+   87   4                      while(!decExit())
+   88   4                      {
+   89   5                          ;//qac
+   90   5                      }
+   91   4                      TM_KillTimer(m_deTTScTimer_Sav);
+   92   4      
+   93   4                      IRQ_Release(m_deTTSOldDspIntAddrSav, IRQ_DSP);
+   94   4                      IRQ_Release(m_deTTSOldDmaIntAddrSav, IRQ_DMA2);
+   95   4                  }
+   96   3              }
+   97   2              break;
+   98   2      
+   99   2          default:
+  100   2              return FALSE;
+  101   2          }
+  102   1          return TRUE;
+  103   1      }
+  104          
+  105          /*************************************************************************
+  106           * SdStopCommand 停止播放
+  107           *1 g_decReadFilePara.ReadFilePages在dma hook中被赋值 = deSdBreakPointSave
+  108           ****************************************************************************/
+  109          
+  110          bool TTSStopCommand(void *param)
+  111          {
+  112   1          param = param;
+  113   1          if(m_deTTSInitFlag)
+  114   1          {
+  115   2              m_deTTSInitFlag = 0;
+  116   2              while (!decExit())
+  117   2              {
+  118   3                  ; //qac
+  119   3              }
+  120   2              TM_KillTimer(m_deTTScTimer_Sav);
+  121   2              IRQ_Release(m_deTTSOldDspIntAddrSav, IRQ_DSP);
+  122   2              IRQ_Release(m_deTTSOldDmaIntAddrSav, IRQ_DMA2);
+C251 COMPILER V4.55,  basal_de_tts_a                                                       13/12/18  16:27:26  PAGE 3   
+
+  123   2      
+  124   2              TTSplay_status.status = PLAYING_STOP;
+  125   2          }
+  126   1          return TRUE;
+  127   1      }
+  128          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       322     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

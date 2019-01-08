@@ -1,0 +1,417 @@
+C251 COMPILER V4.55,  usound_main                                                          13/12/18  16:28:55  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE usound_main
+OBJECT MODULE PLACED IN .\obj\usound_main.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE usound_main.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BRO
+                    -WSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 ORDER DEFINE(USOUND_AP) DEBUG PRINT(.\list\usound_main.lst) OBJECT(.\obj\u
+                    -sound_main.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              AS211A
+    3           *                            Module: USB MAIN
+    4           *                 Copyright(c) 2001-2010 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>         <time>              <version >             <desc>
+    9           *      wanghaijing      2011-1-28 15:27     1.0                build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * \file     usbdisk.c
+   13           * \brief
+   14           * \author   wanghaijing
+   15           * \par      GENERAL DESCRIPTION:
+   16           *               这里对文件进行描述
+   17           * \par      EXTERNALIZED FUNCTIONS:
+   18           *               这里描述调用到外面的模块
+   19           *
+   20           *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
+   21           *
+   22           * \version 1.0
+   23           * \date  2010-3-10
+   24           *******************************************************************************/
+   25          
+   26          #include "usound.h"
+   27          #include "ap_record.h"
+   28          
+   29          void read_var(void);
+   30          //extern int ChangeVolume(void);
+   31          extern void key_timer_count(void);
+   32          extern void init_LRADC_CTL(void);
+   33          extern uint8 check_vbus(void);
+   34          
+   35          #pragma name(AP_MAIN)
+   36          //=====================================================
+   37          extern uint8 g_PAOpenFlag;
+   38          //uint8 USB_Status;
+   39          uint8 max_gain; /*max_gain is Q4.4 format*/
+   40          ap_comval_t g_comval;
+   41          bool need_draw;
+   42          int16 g_result;
+   43          bool urec_en;
+   44          uint8 key_timer_id;
+   45          uint8 first_flag;
+   46          uint8 old_index;
+   47          
+   48          #if 1
+   49          #if 0
+               const uint8 vol_value[49]= 
+               {
+                   0x00, 0x03, 0x06, 0x09, 0x10, 0x13, 0x16,
+                   0x19, 0x20, 0x23, 0x26, 0x29, 0x30, 0x33,
+                   0x36, 0x39, 0x40, 0x43, 0x46, 0x49, 0x50,
+                   0x53, 0x56, 0x59, 0x5B, 0x61, 0x63, 0x65,
+                   0x67, 0x69, 0x6B, 0x71, 0x73, 0x75, 0x77,
+                   0x79, 0x7B, 0x81, 0x83, 0x85, 0x87, 0x89,
+C251 COMPILER V4.55,  usound_main                                                          13/12/18  16:28:55  PAGE 2   
+
+                   0x8B, 0x91, 0x93, 0x95, 0x97, 0x99, 0x9B,
+               };
+               #else
+   61          #if 0
+               const uint8 vol_value[17][2] =
+               {
+                   {0x69, 0x00}, {0x75, 0x00}, {0x80, 0x00}, {0x88, 0x00}, {0x93, 0x00}, {0x9B, 0x00}, {0x86, 0x01},
+                   {0x92, 0x01}, {0x99, 0x01}, {0x8B, 0x02}, {0x96, 0x02}, {0x92, 0x03}, {0x99, 0x03}, {0x96, 0x04},
+                   {0x94, 0x05}, {0x94, 0x06}, {0x9A, 0x06}/*{0x9B, 0x06}*/
+               };
+               #endif
+   69          const uint8 vol_value[17][2] =
+   70          {
+   71              {0x69, 0x00}, {0x75, 0x00}, {0x80, 0x00}, {0x88, 0x00}, {0x93, 0x00}, {0x9B, 0x00}, {0x86, 0x01},
+   72              {0x92, 0x01}, {0x99, 0x01}, {0x8B, 0x02}, {0x91, 0x02},{0x96, 0x02}, {0x92, 0x03}, {0x97, 0x03},
+   73              {0x99, 0x03},{0x9A, 0x03},{0x93, 0x04}/*, {0x99, 0x04},{0x94, 0x05},*/ /*{0x94, 0x06}, {0x9A, 0x06}*/
+   74          };
+   75          
+   76          #endif
+   77          #else
+               const uint8 vol_value[49][2] =
+               {
+                   {0x69, 0x00}, {0x6B, 0x00}, {0x72, 0x00}, {0x75, 0x00}, {0x77, 0x00}, {0x79, 0x00}, {0x80, 0x00},
+                   {0x83, 0x00}, {0x85, 0x00}, {0x88, 0x00}, {0x8A, 0x00}, {0x90, 0x00}, {0x93, 0x00}, {0x96, 0x00},
+                   {0x98, 0x00}, {0x9B, 0x00}, {0x81, 0x01}, {0x83, 0x01}, {0x86, 0x01}, {0x88, 0x01}, {0x8A, 0x01},
+                   {0x92, 0x01}, {0x94, 0x01}, {0x96, 0x01}, {0x99, 0x01}, {0x9B, 0x01}, {0x87, 0x02}, {0x8B, 0x02},
+                   {0x91, 0x02}, {0x93, 0x02}, {0x96, 0x02}, {0x99, 0x02}, {0x9B, 0x02}, {0x92, 0x03}, {0x94, 0x03},
+                   {0x96, 0x03}, {0x99, 0x03}, {0x9B, 0x03}, {0x93, 0x04}, {0x96, 0x04}, {0x99, 0x04}, {0x9B, 0x04},
+                   {0x94, 0x05}, {0x97, 0x05}, {0x99, 0x05}, {0x94, 0x06}, {0x96, 0x06}, {0x99, 0x06}, {0x9B, 0x06}
+               };
+               
+               #endif
+   90          
+   91          
+   92          const uint8 dac_vol[MAX_VOl_NUM] =
+   93          {
+   94              0x00, 0x23, 0x36, 0x40,
+   95              0x47, 0x50, 0x54, 0x57,
+   96              0x5a, 0x60, 0x64, 0x67,
+   97              0x6a, 0x70, 0x72, 0x74,
+   98              0x76, 0x77, 0x79, 0x7a,
+   99              0x7b, 0x80, 0x81, 0x82,
+  100              0x83, 0x84, 0x86, 0x87,
+  101              0x88, 0x89, 0x8a, 0x8b,
+  102              0x90, 0x91, 0x92, 0x93,
+  103              0x94, 0x95, 0x96, 0x97,
+  104              0x98
+  105          
+  106          };
+  107          
+  108          usound_param ud_param =
+  109          //{SAMPLE_96K, SAMPLE_48K, BIT_DEPTH16}; //下传98k, 上传48k, 位深24
+  110          //{SAMPLE_96K, SAMPLE_48K, BIT_DEPTH24}; //下传98k, 上传48k, 位深24
+  111          {SAMPLE_48K,SAMPLE_48K,BIT_DEPTH24}; //下传48k, 上传48k, 位深16
+  112          
+  113          int16 main(int16 para)
+  114          {
+  115   1          //uint8  key = 0;
+  116   1          //BOOL  Audioloop;
+  117   1          para++;
+  118   1              first_flag = TRUE;
+  119   1              
+  120   1          //Audioloop = 1;
+  121   1          need_draw = 1;
+  122   1          max_gain = 0x10;
+  123   1          g_PAOpenFlag = 0x00;
+C251 COMPILER V4.55,  usound_main                                                          13/12/18  16:28:55  PAGE 3   
+
+  124   1          //    LEDClearScreen();
+  125   1          //    LEDPuts(NUMBER1, p_device_name, 1);
+  126   1          //注销卡插拔检测定时器, 避免杂音
+  127   1          //CardSetParam(0x01, 100, CARD_UNDEC);
+  128   1      
+  129   1          read_var();
+  130   1      
+  131   1          //    us_open_dac();
+  132   1          //    us_open_pa();
+  133   1         // SetPAVolume_LR(dac_vol[g_comval.volume], dac_vol[g_comval.volume]);
+  134   1          init_LRADC_CTL();
+  135   1      //    TM_DelayMS(200);
+  136   1      //    TM_DelayMS(200);
+  137   1      //    TM_DelayMS(200);
+  138   1      //    TM_DelayMS(200);
+  139   1      
+  140   1      start_check_usound:
+  141   1          if(usound_init(&ud_param) == 0)  //AP初始化
+  142   1          {
+  143   2              usound_exit();
+  144   2              //        DisablePA();
+  145   2              //重新挂卡插拔检测定时器
+  146   2              //CardSetParam(0x01, 100, CARD_DEC);
+  147   2              return RESULT_NULL;//RESULT_MUSIC;
+  148   2          }
+  149   1          // ChangeVolume();   //设置默认音量值
+  150   1      //      SetPAVolume_LR(dac_vol[g_comval.volume], dac_vol[g_comval.volume]);
+  151   1          OutPutVolume(g_comval.volume);
+  152   1          //~~~~~~~~~~~~~~~~~~~~~
+  153   1          //usb sound loop
+  154   1          //~~~~~~~~~~~~~~~~~~~~~
+  155   1              key_timer_id =0xFF;// TM_SetTimer((uint32) key_timer_count, 4);
+  156   1          g_result = Usound_loop();
+  157   1              TM_KillTimer(key_timer_id);
+  158   1          usound_exit();
+  159   1          //  DisablePA();
+  160   1          VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval)); //回写音量值等信息
+  161   1          VMWrite(&g_record_vars, VM_AP_AMV, sizeof(record_vars_t));
+  162   1      
+  163   1              if(g_result==RESULT_MAIN)
+  164   1              {
+  165   2                      goto start_check_usound;
+  166   2              }
+  167   1          //重新挂卡插拔检测定时器
+  168   1          //CardSetParam(0x01, 100, CARD_DEC);
+  169   1          if(g_result != RESULT_STANDBY)
+  170   1          {
+  171   2              g_result = RESULT_NULL;
+  172   2          }
+  173   1      
+  174   1          return g_result;
+  175   1      }
+  176          
+  177          void init_LRADC_CTL(void)
+  178          {
+  179   1          uint8 sfr_bak;
+  180   1      
+  181   1          sfr_bak = SFR_BANK;
+  182   1          SFR_BANK = BANK_GPIO;
+  183   1              AD_Select1 &= 0xfc;
+  184   1          AD_Select1 |= 0x01;
+  185   1      
+  186   1              // init GPIOA5, the state decide the mode of earphone detecting.
+  187   1              GPIOAPUEN  |= 1<<5; 
+  188   1              GPIOAINEN  |= 1<<5;
+  189   1              GPIOADAT   |= 1<<5;
+C251 COMPILER V4.55,  usound_main                                                          13/12/18  16:28:55  PAGE 4   
+
+  190   1              GPIOAOUTEN &= ~(1<<5);  
+  191   1      
+  192   1              SFR_BANK = BANK_PMU;
+  193   1              PMUADC_CTL |= 0x01<<5;
+  194   1          SFR_BANK = sfr_bak;
+  195   1      }
+  196          
+  197          void read_var(void)
+  198          {
+  199   1          bool result;
+  200   1      
+  201   1          //read comval
+  202   1          result = VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval));
+  203   1          //ASSERT(result);
+  204   1      
+  205   1          //Usound 录音所用VRAM区
+  206   1          result = VMRead(&g_record_vars, VM_AP_AMV, sizeof(g_record_vars));
+  207   1          if ((FALSE == result) || (g_record_vars.maigc != MAGIC_RECORD))
+  208   1          {
+  209   2              g_record_vars.maigc = MAGIC_RECORD;
+  210   2      
+  211   2              g_record_vars.location.disk = 'H';
+  212   2              g_record_vars.rec_source = AP_LINEIN;
+  213   2      
+  214   2              g_record_vars.wav_num = 1;
+  215   2              g_record_vars.rec_InputGain = g_comval.RecordGain;
+  216   2              g_record_vars.rec_ADCGain = 3;
+  217   2              g_record_vars.rec_DSPGain = 0;
+  218   2              g_record_vars.rec_DelayTime = 15;
+  219   2      
+  220   2              //g_record_vars.rec_AVREnable = 0;
+  221   2              //g_record_vars.rec_AVRDelay = 3;
+  222   2              //g_record_vars.rec_AVRLevel = 5;//3400;
+  223   2          }
+  224   1      }
+  225          
+  226          void us_open_dac(void)
+  227          {
+  228   1          dac_t dac_attr;
+  229   1      
+  230   1          dac_attr.dacselect = 0;
+  231   1          dac_attr.rate = FS_44K1;
+  232   1          EnableDAC(&dac_attr);
+  233   1      }
+  234          
+  235          void us_open_pa(void)
+  236          {
+  237   1          pa_t pa_attr;
+  238   1      
+  239   1          if (g_PAOpenFlag == 0x00)
+  240   1          {
+  241   2              pa_attr.pa_in.dacin = 1;
+  242   2              pa_attr.pa_in.fmin = 0;
+  243   2              pa_attr.pa_in.linein = 0;
+  244   2              pa_attr.pa_in.micin = 0;
+  245   2              pa_attr.volume = 0;
+  246   2              EnablePA(&pa_attr);
+  247   2              g_PAOpenFlag = 0x01;
+  248   2          }
+  249   1          //SetPAVolume(32);
+  250   1      }
+  251          
+  252          /*===========================================
+  253           functions: OutPutVolume(int vol)
+  254           input:    int vol: 要输出的音量
+  255           output:  void
+C251 COMPILER V4.55,  usound_main                                                          13/12/18  16:28:55  PAGE 5   
+
+  256           功能： 把音量值送到IO口，
+  257           ============================================*/
+  258          void OutPutVolume(uint8 vol)
+  259          {
+  260   1          uint8 temp;
+  261   1          uint8 sfr_bak;
+  262   1      
+  263   1          temp = vol;
+  264   1      
+  265   1          if (temp > g_comval.VolumeMax)
+  266   1          {
+  267   2              temp = g_comval.VolumeMax;
+  268   2          }
+  269   1          else if (temp < 0)
+  270   1          {
+  271   2              temp = 0;
+  272   2          }
+  273   1          //    SetPAVolume_LR(temp, temp);
+  274   1          SetPAVolume_LR(dac_vol[temp], dac_vol[temp]);
+  275   1      
+  276   1          sfr_bak = SFR_BANK;
+  277   1          SFR_BANK = BANK_AUIP;
+  278   1          if(temp != 0)
+  279   1          {
+  280   2              DAC_ANALOG0 |= 0x01; //dismute,connect
+  281   2          }
+  282   1          else
+  283   1          {
+  284   2              DAC_ANALOG0 &= 0xfe; //mute dac
+  285   2          }
+  286   1          SFR_BANK = sfr_bak;
+  287   1      }
+  288          
+  289          void set_vol(uint8 index)
+  290          {
+  291   1              uint8 dac_vol;
+  292   1              uint8 pa_vol;
+  293   1          uint8 sfr_bak;
+  294   1              
+  295   1          sfr_bak  = SFR_BANK;                                
+  296   1              SFR_BANK = BANK_DAC_ADC;
+  297   1                      
+  298   1      #if 1
+  299   1              dac_vol = vol_value[index][0];
+  300   1              pa_vol = vol_value[index][1]; 
+  301   1              
+  302   1              PA_VOLUME = (PA_VOLUME & 0xf8) | (pa_vol & 0x07);
+  303   1              DAC_VOLUME0 = dac_vol;
+  304   1              DAC_VOLUME1 = dac_vol;
+  305   1      #else
+                       dac_vol = vol_value[index];
+                       DAC_VOLUME0 = dac_vol;
+                       DAC_VOLUME1 = dac_vol;
+               #endif
+  310   1      
+  311   1              SFR_BANK = sfr_bak;
+  312   1      }
+  313          
+  314          void change_vol(uint8 index)
+  315          {
+  316   1          uint8 sfr_bak;
+  317   1      //      uint8 i, j;
+  318   1      
+  319   1          sfr_bak  = SFR_BANK;                                                                                        
+  320   1          SFR_BANK = BANK_AUIP;
+  321   1      
+C251 COMPILER V4.55,  usound_main                                                          13/12/18  16:28:55  PAGE 6   
+
+  322   1          if (index != 0)
+  323   1          {
+  324   2              DAC_ANALOG0 |= 0x01; //dismute
+  325   2          }
+  326   1          else
+  327   1          {
+  328   2              DAC_ANALOG0 &= 0xfe; //mute 
+  329   2          }
+  330   1      
+  331   1      #if 0
+                       if (first_flag == TRUE)
+                       {
+                               first_flag = FALSE;
+                               i = index * 3;
+                               set_vol(i);
+                       }
+                       else
+                       {
+                               if (index > old_index)
+                               {       // increase
+                                       for (j=3; j>0; j--)
+                                       {
+                                               i = index * 3 - (j - 1);
+                                               set_vol(i);
+                                               TM_DelayMS(50);
+                                       }
+                               }
+                               else if (index < old_index)
+                               {       // decrease
+                                       for (j=3; j>0; j--)
+                                       {
+                                               i = index * 3 + (j - 1);
+                                               set_vol(i);
+                                               TM_DelayMS(50);
+                                       }                       
+                               }
+                               else
+                               {
+                                       ;
+                               }
+                               
+                       }       
+                       old_index = index;
+               #else
+  366   1              set_vol(index);
+  367   1      #endif
+  368   1      
+  369   1              SFR_BANK = sfr_bak;
+  370   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       544     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =       100     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+C251 COMPILER V4.55,  usound_main                                                          13/12/18  16:28:55  PAGE 7   
+
+  const size           =    ------     ------
+  hconst size          =        82     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

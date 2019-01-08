@@ -1,0 +1,682 @@
+C251 COMPILER V4.55,  UDiskData                                                            15/07/16  15:45:44  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE UDiskData
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usb\UDiskData.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usb\UDiskData.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) INC
+                    -DIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\UDiskData.lst) OBJECT(..\..\..\obj\lib\usb\UDiskData.obj)
+                    - 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************************************
+             -*
+    3           *                                       ACTOS GL5102
+    4           *
+    5           *
+    6           *                           (c) Copyright 2009-2019, Actions Co,Ld.
+    7           *                                   All Right Reserved
+    8           *
+    9           * File   : UdiskData.msa
+   10           * By     : wanghaijing
+   11           * Version: v1.00     first version     2009-12-13 12:45
+   12           ********************************************************************************************************
+             -*
+   13           */
+   14          
+   15          #include "udisklib.h"
+   16          
+   17          #pragma userclass(hconst=FDATA)
+   18          //note:´Ë±äÁ¿·ÅÔÚAP bank 0xa0µÄÆðÊ¼µÄ¹Ì¶¨Î»ÖÃ,À©ÈÝ¹¤¾ß½âÎöudisk.apÎÄ¼þ,ÌîÐ´À©ÈÝÈÝÁ¿
+   19          uint16 const far fake_udisk_cap = 0x00;
+   20          #pragma userclass(hconst=default)
+   21          
+   22          #pragma userclass(hconst=RDATA)
+   23          const uint8 FFSDCardDrvName[11] = "UD_FFSD.DRV"; //SD card driver name
+   24          const uint8 FFMSCardDrvName[] = "UD_FFMS.DRV"; //MS card driver name
+   25          const uint8 FFCardBaseDrvName[] = "UD_FF648.DRV"; //MS card driver name
+   26          const uint8 ActionsFlag[11] =
+   27          { 'A', 'C', 'T', 'I', 'O', 'N', 'S', 'U', 'S', 'B', 'D' };
+   28          /*actions_solution_flag±äÁ¿µÄµÄÊý¾Ý½á¹¹ÈçÏÂ
+   29           struct system_info
+   30           {
+   31           char reserved_id;
+   32           char company_id;         //¡¯C¡¯ stands for ¡°Öéº£¾æÁ¦¡±; ¡®E¡¯ stands for ¡°±±·½¾æÁ¦¡±
+   33           // ¡®F¡¯ stands for ¡°ÉîÛÚ¾æ²Å¡±; Others reserved;
+   34           char device_id[5];         //¡¯ADFUD¡¯ stands for ¡°Actions firmware update device¡±;
+   35           //¡¯USBD ¡¯ stands for ¡°mass storage USB disk¡±;
+   36           unsigned short brom_pid;            // Èç0x5005
+   37           char brom_version;      //  Èç¡®A¡¯;
+   38           unsigned short ext_brom_id;      // À©Õ¹ brom id£¬Õë¶ÔÍ¬Ò»ÏµÁÐIC£¬»»ÁËÊÐ³¡±àºÅ¶øÐÞ¸Äbrom id
+   39           char ext_brom_version;      //À©Õ¹ brom °æ±¾£¬Õë¶ÔÍ¬Ò»ÏµÁÐIC£¬»»ÁËÊÐ³¡±àºÅ¶øÐÞ¸Ä
+   40           char case_type;           //Çø·Ö¸÷¸ö²»Í¬µÄ·½°¸£¬adfuÊ±·µ»Ø¸ø¹¤¾ßÎª0£¬±íÊ¾²»ÓÃÇø·Ö·½°¸ÐÅÏ¢
+   41           //case_type¶ÔÓ¦¸÷¸ö·½°¸µÄ±àºÅ£º
+   42           //5105/5101                          0x0a
+   43           //5102                               0x0b
+   44           //3976/5103/5107/5108                0x0c
+   45           char reserved[4];        //Ä¬ÈÏÎª0
+   46           };
+   47           */
+   48          const uint8 actions_solution_flag[18] =
+   49          { 0, 'C', 'U', 'S', 'B', 'D', ' ', 0x02, 0x51, 'A', 0, 0, 0, 'B', 0, 0, 0, 0 };
+   50          uint8 const MBR_Bak[224] = //0xE0¸ö×Ö½Ú,Master Boot Record
+   51          {
+   52              0xfa, 0x33, 0xc0, 0x8e, 0xd0, 0xbc, 0x00, 0x7c, 0x8b, 0xf4, 0x50, 0x07, 0x50, 0x1f, 0xfb, 0xfc, 0xbf,
+             - 0x00,
+   53              0x06, 0xb9, 0x00, 0x01, 0xf2, 0xa5, 0xea, 0x1d, 0x06, 0x00, 0x00, 0xbe, 0xbe, 0x07, 0xb3, 0x04, 0x80,
+   54              0x3c, 0x80, 0x74, 0x0e, 0x80, 0x3c, 0x00, 0x75, 0x1c, 0x83, 0xc6, 0x10, 0xfe, 0xcb, 0x75, 0xef, 0xcd,
+C251 COMPILER V4.55,  UDiskData                                                            15/07/16  15:45:44  PAGE 2   
+
+   55              0x18, 0x8b, 0x14, 0x8b, 0x4c, 0x02, 0x8b, 0xee, 0x83, 0xc6, 0x10, 0xfe, 0xcb, 0x74, 0x1a, 0x80, 0x3c,
+   56              0x00, 0x74, 0xf4, 0xbe, 0x8b, 0x06, 0xac, 0x3c, 0x00, 0x74, 0x0b, 0x56, 0xbb, 0x07, 0x00, 0xb4, 0x0e,
+   57              0xcd, 0x10, 0x5e, 0xeb, 0xf0, 0xeb, 0xfe, 0xbf, 0x05, 0x00, 0xbb, 0x00, 0x7c, 0xb8, 0x01, 0x02, 0x57,
+   58              0xcd, 0x13, 0x5f, 0x73, 0x0c, 0x33, 0xc0, 0xcd, 0x13, 0x4f, 0x75, 0xed, 0xbe, 0xa3, 0x06, 0xeb, 0xd3,
+   59              0xbe, 0xc2, 0x06, 0xbf, 0xfe, 0x7d, 0x81, 0x3d, 0x55, 0xaa, 0x75, 0xc7, 0x8b, 0xf5, 0xea, 0x00, 0x7c,
+   60              0x00, 0x00, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x20, 0x70, 0x61, 0x72, 0x74, 0x69, 0x74, 0x69,
+   61              0x6f, 0x6e, 0x20, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x00, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x20, 0x6c, 0x6f,
+   62              0x61, 0x64, 0x69, 0x6e, 0x67, 0x20, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6e, 0x67, 0x20, 0x73,
+   63              0x79, 0x73, 0x74, 0x65, 0x6d, 0x00, 0x4d, 0x69, 0x73, 0x73, 0x69, 0x6e, 0x67, 0x20, 0x6f, 0x70, 0x65,
+   64              0x72, 0x61, 0x74, 0x69, 0x6e, 0x67, 0x20, 0x73, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x00, 0x00, 0x81, 0x22,
+   65              0x08, 0x15,
+   66          };
+   67          const uint8 ActCMDSignatureC[7] =
+   68          { 'A', 'c', 't', 'U', 'S', 'B', 'C', };
+   69          const uint8 ActCMDSignatureS[7] =
+   70          { 'A', 'c', 't', 'U', 'S', 'B', 'S', };
+   71          const uint8 Phy0DiskTag[4] =
+   72          { 'P', 'h', 'y', '0', };
+   73          const uint8 decrypt_key = 0x76;
+   74          #pragma userclass(hconst=default)
+   75          
+   76          #pragma userclass(near=RDATA)
+   77          /*
+   78           ********************************************************************************************************
+             -*
+   79           for globle varible
+   80           ********************************************************************************************************
+             -*
+   81           */
+   82          uint8 CurrentBankNo = 0;
+   83          uint32 OldIsrPtr = 0;
+   84          uint8 sfr_bak = 0x00;
+   85          uint32 SP_Keeper = 0x00;
+   86          uint8 sFlashLedFlag = 0;
+   87          uint8 *sFlashLed = 0;
+   88          uint8 TempBuffer[0x40] =
+   89          {
+   90              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+             - 0x00, 0x00,
+   91              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+             - 0x00,
+   92              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+             - 0x00,
+   93              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+   94          };
+   95          uint8 MCSR2_bak = 0;
+   96          uint8 MCSR4_bak = 0;
+   97          //uint8 MCUPLL_bak = 0;
+   98          /*
+   99           ********************************************************************************************************
+             -*
+  100           for disk information
+  101           ********************************************************************************************************
+             -*
+  102           */
+  103          
+  104          uint8 OSType = 0; //0: mac OSX system    1: windows system  ÓÃÓÚÊµÏÖÔÚÆ»¹ûÏµÍ³ÏÂ¿¨°ÎµôºóÅÌ·ûÏûÊ§Ð§¹û
+  105          uint8 MaxLUN = 0; //ÉÏ±¨PCµÄÅÌ·ûÊý
+  106          uint8 DiskAppearSelect = 0; //ÓÃ»§µÄÅÌ·ûÑ¡Ôñ  0:¶àÅÌ·û(Ä¬ÈÏ)  01h:ÆÕÍ¨ÅÌ  02h:¼ÓÃÜÅÌ  03h:²å¿¨
+  107          
+  108          uint8 AutoRunDiskFlag = 0; //AutoRun¹âÅÌ´æÔÚ±êÖ¾: 0:²»´æÔÚ; ·Ç0:´æÔÚ
+  109          uint8 bWriteCD_ROM = 0; //AutoRun¹âÅÌÐ´ÊôÐÔ 0:²»ÔÊÐíÐ´ 0x80:ÔÊÐíÐ´
+  110          
+  111          uint32 SDDiskCap = 0x00; //SDÇøÈÝÁ¿,ÒÔ512bytesÎªµ¥Î»
+  112          uint32 VMCap = 0x00; //VRAMÇøÈÝÁ¿,ÒÔ512bytesÎªµ¥Î»
+  113          uint32 MICap = 0x00; //MIÇøÈÝÁ¿,ÒÔ512bytesÎªµ¥Î»
+C251 COMPILER V4.55,  UDiskData                                                            15/07/16  15:45:44  PAGE 3   
+
+  114          uint32 UICap = 0x00; //UIÇøÈÝÁ¿,ÒÔ512bytesÎªµ¥Î»
+  115          uint32 AutoRunDiskCapacity = 0; //AutoRun¹âÅÌÈÝÁ¿,ÒÔ512bytesÎªµ¥Î»
+  116          uint32 udisk_total_capacity = 0; //UDISKÇø,ÒÔ512bytesÎªµ¥Î»
+  117          
+  118          uint32 AutoRunDiskStartAddr = 0; //AutoRun¹âÅÌÆðÊ¼ÉÈÇø(512bytes)Æ«ÒÆµØÖ·
+  119          uint32 UdiskStartAddr = 0; //UDISKÇøÆðÊ¼ÉÈÇø(512bytes)Æ«ÒÆµØÖ·
+  120          uint32 EncryptInfoSector = 0x00; //¼ÓÃÜÅÌÐÅÏ¢ÆðÊ¼ÉÈÇø(512bytes)Æ«ÒÆµØÖ·(ÔÚUIÇøÄÚ)
+  121          uint32 EncryptDiskBStartAddr = 0; //¼ÓÃÜÅÌBÅÌÆðÊ¼ÉÈÇø(512bytes)Æ«ÒÆµØÖ·(¼ÓÃÜÅÌ½âÃÜºóµÄ´ÅÅÌ»òÃ»¼ÓÃÜµÄ¼ÓÃÜÅ
+             -Ì)
+  122          uint32 EncryptDiskCStartAddr = 0; //¼ÓÃÜÅÌCÅÌÆðÊ¼ÉÈÇø(512bytes)Æ«ÒÆµØÖ·(¼ÓÃÜÅÌ½âÃÜÇ°µÄ´ÅÅÌ)
+  123          
+  124          //Ö÷´æ´¢½éÖÊÀàÐÍ£º·ÇMLC flash:0; MLC flash:1; 2:SPI Nor flash; 3:LBA flash; 4:card base; 5:TLC flash
+  125          uint8 flash_type = 0;
+  126          uint32 flash_capacity = 0; //Ö÷´æ´¢½éÖÊÈÝÁ¿,º¬¹Ì¼þÇøµÈÆäËûÇø×ÜÈÝÁ¿,ÒÔ128KÎªµ¥Î»
+  127          //Ö÷´æ´¢½éÖÊµÄpage´óÐ¡,µÍbyte±íÊ¾page´óÐ¡£¬pageÄÚsectorÊýÎª2µÄÕû´ÎÃÝ;¸ßbyte±íÊ¾sector´óÐ¡,0:512bytes ÆäËû
+             -Öµ£º1024bytes
+  128          uint16 flash_page_sctrnum = 0;
+  129          uint8 FlashWPFlag = 0; //¿¨Ð´±£»¤±êÖ¾
+  130          //uint8 flash_vram_vld = 0;
+  131          
+  132          uint8 ShowMultiDiskFlag = 0; //²åÏß¼´ÏÔÊ¾¿¨ÅÌ·û  0:²»ÏÔÊ¾¿¨ÅÌ·û 1:ÏÔÊ¾¿¨ÅÌ·û
+  133          uint32 CardCapacity = 0; //¿¨ÈÝÁ¿,ÒÔ512bytesÎªµ¥Î»
+  134          uint8 CardExistFlag = 0; //¿¨ÊÇ·ñ´æÔÚ±êÖ¾
+  135          uint8 CardWPFlag = 0; //¿¨Ð´±£»¤±êÖ¾
+  136          uint8 RWCardError = 0; //ÅÐ¶Ï¶ÁÐ´¿¨ÊÇ·ñ³ö´í£¬0£ºÎÞ´í£¬Ö±½Ó·µ»ØCSW£»1£ºÓÐ´í£¬ÐèÒªÖØÐÂÌ½²â¿¨
+  137          
+  138          uint8 flashorcard_rwflag = 0; //Flash»ò¿¨¶ÁÐ´±êÖ¾: 0,Flash; 1:Card
+  139          ud_rw_struct_t SD_UDRWStruct = //Flash²Ù×÷½á¹¹
+  140          { 0x00, 0x00, 0x00, 0x00, };
+  141          uint32 LBA = 0;
+  142          uint32 sectors_trans_once = 0;
+  143          uint32 udisk_rw_sctr_num = 0;
+  144          uint8 illegalLBAFlag = 0; //LBAÊÇ·ñ·Ç·¨,Èç¶Á·Ç·¨SDÇø»òÔ½¹ýFlashÈÝÁ¿µÈ,´Ë±êÖ¾Ö»¶ÔFlash¶ÁÐ´ÓÐÐ§
+  145          uint8 flash_normal_rw_sctrs = 0; //UdiskÆÕÍ¨¶ÁÐ´FlashÉÈÇøÊý
+  146          uint8 flash_disk_write_flag = 0; //FlashÅÌ(AÅÌ)Ð´±ê¼Ç,ÈçÐ´¹ý±íÊ¾ÐèÒª¸üÐÂFAT´ØÁ´
+  147          uint8 fifo_trans_mode = 0; //0:nomal Ä£Ê½; 1:fifoÖ±Í¨Ä£Ê½
+  148          
+  149          uint8 IsNotFormat = 0x00;
+  150          uint8 bMediaChange = 0;
+  151          uint8 MediaChgFlag = 0; //´ÅÅÌ½éÖÊ±ä»»±êÖ¾£¬ÓÃÓÚ´ÅÅÌÇÐ»»
+  152          
+  153          udisk_fs_info_t UdiskFSInfo = //8k page¶ÔÆë
+  154          { 0xffffffff, 0, 0, 0, 0, 0, 0, 0, 0, };
+  155          
+  156          uint8 set_fake_ucap_flag = 0; //uÅÌÀ©ÈÝ±êÖ¾,0:ÕæÊµflashÈÝÁ¿£»1:À©ÈÝÈÝÁ¿
+  157          uint8 SectorType = 0; //flashÉÈÇø´óÐ¡,1=512bytes/sector, 2=1024bytes/sector,4=2048bytes/sector;
+  158          
+  159          /*
+  160           ********************************************************************************************************
+             -*
+  161           for udisk status record
+  162           ********************************************************************************************************
+             -*
+  163           */
+  164          uint8 USB_State = 0;
+  165          uint8 TransferFlag = 0;
+  166          
+  167          uint8 StatusCheckFlag = 0; //¿ªÊ¼×´Ì¬²éÑ¯±êÖ¾
+  168          uint8 USBBusy = 0; //½øÈëEp1²Ù×÷
+  169          
+  170          uint8 SwitchToADFUFlag = 0; //ÔÊÐíÇÐ»»µ½ADFU
+  171          uint8 CanSwitchToADFU = 0x00;
+  172          uint8 detach_cmd_rcv = 0;
+  173          uint8 FWOpStatus = 0;
+  174          uint8 IsAdfuCondition = 0;
+  175          uint8 IsInAdfuState = 0;
+C251 COMPILER V4.55,  UDiskData                                                            15/07/16  15:45:44  PAGE 4   
+
+  176          uint8 PartiEjectFlag = 0; //·ÖÇøµ¯³ö±êÖ¾
+  177          uint8 PullLineFlag = 0; //°ÎÏß±êÖ¾
+  178          uint8 PcEjectFlag = 0; //PCµ¯³ö±êÖ¾
+  179          uint8 SplitDiskFlag = 0; //ÊÇ·ñÎªDiskA,B,C½á¹¹
+  180          uint8 EjectFlag = 0; //ÊÇ·ñÒÑ·ÖÇøµ¯³ö
+  181          uint8 usb_pwr_suspnd_fnsh = 0; //USBÁ¬ÏßÊ±µÄsuspendÒÑ¾­½áÊø
+  182          uint8 Suspend_Flag = 0; //bit[7]:1 need process suspend,0 don't process suspend; bit[1:0]:0 no suspend; 1
+             - recieve suspend; 2 has handle suspend
+  183          uint8 DisableSuspendFlag = 0; //0:enable suspend   01h:disable suspend
+  184          uint8 UpOrDownLoad = 0; //ÉÏÔØ»¹ÊÇÏÂÔØ  01h:ÉÏÔØ 02:ÏÂÔØ
+  185          uint8 UpOrDownLoadBak = 0; //ÉÏÔØ»¹ÊÇÏÂÔØ±¸·Ý  01h:ÉÏÔØ 02:ÏÂÔØ
+  186          
+  187          uint8 UsbIdleCounter = 0; //Õý³£½øÈë¿ÕÏÐ¼ÆÊý
+  188          uint8 EjectTimeCtr = 0; //·ÖÇøµ¯³öÑÓÊ±¼ÆÊý
+  189          uint8 AdfuTimerCtl = 0;
+  190          uint8 connect_idle_cnt = 0; //USBÁ¬½Óºó³öÓÚIdle×´Ì¬Ê±¼ä¼ÆÊý(2Hz)
+  191          uint8 Counter_30s = 0; //³¬Ê±½øÈë¿ÕÏÐ¼ÆÊý
+  192          uint8 PrevRTCTimerValue1 = 0; //RTCTimerÊýÖµ,UsbIdleCounter,EjectTimeCtr,AdfuTimerCtl¼ÆÊýÊ¹ÓÃ
+  193          uint8 PrevRTCTimerValue2 = 0; //RTCTimerÊýÖµ,30s¼ÆÊýÊ¹ÓÃ
+  194          uint8 prv_connect_idle_tm = 0; //USBÁ¬½Óºó³öÓÚIdle×´Ì¬ÉÏ´ÎTimerµÄÊýÖµ
+  195          
+  196          uint8 cbw_count = 0; //ÓÃÓÚ¼ÇÂ¼µÚÒ»¸öCBW£¬ÓÃÓÚÆ»¹ûÓëwindowsÏµÍ³ÅÐ±ð£¬Æ»¹ûÏµÍ³µÚÒ»¸öCBW¿Ï¶¨ÊÇInquire
+  197          uint8 bTestNoready = 0;
+  198          uint8 short_pckt_flag = 0;
+  199          uint8 ErrorReportFlag = 0; //³ö´í·µ»Ø±êÖ¾
+  200          uint8 ErrorIndicator = 0; //³ö´íÀàÐÍ
+  201          uint8 IsReadCapAndReadRec0 = 0;
+  202          uint8 Removable = 0; //ÊÇ·ñ¿ÉÒÔ°ÎÏß 0:²»¿É°ÎÏß£¬01h:¿É°ÎÏß
+  203          
+  204          /*
+  205           ********************************************************************************************************
+             -*
+  206           for adfu
+  207           ********************************************************************************************************
+             -*
+  208           */
+  209          uint8 LogicOrPhy = 0; //ADFU Âß¼­ºÍÎïÀí¶ÁÐ´±êÖ¾   0:Âß¼­·ÖÇø¶ÁÐ´ 1:ÎïÀí·ÖÇø¶ÁÐ´
+  210          uint8 AccessFlash = 0; //ADFU Ð´Âß¼­Çø²Ù×÷ 0:ÎÞÐ´²Ù×÷ 1:ÓÐÐ´²Ù×÷
+  211          
+  212          uint8 brec_count = 0; //BRECÂß¼­±àºÅ£¬0-3
+  213          uint8 first_brec_sector = 0; //Ã¿·ÝBRECµÄµÚÒ»¸öÉÈÇø±êÖ¾£¬0:Ð´Ê×ÉÈÇø£¬ÆäËûÖµ£º·ÇÊ×ÉÈÇø
+  214          uint16 total_breclogo_sector = 0; //BRECLOGO length£ºBREC length + LOGO length
+  215          uint16 phy_block_addr = 0; //FlashÎïÀíÇø±àºÅ£¬MBRC:0-3;BREC:4-7
+  216          uint16 brec_check_sum = 0; //BRECµÄÐ£ÑéºÍ,²»º¬LOGO
+  217          
+  218          uint32 CallingTaskAdd = 0; //¹¦ÄÜµ÷ÓÃÈë¿ÚµØÖ·
+  219          uint8 CallingTaskFlag = 0; //¹¦ÄÜµ÷ÓÃÈÎÎñ±êÖ¾Î»£¬0£ºÎÞ¹¦ÄÜµ÷ÓÃÈÎÎñ£»1£ºÓÐ¹¦ÄÜµ÷ÓÃÈÎÎñ
+  220          uint16 CallingTaskResult = 0; //×´Ì¬½á¹¹µÄµØÖ·
+  221          uint16 StatusLength = 0; //×´Ì¬½á¹¹µÄ³¤¶È
+  222          
+  223          uint8 adfu_flag = 0; // 1:ÒÑ¿ªÊ¼Á¿²ú
+  224          
+  225          /*
+  226           ********************************************************************************************************
+             -*
+  227           for EnDecrypt
+  228           ********************************************************************************************************
+             -*
+  229           */
+  230          uint8 AccessFlashPhySec1 = 0; //·ÃÎÊÎïÀíÉÈÇø1
+  231          uint8 EncryptFlag = 0; //ÊÇ·ñ¼ÓÃÜ  0:Ã»¼ÓÃÜ  1:Ã»¼ÓÃÜ
+  232          uint8 PasswdPassOk = 0; //ÃÜÂëÐ£ÑéÊÇ·ñÍ¨¹ý  0:Ã»Í¨¹ý  1:Í¨¹ý
+  233          uint8 CMDPerformCondition = 0; //Act UÅÌÐ­ÒéÖ´ÐÐÇé¿ö¼ÇÂ¼
+  234          uint16 ActWRLength = 0; //·ÖÇøÈí¼þÒªÐ´ÉÈÇøÊýÄ¿
+  235          uint32 ActWRLBA = 0; //·ÖÇøÈí¼þÒªÐ´µÄFlashµØÖ·
+  236          uint8 Phy0Sec1RdCounter1 = 0; //Á¬Ðø¶ÁPhy0Sec1¼ÆÊýÆ÷1,ÓÃÓÚÕÒUÅÌ
+C251 COMPILER V4.55,  UDiskData                                                            15/07/16  15:45:44  PAGE 5   
+
+  237          uint8 Phy0Sec1RdCounter2 = 0; //Á¬Ðø¶ÁPhy0Sec1¼ÆÊýÆ÷2,ÓÃÓÚÐ­Òé½»Á÷
+  238          uint8 Phy0EquLog0Flag = 0; //ÎïÀí0ÊÇ·ñÓëÂß¼­0ÖØºÏ
+  239          
+  240          /*
+  241           ********************************************************************************************************
+             -*
+  242           usb bulk packet
+  243           ********************************************************************************************************
+             -*
+  244           */
+  245          //usb bulk only protocal cbw buffer
+  246          CBW_WRAP CBW_data_buffer =
+  247          { 0x55534243, 0, 0, 0, 0, 0, 0, };
+  248          
+  249          CSW_WRAP CSWBuffer =
+  250          { 0x55534253, 0, 0, 0, };
+  251          
+  252          uint8 CMD_Inquiry_information_FOB[60] =
+  253          {
+  254              0x00, //Direct-access device
+  255              0x80, //removable
+  256              0x00, 0x01, //response data format as this spec
+  257              0x1f, //(92¸ö)additional length
+  258              0x00, 0x00, 0x00, //reserved
+  259              'A', 'C', 'T', 'I', 'O', 'N', 'S', 0x20, //Vendor information
+  260              'U', 'S', 'B', ' ', 'D', 'I', 'S', 'K', 0x20, 'F', 'O', 'B', ' ', ' ', ' ', 0x20, //product identific
+             -ation
+  261              '1', '.', '0', '0', //product revision level
+  262              0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, //vendor specific
+  263              0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00, 0x00,
+  264          };
+  265          //for autorun
+  266          uint8 CMD_Inquiry_information_CDROM[] =
+  267          {
+  268              0x05, //Direct-access device
+  269              0x80, //removable
+  270              0x02, 0x02, //response data format as this spec
+  271              0x1f, //(92¸ö)additional length
+  272              0x00, 0x00, 0x00, //reserved
+  273              'A', 'C', 'T', 'I', 'O', 'N', 'S', 0x20, //Vendor information
+  274              'U', 'S', 'B', ' ', 'D', 'I', 'S', 'K', 0x20, 'C', 'D', 'R', 'O', 'M', ' ', 0x20, //product identific
+             -ation
+  275              '1', '.', '0', '0', //product revision level
+  276              0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, //vendor specific
+  277              0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00, 0x00,
+  278          };
+  279          
+  280          uint8 *Cap_Info_DiskCDROM_p = (uint8 *) &Cap_cmd_info_DiskCDROM;
+  281          uint8 *Cap_Info_DiskA_p = (uint8 *) &Cap_cmd_info_DiskA;
+  282          uint8 *Cap_Info_DiskB_p = (uint8 *) &Cap_cmd_info_DiskB;
+  283          uint8 *Cap_Info_DiskC_p = (uint8 *) &Cap_cmd_info_DiskC;
+  284          uint8 *Cap_Info_DiskCard_p = (uint8 *) &Cap_cmd_info_DiskCard;
+  285          cap_info Cap_cmd_info_DiskCDROM =
+  286          { 0, 0x0800, };
+  287          cap_info Cap_cmd_info_DiskA =
+  288          { 0, 0x0200, };
+  289          cap_info Cap_cmd_info_DiskB =
+  290          { 0, 0x0200, };
+  291          cap_info Cap_cmd_info_DiskC =
+  292          { 0, 0x0200, };
+  293          cap_info Cap_cmd_info_DiskCard =
+  294          { 0, 0x0200, };
+  295          format_cap_info Formatcap_cmd_info_DiskA =
+  296          {
+  297              0, 0, 0, 0x10,
+  298              //Current/Max Capacity
+C251 COMPILER V4.55,  UDiskData                                                            15/07/16  15:45:44  PAGE 6   
+
+  299              0, 0x02, 0x00, 0x02, 0x00,
+  300              //Fomattable Capacity
+  301              0, 0x00, 0x00, 0x02, 0x00,
+  302          };
+  303          format_cap_info Formatcap_cmd_info_DiskB =
+  304          {
+  305              0, 0, 0, 0x10,
+  306              //Current/Max Capacity
+  307              0, 0x02, 0x00, 0x02, 0x00,
+  308              //Fomattable Capacity
+  309              0, 0x00, 0x00, 0x02, 0x00,
+  310          };
+  311          format_cap_info Formatcap_cmd_info_DiskC =
+  312          {
+  313              0, 0, 0, 0x10,
+  314              //Current/Max Capacity
+  315              0, 0x02, 0x00, 0x02, 0x00,
+  316              //Fomattable Capacity
+  317              0, 0x00, 0x00, 0x02, 0x00,
+  318          };
+  319          format_cap_info Formatcap_cmd_info_DiskCard =
+  320          {
+  321              0, 0, 0, 0x10,
+  322              //Current/Max Capacity
+  323              0, 0x02, 0x00, 0x02, 0x00,
+  324              //Fomattable Capacity
+  325              0, 0x00, 0x00, 0x02, 0x00,
+  326          };
+  327          
+  328          uint8 Time_Protect_Page_information[16] =
+  329          {
+  330              0x00, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //Mode Parameter Header
+  331              0x1c, 0x06, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00,
+  332          };
+  333          uint8 All_Page_information[52] =
+  334          {
+  335              0x00, 0xc0, 0x00, 0x00, 0x00, 0x00,
+  336              0x00,
+  337              0x00, //Mode Parameter Header
+  338              0x01, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x0a, 0x01, 0x00, 0x00,
+             - 0x00,
+  339              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1b, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+             - 0x00,
+  340              0x1c, 0x06, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00,
+  341          };
+  342          uint8 Request_Sense_cmd_info_NoError[18] =
+  343          { 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0
+             -x00, };
+  344          uint8 Request_Sense_cmd_info_CommandReset[18] =
+  345          { 0x70, 0x00, 0x0b, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x4e, 0x00, 0x00, 0x00, 0x00, 0
+             -x00, };
+  346          uint8 Request_Sense_cmd_info_MediaProtect[18] =
+  347          { 0x70, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x27, 0x00, 0x00, 0x00, 0x00, 0
+             -x00, };
+  348          uint8 Request_Sense_cmd_info_MediaChg[18] =
+  349          { 0x70, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0
+             -x00, };
+  350          uint8 Request_Sense_cmd_info_MediaNotPresent[] =
+  351          { 0x70, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x3a, 0x00, 0x00, 0x00, 0x00, 0
+             -x00, };
+  352          uint8 CDRom_Request_Sense_command_Invalid_Operation_Code[18] =
+  353          { 0x70, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0
+             -x00, };
+  354          
+  355          //;;;;;;;;;;;;;;;;;;;;;;;CD_ROM Command In table;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  356          uint8 Read_TOC_command_information[24] =
+C251 COMPILER V4.55,  UDiskData                                                            15/07/16  15:45:44  PAGE 7   
+
+  357          {
+  358              0x00, 0x12, 0x01, 0x01, 0x00, 0x14, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x14, 0xaa, 0x00, 0x00,
+             - 0x00, 0x0a,
+  359              0x00, 0x00, 0x00, 0x00, 0x00,
+  360          };
+  361          uint8 CDRom_ModeSense_information[8] =
+  362          {
+  363              0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //Mode Parameter Header
+  364          };
+  365          uint8 Mechanism_Status_command_information[13] =
+  366          {
+  367              0x00, 0x00, //this field is reserved for changer
+  368              0x00, 0x00, 0x00, 0x00, //Current LBA
+  369              0x01, //Number of Slots Available
+  370              0x00, 0x04, //Length of Slots Table(s) ,4byte for a slot
+  371              0x80, 0x00, 0x00, 0x00, //Slot Table Response format
+  372          };
+  373          uint8 CDRom_Request_DISCINFORMATION[28] =
+  374          {
+  375              0x00, 0x20, 0x0e, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
+             - 0xff, 0xff,
+  376              0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  377          };
+  378          
+  379          /*
+  380           ********************************************************************************************************
+             -*
+  381           for setup
+  382           ********************************************************************************************************
+             -*
+  383           */
+  384          //bit0~bit1: UdiskÐòÁÐºÅÖ§³Ö:0:no sn; 1:unified sn; 2:random sn;
+  385          //bit4: UdiskÈÏÖ¤Ä£Ê½Ö§³Ö: 1:½øÈëUdiskÈÏÖ¤Ä£Ê½,Æô¶¯Ê±¼ä¼Ó¿ì,Ö§³ÖsuspendºÍresumeµÈUSBÈÏÖ¤¹¦ÄÜ
+  386          uint8 udisk_setting = 0;
+  387          uint8 set_pkt_size = 0;
+  388          uint8 usb_reset_enter_cnt = 0;
+  389          uint16 max_pkt_size = 0;
+  390          
+  391          usb_ctrlrequest setup_paket_data;
+  392          uint8 has_set_usb_dscrptr = 0;
+  393          uint8 ConfigValue = 0;
+  394          uint8 AlternateSetting = 0;
+  395          uint16 DeviceStatus = 0x0100;
+  396          uint16 InterfaceStatus = 0;
+  397          uint16 EndPoint1Status = 0;
+  398          uint16 EndPoint2Status = 0;
+  399          
+  400          usb_languageid_descriptor language_string =
+  401          {
+  402              0x04, //bLength
+  403              USB_DT_STRING, //bDescriptorType
+  404              0x0904, //LANGID code array, US english
+  405          };
+  406          
+  407          usb_manufacure_descriptor manufacure_string =
+  408          {
+  409              0x12, //bLength
+  410              USB_DT_STRING, //bDescriptorType
+  411              //manufacure code array, US english
+  412              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  413          };
+  414          
+  415          usb_product_descriptor device_name_string =
+  416          {
+  417              0x22, //bLength
+  418              USB_DT_STRING, //bDescriptorType
+C251 COMPILER V4.55,  UDiskData                                                            15/07/16  15:45:44  PAGE 8   
+
+  419              //product code array, US english
+  420              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+             - 0x00,
+  421              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  422          };
+  423          
+  424          usb_serialnum_descriptor SerialNumber =
+  425          {
+  426              0x12, //bLength
+  427              USB_DT_STRING, //bDescriptorType
+  428              //SerialNumber code array, US english
+  429              'U', '2', 'd', 'c', '0', 'z', '7', 'w', 's', '5', '3', 'a', '7', '9', 'r', 'n', 0x00, 0x00, 0x00, 0x0
+             -0, 0x00,
+  430              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+             - 0x00,
+  431              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+             - 0x00,
+  432              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  433          };
+  434          
+  435          /*
+  436           ********************************************************************************************************
+             -*
+  437           *                                           ¸ßËÙÉè±¸ÃèÊö·û
+  438           *
+  439           * Description: ¸ßËÙÉè±¸Éè±¸ÃèÊö·û(USB2.0).
+  440           *
+  441           * Note(s)    : °üº¬Ò»¸öÅäÖÃ, Ò»¸ö½Ó¿Ú, Á½¸öBulk¶Ëµã.
+  442           ********************************************************************************************************
+             -*
+  443           */
+  444          usb_device_descriptor HS_Device_Dscrptr =
+  445          {
+  446              sizeof(usb_device_descriptor), //bLength
+  447              USB_DT_DEVICE, //bDescriptorType
+  448          
+  449              0x0002, //bcdUSB, USB release version 2.0,0x200×ªÐ¡¶ËÄ£Ê½,
+  450              0x00, //bDeviceClass, class code
+  451              0x00, //bDeviceSubClass, sub-class code
+  452              0x00, //bDeviceProtocol, protocol
+  453              0x40, //bMaxPacketSize0, max packet size of endpoint0= 64byte
+  454          
+  455              0xD610, //idVendor, vendor ID
+  456              0x0111, //idProduct, product ID
+  457              0x0001, //bcdDevice, device release number
+  458              0x01, //iManufacturer, index of string descriptor of manufacturer
+  459              0x02, //iProduct, index of string descriptor of product
+  460              0x03, //iSerialNumber, index of string descriptor of serial number
+  461              0x01, //bNumConfigurations, number of possible configuration
+  462          };
+  463          
+  464          usb_config_descriptor
+  465          HS_Config_Dscrptr =
+  466          {
+  467              sizeof(usb_config_descriptor), //bLength
+  468              USB_DT_CONFIG, //bDescriptorType
+  469              ((sizeof(usb_config_descriptor) + sizeof(usb_interface_descriptor) + sizeof(usb_endpoint_descriptor)
+  470              * 2) << 8), //wTotalLength
+  471              0x01, //bNumInterfaces, number of interface = 1
+  472              0x01, //bConfigurationValue, configuration value
+  473              0x00, //iConfiguration, configuration string index
+  474              0x80, //bmAttributes, attribute (bus powered, remote wakeup disable)
+  475              0xfa, //bMaxPower, max power (500mA),96h(300mA)
+  476          };
+  477          
+  478          usb_interface_descriptor HS_Interface_Dscrptr =
+C251 COMPILER V4.55,  UDiskData                                                            15/07/16  15:45:44  PAGE 9   
+
+  479          {
+  480              sizeof(usb_interface_descriptor), //bLength
+  481              USB_DT_INTERFACE, //bDescriptorType
+  482          
+  483              0x00, //bInterfaceNumber
+  484              0x00, //bAlternateSetting;
+  485              0x02, //bNumEndpoints, number of endpoint
+  486              0x08, //bInterfaceClass, MASS STORAGE class
+  487              0x05, //bInterfaceSubClass,command block specification SFF-8070i;
+  488              0x50, //bInterfaceProtocol,BULK-ONLY TRANSPORT;
+  489              0x00, //iInterface, interface string index
+  490          };
+  491          
+  492          usb_endpoint_descriptor HS_EndpointA_Dscrptr =
+  493          {
+  494              sizeof(usb_endpoint_descriptor), //bLength
+  495              USB_DT_ENDPOINT, //bDescriptorType
+  496          
+  497              0x81, //bEndpointAddress, endpoint address (in endpoint addressed at 1)
+  498              0x02, //bmAttributes, endpoint type (bulk)
+  499              0x0002, //wMaxPacketSize, max packet size (512 bytes)
+  500              0x00, //bInterval, polling interval (ignored)
+  501          };
+  502          
+  503          usb_endpoint_descriptor HS_EndpointB_Dscrptr =
+  504          {
+  505              sizeof(usb_endpoint_descriptor), //bLength
+  506              USB_DT_ENDPOINT, //bDescriptorType
+  507          
+  508              0x02, //bEndpointAddress, endpoint address (out endpoint addressed at 2)
+  509              0x02, //bmAttributes, endpoint type (bulk)
+  510              0x0002, //wMaxPacketSize, max packet size (512 bytes)
+  511              0x00, //bInterval, polling interval (ignored)
+  512          };
+  513          
+  514          /*
+  515           ********************************************************************************************************
+             -*
+  516           *                                           ÏÞ¶¨¸ßËÙÉè±¸ÃèÊö·û
+  517           *
+  518           * Description: ÏÞ¶¨¸ßËÙÉè±¸Éè±¸ÃèÊö·û(USB2.0).
+  519           *
+  520           * Note(s)    : °üº¬Ò»¸öÅäÖÃ, Ò»¸ö½Ó¿Ú, Á½¸öBulk¶Ëµã.
+  521           ********************************************************************************************************
+             -*
+  522           */
+  523          usb_qualifier_descriptor HS_Device_Qualifier_Dscrptr =
+  524          {
+  525              sizeof(usb_qualifier_descriptor), //bLength
+  526              USB_DT_DEVICE_QUALIFIER, //bDescriptorType
+  527          
+  528              0x0002, //bcdUSB, USB release version 2.0
+  529              0x00, //bDeviceClass, class code
+  530              0x00, //bDeviceSubClass, sub-class code
+  531              0x00, //bDeviceProtocol, protocol
+  532              0x40, //bMaxPacketSize0, max packet size of endpoint0= 64byte
+  533              0x01, //bNumConfigurations, number of possible configuration
+  534              0x00, //bRESERVED
+  535          };
+  536          
+  537          usb_config_descriptor
+  538          HS_OtherSpeed_Config_Dscrptr =
+  539          {
+  540              sizeof(usb_config_descriptor), //bLength
+  541              USB_DT_OTHER_SPEED_CONFIG, //bDescriptorType
+  542          
+C251 COMPILER V4.55,  UDiskData                                                            15/07/16  15:45:44  PAGE 10  
+
+  543              ((sizeof(usb_config_descriptor) + sizeof(usb_interface_descriptor) + sizeof(usb_endpoint_descriptor)
+  544              * 2) << 8), //wTotalLength
+  545              0x01, //bNumInterfaces, number of interface = 1
+  546              0x01, //bConfigurationValue, configuration value
+  547              0x00, //iConfiguration, configuration string index
+  548              0x80, //bmAttributes, attribute (bus powered, remote wakeup disable)
+  549              0xfa, //bMaxPower, max power (500mA) //96h (300mA)
+  550          };
+  551          
+  552          usb_interface_descriptor HS_OtherSpeed_Interface_Dscrptr =
+  553          {
+  554              sizeof(usb_interface_descriptor), //bLength
+  555              USB_DT_INTERFACE, //bDescriptorType
+  556          
+  557              0x00, //bInterfaceNumber
+  558              0x00, //bAlternateSetting;
+  559              0x02, //bNumEndpoints, number of endpoint
+  560              0x08, //bInterfaceClass, MASS STORAGE class;
+  561              0x06, //bInterfaceSubClass,command block specification SFF-8070i    //for autorun;
+  562              0x50, //bInterfaceProtocol,BULK-ONLY TRANSPORT;
+  563              0x00, //iInterface, interface string index
+  564          };
+  565          
+  566          usb_endpoint_descriptor HS_OtherSpeed_EndpointA_Dscrptr =
+  567          {
+  568              sizeof(usb_endpoint_descriptor), //bLength
+  569              USB_DT_ENDPOINT, //bDescriptorType
+  570              0x81, //bEndpointAddress, endpoint address (in endpoint addressed at 1)
+  571              0x02, //bmAttributes, endpoint type (bulk)
+  572              0x4000, //wMaxPacketSize, max packet size (64 bytes)
+  573              0x00, //bInterval, polling interval (ignored)
+  574          };
+  575          
+  576          usb_endpoint_descriptor HS_OtherSpeed_EndpointB_Dscrptr =
+  577          {
+  578              sizeof(usb_endpoint_descriptor), //bLength
+  579              USB_DT_ENDPOINT, //bDescriptorType
+  580          
+  581              0x02, //bEndpointAddress, endpoint address (out endpoint addressed at 2)
+  582              0x02, //bmAttributes, endpoint type (bulk)
+  583              0x4000, //wMaxPacketSize, max packet size (64 bytes)
+  584              0x00, //bInterval, polling interval (ignored)
+  585          };
+  586          #pragma userclass(near=default)
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =    ------     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =      1062     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =      2004     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

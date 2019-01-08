@@ -1,0 +1,7 @@
+-b ..\drv\fw_cfg\fw_cfg.Uv2 -t "fw_cfg"
+-b ..\drv\key\drv_key.Uv2 -t "ky_hard"
+-b ..\drv\uart\uart.Uv2 -t "uart"
+-b ..\drv\welcome\welcome.Uv2 -t "welcome"
+-b ..\ap\ap_main\ap_main.Uv2 -t "main"
+-b ..\ap\ap_udisk\ap_udisk.Uv2 -t "udisk-src"
+-b ..\ap\ap_usound\ap_sound.Uv2 -t "usound-src"

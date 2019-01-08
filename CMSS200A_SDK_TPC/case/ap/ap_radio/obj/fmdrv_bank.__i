@@ -1,0 +1,1 @@
+"FM_QN8035\fmdrv_bank.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) OPTIMIZE (9,SPEED) BROWSE ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE (CHECKALARM) DEBUG PRINT(.\lst\fmdrv_bank.lst) OBJECT(.\obj\fmdrv_bank.obj)

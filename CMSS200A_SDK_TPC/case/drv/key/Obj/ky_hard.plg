@@ -1,0 +1,42 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\key\drv_key.uv2
+Project File Date:  07/25/2016
+
+<h2>Output:</h2>
+Build target 'ky_hard'
+User command #1: .\buildlin.bat
+第54行编译异常：警告：未定义段结束地址!
+compiling key_rcode.c...
+KEY_RCODE.C(55): warning C47: 'lradc4_data': unreferenced local variable
+KEY_RCODE.C(351): warning C47: 'api_no': unreferenced parameter
+KEY_RCODE.C(351): warning C47: 'cur_status': unreferenced parameter
+KEY_RCODE.C(351): warning C47: 'plug_dev_type': unreferenced parameter
+compiling key_IR.c...
+compiling key_init.c...
+KEY_INIT.C(174): warning C47: 'flag': unreferenced parameter
+KEY_INIT.C(210): warning C47: 'api_no': unreferenced parameter
+KEY_INIT.C(210): warning C47: 'light_type': unreferenced parameter
+KEY_INIT.C(210): warning C47: 'flag': unreferenced parameter
+compiling key_tone.c...
+compiling key_charge.c...
+linking...
+Program Size: data=8.0 edata+hdata=77 xdata=0 const=133 code=2748
+creating hex file from ".\Obj\ky_hard"...
+User command #1: .\builddrv.bat
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\key>copy .\Obj\ky_hard.map ky_hard.map 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\key>copy .\Obj\ky_hard.hex ky_hard.hex 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\key>copy .\Obj\ky_hard ky_hard 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\key>..\..\..\psp_rel\tools\builddriver51 ky_hard.hex drv_key.drvl ky_hard.map 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\key>copy ky_hard.drv ..\..\fwpkg\ 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\key>IF {} == {} goto nocopy 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\drv\key>echo build end  
+build end 
+".\Obj\ky_hard" - 0 Error(s), 8 Warning(s).

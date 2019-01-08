@@ -1,0 +1,626 @@
+C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE usound_rec
+OBJECT MODULE PLACED IN .\obj\usound_rec.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE usound_rec.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BROW
+                    -SE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 ORDER DEFINE(USOUND_AP) DEBUG PRINT(.\list\usound_rec.lst) OBJECT(.\obj\uso
+                    -und_rec.obj) 
+
+stmt  level    source
+
+    1          #include "actos.h"
+    2          #include "basal.h"
+    3          #include "enhanced.h"
+    4          #include "ap_common.h"
+    5          #include "ap_record.h"
+    6          
+    7          #define MURAM1H_OFFSET 0x12c0
+    8          #define MURAM1H_ADDR (0x8000 + MURAM1H_OFFSET)
+    9          
+   10          extern DLL_IMP uint32 RecSpare;
+   11          const uint8 g_dir_ext[] = "*  ";
+   12          
+   13          const uint8 g_dir_urec[12] =
+   14          { "UREC       " };
+   15          
+   16          /* Usound录音文件名 */
+   17          const uint8 FilenameHead[] =
+   18          { "UREC" };
+   19          
+   20          /*************全局变量定义*********************************/
+   21          
+   22          /* 可录总秒数*/
+   23          //uint32 total_sec = 0;
+   24          
+   25          uint32 near g_free_space; //剩余磁盘空间//remaining disk space
+   26          
+   27          /* 当前录音文件的page数*/
+   28          //uint32 near g_file_size;
+   29          
+   30          //comval_t g_comval;
+   31          //alarm_vars_t g_alarm;
+   32          record_vars_t near g_record_vars;
+   33          //uint8 near g_rec_from; //当前的录音源 by ccm
+   34          
+   35          /*  可录音总时间*/
+   36          //time_t_ext near time;
+   37          
+   38          /* 录音状态*/
+   39          wav_rec_status_t rec_stat;
+   40          
+   41          resource_t inputSelect =
+   42          { 0 };
+   43          
+   44          /* 录音参数结构*/
+   45          audio_format_t Rec_format;
+   46          
+   47          const int8 log_table[64] =
+   48          {
+   49              96, 94, 92, 90, 88, 86, 84, 82, 80, 78, 76, 74, 72, 70, 68, 66, 64, 62, 60, 58, 56, 54, 52, 50, 48, 4
+             -6, 44, 42, 40,
+   50              38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             - 0, 0, 0,
+   51              0, 0, 0
+   52          };
+   53          
+   54          uint16 StartMP2Record(void);
+   55          
+C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 2   
+
+   56          #pragma name(AP_USOUND_REC)
+   57          
+   58          int16 prepare_urec(void)
+   59          {
+   60   1          BOOL retbool;
+   61   1          RecSpare = 0xffffffff;
+   62   1          retbool = SetCard();
+   63   1      
+   64   1          if (!retbool)
+   65   1          {
+   66   2              //未插卡或驱动装载失败
+   67   2              return USOUND_CARD_ERROR;
+   68   2          }
+   69   1      
+   70   1          //设置USOUND录音目录
+   71   1          //retbool = reset_record_dir();
+   72   1          reset_record_dir();
+   73   1          //if(!retbool)
+   74   1          //{
+   75   1          //设置录音目录失败
+   76   1          //return USOUND_SETDIR_ERROR;
+   77   1          //}
+   78   1      
+   79   1          //分析录音可录时间
+   80   1          parse_total_time();
+   81   1      
+   82   1          if (g_free_space == 0)
+   83   1          {
+   84   2              //卡空间已满, 无法录音
+   85   2              return USOUND_CARD_FULL;
+   86   2          }
+   87   1      
+   88   1          format_filename();
+   89   1          if (!gen_filename()) //产生录音文件序号名
+   90   1          {
+   91   2              //已达到该目录录音文件数限制
+   92   2              return USOUND_DIR_FULL;
+   93   2          }
+   94   1      
+   95   1          if (!StartMP2Record())
+   96   1          {
+   97   2              //创建文件失败
+   98   2              return USOUND_CREAT_FAIL;
+   99   2          }
+  100   1          return 0;
+  101   1      }
+  102          
+  103          /*
+  104           ********************************************************************************
+  105           * Description : 打开USOUND录音
+  106           *
+  107           * Arguments   : NULL
+  108           *
+  109           * Returns     :
+  110           *
+  111           * Notes       :
+  112           *
+  113           ********************************************************************************
+  114           */
+  115          int16 usound_rec(void)
+  116          {
+  117   1          int16 retval=0;
+  118   1      //  uint8 key;
+  119   1      //  uint16 i;
+  120   1      //  status_t status;
+  121   1          retWavrProceed_e mc_result = WRITE_NONE;
+C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 3   
+
+  122   1      #if 0
+               //    LEDDisplay(LED_PAUSE, 0xff, 0);
+               //    LEDDisplay(LED_PLAY, 0xff, 1);
+                   mp3rSendCommand(MC_RECORD, 0);
+                   status = recording;
+               
+                   while (1)
+                   {
+                       if (status != saving)
+                       {
+                           key = ap_get_message();
+               
+                           switch (key)
+                           {
+               
+                           case AP_KEY_PLAY | AP_KEY_UP:
+                               if (status == recording)
+                               {
+                                   mp3rSendCommand(MC_PAUSE, 0);
+               
+                                   retval = do_pause(); //暂停界面
+               
+                                   if (retval != 0)
+                                   {
+                                       status = wait_to_save;
+               
+                                       if (retval == RESULT_CARD_OUT)
+                                       {
+                                           status = saving;
+                                           //显示卡拔出
+                                           mp3rSendCommand(MC_STOP, 0);
+                                           retval = RESULT_SD_OUT;
+                                       }
+                                       else
+                                       {
+               
+                                       }
+                                   }
+                               }
+                               break;
+               
+                           case AP_KEY_MODE | AP_KEY_UP:
+                               status = wait_to_save;
+                               retval = 0;
+                               break;
+               
+                           case AP_KEY_MODE | AP_KEY_LONG:
+                               longkey_flag = 1;
+                               status = wait_to_save;
+                               retval = RESULT_MAIN;
+                               break;
+               
+                           case AP_MSG_SD_OUT:
+                               if (g_record_vars.location.disk == 'H')
+                               {
+                                   status = saving;
+                                   //显示卡拔出
+                                   mp3rSendCommand(MC_STOP, 0);
+                                   retval = RESULT_SD_OUT;
+                               }
+                               break;
+               
+                           case AP_MSG_RTC:
+                               if (status == recording)
+                               {
+                                   mp3rSendCommand(MC_GETSTATUS, (void *) &rec_stat); //add by lei
+C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 4   
+
+                                   if (rec_stat.status > 0xf0)
+                                   {
+                                       mp3rSendCommand(MC_STOP, 0);
+                                       return 0;
+                                   }
+                               }
+                               break;
+               
+                           default:
+                               break;
+                           }//switch
+                       }
+                       if (status == wait_to_save)
+                       {
+                           //show_error(RSAVING);
+                           mp3rSendCommand(MC_STOP, 0);
+                           status = saving;
+                       }
+                       if (status == saving)
+                       {
+                           mp3rSendCommand(MC_GETSTATUS, (void *) &rec_stat);
+                           if (rec_stat.status == RECORDING_STOP)
+                           {
+                               return retval;
+                           }
+                           ClearWatchDog();
+               #if 0            // 暂不超时退出, 避免文件不保存
+                           i++;
+                           if (i >= 2000)
+                           {
+                               return retval;
+                           }
+               #endif
+                       }
+                       mc_result = wavrProceed();
+               
+                       if (mc_result == WRITE_ONE) //已写一个page
+                       {
+                           g_free_space--;
+                           if (g_free_space == 0)
+                           {
+                               mp3rSendCommand(MC_STOP, 0);
+                               i = 0;
+                               while (1)
+                               {
+                                   wavrProceed();
+                                   mp3rSendCommand(MC_GETSTATUS, (void *) &rec_stat);
+                                   i++;
+                                   if ((rec_stat.status == RECORDING_STOP) || (i >= 2000))
+                                   {
+                                       return RESULT_MAIN;
+                                   }
+                               }
+                           }
+                       }
+                       else if (mc_result == WRITE_WRONG) //致命错误
+                       {
+                           while (ap_get_message() != NULL)
+                           {
+                               ;//qac
+                           }
+                           if ((g_record_vars.location.disk == 'H') && ((DRV_DetectUD(1)) != 0x20))
+                           {
+                               mp3rSendCommand(MC_STOP, 0);
+                               return RESULT_MAIN;
+                           }
+C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 5   
+
+                           mp3rSendCommand(MC_STOP, 0);
+                           return RESULT_MAIN;
+                       }
+                       else if (WRITE_HEAD == mc_result)
+                       {
+                           break;
+                       }
+                       else
+                       {
+               
+                       }
+                   }//while(1)
+               
+                   //return 0;
+               #endif
+  269   1          return retval;
+  270   1      
+  271   1      }
+  272          
+  273          /*
+  274           ********************************************************************************
+  275           * Description :    准备开始MP2   格式录音
+  276           *
+  277           * Arguments   :  NULL
+  278           *
+  279           * Returns     :   success/fail
+  280           *
+  281           * Notes       :   主要是调用basal接口函数发命令
+  282           *
+  283           ********************************************************************************
+  284           */
+  285          uint16 StartMP2Record(void)
+  286          {
+  287   1          uint16 result;
+  288   1          char *mp2_buff_addr = (char *) MURAM1H_ADDR;
+  289   1          char *mp2_array_addr = log_table;
+  290   1          memcpy(mp2_buff_addr, mp2_array_addr, sizeof(log_table));
+  291   1      
+  292   1          result = mp3rSendCommand(MC_OPEN, 0);
+  293   1      
+  294   1          mp3rSendCommand(MC_SET_RECORD_DELAY, (void *) g_record_vars.rec_DelayTime);
+  295   1          mp3rSendCommand(MC_SETGAIN, (void *) g_record_vars.rec_InputGain);
+  296   1          mp3rSendCommand(MC_SETGAIN_ADC, (void *) g_record_vars.rec_ADCGain);
+  297   1          mp3rSendCommand(MC_SETGAIN_DSP, (void *) g_record_vars.rec_DSPGain);
+  298   1      
+  299   1          //set record source
+  300   1          inputSelect.input = 0;
+  301   1      
+  302   1          //fpga test
+  303   1          g_record_vars.rec_source = AP_LINEIN;
+  304   1          mp3rSendCommand(MC_SETSOURCE, (void *) &inputSelect);
+  305   1      
+  306   1          //Rec_format.bits = 18;
+  307   1      
+  308   1          //固定采样率
+  309   1          Rec_format.sample_rate = 8;
+  310   1      
+  311   1          //固定单通道
+  312   1          Rec_format.channel = SINGLE_CH;
+  313   1      
+  314   1          //固定比特率 128k
+  315   1          Rec_format.bit_rate[0] = 0 + '0';
+  316   1          Rec_format.bit_rate[1] = 6 + '0';
+  317   1          Rec_format.bit_rate[2] = 4 + '0';
+  318   1          mp3rSendCommand(MC_SETAUDIOFMT, (void *) &Rec_format);
+  319   1      
+C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 6   
+
+  320   1          /* 创建录音文件*/
+  321   1          result = mp3rSendCommand(MC_LOAD, (void *) g_record_vars.location.filename);
+  322   1      
+  323   1          return result;
+  324   1      }
+  325          
+  326          BOOL SetCard(void)
+  327          {
+  328   1          ClearWatchDog();
+  329   1          if (DRV_DetectUD(1) == 0x20)
+  330   1          {
+  331   2              if (DRV_ActiveDrive('H', MODE_SLOW))
+  332   2              {
+  333   3                  g_record_vars.location.disk = 'H';
+  334   3                  return TRUE;
+  335   3              }
+  336   2          }
+  337   1          return FALSE;
+  338   1      }
+  339          
+  340          /*
+  341           ********************************************************************************
+  342           * Description : 设置录音缺省目录
+  343           *
+  344           * Arguments   :
+  345           *
+  346           * Returns     : 成功or 失败
+  347           *
+  348           * Notes       :  根据录音格式, 设置缺省目录为RECORD/VOICE
+  349           *                   或RECORD/MUSIC
+  350           ********************************************************************************
+  351           */
+  352          BOOL reset_record_dir(void)
+  353          {
+  354   1          //uint8  i;
+  355   1          BOOL status;
+  356   1          //uint8 file[12];
+  357   1      
+  358   1          g_record_vars.location.filename[0] = 0;
+  359   1      
+  360   1          strcpy(g_record_vars.location.path, g_dir_urec);
+  361   1      
+  362   1          g_record_vars.location.path[11] = 0x00;
+  363   1          g_record_vars.location.filename[0] = 0;
+  364   1      
+  365   1          FS_CD(FS_CD_ROOT);
+  366   1          status = FS_CD(g_dir_urec);
+  367   1          if (!status)
+  368   1          {
+  369   2              status = FS_MakeDir(g_dir_urec);
+  370   2              if (!status)
+  371   2              { return FALSE; } // 创建目录失败//create directory fail
+  372   2              else
+  373   2              {
+  374   3                  FS_CD(g_dir_urec);
+  375   3              }
+  376   2          }
+  377   1      
+  378   1      #if 0
+                   else
+                   { FS_CD("\\"); }
+               
+                   i = 1;
+                   status = FS_Dir(file, g_dir_ext, FS_DIR_DIR, 0);
+                   do
+                   {
+C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 7   
+
+                       if(0 == memcmp(file, g_dir_urec, 8))
+                       {
+                           break;
+                       }
+                       i++;
+                   }
+                   while ((status = FS_Dir(file, g_dir_ext, FS_DIR_DIR_CONT, 0)));
+                   if (!status)
+                   { return FALSE; }
+               
+                   g_record_vars.location.DirNo[0] = i;
+               
+                   g_record_vars.location.dirLayer = 0;
+                   status = FS_CD(g_dir_urec);
+               
+                   g_record_vars.location.ClusterNo = FS_GetCurDir();
+                   g_record_vars.location.DirEntry = FS_GetCurDirEntry();
+               #endif
+  404   1      
+  405   1          return TRUE;
+  406   1      }
+  407          
+  408          /*
+  409           ********************************************************************************
+  410           * Description : 分析剩余空间,计算可录音时间
+  411           *
+  412           * Arguments   :  NULL
+  413           *
+  414           * Returns     :  NULL
+  415           *
+  416           * Notes       :  根据剩余空间g_free_space  ( 以扇区为单位) , 计算可录
+  417           *                   时间
+  418           ********************************************************************************
+  419           */
+  420          void parse_total_time(void)
+  421          {
+  422   1          //uint32 total_sec_temp;
+  423   1          g_free_space = (ulong) FS_GetSpace(FS_GET_SPACE_FREE);
+  424   1      
+  425   1          if (g_free_space > SPACE_LOW)
+  426   1          {
+  427   2              g_free_space -= SPACE_LOW;
+  428   2          }
+  429   1          else
+  430   1          {
+  431   2              g_free_space = 0;
+  432   2              //total_sec = 0;
+  433   2              return;
+  434   2          }
+  435   1      
+  436   1          //total_sec = g_free_space / 32;                      // 128kbps mp2 record
+  437   1          //total_sec_temp = total_sec;
+  438   1      
+  439   1          //time.hour = total_sec_temp / 3600;
+  440   1          //total_sec_temp %= 3600;
+  441   1          //time.minute = (uint8) (total_sec_temp / 60);
+  442   1          //time.second = (uint8) (total_sec_temp % 60);
+  443   1      }
+  444          
+  445          void format_filename(void)
+  446          {
+  447   1          memset(g_record_vars.location.filename, 0, 12);
+  448   1          strcpy(g_record_vars.location.filename, FilenameHead); //UREC001.MP3
+  449   1          itoa3(g_record_vars.wav_num, &g_record_vars.location.filename[4]);
+  450   1          strcat(g_record_vars.location.filename, " ");
+  451   1          strcat(g_record_vars.location.filename, "WAV");
+C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 8   
+
+  452   1      }
+  453          
+  454          /*
+  455           ********************************************************************************
+  456           * Description : 根据序号生成新的可用文件名
+  457           *
+  458           * Arguments   : location->filename, 原来的文件名
+  459           *               location->filename, 输出新的文件名
+  460           *
+  461           * Returns     :  新文件的序号, 01~99
+  462           *        如果01~99 文件存在, 返回0
+  463           *
+  464           * Notes       :文件名字格式 : xxx000 WAV, xxx000 ACT, ***000 JPG...
+  465           *        如果输入的文件不存在,则直接返回
+  466           检查目录满最长时间15s
+  467           顺序产生下一个目录名最长时间1s.
+  468           *
+  469           * TODO:        不要使用 atoi(), 节省128byte  (ok!)
+  470           ********************************************************************************
+  471           */
+  472          int GenNewName_forUrec(file_location_urec_t *location)
+  473          {
+  474   1          int num;
+  475   1          int loops = 0;
+  476   1          uint8 new_name[12];
+  477   1          handle f;
+  478   1      
+  479   1          //复制到new_name
+  480   1          memcpy(new_name, location->filename, 12);
+  481   1      
+  482   1          // 检查文件夹是否含有001这个文件,如没有RETURN 1
+  483   1          new_name[4] = '0';
+  484   1          new_name[5] = '0';
+  485   1          new_name[6] = '1';
+  486   1          // 如果文件不存在
+  487   1          f = FS_FOpen(new_name, 0);
+  488   1          if (f == NULL)
+  489   1          {
+  490   2              memcpy(location->filename, new_name, 11);
+  491   2              location->filename[11] = 0;
+  492   2              // 删除文件长度为0的文件.
+  493   2              //文件名已经存在，但文件长度为0时open也失败。
+  494   2              FS_FRemove(location->filename);
+  495   2              return 1;
+  496   2          }
+  497   1          else
+  498   1          {
+  499   2              FS_FClose(f);
+  500   2          }
+  501   1      
+  502   1          // 按指定的值,继续查找.
+  503   1          memcpy(new_name, location->filename, 12);
+  504   1          num = (new_name[4] - '0') * 100 + (new_name[5] - '0') * 10 + (new_name[6] - '0');
+  505   1      
+  506   1          if ((num <= 0) || (num > 200))
+  507   1          {
+  508   2              num = 1;
+  509   2              itoa3(num, &new_name[4]);
+  510   2          }
+  511   1      
+  512   1          //如果文件存在,数字加1
+  513   1          do
+  514   1          {
+  515   2              // 如果文件不存在
+  516   2              ClearWatchDog();
+  517   2              f = FS_FOpen(new_name, 0);
+C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 9   
+
+  518   2              if (f == NULL)
+  519   2              {
+  520   3                  memcpy(location->filename, new_name, 11);
+  521   3                  location->filename[11] = 0;
+  522   3                  FS_FRemove(location->filename);
+  523   3                  return num;
+  524   3              }
+  525   2              else
+  526   2              {
+  527   3                  FS_FClose(f);
+  528   3                  num++;
+  529   3                  if (num > 200)
+  530   3                  {
+  531   4                      num = 1;
+  532   4                  }
+  533   3                  itoa3(num, &new_name[4]);
+  534   3              }
+  535   2              loops++;
+  536   2          }
+  537   1          while (loops < 200);
+  538   1      
+  539   1          return 0;
+  540   1      }
+  541          
+  542          /*
+  543           ********************************************************************************
+  544           * Description : 生成新的录音文件名
+  545           *
+  546           * Arguments   : NULL
+  547           *
+  548           * Returns     : TRUE, 成功
+  549           FALSE, 编号01~99 文件都存在
+  550           全局变量
+  551           g_record_vars.location
+  552           g_record_vars.wav_num
+  553           g_file_name_time[], 文件名,文件时间字符串
+  554           *
+  555           * Notes       :
+  556           *
+  557           ********************************************************************************
+  558           */
+  559          BOOL gen_filename(void)
+  560          {
+  561   1          uint16 num = (uint16) GenNewName_forUrec(&g_record_vars.location);
+  562   1      
+  563   1          if (num == 0)
+  564   1          {
+  565   2              return FALSE;
+  566   2          }
+  567   1      
+  568   1          g_record_vars.wav_num = num;
+  569   1          return TRUE;
+  570   1      }
+  571          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       950     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        75     ------
+  bit size             =    ------     ------
+C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 10  
+
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        99     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

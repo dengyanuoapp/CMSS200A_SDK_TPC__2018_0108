@@ -1,0 +1,1 @@
+"uart_apitable.A51" MODSRC INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 SET (XSMALL,ROMHUGE) DEBUG PRINT(.\output\uart_apitable.lst) OBJECT(.\output\uart_apitable.obj) EP

@@ -1,0 +1,378 @@
+C251 COMPILER V4.55,  ui_clock                                                             23/05/16  10:41:55  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE ui_clock
+OBJECT MODULE PLACED IN .\Obj\ui_clock.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ui_clock.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED
+                    -) BROWSE INCDIR(..\..\inc;..\..\..\psp_rel\inc) I4 DEBUG PRINT(.\Lst\ui_clock.lst) OBJECT(.\Obj\ui_clock.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ******************************************************************************
+    3           *                               AS211A
+    4           *                            Module: music
+    5           *                 Copyright(c) 2002-2010 Actions Semiconductor,
+    6           *                            All Rights Reserved.
+    7           *
+    8           * Descripton: sub functions 2 of music
+    9           *
+   10           * History:
+   11           *      <author>    <time>           <version >             <desc>
+   12           *       xusong    2010-07-15 15:00     1.0             build this file
+   13           ******************************************************************************
+   14           */
+   15          #include "ap_music.h"
+   16          
+   17          #pragma name(AP_CLOCK)
+   18          
+   19          const uint8 alarm_str[2][4] =
+   20          { "OFF", "ONZ" };
+   21          void ShowTimer(void)
+   22          {
+   23   1          TM_GetDate(&date);
+   24   1          TM_GetTime(&time);
+   25   1          if (date.year > 2098)
+   26   1          {
+   27   2              date.year = 2000;
+   28   2              date.month = 0x01;
+   29   2              date.day = 0x01;
+   30   2              time.hour = 0;
+   31   2              time.minute = 0;
+   32   2              time.second = 1;
+   33   2              TM_SetDate(&date);
+   34   2              TM_SetTime(&time);
+   35   2          }
+   36   1      
+   37   1          if (memcmp(&tmp_time, &time, sizeof(time_t)) != 0)
+   38   1          {
+   39   2              memcpy(&tmp_time, &time, sizeof(time_t));
+   40   2              itoa_2(time.hour, &temp_buffer[0]);
+   41   2              itoa_2(time.minute, &temp_buffer[2]);
+   42   2              temp_buffer[4] = 0x0;
+   43   2              LEDPuts(NUMBER1, temp_buffer, 1);
+   44   2          }
+   45   1          LEDDisplay(LED_COL, 0xff, show_what);
+   46   1      }
+   47          void show_time_setting(void)
+   48          {
+   49   1          switch (set_what)
+   50   1          {
+   51   2          case 0://设置年份
+   52   2              if (show_what == 0)
+   53   2              {
+   54   3                  memset(temp_buffer, 0xff, 0x04);
+   55   3              }
+   56   2              else
+   57   2              {
+   58   3                  if (DigitalCount != 0)
+C251 COMPILER V4.55,  ui_clock                                                             23/05/16  10:41:55  PAGE 2   
+
+   59   3                  {
+   60   4                      memset(temp_buffer, 0x0, 0x04);
+   61   4                      memcpy(&temp_buffer[4 - DigitalCount], DigitalBuf, DigitalCount);
+   62   4                      break;
+   63   4                  }
+   64   3                  itoa4(date.year, temp_buffer);
+   65   3              }
+   66   2              break;
+   67   2          case 1://设置月份
+   68   2              if (show_what == 0)
+   69   2              {
+   70   3                  memset(temp_buffer, 0xff, 0x02);
+   71   3              }
+   72   2              else
+   73   2              {
+   74   3                  if (DigitalCount != 0)
+   75   3                  {
+   76   4                      memset(temp_buffer, 0x0, 0x02);
+   77   4                      memcpy(&temp_buffer[2 - DigitalCount], DigitalBuf, DigitalCount);
+   78   4                  }
+   79   3                  else
+   80   3                  {
+   81   4                      itoa2(date.month, temp_buffer);
+   82   4                  }
+   83   3              }
+   84   2              itoa2(date.day, &temp_buffer[2]);
+   85   2              break;
+   86   2          case 2://设置日期(时间设置)或设置闹钟开关(闹钟设置)
+   87   2              if (CurUI_Type == TimeSet_UI)
+   88   2              {
+   89   3                  itoa2(date.month, temp_buffer);
+   90   3                  if (show_what == 0)
+   91   3                  {
+   92   4                      memset(&temp_buffer[2], 0xff, 0x02);
+   93   4                  }
+   94   3                  else
+   95   3                  {
+   96   4                      if (DigitalCount != 0)
+   97   4                      {
+   98   5                          memset(&temp_buffer[2], 0x0, 0x02);
+   99   5                          memcpy(&temp_buffer[4 - DigitalCount], DigitalBuf, DigitalCount);
+  100   5                          break;
+  101   5                      }
+  102   4                      itoa2(date.day, &temp_buffer[2]);
+  103   4                  }
+  104   3              }
+  105   2              else
+  106   2              {
+  107   3                  if (show_what == 0)
+  108   3                  {
+  109   4                      memset(temp_buffer, 0xff, 0x03);
+  110   4                  }
+  111   3                  else
+  112   3                  {
+  113   4                      memcpy(temp_buffer, alarm_str[g_comval.g_alarm.AlarmEnable], 0x03);
+  114   4                  }
+  115   3                  LEDPuts(NUMBER2, temp_buffer, 1);
+  116   3                  return;
+  117   3              }
+  118   2              break;
+  119   2          case 3://设置时间中的时
+  120   2              if (show_what == 0)
+  121   2              {
+  122   3                  memset(temp_buffer, 0xff, 0x02);
+  123   3              }
+  124   2              else
+C251 COMPILER V4.55,  ui_clock                                                             23/05/16  10:41:55  PAGE 3   
+
+  125   2              {
+  126   3                  if (DigitalCount != 0)
+  127   3                  {
+  128   4                      memset(temp_buffer, 0x0, 0x02);
+  129   4                      memcpy(&temp_buffer[2 - DigitalCount], DigitalBuf, DigitalCount);
+  130   4                      break;
+  131   4                  }
+  132   3                  else
+  133   3                  {
+  134   4                      itoa2(time.hour, temp_buffer);
+  135   4                  }
+  136   3      
+  137   3              }
+  138   2              itoa2(time.minute, &temp_buffer[2]);
+  139   2              break;
+  140   2          case 4://设置时间中的分
+  141   2              itoa2(time.hour, temp_buffer);
+  142   2              if (show_what == 0)
+  143   2              {
+  144   3                  memset(&temp_buffer[2], 0xff, 0x02);
+  145   3              }
+  146   2              else
+  147   2              {
+  148   3                  if (DigitalCount != 0)
+  149   3                  {
+  150   4                      memset(&temp_buffer[2], 0x0, 0x02);
+  151   4                      memcpy(&temp_buffer[4 - DigitalCount], DigitalBuf, DigitalCount);
+  152   4                      break;
+  153   4                  }
+  154   3                  itoa2(time.minute, &temp_buffer[2]);
+  155   3              }
+  156   2              break;
+  157   2          }
+  158   1          if (set_what >= 3)
+  159   1          {
+  160   2              LEDDisplay(LED_COL, 0xff, 1);
+  161   2          }
+  162   1          LEDPuts(NUMBER1, temp_buffer, 1);
+  163   1      }
+  164          void show_clock_ui(void)
+  165          {
+  166   1          switch(CurUI_Type)
+  167   1          {
+  168   2          case Clock_UI:
+  169   2              //显示当前的系统时间
+  170   2              ShowTimer();
+  171   2              break;
+  172   2          case TimeSet_UI:
+  173   2          case AlarmSet_UI:
+  174   2              //显示时间设置或闹钟设置界面
+  175   2              show_time_setting();
+  176   2              break;
+  177   2          default:
+  178   2              break;
+  179   2          }
+  180   1      }
+  181          
+  182          uint8 set_clock_loop(void)
+  183          {
+  184   1          uint8 key, retval = NULL;
+  185   1          while (1)
+  186   1          {
+  187   2              if (need_draw == TRUE)
+  188   2              {
+  189   3                  show_clock_ui();
+  190   3                  need_draw = FALSE;
+C251 COMPILER V4.55,  ui_clock                                                             23/05/16  10:41:55  PAGE 4   
+
+  191   3              }
+  192   2              key = ap_get_message(); //读键值
+  193   2              switch (key)
+  194   2              {
+  195   3              case AP_MSG_WAIT_TIMEOUT:
+  196   3                  if ((CurUI_Type != TimeSet_UI) && (CurUI_Type != AlarmSet_UI))
+  197   3                  {
+  198   4                      SetCurUI_Type(Music_UI);
+  199   4                      return NULL;
+  200   4                  }
+  201   3              case AP_MSG_RTC:
+  202   3                  if (show_ui_flag == 0)
+  203   3                  {
+  204   4                      show_count++;
+  205   4                      if (show_count > 4)
+  206   4                      {
+  207   5                          show_ui_flag = 1;
+  208   5                          show_count = 0;
+  209   5                      }
+  210   4                  }
+  211   3                  else
+  212   3                  {
+  213   4                      show_what = !show_what;
+  214   4                      need_draw = TRUE;
+  215   4                  }
+  216   3                  break;
+  217   3              case AP_KEY_MODE | AP_KEY_UP:
+  218   3                  retval = deal_mode_msg();
+  219   3                  if (retval == 1)
+  220   3                  {
+  221   4                      return NULL;
+  222   4                  }
+  223   3                  if (retval == NULL)
+  224   3                  {
+  225   4                      show_disk_icon(1);
+  226   4                  }
+  227   3                  break;
+  228   3              case AP_KEY_CLOCK | AP_KEY_UP:
+  229   3                  deal_clock_mode_msg();
+  230   3                  need_draw = TRUE;
+  231   3                  break;
+  232   3      
+  233   3              case AP_KEY_MODE | AP_KEY_LONG:
+  234   3                  if (CurUI_Type == Clock_UI)
+  235   3                  {
+  236   4                      longkey_flag = 1;
+  237   4                      init_alarm_setting();
+  238   4                      need_draw = TRUE;
+  239   4                  }
+  240   3                  break;
+  241   3              case AP_KEY_CLOCK | AP_KEY_LONG:
+  242   3      #ifdef MUSIC_AP
+                           longkey_flag = TRUE;
+                           retval = deal_clock_report();
+               #endif
+  246   3                  break;
+  247   3              case AP_KEY_VOL | AP_KEY_LONG:
+  248   3      #ifdef MUSIC_AP
+                           longkey_flag = TRUE;
+                           retval = deal_play_report();
+               #endif
+  252   3                  break;
+  253   3              case AP_KEY_VOL | AP_KEY_UP:
+  254   3                  key = Key_None;
+  255   3                  goto dealvolkey;
+  256   3              case AP_KEY_VOLADD | AP_KEY_UP:
+C251 COMPILER V4.55,  ui_clock                                                             23/05/16  10:41:55  PAGE 5   
+
+  257   3              case AP_KEY_VOLADD | AP_KEY_LONG:
+  258   3                  key = Key_Next;
+  259   3              case AP_KEY_VOLSUB | AP_KEY_UP:
+  260   3              case AP_KEY_VOLSUB | AP_KEY_LONG:
+  261   3      dealvolkey:
+  262   3                  deal_vol_msg(key, Clock_UI);
+  263   3                  break;
+  264   3              case AP_KEY_PLAY | AP_KEY_UP:
+  265   3                  if (CurUI_Type != Clock_UI)
+  266   3                  {
+  267   4                      SetCurUI_Type(Clock_UI);
+  268   4                  }
+  269   3                  else
+  270   3                  {
+  271   4                      SetCurUI_Type(Music_UI);
+  272   4                      return NULL;
+  273   4                  }
+  274   3                  break;
+  275   3              case AP_KEY_NEXT | AP_KEY_UP:
+  276   3                  key = Key_Next;
+  277   3              case AP_KEY_PREV | AP_KEY_UP:
+  278   3                  deal_clock_next_prev(key);
+  279   3                  need_draw = TRUE;
+  280   3                  break;
+  281   3              case AP_MSG_SD_IN:
+  282   3              case AP_MSG_SD_OUT:
+  283   3              case AP_MSG_UH_IN:
+  284   3              case AP_MSG_UH_OUT:
+  285   3                  retval = deal_device_msg(key);
+  286   3                  if(retval == 1)
+  287   3                  {
+  288   4                      return NULL;
+  289   4                  }
+  290   3                  break;
+  291   3              case AP_KEY_AUTOSLEEP | AP_KEY_UP:
+  292   3                  set_autosleep_time(Key_None);
+  293   3                  break;
+  294   3              default:
+  295   3                  if ((key >= (AP_KEY_NUM0 | AP_KEY_UP)) && (key <= (AP_KEY_NUM9 | AP_KEY_UP)))
+  296   3                  {
+  297   4                      deal_clock_digital_key(key);
+  298   4                  }
+  299   3                  else
+  300   3                  {
+  301   4                      retval = ap_handle_hotkey(key);
+  302   4                  }
+  303   3                  break;
+  304   3              }
+  305   2              if (retval != NULL)
+  306   2              {
+  307   3                  break;
+  308   3              }
+  309   2              retval = deal_play_status();
+  310   2              if (retval != NULL)
+  311   2              {
+  312   3                  break;
+  313   3              }
+  314   2          }
+  315   1          return retval;
+  316   1      }
+  317          uint8 set_clock_ui(uint8 auto_return)
+  318          {
+  319   1          uint8 retval;
+  320   1          auto_return = auto_return;
+  321   1          need_draw = TRUE;
+  322   1          set_what = 3;
+C251 COMPILER V4.55,  ui_clock                                                             23/05/16  10:41:55  PAGE 6   
+
+  323   1          show_what = 1;
+  324   1          show_count = 0;
+  325   1          show_ui_flag = 1;
+  326   1          LEDClearScreen();
+  327   1          show_disk_icon(1);
+  328   1          SetCurUI_Type(Clock_UI);
+  329   1          retval = set_clock_loop();
+  330   1          show_count = 0;
+  331   1          show_ui_flag = 0;
+  332   1          return retval;
+  333   1      }
+  334          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1288     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =         8     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

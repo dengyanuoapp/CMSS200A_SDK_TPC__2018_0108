@@ -1,0 +1,194 @@
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:41:38  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE deal_key_message
+OBJECT MODULE PLACED IN .\Obj\deal_key_message.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE deal_key_message.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED
+                    -) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\deal_key_message.lst) OBJECT(.\Obj\deal_key_message
+                    -.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        main ap of sdk 3.0
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *******************************************************************************
+   10           */
+   11          #include "ap_linein.h"
+   12          #include "actos.h"
+   13          #include "alarmdef.h"
+   14          
+   15          #pragma name(DEAL_KEY_MSG)
+   16          
+   17          //uint8 deal_vol_msg(uint8 key);
+   18          bool CheckLineOut(void);
+   19          uint16 show_ui_func(uint8 mode)
+   20          {
+   21   1          uint16 result = 0;
+   22   1          need_draw = TRUE;
+   23   1      
+   24   1          mode = mode;
+   25   1          SetCurUI_Type(Linein_UI);
+   26   1          LEDClearScreen();
+   27   1          while (1)
+   28   1          {
+   29   2              if (need_draw) //屏幕重画
+   30   2              {
+   31   3                  ui_display();
+   32   3                  need_draw = FALSE;
+   33   3              }
+   34   2              deal_pc_eqsrs(0);
+   35   2              result = deal_key_msg();
+   36   2              if (result != 0)
+   37   2                  break;
+   38   2          }
+   39   1          return result;
+   40   1      }
+   41          
+   42          int16 deal_key_msg(void)
+   43          {
+   44   1          int16 result = 0;
+   45   1          uint8 key;
+   46   1          key = ap_get_message();
+   47   1          switch (key)
+   48   1          {
+   49   2          case AP_MSG_RTC:
+   50   2              break;
+   51   2          case AP_MSG_WAIT_TIMEOUT:
+   52   2              if (CurUI_Type != Linein_UI)
+   53   2              {
+   54   3                  SetCurUI_Type(Linein_UI);
+   55   3              }
+   56   2              break;
+   57   2          case AP_KEY_PLAY | AP_KEY_UP: //play按键作返回处理
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:41:38  PAGE 2   
+
+   58   2              if (CurUI_Type != Linein_UI)
+   59   2              {
+   60   3                  SetCurUI_Type(Linein_UI);
+   61   3              }
+   62   2              break;
+   63   2      
+   64   2          case AP_KEY_MODE | AP_KEY_UP: //AP切换热键
+   65   2              return RESULT_MAIN;
+   66   2              break;
+   67   2      
+   68   2          case AP_KEY_MUTE | AP_KEY_UP: //mute设置
+   69   2              mute_flag = !mute_flag;
+   70   2              if (mute_flag)
+   71   2              {
+   72   3                  exit_linein_func();
+   73   3              }
+   74   2              else
+   75   2              {
+   76   3                  init_linein_channel();
+   77   3              }
+   78   2              SetCurUI_Type(Linein_UI);
+   79   2              break;
+   80   2      
+   81   2          case AP_KEY_VOL | AP_KEY_UP: //调节音量
+   82   2              key = Key_None;
+   83   2              goto set_vol;
+   84   2              break;
+   85   2          case AP_KEY_VOLADD| AP_KEY_UP: //调节音量
+   86   2          case AP_KEY_VOLADD| AP_KEY_LONG: //调节音量
+   87   2              key = Key_Next;
+   88   2          case AP_KEY_VOLSUB| AP_KEY_UP: //调节音量
+   89   2          case AP_KEY_VOLSUB| AP_KEY_LONG: //调节音量
+   90   2      set_vol:
+   91   2              deal_vol_msg(key, Linein_UI);
+   92   2              break;
+   93   2      
+   94   2          case AP_KEY_NEXT | AP_KEY_UP:
+   95   2          case AP_KEY_NEXT | AP_KEY_LONG:
+   96   2              key = Key_Next;
+   97   2          case AP_KEY_PREV | AP_KEY_UP:
+   98   2          case AP_KEY_PREV | AP_KEY_LONG:
+   99   2              if(CurUI_Type == Volume_UI)
+  100   2              {
+  101   3                  goto set_vol;
+  102   3              }
+  103   2              else if(CurUI_Type == EQ_UI)
+  104   2              {
+  105   3                  goto set_eq;
+  106   3              }
+  107   2              else
+  108   2              {
+  109   3                  break;
+  110   3              }
+  111   2              break;
+  112   2          case AP_MSG_LINEIN_OUT:
+  113   2              result = RESULT_LINEIN;
+  114   2              break;
+  115   2          case AP_KEY_CLOCK | AP_KEY_UP:
+  116   2              result = set_clock_ui(1);
+  117   2              if(result == NULL)
+  118   2              {
+  119   3                  SetCurUI_Type(Linein_UI);
+  120   3              }
+  121   2              break;
+  122   2          case AP_KEY_EQ | AP_KEY_UP:
+  123   2              key = Key_None;
+C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:41:38  PAGE 3   
+
+  124   2      set_eq:
+  125   2              result = deal_eq_msg(key);
+  126   2              break;
+  127   2          case AP_KEY_CLOCK | AP_KEY_LONG:
+  128   2      #if defined(LINEIN_AP)
+                       longkey_flag = TRUE;
+                       if(g_comval.SuppTTS != 0)
+                       {
+                           exit_linein_func();
+                           result = report_time_info(0, TRUE);
+                           init_linein_channel();
+                           if(result != 0)
+                           {
+                               return result;
+                           }
+                       }
+               #endif
+  141   2              break;
+  142   2      
+  143   2          case AP_KEY_AUTOSLEEP:
+  144   2              set_autosleep_time(Key_None);
+  145   2              break;
+  146   2          case AP_MSG_LINEIN_IN:
+  147   2              //        result = RESULT_MAIN;
+  148   2              break;
+  149   2      
+  150   2          default: //热键处理
+  151   2              result = ap_handle_hotkey_core(key);
+  152   2              break;
+  153   2          }
+  154   1          return result;
+  155   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       349     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

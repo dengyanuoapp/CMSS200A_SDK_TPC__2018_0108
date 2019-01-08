@@ -1,0 +1,263 @@
+C251 COMPILER V4.55,  Sdrv_LEDDisplay                                                      23/07/16  20:31:15  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE Sdrv_LEDDisplay
+OBJECT MODULE PLACED IN .\UI_Release\obj\Sdrv_LEDDisplay.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE Sdrv_LEDDisplay.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) BROWSE INCDIR(..\
+                    -..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\UI_Release\list\Sdrv_LEDDisplay.lst) OBJECT(.\UI_Release\obj\Sdrv_LEDDispl
+                    -ay.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************
+    3           *                       ACTOS
+    4           *                  ui dirver show picture
+    5           *
+    6           *                (c) Copyright 2002-2003, Actions Co,Ld.
+    7           *                        All Right Reserved
+    8           *
+    9           * File   : Sdrv_LEDDisplay.c
+   10           * By     : fiona
+   11           * Version: 1> v1.00     first version     10/17/2010 10:46PM
+   12           ********************************************************************************
+   13           */
+   14          #include "drv_led.h"
+   15          #pragma name(SDRV_DISPLAY)
+   16          #if 0
+               const uint8 iconshowval[SEGNUM] =
+               { 0x08, 0x04, 0x10, 0x01, 0x02, 0x20, 0x40 };
+               #else
+   20          const uint8 iconshowval[SEGNUM] =
+   21          { 0x01, 0x08, 0x04, 0x40, 0x020, 0x02, 0x10 };
+   22          #endif
+   23          //{ 0x08, 0x10, 0x40, 0x02, 0x20, 0x01, 0x04 };
+   24          
+   25          const uint8 LED_com_add[NUMBERADDR] =
+   26          { 0x03, 0x04, 0x01, 0x0};
+   27          #if 1
+   28          const uint8 numbershowval[NUMBER] =
+   29          {
+   30              0x7B, //number0
+   31              0x28, //number1
+   32              0x67, //number2
+   33              0x6d, //number3
+   34              0x3c, //number4
+   35              0x5d, //number5
+   36              0x5f, //number6
+   37              0x68, //number7
+   38              0x7f, //number8
+   39              0x7d, //number9
+   40              0x7e, //'A'
+   41              0x7f, //'b'
+   42              0x53, //'C'
+   43              0x7b, //'d'
+   44              0x57, //'E'
+   45              0x56, //'F'
+   46              0x7d, //'g'
+   47              0x3e, //'H'
+   48              0x28, //'I'
+   49              0x2a, //'J'
+   50              0x0,//k,nodisplay
+   51              0x13, //'L'
+   52              0x0, //m,nodisplay
+   53              0x7a, //'n' big 0x0e   littal 0x3a
+   54              0x7b, //'O'
+   55              0x36, //'P'
+   56              0x3c,//'q'
+   57              0x7e, //'r'
+C251 COMPILER V4.55,  Sdrv_LEDDisplay                                                      23/07/16  20:31:15  PAGE 2   
+
+   58              0x5d, //'s'
+   59              0x0, //t,nodisplay
+   60              0x3b, //'u'
+   61              0x0,//v,nodisplay
+   62              0x0,//w,nodisplay
+   63              0x0,//x,nodisplay
+   64              0x3c, //'y'
+   65          };
+   66          #else
+               const uint8 numbershowval[NUMBER] =
+               {
+                   0x3f, //number0
+                   0x06, //number1
+                   0x5b, //number2
+                   0x4f, //number3
+                   0x66, //number4
+                   0x6d, //number5
+                   0x7d, //number6
+                   0x07, //number7
+                   0x7f, //number8
+                   0x6f, //number9
+                   0x77, //'A'
+                   0x7f, //'b'
+                   0x39, //'C'
+                   0x3f, //'d'
+                   0x79, //'E'
+                   0x71, //'F'
+                   0x6f, //'g'
+                   0x76, //'H'
+                   0x06, //'I'
+                   0x0E, //'J'
+                   0x0,//k,nodisplay
+                   0x38, //'L'
+                   0x0, //m,nodisplay
+                   0x37, //'n' big 0x37   littal 0x54
+                   0x3f, //'O'
+                   0x73, //'P'
+                   0x6f,//'q'
+                   0x77, //'r'
+                   0x6d, //'s'
+                   0x0, //t,nodisplay
+                   0x3e, //'u'
+                   0x0,//v,nodisplay
+                   0x0,//w,nodisplay
+                   0x0,//x,nodisplay
+                   0x66, //'y'
+               
+               };
+               
+               #endif
+  108          ////*******************************************************************************/
+  109          ///*
+  110          //** FUNCTION:     Sdrv_LEDDisplay
+  111          //**
+  112          //** Description:  在四个8上输出一定范围内的字符，具体可以显示的字符见display.h
+  113          //**
+  114          //**  input
+  115          //**     addr: segment address
+  116          //**     str: show content
+  117          //**     type: signature it is show or hide
+  118          //**
+  119          //**  output
+  120          //**     none如果输出的字符不在可输出范围内，则会将当前的icom灭掉
+  121          //********************************************************************************/
+  122          
+  123          void Sdrv_LEDPuts(uint8 api_no, uint8 addr, uint8 *str, uint8 type)
+C251 COMPILER V4.55,  Sdrv_LEDDisplay                                                      23/07/16  20:31:15  PAGE 3   
+
+  124          {
+  125   1          uint8 i = 0, tmp_val;
+  126   1          uint8 displayval;
+  127   1          api_no = api_no;
+  128   1          if (type == 0)
+  129   1          {
+  130   2              for (i = addr; i < 4; i++)
+  131   2              {
+  132   3                  Hdrv_DataSend(LED_com_add[i], 0, 0);
+  133   3              }
+  134   2          }
+  135   1          else
+  136   1          {
+  137   2              for (i = addr; i < 4; i++)
+  138   2              {
+  139   3                  tmp_val = *str++;
+  140   3                  if (tmp_val >= 0 && tmp_val <= 9)//从0到9
+  141   3                  {
+  142   4                  }
+  143   3                  else if (tmp_val >= 0x30 && tmp_val <= 0x39)//从'0'到'9'
+  144   3                  {
+  145   4                      tmp_val = tmp_val - 0x30;
+  146   4                  }
+  147   3                  else if (tmp_val >= 'A' && tmp_val < 'Z')//从"A"到'U'
+  148   3                  {
+  149   4                      tmp_val = tmp_val - 'A' + 10;
+  150   4                  }
+  151   3                  else if (tmp_val >= 'a' && tmp_val < 'z')//从'a'到'u'
+  152   3                  {
+  153   4                      tmp_val = tmp_val - 'a' + 10;
+  154   4                  }
+  155   3                  else
+  156   3                  {
+  157   4                      Hdrv_DataSend(LED_com_add[i], 0, 0);
+  158   4                      continue;
+  159   4                  }
+  160   3                  displayval = numbershowval[tmp_val];
+  161   3                  Hdrv_DataSend(LED_com_add[i], displayval, type);
+  162   3              }
+  163   2          }
+  164   1      
+  165   1      }
+  166          
+  167          ////*******************************************************************************/
+  168          ///*
+  169          //** FUNCTION:     Sdrv_LEDDisplay
+  170          //**
+  171          //** Description:  根据输入，显示or隐藏段码屏上相应的segment
+  172          //**
+  173          //**  input
+  174          //**     addr: segment address
+  175          //**     content: show content
+  176          //**     type: signature it is show or hide
+  177          //**
+  178          //**  output
+  179          //**     none
+  180          //********************************************************************************/
+  181          void Sdrv_LEDDisplay(uint8 api_no, uint8 addr, uint8 content, uint8 type)
+  182          {
+  183   1          uint8 displayval;
+  184   1          uint8 displayaddr;
+  185   1          //judge it is icon or number
+  186   1          api_no = api_no;
+  187   1          if (content == 0xff)
+  188   1          {
+  189   2              //       uint8 real_addr;
+C251 COMPILER V4.55,  Sdrv_LEDDisplay                                                      23/07/16  20:31:15  PAGE 4   
+
+  190   2              //      real_addr = addr;//icon_set[addr];
+  191   2              //get icon display address
+  192   2              displayaddr = 0x02;// iconaddr[real_addr];
+  193   2              //get icon display value
+  194   2              if (type != 0)
+  195   2              {
+  196   3                  displayval = iconshowval[addr];
+  197   3              }
+  198   2              else
+  199   2              {
+  200   3                  displayval = 0xff - iconshowval[addr];//  iconhideval[real_addr];
+  201   3              }
+  202   2          }
+  203   1          else
+  204   1          {
+  205   2              //get number display address
+  206   2              displayaddr = LED_com_add[addr];
+  207   2              //get number display value
+  208   2              if (type != 0)
+  209   2              {
+  210   3                  if (content > (NUMBER - 1))
+  211   3                  {
+  212   4                      content = NUMBER - 1;
+  213   4                  }
+  214   3                  displayval = numbershowval[content];
+  215   3              }
+  216   2              else
+  217   2              {
+  218   3                  displayval = 0x0;// numberhideval[addr];
+  219   3              }
+  220   2          }
+  221   1          Hdrv_DataSend(displayaddr, displayval, type);
+  222   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       391     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        46     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

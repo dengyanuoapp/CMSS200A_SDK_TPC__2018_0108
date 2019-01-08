@@ -1,0 +1,1 @@
+"..\..\..\libsrc\usb\ADFUFunc.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usb\ADFUFunc.lst) OBJECT(..\..\..\obj\lib\usb\ADFUFunc.obj)

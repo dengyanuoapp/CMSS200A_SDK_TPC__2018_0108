@@ -1,0 +1,40 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_udisk\ap_udisk.uv2
+Project File Date:  07/15/2016
+
+<h2>Output:</h2>
+Build target 'udisk-src'
+User command #1: .\buildapl.bat
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_udisk>..\..\..\psp_rel\tools\LinkfileParse.exe ap_udisk.apl ap_udisk.lin ap_udisk.apc 
+第31行编译异常：警告：未定义段结束地址!
+第32行编译异常：警告：未定义段结束地址!
+第33行编译异常：警告：未定义段结束地址!
+第36行编译异常：警告：未定义段结束地址!
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_udisk>pause
+请按任意键继续. . . 
+compiling usbdisk_main.c...
+compiling usbdisk_task.c...
+USBDISK_TASK.C(118): warning C47: 'dispIndi': unreferenced parameter
+compiling usbdisk_enter2exit.c...
+compiling ap_common.c...
+linking...
+Program Size: data=8.0 edata+hdata=1348 xdata=0 const=2065 code=15930
+creating hex file from ".\obj\ap_udisk"...
+User command #1: .\buildap.bat
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_udisk>..\..\..\psp_rel\tools\apbuilder.exe -c ap_udisk.apc 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_udisk>copy .\obj\ap_udisk.hex ap_udisk.hex 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_udisk>copy .\obj\ap_udisk.map ap_udisk.map 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_udisk>copy .\obj\ap_udisk ap_udisk 
+已复制         1 个文件。
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_udisk>del .\obj\ap_udisk.hex  
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_udisk>del .\obj\ap_udisk.map 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_udisk>del .\obj\ap_udisk 
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\case\ap\ap_udisk>copy udisk.ap ..\..\fwpkg\usbdisk.ap 
+已复制         1 个文件。
+".\obj\ap_udisk" - 0 Error(s), 1 Warning(s).

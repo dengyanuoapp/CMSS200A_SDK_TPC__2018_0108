@@ -1,0 +1,252 @@
+C251 COMPILER V4.55,  UdiskFS                                                              15/07/16  15:45:45  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE UdiskFS
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usb\UdiskFS.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usb\UdiskFS.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) INCDI
+                    -R(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\UdiskFS.lst) OBJECT(..\..\..\obj\lib\usb\UdiskFS.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************************************
+             -*
+    3           *                                       ACTOS GL5102
+    4           *
+    5           *
+    6           *                           Copyright(c) 2001-2010, Actions Co,Ld.
+    7           *                                   All Right Reserved
+    8           *
+    9           * File   : UdiskFS.c
+   10           * By     : wanghaijing
+   11           * Version: v1.00     first version     2010/06/17
+   12           * brief  : 计算数据区起始地址,以对数据区进行对齐
+   13           ********************************************************************************************************
+             -*
+   14           */
+   15          
+   16          #include "udisklib.h"
+   17          
+   18          #pragma name(UDISK_FS)
+   19          void Udisk_Mbr_Check(void);
+   20          uint8 Check_Dbr_Data(uint8 *DBRAddr);
+   21          
+   22          #pragma renamecode(?PR?UDISK_FS)
+   23          /*
+   24           ********************************************************************************************************
+             -*
+   25           *                                           Partion_MBR_Initial
+   26           *
+   27           * Description: 初始化MBR和DBR相关变量,并检查是否有MBR, DBR,如有则找到数据区(不包括根目录首簇)起始地址.
+   28           *
+   29           * Arguments  : None.
+   30           *
+   31           * Returns    : None.
+   32           *
+   33           * Note(s)    : None.
+   34           ********************************************************************************************************
+             -*
+   35           */
+   36          void Partion_MBR_Initial(void)
+   37          {
+   38   1          UdiskFSInfo.DBRStartAddress = 0x00;
+   39   1          UdiskFSInfo.DataAreaStartAddress = 0xffffffff;
+   40   1          UdiskFSInfo.DataAreaOffset = 0x00;
+   41   1          UdiskFSInfo.rw_dbr_flag = 0x00;
+   42   1      
+   43   1          Udisk_Mbr_Check();
+   44   1      }
+   45          
+   46          /*
+   47           ********************************************************************************************************
+             -*
+   48           *                                           Udisk_Parse_MBR
+   49           *
+   50           * Description: 检查是否是写DBR,如是重新解析DBR数据并计算数据区偏移和对齐.
+   51           *
+   52           * Arguments  : None.
+   53           *
+C251 COMPILER V4.55,  UdiskFS                                                              15/07/16  15:45:45  PAGE 2   
+
+   54           * Returns    : None.
+   55           *
+   56           * Note(s)    : None.
+   57           ********************************************************************************************************
+             -*
+   58           */
+   59          void Udisk_Parse_MBR(void)
+   60          {
+   61   1          if (UdiskFSInfo.rw_dbr_flag != 0x00)
+   62   1          {
+   63   2              Udisk_Mbr_Check();
+   64   2              UdiskFSInfo.rw_dbr_flag = 0x00;
+   65   2          }
+   66   1      }
+   67          
+   68          /*
+   69           ********************************************************************************************************
+             -*
+   70           *                                           Udisk_Mbr_Check
+   71           *
+   72           * Description: 检查是否有MBR,并解析文件系统,以使数据区8Kbyte对齐.
+   73           *
+   74           * Arguments  : None.
+   75           *
+   76           * Returns    : None.
+   77           *
+   78           * Note(s)    : None.
+   79           ********************************************************************************************************
+             -*
+   80           */
+   81          void Udisk_Mbr_Check(void)
+   82          {
+   83   1          sFlash_Rds(RW_FIX, UdiskStartAddr, DATABUFFER); //Read first sector of Udisk
+   84   1      
+   85   1          /* check if MBR.*/
+   86   1          if (*(uint16 *) (DATABUFFER + 0x1fe) == 0x55aa)
+   87   1          {
+   88   2              if ((*(uint8 *) (DATABUFFER + 0x1be) == 0x80) || (*(uint8 *) (DATABUFFER + 0x1be) == 0x00))
+   89   2              {
+   90   3                  //byte per sector is 1024, convert it to 512
+   91   3                  UdiskFSInfo.DBRStartAddress = *((uint32 *) ((uint8 *) DATABUFFER + 0x1be + 8));
+   92   3                  EndianReverse((uint8 *) & (UdiskFSInfo.DBRStartAddress), (uint16) (sizeof(UdiskFSInfo.DBRStar
+             -tAddress)));
+   93   3                  UdiskFSInfo.DBRStartAddress = (UdiskFSInfo.DBRStartAddress) * SectorType;
+   94   3      
+   95   3                  //check if MBR is valid, partition offset is not 0
+   96   3                  if (UdiskFSInfo.DBRStartAddress != 0x00)
+   97   3                  {
+   98   4                      //read DBR according to partition table
+   99   4                      sFlash_Rds(RW_FIX, (UdiskStartAddr + UdiskFSInfo.DBRStartAddress), DATABUFFER);
+  100   4                  }
+  101   3              }
+  102   2      
+  103   2              //check if DBR is valid
+  104   2              Check_Dbr_Data(DATABUFFER);
+  105   2          }
+  106   1          else
+  107   1          {
+  108   2              UdiskFSInfo.DataAreaStartAddress = 0xffffffff;
+  109   2              UdiskFSInfo.DataAreaOffset = 0x00;
+  110   2          }
+  111   1      }
+  112          
+  113          /*
+  114           ********************************************************************************************************
+             -*
+C251 COMPILER V4.55,  UdiskFS                                                              15/07/16  15:45:45  PAGE 3   
+
+  115           *                                           Check_Dbr_Data
+  116           *
+  117           * Description: 检查DBR是否合法,如合法计算数据区根目录首簇后数据起始地址,以计算其对齐时需要补齐的扇区数.
+  118           *
+  119           * Arguments  : DBRAddr:DBR数据起始地址.
+  120           *
+  121           * Returns    : DBR数据合法性; 0: illegal; 1:legal.
+  122           *
+  123           * Note(s)    : None.
+  124           ********************************************************************************************************
+             -*
+  125           */
+  126          uint8 Check_Dbr_Data(uint8 *DBRAddr)
+  127          {
+  128   1          uint8 ret = 1;
+  129   1          /* check if DBR is valid.    */
+  130   1          if ((*((uint16 *) (DBRAddr + 0x1fe)) == 0x55aa) && ((*((uint8 *) DBRAddr) == 0xeb) || (*((uint8 *) DB
+             -RAddr) == 0xe9)))
+  131   1          {
+  132   2              if ((*((uint32 *) (DBRAddr + 3)) == 0x45584641) && (*((uint8 *) (DBRAddr + 7)) == 0x54))
+  133   2              {
+  134   3                  return ret;
+  135   3              }
+  136   2      
+  137   2              /* parse dbr.    */
+  138   2              UdiskFSInfo.SectorPerCluster = *((uint8 *) (DBRAddr + 13));
+  139   2      
+  140   2              UdiskFSInfo.ReservedSecotr = *((uint16 *) (DBRAddr + 14));
+  141   2              EndianReverse((uint8 *) (&(UdiskFSInfo.ReservedSecotr)), (uint16) (sizeof(UdiskFSInfo.ReservedSec
+             -otr)));
+  142   2      
+  143   2              /* if root directory entry number is 0, it is FAT32, else FAT16.    */
+  144   2              UdiskFSInfo.BPB_RootEntCnt = *((uint16 *) (DBRAddr + 17));
+  145   2              EndianReverse((uint8 *) (&(UdiskFSInfo.BPB_RootEntCnt)), sizeof(UdiskFSInfo.BPB_RootEntCnt));
+  146   2      
+  147   2              UdiskFSInfo.FATSize = (uint32) ((((uint16) (*((uint8 *) (DBRAddr + 23)))) << 8) + * ((uint8 *) (D
+             -BRAddr + 22)));
+  148   2              if (UdiskFSInfo.FATSize == 0x00)
+  149   2              {
+  150   3                  UdiskFSInfo.FATSize = *((uint32 *) (DBRAddr + 36));
+  151   3                  EndianReverse((uint8 *) (&(UdiskFSInfo.FATSize)), sizeof(UdiskFSInfo.FATSize));
+  152   3              }
+  153   2      
+  154   2              /* FAT number is 2 defaultly.    */
+  155   2              UdiskFSInfo.DataAreaStartAddress = UdiskFSInfo.ReservedSecotr + 2 * UdiskFSInfo.FATSize;
+  156   2      
+  157   2              if (UdiskFSInfo.BPB_RootEntCnt != 0x00)
+  158   2              {
+  159   3                  /*
+  160   3                   *以前文件系统FAT16默认根目录为32个扇区，根据实际的应用场合，这种假设是没有道理的
+  161   3                   *根据以下公式来计算RootDirSectors=((BPB_RootEntCnt*32)+(BPB_BytePerSec-1))/BPB_BytePerSec
+  162   3                   *2009-8-16 14:56 husanxi
+  163   3                   */
+  164   3                  UdiskFSInfo.DataAreaStartAddress = UdiskFSInfo.DataAreaStartAddress + (((UdiskFSInfo.BPB_Root
+             -EntCnt * 32)
+  165   3                                                     + 0x3ff) / 0x400);
+  166   3      
+  167   3              }
+  168   2              else
+  169   2              {
+  170   3                  UdiskFSInfo.DataAreaStartAddress += UdiskFSInfo.SectorPerCluster;
+  171   3              }
+  172   2      
+  173   2              //convert byte/sector to 512bytes unit
+  174   2              UdiskFSInfo.DataAreaStartAddress = SectorType * UdiskFSInfo.DataAreaStartAddress + UdiskFSInfo.DB
+             -RStartAddress;
+C251 COMPILER V4.55,  UdiskFS                                                              15/07/16  15:45:45  PAGE 4   
+
+  175   2      
+  176   2              if ((uint8) ((UdiskFSInfo.DataAreaStartAddress) & 0xff) == 0x00)
+  177   2              {
+  178   3                  UdiskFSInfo.DataAreaOffset = 0x00;
+  179   3              }
+  180   2              else
+  181   2              {
+  182   3                  //使数据区根目录首簇之后LBA地址模16对齐
+  183   3                  UdiskFSInfo.DataAreaOffset = (uint8) (0x100 - (UdiskFSInfo.DataAreaStartAddress & 0xff));
+  184   3              }
+  185   2      
+  186   2              ret = 0x01;
+  187   2          }
+  188   1          else
+  189   1          {
+  190   2              UdiskFSInfo.DataAreaStartAddress = 0xffffffff;
+  191   2              UdiskFSInfo.DataAreaOffset = 0x00;
+  192   2              ret = 0x00;
+  193   2          }
+  194   1      
+  195   1          return ret;
+  196   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       557     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

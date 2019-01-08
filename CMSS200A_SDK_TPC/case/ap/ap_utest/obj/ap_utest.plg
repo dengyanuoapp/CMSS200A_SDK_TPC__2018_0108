@@ -1,0 +1,36 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+D:\gl5115\AS260B\case_260b\ap\ap_utest\ap_utest.uv2
+Project File Date:  03/03/2014
+
+<h2>Output:</h2>
+Build target 'utest-src'
+User command #1: .\buildapl.bat
+D:\gl5115\AS260B\case_260b\ap\ap_utest>..\..\..\psp_rel\tools\LinkfileParse.exe ap_utest.apl ap_utest.lin ap_utest.apc 
+第27行编译异常：警告：未定义段结束地址!
+第28行编译异常：警告：未定义段结束地址!
+第29行编译异常：警告：未定义段结束地址!
+第31行编译异常：警告：未定义段结束地址!
+D:\gl5115\AS260B\case_260b\ap\ap_utest>pause
+请按任意键继续. . . 
+compiling usbtest_main.c...
+linking...
+Program Size: data=8.0 edata+hdata=319 xdata=0 const=435 code=4522
+creating hex file from ".\obj\ap_utest"...
+User command #1: .\buildap.bat
+D:\gl5115\AS260B\case_260b\ap\ap_utest>..\..\..\psp_rel\tools\apbuilder.exe -c ap_utest.apc 
+D:\gl5115\AS260B\case_260b\ap\ap_utest>copy .\obj\ap_utest.hex ap_utest.hex 
+已复制         1 个文件。
+D:\gl5115\AS260B\case_260b\ap\ap_utest>copy .\obj\ap_utest.map ap_utest.map 
+已复制         1 个文件。
+D:\gl5115\AS260B\case_260b\ap\ap_utest>copy .\obj\ap_utest ap_utest 
+已复制         1 个文件。
+D:\gl5115\AS260B\case_260b\ap\ap_utest>del .\obj\ap_utest.hex  
+D:\gl5115\AS260B\case_260b\ap\ap_utest>del .\obj\ap_utest.map 
+D:\gl5115\AS260B\case_260b\ap\ap_utest>del .\obj\ap_utest 
+D:\gl5115\AS260B\case_260b\ap\ap_utest>copy utest.ap ..\..\fwpkg\usbtest.ap 
+已复制         1 个文件。
+".\obj\ap_utest" - 0 Error(s), 0 Warning(s).

@@ -1,0 +1,121 @@
+C251 COMPILER V4.55,  display                                                              23/05/16  10:41:38  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE display
+OBJECT MODULE PLACED IN .\Obj\display.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE display.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BROWSE 
+                    -INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\display.lst) OBJECT(.\Obj\display.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        main ap of sdk 3.0
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *******************************************************************************
+   10           */
+   11          #include "ap_linein.h"
+   12          #include "actos.h"
+   13          #include "alarmdef.h"
+   14          
+   15          #pragma name(DISPLAY)
+   16          const uint8 linein_str[5] =
+   17          { "LINE" };
+   18          const uint8 eq_str[eq_max][3] =
+   19          { "E1", "E2", "E3", "E4", "E5", "E6", "E7" , "E8"};
+   20          
+   21          //void show_volume_ui(void);
+   22          void show_linein_ui(void);
+   23          
+   24          void show_eq_ui(void)
+   25          {
+   26   1          memset(temp_buffer, 0xff, 0x04);
+   27   1          memcpy(temp_buffer, &eq_str[g_comval.eq_type], 0x02);
+   28   1          LEDPuts(NUMBER2, temp_buffer, 1);
+   29   1      }
+   30          #if 0
+               /********************************************************************************
+                * Description :显示当前的状态信息
+                *
+                * Arguments  :
+                *
+                * Returns     :
+                *            无
+                * Notes       :
+                *
+                ********************************************************************************/
+               void show_volume_ui(void)
+               {
+                   memset(temp_buffer, 0xff, 0x04);
+                   itoa2(g_comval.volume, temp_buffer);
+                   LEDPuts(NUMBER2, temp_buffer, 1);
+               }
+               #endif
+   48          void show_linein_ui(void)
+   49          {
+   50   1          LEDClearScreen();
+   51   1          LEDPuts(NUMBER1, linein_str, 1);
+   52   1          LEDDisplay(LED_AUX, 0xff, 1);
+   53   1          /* stop or play icon */
+   54   1          if (mute_flag)
+   55   1          {
+   56   2              LEDDisplay(LED_PLAY, 0xff, 0);
+   57   2              LEDDisplay(LED_PAUSE, 0xff, 1);
+   58   2          }
+C251 COMPILER V4.55,  display                                                              23/05/16  10:41:38  PAGE 2   
+
+   59   1          else
+   60   1          {
+   61   2              LEDDisplay(LED_PLAY, 0xff, 1);
+   62   2              LEDDisplay(LED_PAUSE, 0xff, 0);
+   63   2          }
+   64   1      }
+   65          
+   66          void ui_display(void)
+   67          {
+   68   1          switch (CurUI_Type)
+   69   1          {
+   70   2          case Volume_UI:
+   71   2              show_volume_ui();
+   72   2              break;
+   73   2          case EQ_UI:
+   74   2              show_eq_ui();
+   75   2              break;
+   76   2          case Linein_UI:
+   77   2              show_linein_ui();
+   78   2              break;
+   79   2          case STANDBY_UI:
+   80   2              //        ShowTimerSetting_UI();
+   81   2              break;
+   82   2          default:
+   83   2              break;
+   84   2          }
+   85   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       203     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        29     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

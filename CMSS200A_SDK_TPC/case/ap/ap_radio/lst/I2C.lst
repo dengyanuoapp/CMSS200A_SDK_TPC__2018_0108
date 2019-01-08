@@ -1,0 +1,603 @@
+C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE I2C
+OBJECT MODULE PLACED IN .\obj\I2C.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE FM_QN8035\I2C.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) B
+                    -ROWSE ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE(CHECKALARM) DEBUG PRINT(.\lst\I2C.lst) OBJECT(
+                    -.\obj\I2C.obj) 
+
+stmt  level    source
+
+    1          /*******************************************************************************
+    2           *                              AS260A
+    3           *                            Module: IIC driver
+    4           *                 Copyright(c) 2003-2011 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>        <time>           <version >            <desc>
+    9           *     mikeyang     2011-11-03 15:00     1.0             build this file
+   10           *******************************************************************************/
+   11          #include "I2C.h"
+   12          
+   13          #pragma name(FM_DRV_IIC)
+   14          
+   15          void near Set_GPIO(uint8 port, uint8 GPIO_port, uint8 GPIO_port_num);
+   16          void near Reset_GPIO(uint8 port, uint8 GPIO_port, uint8 GPIO_port_num);
+   17          void near IIC_WriteByte(uint8 dat);
+   18          uint8 near IIC_ReadByte(void);
+   19          uint8 near IIC_GetAck(void);
+   20          void near IIC_SendAck(uint8 ack);
+   21          void near IIC_Delay(uint16 delay);
+   22          
+   23          void near SetSDA_1_hold(void)
+   24          {
+   25   1          uint8 sfr_bak;
+   26   1          sfr_bak = SFR_BANK;
+   27   1          SFR_BANK = BANK_GPIO;
+   28   1      
+   29   1          SFR_SDA_DATA |= (0x01 << SDA_PORT_NUM);
+   30   1      
+   31   1          SFR_BANK = sfr_bak;
+   32   1      
+   33   1          IIC_Delay(5);
+   34   1      
+   35   1      }
+   36          
+   37          void near SetSDA_0_hold(void)
+   38          {
+   39   1          uint8 sfr_bak;
+   40   1          sfr_bak = SFR_BANK;
+   41   1          SFR_BANK = BANK_GPIO;
+   42   1      
+   43   1          SFR_SDA_DATA &= ~(0x01 << SDA_PORT_NUM);
+   44   1      
+   45   1          SFR_BANK = sfr_bak;
+   46   1          IIC_Delay(5);
+   47   1      }
+   48          
+   49          void near SetCLK_1_hold(void)
+   50          {
+   51   1          uint8 sfr_bak;
+   52   1          sfr_bak = SFR_BANK;
+   53   1          SFR_BANK = BANK_GPIO;
+   54   1      
+   55   1          SFR_SCL_DATA |= (0x01 << SCL_PORT_NUM);
+   56   1      
+   57   1          SFR_BANK = sfr_bak;
+C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 2   
+
+   58   1          IIC_Delay(5);
+   59   1      }
+   60          
+   61          void near SetCLK_0_hold(void)
+   62          {
+   63   1          uint8 sfr_bak;
+   64   1          sfr_bak = SFR_BANK;
+   65   1          SFR_BANK = BANK_GPIO;
+   66   1      
+   67   1          SFR_SCL_DATA &= ~(0x01 << SCL_PORT_NUM);
+   68   1      
+   69   1          SFR_BANK = sfr_bak;
+   70   1          IIC_Delay(5);
+   71   1      }
+   72          
+   73          void near SetSDAOut(void)
+   74          {
+   75   1          uint8 sfr_bak;
+   76   1          sfr_bak = SFR_BANK;
+   77   1          SFR_BANK = BANK_GPIO;
+   78   1      
+   79   1          SFR_SDA_OUT_EN |= (0x01 << SDA_PORT_NUM);
+   80   1          SFR_SDA_IN_EN &= ~(0x01 << SDA_PORT_NUM);
+   81   1      
+   82   1          SFR_BANK = sfr_bak;
+   83   1      }
+   84          
+   85          void near SetSDAIn(void)
+   86          {
+   87   1          uint8 sfr_bak;
+   88   1          sfr_bak = SFR_BANK;
+   89   1          SFR_BANK = BANK_GPIO;
+   90   1      
+   91   1          SFR_SDA_IN_EN |= (0x01 << SDA_PORT_NUM);
+   92   1          SFR_SDA_OUT_EN &= ~(0x01 << SDA_PORT_NUM);
+   93   1      
+   94   1          SFR_BANK = sfr_bak;
+   95   1      }
+   96          
+   97          void near SetCLKOut(void)
+   98          {
+   99   1          uint8 sfr_bak;
+  100   1          sfr_bak = SFR_BANK;
+  101   1          SFR_BANK = BANK_GPIO;
+  102   1      
+  103   1          SFR_SCL_OUT_EN |= (0x01 << SCL_PORT_NUM);
+  104   1          SFR_SCL_IN_EN &= ~(0x01 << SCL_PORT_NUM);
+  105   1      
+  106   1          SFR_BANK = sfr_bak;
+  107   1      }
+  108          
+  109          BOOL near GetSDAIn(void)
+  110          {
+  111   1          uint8 ret;
+  112   1          uint8 sfr_bak;
+  113   1          sfr_bak = SFR_BANK;
+  114   1          SFR_BANK = BANK_GPIO;
+  115   1      
+  116   1          ret = (SFR_SDA_DATA & (0x01 << SDA_PORT_NUM)) ? 1 : 0;
+  117   1          //ret = (SFR_SDA_DATA & (0x01 << SDA_PORT_NUM))
+  118   1      
+  119   1          SFR_BANK = sfr_bak;
+  120   1          return ret;
+  121   1      }
+  122          
+  123          /*
+C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 3   
+
+  124           *******************************************************************************
+  125           *             void IIC_Init(void)
+  126           *
+  127           * Description : I2C初始化
+  128           *
+  129           * Arguments   :
+  130          
+  131           * Returns     :
+  132          
+  133           * Notes       :
+  134           *
+  135           *******************************************************************************
+  136           */
+  137          void near IIC_Init(void)
+  138          {
+  139   1          //使能输出,并将时钟线和数据线拉高
+  140   1          SetSDAOut();
+  141   1          SetCLKOut();
+  142   1          SetSDA_1_hold();
+  143   1          SetCLK_1_hold();
+  144   1      }
+  145          
+  146          void near IIC_Exit(void)
+  147          {
+  148   1          uint8 sfr_bak;
+  149   1          sfr_bak = SFR_BANK;
+  150   1          SFR_BANK = BANK_GPIO;
+  151   1      
+  152   1          SFR_SCL_IN_EN &= ~(0x01 << SCL_PORT_NUM);
+  153   1          SFR_SCL_OUT_EN &= ~(0x01 << SCL_PORT_NUM);
+  154   1      
+  155   1          SFR_SDA_IN_EN &= ~(0x01 << SDA_PORT_NUM);
+  156   1          SFR_SDA_OUT_EN &= ~(0x01 << SDA_PORT_NUM);
+  157   1      
+  158   1          SFR_BANK = sfr_bak;
+  159   1          //Disable 时钟线和数据线的输入, 输出
+  160   1          //    Reset_GPIO(I2CDAT, SDA_OUTPORT, SDA_OUTPORT_NUM);
+  161   1          //    Reset_GPIO(I2CDAT, SDA_INPORT, SDA_INPORT_NUM);
+  162   1          //    Reset_GPIO(I2CSCL, SCL_OUTPORT, SCL_OUTPORT_NUM);
+  163   1          //    Reset_GPIO(I2CSCL, SCL_INPORT, SCL_INPORT_NUM);
+  164   1      }
+  165          
+  166          /************************************************************************
+  167           * Description:  模拟IIC  总线IIC 操作延时
+  168           * Input:   延时值
+  169           * Output: none
+  170           * Note:
+  171           *************************************************************************
+  172           **/
+  173          void near IIC_Delay(uint16 delay)
+  174          {
+  175   1          uint16 j;
+  176   1      
+  177   1          for (j = 0; j < delay; j++)
+  178   1          {
+  179   2              //延时函数
+  180   2              //;
+  181   2          }
+  182   1      }
+  183          
+  184          /*
+  185           *******************************************************************************
+  186           *             IIC_Start
+  187           *
+  188           * Description :  模拟IIC   Start  流程
+  189           *
+C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 4   
+
+  190           * Arguments   :
+  191           *
+  192           * Returns     :
+  193           *
+  194           * Notes       :
+  195           *
+  196           *******************************************************************************
+  197           */
+  198          /*
+  199           ____
+  200           SDA:    |_______
+  201          
+  202           ______
+  203           SCL:      |_____
+  204           */
+  205          
+  206          void near IIC_Start(void) /*IIC start command*/
+  207          {
+  208   1          //data pull up
+  209   1          //Set_GPIO(I2CDAT,SDA_DATAPORT, SDA_DATAPORT_NUM);
+  210   1          SetSDA_1_hold();
+  211   1          //clk pull up
+  212   1          //Set_GPIO(I2CSCL,SCL_DATAPORT, SCL_DATAPORT_NUM);
+  213   1          SetCLK_1_hold();
+  214   1          //data pull down
+  215   1          //Reset_GPIO(I2CDAT,SDA_DATAPORT, SDA_DATAPORT_NUM);
+  216   1          SetSDA_0_hold();
+  217   1          //clk pull down
+  218   1          //Reset_GPIO(I2CSCL,SCL_DATAPORT, SCL_DATAPORT_NUM);
+  219   1          SetCLK_0_hold();
+  220   1      }
+  221          
+  222          /*
+  223           *******************************************************************************
+  224           *             IIC_Stop
+  225           *
+  226           * Description :  模拟IIC  Stop  流程
+  227           *
+  228           * Arguments   :
+  229           *
+  230           * Returns     :
+  231           *
+  232           * Notes       :
+  233           *
+  234           *******************************************************************************
+  235           */
+  236          /*
+  237           _______
+  238           SDA: _______|
+  239           ________
+  240           SCL: ______|
+  241           */
+  242          
+  243          void near IIC_Stop(void) /*IIC stop command*/
+  244          {
+  245   1          //data pull down
+  246   1          //Reset_GPIO(I2CDAT, SDA_DATAPORT, SDA_DATAPORT_NUM);
+  247   1          SetSDA_0_hold();
+  248   1          //clk  pull up
+  249   1          //Set_GPIO(I2CSCL,SCL_DATAPORT, SCL_DATAPORT_NUM);
+  250   1          SetCLK_1_hold();
+  251   1          //data pull up
+  252   1          //Set_GPIO(I2CDAT,SDA_DATAPORT, SDA_DATAPORT_NUM);
+  253   1          SetSDA_1_hold();
+  254   1      }
+  255          
+C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 5   
+
+  256          //=============================================================================================
+  257          /*
+  258           ******************************************************************************
+  259           *             uint8 I2C_Trans_Bytes(uint8 *buf, uint8 length)
+  260           *
+  261           * Description : 将存放到*buf地址里长度为length的数据发送出去
+  262           *
+  263           * Arguments   : unsigned char *buf: 数据存放地址
+  264           unsigned char length: 数据长度, 以byte为单位
+  265           *
+  266           * Returns     : FALSE: 发送数据接收到nack
+  267           TRUE: 发送数据接收到ack
+  268           *
+  269           * Notes       : 由主控向I2C 设备发送数据，接收来自设备的响应
+  270           *
+  271           ********************************************************************************
+  272           */
+  273          uint8 I2C_Trans_Bytes(uint8 *buf, uint8 length)
+  274          {
+  275   1          uint8 ret;
+  276   1      
+  277   1          IIC_Init();
+  278   1      
+  279   1          IIC_Start();
+  280   1          //发送数据
+  281   1          do
+  282   1          {
+  283   2              IIC_WriteByte(*buf);
+  284   2              buf++;
+  285   2              if (!IIC_GetAck())
+  286   2              {
+  287   3                  break;
+  288   3              }
+  289   2              --length;
+  290   2          }
+  291   1          while (length != 0);
+  292   1      
+  293   1          if (length == 0)
+  294   1          {
+  295   2              //全部数据发送完成, 成功
+  296   2              ret = 1;
+  297   2          }
+  298   1          else
+  299   1          {
+  300   2              //未发送完成, 失败
+  301   2              ret = 0;
+  302   2          }
+  303   1          IIC_Stop();
+  304   1      
+  305   1          IIC_Exit();
+  306   1          return ret;
+  307   1      }
+  308          
+  309          //=============================================================================================
+  310          /*
+  311           ******************************************************************************
+  312           *             uint8 I2C_Recev_Bytes(uint8 *buf, uint8 address, uint8 length)
+  313           *
+  314           * Description : 读取长度length
+  315           *
+  316           * Arguments   : unsigned char *buf: 数据存放地址
+  317           unsigned char address: slave地址
+  318           *               unsigned char length: 数据长度,以byte为单位
+  319           *
+  320           * Returns     : FALSE: slave不响应
+  321           TRUE: 收到数据
+C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 6   
+
+  322           *
+  323           * Notes       :
+  324           *
+  325           ********************************************************************************
+  326           */
+  327          uint8 I2C_Recev_Bytes(uint8 *buf, uint8 Regaddress, uint8 length)
+  328          {
+  329   1          uint8 ret = 0;
+  330   1          uint8 *p;
+  331   1      
+  332   1          p = buf;
+  333   1      
+  334   1          IIC_Init();
+  335   1          IIC_Start();
+  336   1      
+  337   1          //写设备地址
+  338   1          IIC_WriteByte(0x20);
+  339   1      
+  340   1          if (!IIC_GetAck())
+  341   1          {
+  342   2              ret = 0;
+  343   2              goto recev_ret;
+  344   2          }
+  345   1      
+  346   1          IIC_WriteByte(Regaddress); //读寄存器地址
+  347   1          if (!IIC_GetAck())
+  348   1          {
+  349   2              ret = 0;
+  350   2              goto recev_ret;
+  351   2          }
+  352   1      
+  353   1          IIC_Start(); //restart
+  354   1          //读设备地址
+  355   1          IIC_WriteByte(0x21);
+  356   1      
+  357   1          if (!IIC_GetAck())
+  358   1          {
+  359   2              ret = 0;
+  360   2              goto recev_ret;
+  361   2          }
+  362   1      
+  363   1          while (length != 0)
+  364   1          {
+  365   2              if (length == 1) //the last byte, sent nack
+  366   2              {
+  367   3                  *p = IIC_ReadByte();
+  368   3                  IIC_SendAck(1);
+  369   3              }
+  370   2              else
+  371   2              {
+  372   3                  *p = IIC_ReadByte();
+  373   3                  IIC_SendAck(0);
+  374   3              }
+  375   2              p++;
+  376   2              length--;
+  377   2          }
+  378   1          ret = 1;
+  379   1      recev_ret:
+  380   1          IIC_Stop();
+  381   1          IIC_Exit();
+  382   1          return ret;
+  383   1      }
+  384          
+  385          /*
+  386           *******************************************************************************
+  387           *             void IIC_WriteByte(uint8 dat)
+C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 7   
+
+  388           *
+  389           * Description : 写1个字节的数据到slave
+  390           *
+  391           * Arguments   : 1个字节数据
+  392          
+  393           *
+  394           * Returns     : 1 ack; 0 nack
+  395           *
+  396           * Notes       :
+  397           *
+  398           *******************************************************************************
+  399           */
+  400          void near IIC_WriteByte(uint8 dat)
+  401          {
+  402   1          uint8 i;
+  403   1          for (i = 0; i < 8; i++)
+  404   1          {
+  405   2              if (((dat << i) & 0x80) != 0) //对于一个字节，从高bit 到低bit 依次发送
+  406   2      
+  407   2              {
+  408   3                  //Set_GPIO(I2CDAT,SDA_DATAPORT, SDA_DATAPORT_NUM);             //data  pull up
+  409   3                  SetSDA_1_hold();
+  410   3      
+  411   3              }
+  412   2              else
+  413   2              {
+  414   3                  //Reset_GPIO(I2CDAT,SDA_DATAPORT, SDA_DATAPORT_NUM);             //data pull down
+  415   3                  SetSDA_0_hold();
+  416   3              }
+  417   2              //Set_GPIO(I2CSCL, SCL_DATAPORT, SCL_DATAPORT_NUM);            //clk pull up
+  418   2              //Reset_GPIO(I2CSCL, SCL_DATAPORT, SCL_DATAPORT_NUM);          //clk pull down
+  419   2              SetCLK_1_hold();
+  420   2              SetCLK_0_hold();
+  421   2          }
+  422   1      }
+  423          
+  424          /*
+  425           *******************************************************************************
+  426           *             uint8 IIC_ReadByte(void)
+  427           *
+  428           * Description : 读取1个字节的数据,并回ack或者nack给slave
+  429           *
+  430           * Arguments   : unsigned char ack: 1 ack; 0 nack
+  431          
+  432           *
+  433           * Returns     : 读到的数据
+  434           *
+  435           * Notes       :
+  436           *
+  437           *******************************************************************************
+  438           */
+  439          uint8 near IIC_ReadByte(void)
+  440          {
+  441   1          uint8 t = 8, dat = 0;
+  442   1      
+  443   1          //Reset_GPIO(I2CDAT,SDA_OUTPORT, SDA_OUTPORT_NUM);       //disable data pin output
+  444   1          SetSDAIn();
+  445   1      
+  446   1          IIC_Delay(IIC_DELAY_TIME);
+  447   1      
+  448   1          do
+  449   1          {
+  450   2              //Set_GPIO(I2CSCL, SCL_DATAPORT, SCL_DATAPORT_NUM);            //clk pull up
+  451   2              SetCLK_1_hold();
+  452   2      
+  453   2              dat <<= 1;
+C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 8   
+
+  454   2      
+  455   2              dat |= GetSDAIn();
+  456   2      
+  457   2              //Reset_GPIO(I2CSCL, SCL_DATAPORT, SCL_DATAPORT_NUM);          //clk pull down
+  458   2              SetCLK_0_hold();
+  459   2      
+  460   2              --t;
+  461   2          }
+  462   1          while (t != 0);
+  463   1      
+  464   1          //Set_GPIO(I2CDAT,SDA_OUTPORT, SDA_OUTPORT_NUM);         //enable data pin output
+  465   1          SetSDAOut();
+  466   1          //IIC_Delay(IIC_DELAY_TIME);
+  467   1          return dat;
+  468   1      }
+  469          
+  470          /*
+  471           *******************************************************************************
+  472           *             void IIC_SendAck(uint8 ack)
+  473           *
+  474           * Description : 发送ack还是nack
+  475           *
+  476           * Arguments   : unsigned char ack: 1 noack; 0 ack
+  477          
+  478           *
+  479           * Returns     :
+  480           *
+  481           * Notes       :
+  482           *
+  483           *******************************************************************************
+  484           */
+  485          void near IIC_SendAck(uint8 ack)
+  486          {
+  487   1          if (ack != 0)
+  488   1          {
+  489   2              //Set_GPIO(I2CDAT,SDA_DATAPORT, SDA_DATAPORT_NUM);          //nack
+  490   2              SetSDA_1_hold();
+  491   2          }
+  492   1          else
+  493   1          {
+  494   2              //Reset_GPIO(I2CDAT, SDA_DATAPORT, SDA_DATAPORT_NUM);          //ack
+  495   2              SetSDA_0_hold();
+  496   2          }
+  497   1          //Set_GPIO(I2CSCL, SCL_DATAPORT, SCL_DATAPORT_NUM);          //clk pull up
+  498   1          //Reset_GPIO(I2CSCL, SCL_DATAPORT, SCL_DATAPORT_NUM);          //clk pull down
+  499   1          SetCLK_1_hold();
+  500   1          SetCLK_0_hold();
+  501   1      }
+  502          
+  503          /*
+  504           *******************************************************************************
+  505           *             uint8 IIC_GetAck(void)
+  506           *
+  507           * Description : Return Ack From the slave device, one is Ack, but zero NoAck.
+  508           *
+  509           * Arguments   : unsigned char ack: 1 noack; 0 ack
+  510          
+  511           *
+  512           * Returns     :
+  513           *
+  514           * Notes       :   获取从设备端发送过来的响应信号Ack  or  NAck
+  515           *
+  516           *******************************************************************************
+  517           */
+  518          uint8 near IIC_GetAck(void)
+  519          {
+C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 9   
+
+  520   1          uint8 ack, read_val;
+  521   1      
+  522   1          //Reset_GPIO(I2CDAT, SDA_OUTPORT, SDA_OUTPORT_NUM);        //disable data output,   input always enab
+             -le
+  523   1          SetSDA_1_hold();
+  524   1      
+  525   1          SetSDAIn();
+  526   1      
+  527   1          //IIC_Delay(IIC_DELAY_TIME);
+  528   1          //Set_GPIO(I2CSCL, SCL_DATAPORT, SCL_DATAPORT_NUM);          //clk pull up
+  529   1          SetCLK_1_hold();
+  530   1      
+  531   1          //ack = !GetSDAIn();
+  532   1          read_val = GetSDAIn();
+  533   1          if(read_val != 0)
+  534   1          {
+  535   2              ack = 0;
+  536   2          }
+  537   1          else
+  538   1          {
+  539   2              ack = 1;
+  540   2          }
+  541   1      
+  542   1          //Set_GPIO(I2CDAT, SDA_OUTPORT, SDA_OUTPORT_NUM);
+  543   1      
+  544   1          //IIC_Delay(IIC_DELAY_TIME);
+  545   1          //Reset_GPIO(I2CSCL, SCL_DATAPORT, SCL_DATAPORT_NUM);          //clk pull down
+  546   1          //Reset_GPIO(I2CDAT, SDA_DATAPORT, SDA_DATAPORT_NUM);          //data pull down
+  547   1          SetCLK_0_hold();
+  548   1          //SetSDA_0_hold();
+  549   1          SetSDAOut();
+  550   1          return ack;
+  551   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       564     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,1879 @@
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE UDiskBulkCommand
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usb\UDiskBulkCommand.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usb\UDiskBulkCommand.c XSMALL FUNCTIONS(REENTRANT) ROM(HU
+                    -GE) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usb\UDiskBulkCommand.lst) OBJECT(..\..\..\obj\lib\usb\UDi
+                    -skBulkCommand.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************************************
+             -*
+    3           *                                       ACTOS GL3976
+    4           *
+    5           *
+    6           *                           (c) Copyright 2002-2007, Actions Co,Ld.
+    7           *                                   All Right Reserved
+    8           *
+    9           * File   : UdiskBulkCommand.msa
+   10           * By     : zhouxl
+   11           * Version: v1.02     first version     2004-12-13 12:45
+   12           ********************************************************************************************************
+             -*
+   13           */
+   14          #include "udisklib.h"
+   15          
+   16          #pragma name(BULKCMD_C)
+   17          extern unsigned long systemtime;
+   18          
+   19          #pragma ROM(HUGE)
+   20          //record operations of Udisk mode;0x00 没有进行usidk写操作；bit0 == 1, UDisk write;bit4 == 1, MTP write.
+   21          extern uint8 UDiskOperationInfo;
+   22          
+   23          static void lsNotSuppCMD(void);
+   24          static void CMD_TestUnitReady_(void);
+   25          static void CMD_PreventMediumRemoval_(void);
+   26          static void CMD_ReadCapacities_(void);
+   27          static void CMD_ReadFormatCapacities_(void);
+   28          static void ReadCapacities(void);
+   29          static void CMD_Inquiry_(void);
+   30          static void CMD_ModeSense_(void);
+   31          static void CMD_ModeSelect_(void);
+   32          static void CMD_RequestSense_(void);
+   33          static void CMD_Verify_(void);
+   34          static void CMD_StartStopUnit_(void);
+   35          static void CMD_Philips_(void);
+   36          
+   37          static void CMD_SwitchToADFU(void);
+   38          static void CMD_IsActions(void);
+   39          static void Get_User_DefinedID(void);
+   40          static void Data_Decrypt_Xor(uint8 *dataAddr, uint8 dataLength);
+   41          static void Set_Device_Info(void);
+   42          static void Access_Device_Info(void);
+   43          
+   44          static void CMD_Read_TOC(void);
+   45          void CMD_Mechanism_Status(void);
+   46          static void CMD_ReadDiscInformation(void);
+   47          static void CMD_WriteCD_(void);
+   48          static void CMD_PlayAudio(void);
+   49          static void CMD_Read_Autorun_Record_(void);
+   50          
+   51          static uint16 Fix_Nrmlmode_RWSctrs(void);
+   52          static uint32 Ajust_Data_Length(uint32 length, uint32 largestLength);
+   53          static void Udisk_NrmlMode_Read(uint32 readnum);
+   54          static void Udisk_NrmlMode_Write(uint32 readnum);
+   55          static void Udisk_FIFOMode_Read(uint32 readnum);
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 2   
+
+   56          static void Udisk_FIFOMode_Write(uint32 readnum);
+   57          #pragma ROM(HUGE)
+   58          
+   59          #pragma renamecode(?PR?BULKCMD_C)
+   60          //#pragma ROM(HUGE)
+   61          #pragma ROM(HUGE)
+   62          
+   63          //此定义为避免屏蔽掉打印后，udisk应用编译常量段定义未使用导致的编译错误。
+   64          #ifndef _PRINT_DEBUG_
+   65          const uint8 ConstSeg1 = 'A';
+   66          #endif
+   67          
+   68          /*
+   69           ********************************************************************************************************
+             -*
+   70           *                                           Bulk_Out_Handle
+   71           *
+   72           * Description: Endpoint a interrupt handle function.
+   73           *
+   74           * Arguments  : None.
+   75           *
+   76           * Returns    : None.
+   77           *
+   78           * Note(s)    : None.
+   79           ********************************************************************************************************
+             -*
+   80           */
+   81          void Bulk_Out_Handle(void)
+   82          {
+   83   1          uint8 i;
+   84   1          //标志在查状态过程有USB中断发生
+   85   1          StatusCheckFlag = 0;
+   86   1          illegalLBAFlag = 0;
+   87   1          flash_normal_rw_sctrs = 0x00;
+   88   1      
+   89   1          for (i = 0; i < 24; i++)
+   90   1          {
+   91   2              ((uint8 *) &CBW_data_buffer)[i] = Fifo2dat;
+   92   2          }
+   93   1      
+   94   1          Out2cs_hcin2cs = Out2cs_hcin2cs | 0x02; //clear EPB fifo
+   95   1          USBEIRQ = USBEIRQ | (uint8) 0x80;
+   96   1          SHORTPCKIRQ = SHORTPCKIRQ | 0x20;
+   97   1      
+   98   1          //将_dCBWDataTransferLength长度从小端转为大端
+   99   1          EndianReverse((uint8 *) (&CBW_data_buffer._dCBWDataTransferLength), 4);
+  100   1      
+  101   1          if (cbw_count != 2)
+  102   1          {
+  103   2              cbw_count++;
+  104   2          }
+  105   1      
+  106   1          //"USBC":0x55534243
+  107   1          if (CBW_data_buffer._dCBWSignature != 0x55534243)
+  108   1          {
+  109   2              lsNotSuppCMD();
+  110   2          }
+  111   1          else
+  112   1          {
+  113   2              //save _dCBWTag using at _dCSWTag reply
+  114   2              CSWBuffer._dCSWTag = CBW_data_buffer._dCBWTag;
+  115   2      
+  116   2              //AutoRun光盘存在标志: 0:不存在; 非0:存在
+  117   2              if (AutoRunDiskFlag == 0)
+  118   2              {
+  119   3                  CBW_data_buffer._bCBWLUN++;
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 3   
+
+  120   3              }
+  121   2      
+  122   2              //用户的盘符选择  0:多盘符(默认)  01h:普通盘  02h:加密盘  03h:插卡
+  123   2              if (DiskAppearSelect == 2)
+  124   2              {
+  125   3                  CBW_data_buffer._bCBWLUN++;
+  126   3              }
+  127   2      
+  128   2              if (DiskAppearSelect == 3)
+  129   2              {
+  130   3                  CBW_data_buffer._bCBWLUN += 2;
+  131   3              }
+  132   2      
+  133   2              //没有加密盘,访问加密盘则默认在访问卡盘符
+  134   2              if (CBW_data_buffer._bCBWLUN == 0x02)
+  135   2              {
+  136   3                  if (SplitDiskFlag == 0x00)
+  137   3                  {
+  138   4                      CBW_data_buffer._bCBWLUN = 0x03;
+  139   4                  }
+  140   3              }
+  141   2      
+  142   2              //CBWCB第一个字节是命令字节
+  143   2              switch (CBW_data_buffer._CBWCB[0])
+  144   2              {
+  145   3              case 0x00:
+  146   3                  CMD_TestUnitReady_();
+  147   3                  break;
+  148   3              case 0x28:
+  149   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  150   3                  IsAdfuCondition = 0;
+  151   3                  USBBusy = 1;
+  152   3                  CMD_Read10_();
+  153   3                  break;
+  154   3              case 0x2a:
+  155   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  156   3                  IsAdfuCondition = 0;
+  157   3                  USBBusy = 1;
+  158   3                  //for autorun
+  159   3                  CMD_Write10_();
+  160   3                  break;
+  161   3              case 0x1e:
+  162   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  163   3                  IsAdfuCondition = 0;
+  164   3                  USBBusy = 1;
+  165   3                  //for autorun
+  166   3                  CMD_PreventMediumRemoval_();
+  167   3                  break;
+  168   3              case 0x25:
+  169   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  170   3                  IsAdfuCondition = 0;
+  171   3                  USBBusy = 1;
+  172   3                  //for autorun
+  173   3                  CMD_ReadCapacities_();
+  174   3                  break;
+  175   3              case 0x23:
+  176   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  177   3                  IsAdfuCondition = 0;
+  178   3                  USBBusy = 1;
+  179   3                  //for autorun
+  180   3                  CMD_ReadFormatCapacities_();
+  181   3                  break;
+  182   3              case 0x12:
+  183   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  184   3                  IsAdfuCondition = 0;
+  185   3                  USBBusy = 1;
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 4   
+
+  186   3                  //for autorun
+  187   3                  CMD_Inquiry_();
+  188   3                  break;
+  189   3              case 0x5a: //CMD_ModeSense10_
+  190   3              case 0x1a: //CMD_ModeSense06_,Command Descriptor Block(CDB) For SCSI Device
+  191   3      
+  192   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  193   3                  IsAdfuCondition = 0;
+  194   3                  USBBusy = 1;
+  195   3                  CMD_ModeSense_();
+  196   3                  break;
+  197   3              case 0x55:
+  198   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  199   3                  IsAdfuCondition = 0;
+  200   3                  USBBusy = 1;
+  201   3                  CMD_ModeSelect_();
+  202   3                  break;
+  203   3              case 0x03:
+  204   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  205   3                  IsAdfuCondition = 0;
+  206   3                  USBBusy = 1;
+  207   3                  CMD_RequestSense_();
+  208   3                  break;
+  209   3              case 0x2f:
+  210   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  211   3                  IsAdfuCondition = 0;
+  212   3                  USBBusy = 1;
+  213   3                  CMD_Verify_();
+  214   3                  break;
+  215   3              case 0x1b:
+  216   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  217   3                  IsAdfuCondition = 0;
+  218   3                  USBBusy = 1;
+  219   3                  CMD_StartStopUnit_();
+  220   3                  break;
+  221   3      
+  222   3              case 0xdd:
+  223   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  224   3                  IsAdfuCondition = 0;
+  225   3                  USBBusy = 1;
+  226   3                  CMD_Philips_();
+  227   3                  break;
+  228   3      
+  229   3                  //for autorun cmd
+  230   3              case 0x43:
+  231   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  232   3                  IsAdfuCondition = 0;
+  233   3                  USBBusy = 1;
+  234   3                  CMD_Read_TOC();
+  235   3                  break;
+  236   3              case 0xbd:
+  237   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  238   3                  IsAdfuCondition = 0;
+  239   3                  USBBusy = 1;
+  240   3                  CMD_WriteCD_();
+  241   3                  break;
+  242   3              case 0x51:
+  243   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  244   3                  IsAdfuCondition = 0;
+  245   3                  USBBusy = 1;
+  246   3                  CMD_ReadDiscInformation();
+  247   3                  break;
+  248   3              case 0x45:
+  249   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  250   3                  IsAdfuCondition = 0;
+  251   3                  USBBusy = 1;
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 5   
+
+  252   3                  CMD_PlayAudio();
+  253   3                  break;
+  254   3              case 0xce:
+  255   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  256   3                  IsAdfuCondition = 0;
+  257   3                  USBBusy = 1;
+  258   3                  CMD_Read_Autorun_Record_();
+  259   3                  break;
+  260   3                  //for autorun end
+  261   3      
+  262   3      
+  263   3                  //自定义类协议
+  264   3              case 0xcb:
+  265   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  266   3                  IsAdfuCondition = 0;
+  267   3                  USBBusy = 1;
+  268   3                  CMD_SwitchToADFU();
+  269   3                  break;
+  270   3              case 0xcc:
+  271   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  272   3                  IsAdfuCondition = 0;
+  273   3                  USBBusy = 1;
+  274   3                  CMD_IsActions();
+  275   3                  break;
+  276   3              case 0xca:
+  277   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  278   3                  IsAdfuCondition = 0;
+  279   3                  USBBusy = 1;
+  280   3                  Get_User_DefinedID();
+  281   3                  break;
+  282   3              case 0xb0:
+  283   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  284   3                  IsAdfuCondition = 0;
+  285   3                  USBBusy = 1;
+  286   3                  Set_Device_Info();
+  287   3                  break;
+  288   3              case 0xcd:
+  289   3                  //除了TestUnitReady_,其他操作认为忙。USBBusy在state0时被查询
+  290   3                  //cd命令为统一后的set/get infomation协议命令字
+  291   3                  IsAdfuCondition = 0;
+  292   3                  USBBusy = 1;
+  293   3                  Access_Device_Info();
+  294   3                  break;
+  295   3      
+  296   3                  //进入ADFU命令
+  297   3              case 0x05:
+  298   3                  IsAdfuCondition = 1;
+  299   3                  USBBusy = 1;
+  300   3                  Access_Internal_RAM_Command();
+  301   3                  break;
+  302   3              case 0x08:
+  303   3              case 0x09:
+  304   3                  IsAdfuCondition = 1;
+  305   3                  USBBusy = 1;
+  306   3                  Access_Nand_Flash_Command();
+  307   3                  break;
+  308   3              case 0x10:
+  309   3                  IsAdfuCondition = 1;
+  310   3                  USBBusy = 1;
+  311   3                  Switch_Firmware_Command();
+  312   3                  break;
+  313   3              case 0x16:
+  314   3                  IsAdfuCondition = 1;
+  315   3                  USBBusy = 1;
+  316   3                  Detach_Device_Command();
+  317   3                  break;
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 6   
+
+  318   3              case 0x18:
+  319   3                  IsAdfuCondition = 1;
+  320   3                  USBBusy = 1;
+  321   3                  Polling_Ready_Command();
+  322   3                  break;
+  323   3                  //case 0x1a:
+  324   3                  //IsAdfuCondition = 1;
+  325   3                  //USBBusy = 1;
+  326   3                  //Get_Status_Command();
+  327   3                  //break;
+  328   3              case 0x20:
+  329   3                  IsAdfuCondition = 1;
+  330   3                  USBBusy = 1;
+  331   3                  Calling_Entry_Command();
+  332   3                  break;
+  333   3              default:
+  334   3                  lsNotSuppCMD();
+  335   3                  break;
+  336   3              }
+  337   2          }
+  338   1      }
+  339          
+  340          /*
+  341           ********************************************************************************************************
+             -*
+  342           *                                           lsNotSuppCMD
+  343           *
+  344           * Description: USB SFF-8020i protocol handle, command not support.
+  345           *
+  346           * Arguments  : None.
+  347           *
+  348           * Returns    : None.
+  349           *
+  350           * Note(s)    : None.
+  351           ********************************************************************************************************
+             -*
+  352           */
+  353          static void lsNotSuppCMD(void)
+  354          {
+  355   1          IsAdfuCondition = 0x01;
+  356   1          //返回任意数，避免98死机
+  357   1          Send_Data_To_PC((uint8 *) &Cap_cmd_info_DiskA, CBW_data_buffer._dCBWDataTransferLength);
+  358   1          CSWBuffer._bCSWStatus = 0x01;
+  359   1          ReportCSW(0);
+  360   1      }
+  361          
+  362          /*
+  363           ********************************************************************************************************
+             -*
+  364           *                                           CMD_TestUnitReady_
+  365           *
+  366           * Description: USB SFF-8020i protocol handle, test if unit is ready; There will be 1 command every 1s in
+             - WINXP.
+  367           *
+  368           * Arguments  : None.
+  369           *
+  370           * Returns    : None.
+  371           *
+  372           * Note(s)    : None.
+  373           ********************************************************************************************************
+             -*
+  374           */
+  375          static void CMD_TestUnitReady_(void)
+  376          {
+  377   1          uint8 errorflag;
+  378   1          uint8 cardstatus;
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 7   
+
+  379   1      
+  380   1          errorflag = 0;
+  381   1      
+  382   1          //updata，mast call card operate
+  383   1          if (IsInAdfuState != 0xff)
+  384   1          {
+  385   2              switch (CBW_data_buffer._bCBWLUN)
+  386   2              {
+  387   3              case 0x00: //for autorun
+  388   3                  if (bTestNoready == 0x00)
+  389   3                  {
+  390   4                      bTestNoready = 0x80;
+  391   4                      //Media Not Present
+  392   4                      errorflag = 0x04;
+  393   4                  }
+  394   3      
+  395   3                  if (OSType == 0x00) //mac OSX system
+  396   3                  {
+  397   4                      //实现在苹果系统下取消Autorun盘符的效果
+  398   4                      if (AutoRunDiskFlag == 0xff)
+  399   4                      {
+  400   5      #ifdef _PRINT_DEBUG_
+                                   prints("no autorun\n");
+               #endif
+  403   5      
+  404   5                          //Media Not Present
+  405   5                          errorflag = 0x04;
+  406   5                      }
+  407   4                  }
+  408   3                  break;
+  409   3              case 0x01: //普通盘
+  410   3                  break;
+  411   3              case 0x02: //加密盘
+  412   3                  //密码通过该变量会置位
+  413   3                  if (MediaChgFlag != 0)
+  414   3                  {
+  415   4                      MediaChgFlag = 0;
+  416   4                      //密码通过,地址计算切换到DiskB
+  417   4                      PasswdPassOk++;
+  418   4                      //Media Change
+  419   4                      errorflag = 0x03;
+  420   4                  }
+  421   3                  break;
+  422   3              case 0x03: //卡盘
+  423   3                  cardstatus = 0x00;
+  424   3                  //判断卡存在标志，0：需要探测卡； 1：继续
+  425   3                  if (CardExistFlag == 0x00)
+  426   3                  {
+  427   4                      //卡没有插入的情况下不需去做卡驱动的重新初始化
+  428   4                      cardstatus = 0x01;
+  429   4                  }
+  430   3                  else
+  431   3                  {
+  432   4                      CardWPCheck();
+  433   4                      if (RWCardError != 0)
+  434   4                      {
+  435   5                          //判断读写卡是否出错，0：无错，直接返回CSW；1：有错，需要重新探测卡
+  436   5                          cardstatus = 0x01;
+  437   5                      }
+  438   4                  }
+  439   3                  if (cardstatus == 0x01)
+  440   3                  {
+  441   4                      if (CardDetectState != 0x00)
+  442   4                      {
+  443   5                          //调用卡初始化，会修改CardExistFlag
+  444   5                          sCardCapCheck();
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 8   
+
+  445   5                      }
+  446   4      
+  447   4                      if (CardExistFlag == 0x00)
+  448   4                      {
+  449   5                          //Media Not Present
+  450   5                          errorflag = 0x04;
+  451   5                      }
+  452   4                      else
+  453   4                      {
+  454   5                          //Media Change
+  455   5                          errorflag = 0x03;
+  456   5                      }
+  457   4                  }
+  458   3                  break;
+  459   3              default:
+  460   3                  break;
+  461   3              }
+  462   2          }
+  463   1          ReportCSW(errorflag);
+  464   1      }
+  465          
+  466          /*
+  467           ********************************************************************************************************
+             -*
+  468           *                                           CMD_Read10_
+  469           *
+  470           * Description: USB SFF-8020i protocol handle, read device.
+  471           *
+  472           * Arguments  : None.
+  473           *
+  474           * Returns    : None.
+  475           *
+  476           * Note(s)    : None.
+  477           ********************************************************************************************************
+             -*
+  478           */
+  479          void CMD_Read10_(void)
+  480          {
+  481   1          uint8 errorflag = 0;
+  482   1          DMA_DT_Trnsfr_t dma_transfer;
+  483   1      
+  484   1          //upload
+  485   1          UpOrDownLoad = 0x01;
+  486   1      
+  487   1          Compute_LBA();
+  488   1          EPA_In_Rdy();
+  489   1      
+  490   1          //nand base,不插卡的情况下PC会有一次读卡的操作,不装载卡驱动,直接送随机数据到PC
+  491   1          if ((CardExistFlag == 0x00) && (flashorcard_rwflag == 0x01))
+  492   1          {
+  493   2              while (udisk_rw_sctr_num != 0x00)
+  494   2              {
+  495   3                  udisk_rw_sctr_num--;
+  496   3      
+  497   3                  ClearWatchdog();
+  498   3      
+  499   3                  dma_transfer.source_addr = DATABUFFER;
+  500   3                  dma_transfer.dst_addr = URAMSTARTADDR;
+  501   3                  dma_transfer.length = 0x200;
+  502   3                  dma_transfer.pagenum = DRAM_TO_USBFIFO;
+  503   3                  DMA_Data_Transfer(&dma_transfer);
+  504   3                  Wait_PrevDMA_TransEnd();
+  505   3              }
+  506   2      
+  507   2              //Media Not Present
+  508   2              errorflag = 0x04;
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 9   
+
+  509   2          }
+  510   1          else if ((sReadCheckForEncryp() != 0x00) || (illegalLBAFlag != 0x00))
+  511   1          {
+  512   2              if (illegalLBAFlag != 0x00)
+  513   2              {
+  514   3                  memset(DATABUFFER, 0, 0x200);
+  515   3              }
+  516   2      
+  517   2              while (udisk_rw_sctr_num != 0x00)
+  518   2              {
+  519   3                  ClearWatchdog();
+  520   3      
+  521   3                  udisk_rw_sctr_num--;
+  522   3      
+  523   3                  dma_transfer.source_addr = DATABUFFER;
+  524   3                  dma_transfer.dst_addr = URAMSTARTADDR;
+  525   3                  dma_transfer.length = 0x200;
+  526   3                  dma_transfer.pagenum = DRAM_TO_USBFIFO;
+  527   3                  DMA_Data_Transfer(&dma_transfer);
+  528   3                  Wait_PrevDMA_TransEnd();
+  529   3              }
+  530   2          }
+  531   1          else
+  532   1          {
+  533   2              //#ifdef FIFO_TRANS_MODE
+  534   2              if (IsAdfuCondition == 0x00)
+  535   2              {
+  536   3                  // card fifo read
+  537   3                  Udisk_FIFOMode_Read(udisk_rw_sctr_num);
+  538   3              }
+  539   2              else
+  540   2              {
+  541   3                  //#else
+  542   3                  Udisk_NrmlMode_Read(udisk_rw_sctr_num);
+  543   3              }
+  544   2              //#endif
+  545   2          }
+  546   1      
+  547   1          if (CBW_data_buffer._bCBWLUN == 0x03)
+  548   1          {
+  549   2              if (IsInAdfuState != 0xff)
+  550   2              {
+  551   3                  //卡是否出错
+  552   3                  if ((CardExistFlag == 0x00) && (RWCardError != 0x00))
+  553   3                  {
+  554   4                      errorflag = 0x04;
+  555   4                  }
+  556   3                  if ((CardExistFlag != 0x00) && (RWCardError != 0x00))
+  557   3                  {
+  558   4                      errorflag = 0x03;
+  559   4                  }
+  560   3              }
+  561   2              else
+  562   2              {
+  563   3                  errorflag = 0x00;
+  564   3              }
+  565   2          }
+  566   1      
+  567   1          ReportCSW(errorflag);
+  568   1      
+  569   1          //nand flash的读写调用完成后，清除是否进入空闲状态的计数值
+  570   1          PrevRTCTimerValue1 = 0x00;
+  571   1          PrevRTCTimerValue2 = 0x00;
+  572   1      }
+  573          
+  574          /*
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 10  
+
+  575           ********************************************************************************************************
+             -*
+  576           *                                           CMD_Write10_
+  577           *
+  578           * Description: USB SFF-8020i protocol handle, write device.
+  579           *
+  580           * Arguments  : None.
+  581           *
+  582           * Returns    : None.
+  583           *
+  584           * Note(s)    : None.
+  585           ********************************************************************************************************
+             -*
+  586           */
+  587          void CMD_Write10_(void)
+  588          {
+  589   1          DMA_DT_Trnsfr_t dma_transfer;
+  590   1          uint8 errorflag = 0;
+  591   1      
+  592   1          //download
+  593   1          UpOrDownLoad = 0x02;
+  594   1      
+  595   1          /* record udisk write 2010-12-31 16:29*/
+  596   1          UDiskOperationInfo = UDiskOperationInfo | 0x01;
+  597   1      
+  598   1          //输入LBA，(udisk_rw_sctr_num)
+  599   1          Compute_LBA();
+  600   1      
+  601   1          EPB_OutRdy_FIFOFullNAK();
+  602   1      
+  603   1          if (udisk_rw_sctr_num != 0x00)
+  604   1          {
+  605   2              flash_disk_write_flag++;
+  606   2          }
+  607   1      
+  608   1          //检查是否加密盘协议操作
+  609   1          if ((sWriteCheckForEncryp() != 0x00) || (illegalLBAFlag != 0x00))
+  610   1          {
+  611   2              while (udisk_rw_sctr_num != 0)
+  612   2              {
+  613   3                  udisk_rw_sctr_num--;
+  614   3      
+  615   3                  ClearWatchdog();
+  616   3      
+  617   3                  dma_transfer.source_addr = URAMSTARTADDR;
+  618   3                  dma_transfer.dst_addr = DATABUFFER;
+  619   3                  dma_transfer.length = 0x200;
+  620   3                  dma_transfer.pagenum = USBFIFO_TO_DRAM;
+  621   3                  DMA_Data_Transfer(&dma_transfer);
+  622   3                  Wait_PrevDMA_TransEnd();
+  623   3      
+  624   3                  //检查加密盘是否要写
+  625   3                  if (sEncrypParseInWR() == 0x00)
+  626   3                  {
+  627   4                      sectors_trans_once = 0x01;
+  628   4                      sProgramSectorsToStorage((uint8 *) DATABUFFER);
+  629   4                  }
+  630   3              }
+  631   2          }
+  632   1          else
+  633   1          {
+  634   2              //#ifdef FIFO_TRANS_MODE
+  635   2              if (IsAdfuCondition == 0x00)
+  636   2              {
+  637   3                  // card fifo read
+  638   3                  Udisk_FIFOMode_Write(udisk_rw_sctr_num);
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 11  
+
+  639   3              }
+  640   2              //#else
+  641   2              else
+  642   2              {
+  643   3                  Udisk_NrmlMode_Write(udisk_rw_sctr_num);
+  644   3              }
+  645   2              //#endif
+  646   2      
+  647   2          }
+  648   1      
+  649   1          if (flash_type != 4)
+  650   1          {
+  651   2              //        Udisk_Parse_MBR();
+  652   2          }
+  653   1      
+  654   1          //升级中，屏蔽所有有可能对卡的访问，因为由于无卡而报错，会使升级失败
+  655   1          if (IsInAdfuState != 0xff)
+  656   1          {
+  657   2              if ((flashorcard_rwflag != 0x00) && (RWCardError != 0x00))
+  658   2              {
+  659   3                  //会修改CardExistFlag,RWCardError
+  660   3                  //sCardCapCheck();
+  661   3                  RWCardError = 0x01;
+  662   3              }
+  663   2      
+  664   2              if (CBW_data_buffer._bCBWLUN == 0x00)
+  665   2              {
+  666   3                  //Cannot Write CD_ROM
+  667   3                  if (bWriteCD_ROM == 0x00)
+  668   3                  {
+  669   4                      errorflag = 2;
+  670   4                  }
+  671   3                  //光盘写属性清0
+  672   3                  bWriteCD_ROM = 0;
+  673   3              }
+  674   2              else if (CBW_data_buffer._bCBWLUN == 0x01)
+  675   2              {
+  676   3                  if (FlashWPFlag != 0x00)
+  677   3                  {
+  678   4                      errorflag = 2;
+  679   4                  }
+  680   3              }
+  681   2              else
+  682   2              {
+  683   3                  if (CardWPFlag != 0x00)
+  684   3                  {
+  685   4                      errorflag = 2;
+  686   4                  }
+  687   3                  if ((CardExistFlag == 0x00) && (RWCardError != 0x00))
+  688   3                  {
+  689   4                      errorflag = 4;
+  690   4                  }
+  691   3                  if ((CardExistFlag != 0x00) && (RWCardError != 0x00))
+  692   3                  {
+  693   4                      errorflag = 3;
+  694   4                  }
+  695   3              }
+  696   2          }
+  697   1          else
+  698   1          {
+  699   2              errorflag = 0;
+  700   2          }
+  701   1      
+  702   1          ReportCSW(errorflag);
+  703   1      
+  704   1          //nand flash的读写调用完成后，清除是否进入空闲状态的计数值
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 12  
+
+  705   1          PrevRTCTimerValue1 = 0x00;
+  706   1          PrevRTCTimerValue2 = 0x00;
+  707   1      }
+  708          
+  709          /*
+  710           ********************************************************************************************************
+             -*
+  711           *                                           CMD_PreventMediumRemoval_
+  712           *
+  713           * Description: USB SFF-8020i protocol handle, decide whether the device can be moved.
+  714           *
+  715           * Arguments  : None.
+  716           *
+  717           * Returns    : None.
+  718           *
+  719           * Note(s)    : None.
+  720           ********************************************************************************************************
+             -*
+  721           */
+  722          static void CMD_PreventMediumRemoval_(void)
+  723          {
+  724   1          if ((CBW_data_buffer._CBWCB[4] & 0x01) == 0x00)
+  725   1          {
+  726   2              //在PC写文件时, PC允许拔线后,立即update flash,减少PC写完文件小机立即掉电,写的文件数据错误的机率.
+  727   2              UD_Update(); // need fix
+  728   2              //USB Not Busy
+  729   2              Removable = 0x01;
+  730   2          }
+  731   1          else
+  732   1          {
+  733   2              //USB Busy
+  734   2              Removable = 0x00;
+  735   2          }
+  736   1      
+  737   1          ReportCSW(0);
+  738   1      }
+  739          
+  740          /*
+  741           ********************************************************************************************************
+             -*
+  742           *                                           CMD_ReadCapacities_
+  743           *
+  744           * Description: USB SFF-8020i protocol handle, read device capacity.
+  745           *
+  746           * Arguments  : None.
+  747           *
+  748           * Returns    : None.
+  749           *
+  750           * Note(s)    : None.
+  751           ********************************************************************************************************
+             -*
+  752           */
+  753          static void CMD_ReadCapacities_(void)
+  754          {
+  755   1          Cap_Info_DiskA_p = (uint8 *) &Cap_cmd_info_DiskA;
+  756   1          Cap_Info_DiskB_p = (uint8 *) &Cap_cmd_info_DiskB;
+  757   1          Cap_Info_DiskC_p = (uint8 *) &Cap_cmd_info_DiskC;
+  758   1          Cap_Info_DiskCard_p = (uint8 *) &Cap_cmd_info_DiskCard;
+  759   1          ReadCapacities();
+  760   1      }
+  761          
+  762          /*
+  763           ********************************************************************************************************
+             -*
+  764           *                                           CMD_ReadFormatCapacities_
+  765           *
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 13  
+
+  766           * Description: USB SFF-8020i protocol handle, read device formatted capacity.
+  767           *
+  768           * Arguments  : None.
+  769           *
+  770           * Returns    : None.
+  771           *
+  772           * Note(s)    : None.
+  773           ********************************************************************************************************
+             -*
+  774           */
+  775          static void CMD_ReadFormatCapacities_(void)
+  776          {
+  777   1          Cap_Info_DiskA_p = (uint8 *) &Formatcap_cmd_info_DiskA;
+  778   1          Cap_Info_DiskB_p = (uint8 *) &Formatcap_cmd_info_DiskB;
+  779   1          Cap_Info_DiskC_p = (uint8 *) &Formatcap_cmd_info_DiskC;
+  780   1          Cap_Info_DiskCard_p = (uint8 *) &Formatcap_cmd_info_DiskCard;
+  781   1      
+  782   1          if (CBW_data_buffer._dCBWDataTransferLength > 20)
+  783   1          {
+  784   2              CSWBuffer._dCSWDataResidue = CBW_data_buffer._dCBWDataTransferLength - 20;
+  785   2              CBW_data_buffer._dCBWDataTransferLength = 20;
+  786   2          }
+  787   1      
+  788   1          ReadCapacities();
+  789   1      }
+  790          
+  791          /*
+  792           ********************************************************************************************************
+             -*
+  793           *                                           ReadCapacities
+  794           *
+  795           * Description: USB SFF-8020i protocol handle, send device capacity.
+  796           *
+  797           * Arguments  : None.
+  798           *
+  799           * Returns    : None.
+  800           *
+  801           * Note(s)    : None.
+  802           ********************************************************************************************************
+             -*
+  803           */
+  804          static void ReadCapacities(void)
+  805          {
+  806   1          uint8 errorflag = 0;
+  807   1          uint8 *data_p;
+  808   1      
+  809   1          Cap_Info_DiskCDROM_p = (uint8 *) &Cap_cmd_info_DiskCDROM;
+  810   1      
+  811   1          switch (CBW_data_buffer._bCBWLUN)
+  812   1          {
+  813   2          case 0x00: //for autorun
+  814   2              if (bMediaChange == 0x00)
+  815   2              {
+  816   3                  bMediaChange = 0x80;
+  817   3                  //media change
+  818   3                  errorflag = 0x03;
+  819   3              }
+  820   2              data_p = Cap_Info_DiskCDROM_p;
+  821   2              break;
+  822   2          case 0x01:
+  823   2              data_p = (uint8 *) Cap_Info_DiskA_p;
+  824   2              break;
+  825   2          case 0x02:
+  826   2              if ((EncryptFlag == 0x00) || (PasswdPassOk == 1))
+  827   2              {
+  828   3                  data_p = (uint8 *) Cap_Info_DiskB_p;
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 14  
+
+  829   3              }
+  830   2              else
+  831   2              {
+  832   3                  data_p = (uint8 *) Cap_Info_DiskC_p;
+  833   3              }
+  834   2              break;
+  835   2          case 0x03:
+  836   2              if (IsInAdfuState != 0xff)
+  837   2              {
+  838   3                  if (CardExistFlag == 0x00)
+  839   3                  {
+  840   4                      //Media Not Present
+  841   4                      errorflag = 0x04;
+  842   4                  }
+  843   3              }
+  844   2              data_p = (uint8 *) Cap_Info_DiskCard_p;
+  845   2              break;
+  846   2          default:
+  847   2              data_p = (uint8 *) Cap_Info_DiskA_p;
+  848   2              break;
+  849   2          }
+  850   1          Send_Data_To_PC(data_p, CBW_data_buffer._dCBWDataTransferLength);
+  851   1      
+  852   1          ReportCSW(errorflag);
+  853   1      }
+  854          
+  855          /*
+  856           ********************************************************************************************************
+             -*
+  857           *                                           CMD_Inquiry_
+  858           *
+  859           * Description: USB SFF-8020i protocol handle, inquiry the device infomation.
+  860           *
+  861           * Arguments  : None.
+  862           *
+  863           * Returns    : None.
+  864           *
+  865           * Note(s)    : Windows系统进入U盘后,第一个CBW命令为0x12.
+  866           ********************************************************************************************************
+             -*
+  867           */
+  868          static void CMD_Inquiry_(void)
+  869          {
+  870   1          uint8 *data_p;
+  871   1          if (cbw_count == 1)
+  872   1          {
+  873   2              //0: mac OSX system    1: windows system  用于实现在苹果系统下卡拔掉后盘符消失效果
+  874   2              OSType = 1;
+  875   2          }
+  876   1          if (CBW_data_buffer._bCBWLUN == 0x00)
+  877   1          {
+  878   2              //for autorun
+  879   2              data_p = (uint8 *) &CMD_Inquiry_information_CDROM;
+  880   2          }
+  881   1          else
+  882   1          {
+  883   2              data_p = (uint8 *) &CMD_Inquiry_information_FOB;
+  884   2          }
+  885   1      
+  886   1          Send_Data_To_PC(data_p, CBW_data_buffer._dCBWDataTransferLength);
+  887   1          ReportCSW(0);
+  888   1      }
+  889          
+  890          /*
+  891           ********************************************************************************************************
+             -*
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 15  
+
+  892           *                                           CMD_ModeSense06_
+  893           *
+  894           * Description: USB SFF-8020i protocol handle, return the usb mode information.
+  895           *
+  896           * Arguments  : None.
+  897           *
+  898           * Returns    : None.
+  899           *
+  900           * Note(s)    : None.
+  901           ********************************************************************************************************
+             -*
+  902           */
+  903          static void CMD_ModeSense_(void)
+  904          {
+  905   1          uint8 *data_p;
+  906   1          uint8 tmp = 0x00;
+  907   1      
+  908   1          IsReadCapAndReadRec0 = 0;
+  909   1          if (CBW_data_buffer._bCBWLUN == 0x00)
+  910   1          {
+  911   2              data_p = (uint8 *) &CDRom_ModeSense_information;
+  912   2          }
+  913   1          else
+  914   1          {
+  915   2              if (CBW_data_buffer._bCBWLUN == 0x03)
+  916   2              {
+  917   3                  if (CardWPFlag != 0x00)
+  918   3                  {
+  919   4                      tmp = 0x80;
+  920   4                  }
+  921   3              }
+  922   2              else
+  923   2              {
+  924   3                  if (FlashWPFlag != 0x00)
+  925   3                  {
+  926   4                      tmp = 0x80;
+  927   4                  }
+  928   3              }
+  929   2      
+  930   2              Time_Protect_Page_information[3] = tmp;
+  931   2              All_Page_information[3] = tmp;
+  932   2      
+  933   2              //PC and Page Code
+  934   2              if (CBW_data_buffer._CBWCB[2] == 0x3f)
+  935   2              {
+  936   3                  data_p = (uint8 *) &All_Page_information;
+  937   3              }
+  938   2              else
+  939   2              {
+  940   3                  data_p = (uint8 *) &Time_Protect_Page_information;
+  941   3              }
+  942   2          }
+  943   1      
+  944   1          Send_Data_To_PC(data_p, CBW_data_buffer._dCBWDataTransferLength);
+  945   1          ReportCSW(0);
+  946   1      }
+  947          
+  948          /*
+  949           ********************************************************************************************************
+             -*
+  950           *                                           CMD_ModeSelect_
+  951           *
+  952           * Description: USB SFF-8020i protocol handle, usb mode select.
+  953           *
+  954           * Arguments  : None.
+  955           *
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 16  
+
+  956           * Returns    : None.
+  957           *
+  958           * Note(s)    : None.
+  959           ********************************************************************************************************
+             -*
+  960           */
+  961          static void CMD_ModeSelect_(void)
+  962          {
+  963   1          IsReadCapAndReadRec0 = 0;
+  964   1          EPB_OutRdy_FIFOFullNAK();
+  965   1      
+  966   1          //Data Packet Received Interrupt
+  967   1          while ((SHORTPCKIRQ & 0x20) == 0x00)
+  968   1          {
+  969   2      #ifdef _PRINT_DEBUG_
+                       prints("cmd:0x55 err\n");
+               #endif
+  972   2          }
+  973   1      
+  974   1          ReportCSW(0);
+  975   1      }
+  976          
+  977          /*
+  978           ********************************************************************************************************
+             -*
+  979           *                                           CMD_RequestSense_
+  980           *
+  981           * Description: USB SFF-8020i protocol handle, request the error type for last wrong transfer.
+  982           *
+  983           * Arguments  : None.
+  984           *
+  985           * Returns    : None.
+  986           *
+  987           * Note(s)    : None.
+  988           ********************************************************************************************************
+             -*
+  989           */
+  990          static void CMD_RequestSense_(void)
+  991          {
+  992   1          uint8 *data_p;
+  993   1      
+  994   1          //XP下当卡不存在时会在TestReady中不停报错，此句使小机不进入忙状态
+  995   1          USBBusy = 0;
+  996   1          ErrorReportFlag = 0;
+  997   1      
+  998   1          switch (ErrorIndicator)
+  999   1          {
+ 1000   2          case 0x00:
+ 1001   2              data_p = (uint8 *) &Request_Sense_cmd_info_NoError;
+ 1002   2              break;
+ 1003   2          case 0x01:
+ 1004   2              data_p = (uint8 *) &Request_Sense_cmd_info_CommandReset;
+ 1005   2              break;
+ 1006   2          case 0x02:
+ 1007   2              data_p = (uint8 *) &Request_Sense_cmd_info_MediaProtect;
+ 1008   2              break;
+ 1009   2          case 0x03:
+ 1010   2              data_p = (uint8 *) &Request_Sense_cmd_info_MediaChg;
+ 1011   2              break;
+ 1012   2          case 0x04:
+ 1013   2              data_p = (uint8 *) &Request_Sense_cmd_info_MediaNotPresent;
+ 1014   2              break;
+ 1015   2              //for autorun
+ 1016   2          case 0x05:
+ 1017   2              data_p = (uint8 *) &CDRom_Request_Sense_command_Invalid_Operation_Code;
+ 1018   2              break;
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 17  
+
+ 1019   2          default:
+ 1020   2              data_p = (uint8 *) &Request_Sense_cmd_info_NoError;
+ 1021   2              break;
+ 1022   2          }
+ 1023   1      
+ 1024   1          Send_Data_To_PC(data_p, CBW_data_buffer._dCBWDataTransferLength);
+ 1025   1          ReportCSW(0);
+ 1026   1      
+ 1027   1          ErrorIndicator = 0;
+ 1028   1      }
+ 1029          
+ 1030          /*
+ 1031           ********************************************************************************************************
+             -*
+ 1032           *                                           CMD_Verify_
+ 1033           *
+ 1034           * Description: USB SFF-8020i protocol handle, device sector verify.
+ 1035           *
+ 1036           * Arguments  : None.
+ 1037           *
+ 1038           * Returns    : None.
+ 1039           *
+ 1040           * Note(s)    : None.
+ 1041           ********************************************************************************************************
+             -*
+ 1042           */
+ 1043          static void CMD_Verify_(void)
+ 1044          {
+ 1045   1          IsReadCapAndReadRec0 = 0;
+ 1046   1          ReportCSW(0);
+ 1047   1      
+ 1048   1      }
+ 1049          
+ 1050          /*
+ 1051           ********************************************************************************************************
+             -*
+ 1052           *                                           CMD_StartStopUnit_
+ 1053           *
+ 1054           * Description: USB SFF-8020i protocol handle, pc eject the device.
+ 1055           *
+ 1056           * Arguments  : None.
+ 1057           *
+ 1058           * Returns    : None.
+ 1059           *
+ 1060           * Note(s)    : None.
+ 1061           ********************************************************************************************************
+             -*
+ 1062           */
+ 1063          static void CMD_StartStopUnit_(void)
+ 1064          {
+ 1065   1          if (CBW_data_buffer._CBWCB[4] == 0x02)
+ 1066   1          {
+ 1067   2              //置PC弹出标志
+ 1068   2              PcEjectFlag = 0x01;
+ 1069   2              //量产工具在win7和win vista下不能发送suspend,通过此命令实现断线
+ 1070   2              FWOpStatus = 0x01;
+ 1071   2          }
+ 1072   1      
+ 1073   1          ReportCSW(0);
+ 1074   1      }
+ 1075          
+ 1076          /*
+ 1077           ********************************************************************************************************
+             -*
+ 1078           *                                           CMD_Philips_
+ 1079           *
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 18  
+
+ 1080           * Description: 新增协议,为支持PD客户philips,上报客户的信息
+ 1081           *
+ 1082           * Arguments  : None.
+ 1083           *
+ 1084           * Returns    : None.
+ 1085           *
+ 1086           * Note(s)    : None.
+ 1087           ********************************************************************************************************
+             -*
+ 1088           */
+ 1089          void CMD_Philips_(void)
+ 1090          {
+ 1091   1          uint32 tmp;
+ 1092   1          DMA_DT_Trnsfr_t dma_transfer;
+ 1093   1      
+ 1094   1          EPA_In_Rdy();
+ 1095   1      
+ 1096   1          sFlash_Rds(RW_FIX, 0, DATABUFFER);
+ 1097   1          tmp = *(uint32 *) (DATABUFFER + 512 - 6);
+ 1098   1      
+ 1099   1          uprintf("addr=%x\n", tmp);
+ 1100   1      
+ 1101   1          sFlash_Rds(RW_FIX, tmp, DATABUFFER);
+ 1102   1          dma_transfer.source_addr = DATABUFFER;
+ 1103   1          dma_transfer.dst_addr = URAMSTARTADDR;
+ 1104   1          dma_transfer.length = 0x200;
+ 1105   1          dma_transfer.pagenum = DRAM_TO_USBFIFO;
+ 1106   1          DMA_Data_Transfer(&dma_transfer);
+ 1107   1          Wait_PrevDMA_TransEnd();
+ 1108   1      
+ 1109   1          sFlash_Rds(RW_FIX, tmp + 1, DATABUFFER);
+ 1110   1          dma_transfer.source_addr = DATABUFFER;
+ 1111   1          dma_transfer.dst_addr = URAMSTARTADDR;
+ 1112   1          dma_transfer.length = 0x200;
+ 1113   1          dma_transfer.pagenum = DRAM_TO_USBFIFO;
+ 1114   1          DMA_Data_Transfer(&dma_transfer);
+ 1115   1          Wait_PrevDMA_TransEnd();
+ 1116   1      
+ 1117   1          sFlash_Rds(RW_FIX, tmp + 2, DATABUFFER);
+ 1118   1          dma_transfer.source_addr = DATABUFFER;
+ 1119   1          dma_transfer.dst_addr = URAMSTARTADDR;
+ 1120   1          dma_transfer.length = 0x200;
+ 1121   1          dma_transfer.pagenum = DRAM_TO_USBFIFO;
+ 1122   1          DMA_Data_Transfer(&dma_transfer);
+ 1123   1          Wait_PrevDMA_TransEnd();
+ 1124   1      
+ 1125   1          ReportCSW(0);
+ 1126   1      }
+ 1127          
+ 1128          /*
+ 1129           ********************************************************************************************************
+             -*
+ 1130           *                                           CMD_SwitchToADFU
+ 1131           *
+ 1132           * Description: ADFU protocol handle, switch from udisk mode to adfu upgrade mode.
+ 1133           *
+ 1134           * Arguments  : None.
+ 1135           *
+ 1136           * Returns    : None.
+ 1137           *
+ 1138           * Note(s)    : Will load the adfu segment and cover encrypt disk segment.
+ 1139           ********************************************************************************************************
+             -*
+ 1140           */
+ 1141          static void CMD_SwitchToADFU(void)
+ 1142          {
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 19  
+
+ 1143   1          //flash非保护/单盘符情况下不需要判断是否是写Flash盘
+ 1144   1          if ((FlashWPFlag == 0x00) && ((DiskAppearSelect != 0x00) || (CBW_data_buffer._bCBWLUN == 0x01)))
+ 1145   1          {
+ 1146   2              CanSwitchToADFU = 0xff;
+ 1147   2              SwitchToADFUFlag = 0xff;
+ 1148   2              //认为是进入升级状态，用于升级时屏蔽PC对卡的read操作
+ 1149   2              IsInAdfuState = 0xff;
+ 1150   2          }
+ 1151   1          else
+ 1152   1          {
+ 1153   2              CanSwitchToADFU = 0x00;
+ 1154   2          }
+ 1155   1      
+ 1156   1          Send_Data_To_PC(&CanSwitchToADFU, CBW_data_buffer._dCBWDataTransferLength);
+ 1157   1      
+ 1158   1          ReportCSW(0);
+ 1159   1      }
+ 1160          
+ 1161          /*
+ 1162           ********************************************************************************************************
+             -*
+ 1163           *                                           CMD_IsActions
+ 1164           *
+ 1165           * Description: ADFU protocol handle, inquiry if the device is base on ACTIONS ic.
+ 1166           *
+ 1167           * Arguments  : None.
+ 1168           *
+ 1169           * Returns    : None.
+ 1170           *
+ 1171           * Note(s)    : None.
+ 1172           ********************************************************************************************************
+             -*
+ 1173           */
+ 1174          static void CMD_IsActions(void)
+ 1175          {
+ 1176   1          if (IsReadCapAndReadRec0 == 0x02)
+ 1177   1          {
+ 1178   2              IsNotFormat = 0x01;
+ 1179   2          }
+ 1180   1          else
+ 1181   1          {
+ 1182   2              IsNotFormat = 0x00;
+ 1183   2          }
+ 1184   1      
+ 1185   1          IsReadCapAndReadRec0 = 0x00;
+ 1186   1      
+ 1187   1          //单盘符情况下不需要判断是否是写Flash盘，写Flash?
+ 1188   1          if ((DiskAppearSelect != 0x00) || (CBW_data_buffer._bCBWLUN == 0x01))
+ 1189   1          {
+ 1190   2              if (CBW_data_buffer._dCBWDataTransferLength == 0x0B)
+ 1191   2              {
+ 1192   3                  Send_Data_To_PC(ActionsFlag, CBW_data_buffer._dCBWDataTransferLength);
+ 1193   3              }
+ 1194   2              else
+ 1195   2              {
+ 1196   3                  Send_Data_To_PC(actions_solution_flag, CBW_data_buffer._dCBWDataTransferLength);
+ 1197   3              }
+ 1198   2          }
+ 1199   1          else
+ 1200   1          {
+ 1201   2              Send_Data_To_PC(DATABUFFER, CBW_data_buffer._dCBWDataTransferLength);
+ 1202   2          }
+ 1203   1      
+ 1204   1          ReportCSW(0);
+ 1205   1      }
+ 1206          
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 20  
+
+ 1207          /*
+ 1208           ********************************************************************************************************
+             -*
+ 1209           *                                           Get_User_DefinedID
+ 1210           *
+ 1211           * Description:ADFU protocol handle, 读取设备固件量产时写入LFI_Head中的用户自定义ID.
+ 1212           *
+ 1213           * Arguments  : None.
+ 1214           *
+ 1215           * Returns    : None.
+ 1216           *
+ 1217           * Note(s)    : None.
+ 1218           ********************************************************************************************************
+             -*
+ 1219           */
+ 1220          static void Get_User_DefinedID(void)
+ 1221          {
+ 1222   1          //读SD区头扇区数据到Uram中DataBuffer起始的地方去
+ 1223   1          sFlash_Rds(RW_FIX, 0x00, DATABUFFER);
+ 1224   1      
+ 1225   1          *((uint16 *) ((uint8 *) DATABUFFER + 284)) = 50;
+ 1226   1          *((uint16 *) ((uint8 *) DATABUFFER + 286)) = 0;
+ 1227   1      
+ 1228   1          Data_Decrypt_Xor((DATABUFFER + 284), 50);
+ 1229   1      
+ 1230   1          Send_Data_To_PC((DATABUFFER + 284), CBW_data_buffer._dCBWDataTransferLength);
+ 1231   1      
+ 1232   1          ReportCSW(0);
+ 1233   1      }
+ 1234          
+ 1235          /*
+ 1236           ********************************************************************************************************
+             -*
+ 1237           *                                           Data_Decrypt_Xor
+ 1238           *
+ 1239           * Description: 对数据进行解密(不能大于256byte).
+ 1240           *
+ 1241           * Arguments  : dataAddr:data address; dataLength:data decrypt length.
+ 1242           *
+ 1243           * Returns    : None.
+ 1244           *
+ 1245           * Note(s)    : None.
+ 1246           ********************************************************************************************************
+             -*
+ 1247           */
+ 1248          static void Data_Decrypt_Xor(uint8 *dataAddr, uint8 dataLength)
+ 1249          {
+ 1250   1          uint8 i;
+ 1251   1      
+ 1252   1          for (i = 0; i < dataLength; i++)
+ 1253   1          {
+ 1254   2              *dataAddr = (*dataAddr - decrypt_key) ^ decrypt_key + 0x7f;
+ 1255   2              dataAddr++;
+ 1256   2          }
+ 1257   1      }
+ 1258          
+ 1259          /*
+ 1260           ********************************************************************************************************
+             -*
+ 1261           *                                           Set_Device_Info
+ 1262           *
+ 1263           * Description: 设置设备信息(如DeviceID、时间等)
+ 1264           *
+ 1265           * Arguments  : None.
+ 1266           *
+ 1267           * Returns    : None.
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 21  
+
+ 1268           *
+ 1269           * Note(s)    : 默认只有写方向,设置时间.
+ 1270           ********************************************************************************************************
+             -*
+ 1271           */
+ 1272          static void Set_Device_Info(void)
+ 1273          {
+ 1274   1          uint8 i;
+ 1275   1          kval_t *kval_p;
+ 1276   1      
+ 1277   1          EPB_OutRdy_FIFOFullNAK();
+ 1278   1      
+ 1279   1          //Data Packet Received Interrupt
+ 1280   1          while ((SHORTPCKIRQ & 0x20) == 0x00)
+ 1281   1          {
+ 1282   2      #ifdef _PRINT_DEBUG_
+                       prints("cmd:0xb0 err\n");
+               #endif
+ 1285   2          }
+ 1286   1      
+ 1287   1          for (i = 0; i < CBW_data_buffer._dCBWDataTransferLength; i++)
+ 1288   1          {
+ 1289   2              TempBuffer[i] = Fifo2dat;
+ 1290   2          }
+ 1291   1      
+ 1292   1          EndianReverse(TempBuffer, 2);
+ 1293   1      
+ 1294   1          TM_SetDate((date_t *) TempBuffer);
+ 1295   1          TM_SetTime((time_t *) (TempBuffer + 4));
+ 1296   1      
+ 1297   1          //将systemtime 写回到VRAM中
+ 1298   1          sFlash_Rds(RW_FIX, SDDiskCap, DATABUFFER);
+ 1299   1          //将全局变量systemtime更新Vram中去
+ 1300   1          kval_p = DATABUFFER;
+ 1301   1          kval_p->systemtime = systemtime; //全局变量
+ 1302   1          sFlash_Wrts(RW_FIX, SDDiskCap, DATABUFFER);
+ 1303   1      
+ 1304   1          ReportCSW(0);
+ 1305   1      }
+ 1306          
+ 1307          /*
+ 1308           ********************************************************************************************************
+             -*
+ 1309           *                                           Access_Device_Info
+ 1310           *
+ 1311           * Description: set/get infomation，此协议为统一后的set/get infomation协议
+ 1312           *
+ 1313           * Arguments  : None.
+ 1314           *
+ 1315           * Returns    : None.
+ 1316           *
+ 1317           * Note(s)    : 当前此协议仅用来处理图片、视频转换工具获取屏的大小
+ 1318           ********************************************************************************************************
+             -*
+ 1319           */
+ 1320          static void Access_Device_Info(void)
+ 1321          {
+ 1322   1          uint16 *data_p;
+ 1323   1      
+ 1324   1          data_p = DATABUFFER;
+ 1325   1          if ((CBW_data_buffer._CBWCB[1] == 0xc0) && (CBW_data_buffer._CBWCB[2] == 0x0c))
+ 1326   1          {
+ 1327   2              *data_p = 0; //(uint16)GetLCDWidth();
+ 1328   2              data_p++;
+ 1329   2              *data_p = 0; //(uint16)GetLCDHeight();
+ 1330   2              Send_Data_To_PC(DATABUFFER, CBW_data_buffer._dCBWDataTransferLength);
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 22  
+
+ 1331   2              ReportCSW(0);
+ 1332   2          }
+ 1333   1          else
+ 1334   1          {
+ 1335   2              lsNotSuppCMD();
+ 1336   2          }
+ 1337   1      }
+ 1338          
+ 1339          /*
+ 1340           ********************************************************************************************************
+             -*
+ 1341           *                                           CMD_Read_TOC
+ 1342           *
+ 1343           * Description: for autorun.
+ 1344           *
+ 1345           * Arguments  : None.
+ 1346           *
+ 1347           * Returns    : None.
+ 1348           *
+ 1349           * Note(s)    : None.
+ 1350           ********************************************************************************************************
+             -*
+ 1351           */
+ 1352          //for autorun
+ 1353          static void CMD_Read_TOC(void)
+ 1354          {
+ 1355   1          if (CBW_data_buffer._dCBWDataTransferLength > 24)
+ 1356   1          {
+ 1357   2              CSWBuffer._dCSWDataResidue = CBW_data_buffer._dCBWDataTransferLength - 24;
+ 1358   2              CBW_data_buffer._dCBWDataTransferLength = 24;
+ 1359   2          }
+ 1360   1      
+ 1361   1          Send_Data_To_PC((uint8 *) &Read_TOC_command_information, CBW_data_buffer._dCBWDataTransferLength);
+ 1362   1      
+ 1363   1          ReportCSW(0);
+ 1364   1      }
+ 1365          
+ 1366          void CMD_Mechanism_Status(void)
+ 1367          {
+ 1368   1          if (CBW_data_buffer._dCBWDataTransferLength > 13)
+ 1369   1          {
+ 1370   2              CSWBuffer._dCSWDataResidue = CBW_data_buffer._dCBWDataTransferLength - 13;
+ 1371   2              CBW_data_buffer._dCBWDataTransferLength = 13;
+ 1372   2          }
+ 1373   1      
+ 1374   1          Send_Data_To_PC((uint8 *) &Mechanism_Status_command_information, CBW_data_buffer._dCBWDataTransferLen
+             -gth);
+ 1375   1      
+ 1376   1          ReportCSW(0);
+ 1377   1      }
+ 1378          
+ 1379          static void CMD_ReadDiscInformation(void)
+ 1380          {
+ 1381   1          if (CBW_data_buffer._dCBWDataTransferLength > 28)
+ 1382   1          {
+ 1383   2              CSWBuffer._dCSWDataResidue = CBW_data_buffer._dCBWDataTransferLength - 28;
+ 1384   2              CBW_data_buffer._dCBWDataTransferLength = 28;
+ 1385   2          }
+ 1386   1      
+ 1387   1          Send_Data_To_PC((uint8 *) &CDRom_Request_DISCINFORMATION, CBW_data_buffer._dCBWDataTransferLength);
+ 1388   1      
+ 1389   1          ReportCSW(0);
+ 1390   1      }
+ 1391          
+ 1392          static void CMD_WriteCD_(void)
+ 1393          {
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 23  
+
+ 1394   1          bWriteCD_ROM = 0x80;
+ 1395   1          CMD_Write10_();
+ 1396   1      }
+ 1397          
+ 1398          static void CMD_PlayAudio(void)
+ 1399          {
+ 1400   1          ReportCSW(0x05); //media change
+ 1401   1      }
+ 1402          
+ 1403          static void CMD_Read_Autorun_Record_(void)
+ 1404          {
+ 1405   1          uint8 i;
+ 1406   1          for (i = 0; i < 8; i++)
+ 1407   1          {
+ 1408   2          }
+ 1409   1          CMD_Read10_();
+ 1410   1      }
+ 1411          
+ 1412          //for autorun end
+ 1413          
+ 1414          
+ 1415          /*
+ 1416           ********************************************************************************************************
+             -*
+ 1417           *                                           sRestoreNormalCSW
+ 1418           *
+ 1419           * Description: send CSW.
+ 1420           *
+ 1421           * Arguments  : err_type-error type
+ 1422           *
+ 1423           * Returns    : None.
+ 1424           *
+ 1425           * Note(s)    : None.
+ 1426           ********************************************************************************************************
+             -*
+ 1427           */
+ 1428          void ReportCSW(uint8 err_type)
+ 1429          {
+ 1430   1          if (err_type != 0x00)
+ 1431   1          {
+ 1432   2              ErrorIndicator = err_type;
+ 1433   2              CSWBuffer._bCSWStatus = 0x01;
+ 1434   2              CSWBuffer._dCSWDataResidue = CBW_data_buffer._dCBWDataTransferLength;
+ 1435   2          }
+ 1436   1      
+ 1437   1          EndianReverse((uint8 *) (&CSWBuffer._dCSWDataResidue), 4);
+ 1438   1      
+ 1439   1          Send_CSW();
+ 1440   1          bulk_out_back();
+ 1441   1      
+ 1442   1          CSWBuffer._bCSWStatus = 0x00;
+ 1443   1          CSWBuffer._dCSWDataResidue = 0x00;
+ 1444   1      }
+ 1445          
+ 1446          /*
+ 1447           ********************************************************************************************************
+             -*
+ 1448           *                                           bulk_out_back
+ 1449           *
+ 1450           * Description: Epa interrupt function return.
+ 1451           *
+ 1452           * Arguments  : None.
+ 1453           *
+ 1454           * Returns    : None.
+ 1455           *
+ 1456           * Note(s)    : None.
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 24  
+
+ 1457           ********************************************************************************************************
+             -*
+ 1458           */
+ 1459          void bulk_out_back(void)
+ 1460          {
+ 1461   1          if ((sFlashLedFlag) != 0x00)
+ 1462   1          {
+ 1463   2              //是否要闪灯
+ 1464   2              (*((void( *)()) (sFlashLed)))();
+ 1465   2          }
+ 1466   1      
+ 1467   1          //收到ADFU detach命令后,不会立即断线,需要将之后的命令转换为ADFU命令,防止USB状态更新,刷图重启
+ 1468   1          IsAdfuCondition = detach_cmd_rcv | IsAdfuCondition;
+ 1469   1          if (IsAdfuCondition == 0x00)
+ 1470   1          {
+ 1471   2              //CMD_TestUnitReady_命令不能影响UpOrDownLoad，也即不能影响显示
+ 1472   2              if (USBBusy != 0x00)
+ 1473   2              {
+ 1474   3                  if (UpOrDownLoadBak != UpOrDownLoad)
+ 1475   3                  {
+ 1476   4                      //01:上传  02:下传
+ 1477   4                      UpOrDownLoadBak = UpOrDownLoad;
+ 1478   4                      //disable USB INT,做显示任务
+ 1479   4                      AIE = AIE & (uint8) 0xfe;
+ 1480   4                  }
+ 1481   3              }
+ 1482   2          }
+ 1483   1          else
+ 1484   1          {
+ 1485   2              //disable USB INT
+ 1486   2              AIE = AIE & (uint8) 0xfe;
+ 1487   2          }
+ 1488   1      }
+ 1489          
+ 1490          /*
+ 1491           ********************************************************************************************************
+             -*
+ 1492           *                                           Fix_Nrmlmode_RWSctrs
+ 1493           *
+ 1494           * Description: 计算Udisk读写Flash需要用普通模式和Umode读写的扇区数,并计算后一次需要用普通模式读写扇区数.
+ 1495           *
+ 1496           * Arguments  : None.
+ 1497           *
+ 1498           * Returns    : a: 本次UDisk需用普通模式读写的扇区数.
+ 1499           *
+ 1500           * Note(s)    : 会更新总的Umode读写扇区数和结尾的普通模式读写扇区数,没有保护使用过的寄存器.
+ 1501           ********************************************************************************************************
+             -*
+ 1502           */
+ 1503          static uint16 Fix_Nrmlmode_RWSctrs(void)
+ 1504          {
+ 1505   1          uint16 tmp;
+ 1506   1          uint16 tmp1;
+ 1507   1          uint16 ret;
+ 1508   1          uint8 pagesize;
+ 1509   1      
+ 1510   1          pagesize = (uint8) flash_page_sctrnum;
+ 1511   1          //page内sector数为2的整次幂
+ 1512   1          tmp = (uint16) LBA & (pagesize - 1);
+ 1513   1      
+ 1514   1          if (tmp != 0x00)
+ 1515   1          {
+ 1516   2              tmp = pagesize - tmp;
+ 1517   2          }
+ 1518   1      
+ 1519   1          if (udisk_rw_sctr_num < tmp)
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 25  
+
+ 1520   1          {
+ 1521   2              ret = udisk_rw_sctr_num;
+ 1522   2              flash_normal_rw_sctrs = 0;
+ 1523   2              udisk_rw_sctr_num = 0;
+ 1524   2          }
+ 1525   1          else
+ 1526   1          {
+ 1527   2              ret = tmp;
+ 1528   2              tmp1 = udisk_rw_sctr_num - tmp;
+ 1529   2              flash_normal_rw_sctrs = tmp1 & (pagesize - 1);
+ 1530   2              udisk_rw_sctr_num = tmp1 - flash_normal_rw_sctrs;
+ 1531   2          }
+ 1532   1          return ret;
+ 1533   1      }
+ 1534          
+ 1535          /*
+ 1536           ********************************************************************************************************
+             -*
+ 1537           *                                           Ajust_Data_Length
+ 1538           *
+ 1539           * Description: Calculate the maximun data length in this data transfer.
+ 1540           *
+ 1541           * Arguments  : length: the total data length; largestLength: the largest packet length.
+ 1542           *
+ 1543           * Returns    :  the transfer data length.
+ 1544           *
+ 1545           * Note(s)    : None.
+ 1546           ********************************************************************************************************
+             -*
+ 1547           */
+ 1548          static uint32 Ajust_Data_Length(uint32 length, uint32 largestLength)
+ 1549          {
+ 1550   1          if (length >= largestLength)
+ 1551   1          {
+ 1552   2              return largestLength;
+ 1553   2          }
+ 1554   1          else
+ 1555   1          {
+ 1556   2              return length;
+ 1557   2          }
+ 1558   1      }
+ 1559          
+ 1560          /*
+ 1561           ********************************************************************************************************
+             -*
+ 1562           *                                           Udisk_NrmlMode_Read
+ 1563           *
+ 1564           * Description: Udisk下普通模式读(因Flash只有Page对齐地址才能使用快速模式读写).
+ 1565           *
+ 1566           * Arguments  : e: Udisk非快速模式读扇区数.
+ 1567           *
+ 1568           * Returns    : None.
+ 1569           *
+ 1570           * Note(s)    : 只针对Flash作此Page对齐读动作,没有保护使用过的寄存器.
+ 1571           ********************************************************************************************************
+             -*
+ 1572           */
+ 1573          static void Udisk_NrmlMode_Read(uint32 readnum)
+ 1574          {
+ 1575   1          DMA_DT_Trnsfr_t dma_transfer;
+ 1576   1      
+ 1577   1          while (readnum != 0)
+ 1578   1          {
+ 1579   2              ClearWatchdog();
+ 1580   2              sectors_trans_once = Ajust_Data_Length(readnum, MAX_NORMAL_RW_SETCORS);
+ 1581   2              readnum = readnum - sectors_trans_once;
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 26  
+
+ 1582   2      
+ 1583   2              sReadSectorsToBuff((uint8 *) DATABUFFER);
+ 1584   2      
+ 1585   2              dma_transfer.source_addr = DATABUFFER;
+ 1586   2              dma_transfer.dst_addr = URAMSTARTADDR;
+ 1587   2              dma_transfer.length = sectors_trans_once * 0x200;
+ 1588   2              dma_transfer.pagenum = DRAM_TO_USBFIFO;
+ 1589   2              DMA_Data_Transfer(&dma_transfer);
+ 1590   2              Wait_PrevDMA_TransEnd();
+ 1591   2          }
+ 1592   1      }
+ 1593          
+ 1594          /*
+ 1595           ********************************************************************************************************
+             -*
+ 1596           *                                           Udisk_NrmlMode_Write
+ 1597           *
+ 1598           * Description: Udisk下普通模式写(因Flash只有Page对齐地址才能使用快速模式读写).
+ 1599           *
+ 1600           * Arguments  : e: Udisk普通模式写扇区数.
+ 1601           *
+ 1602           * Returns    : None.
+ 1603           *
+ 1604           * Note(s)    : 只针对Flash作此Page对齐写动作,没有保护使用过的寄存器.
+ 1605           ********************************************************************************************************
+             -*
+ 1606           */
+ 1607          static void Udisk_NrmlMode_Write(uint32 readnum)
+ 1608          {
+ 1609   1          DMA_DT_Trnsfr_t dma_transfer;
+ 1610   1      
+ 1611   1          while (readnum != 0)
+ 1612   1          {
+ 1613   2              ClearWatchdog();
+ 1614   2              sectors_trans_once = Ajust_Data_Length(readnum, MAX_NORMAL_RW_SETCORS);
+ 1615   2      
+ 1616   2              dma_transfer.source_addr = URAMSTARTADDR;
+ 1617   2              dma_transfer.dst_addr = DATABUFFER;
+ 1618   2              dma_transfer.length = sectors_trans_once * 0x200;
+ 1619   2              dma_transfer.pagenum = USBFIFO_TO_DRAM;
+ 1620   2              DMA_Data_Transfer(&dma_transfer);
+ 1621   2              Wait_PrevDMA_TransEnd();
+ 1622   2      
+ 1623   2              sProgramSectorsToStorage((uint8 *) DATABUFFER);
+ 1624   2      
+ 1625   2              readnum = readnum - sectors_trans_once;
+ 1626   2          }
+ 1627   1      }
+ 1628          
+ 1629          /*
+ 1630           ********************************************************************************************************
+             -*
+ 1631           *                                           Udisk_FIFOMode_Read
+ 1632           *
+ 1633           * Description: Udisk下FIFO直通模式读.
+ 1634           *
+ 1635           * Arguments  : readnum: Udisk读扇区数.
+ 1636           *
+ 1637           * Returns    : None.
+ 1638           *
+ 1639           * Note(s)    :
+ 1640           ********************************************************************************************************
+             -*
+ 1641           */
+ 1642          static void Udisk_FIFOMode_Read(uint32 readnum)
+ 1643          {
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 27  
+
+ 1644   1          DMA_DT_Trnsfr_t dma_transfer;
+ 1645   1      
+ 1646   1          fifo_trans_mode = 0x01;
+ 1647   1      
+ 1648   1          while (readnum != 0)
+ 1649   1          {
+ 1650   2              ClearWatchdog();
+ 1651   2              sectors_trans_once = Ajust_Data_Length(readnum, MAX_FIFO_RW_SETCORS);
+ 1652   2              readnum = readnum - sectors_trans_once;
+ 1653   2      
+ 1654   2              dma_transfer.source_addr = 0;
+ 1655   2              dma_transfer.dst_addr = 0;
+ 1656   2              dma_transfer.length = (uint16) sectors_trans_once * 0x200;
+ 1657   2      
+ 1658   2              dma_transfer.pagenum = FLASHFIFO_TO_USBFIFO;
+ 1659   2              if ((flashorcard_rwflag != 0) || (flash_type == 0x04))
+ 1660   2              {
+ 1661   3                  dma_transfer.pagenum = CARDFIFO_TO_USBFIFO;
+ 1662   3                  DMA_Data_Transfer(&dma_transfer);
+ 1663   3              }
+ 1664   2              else
+ 1665   2              {
+ 1666   3                  SFR_BANK = BANK_DMA_CARD;
+ 1667   3                  DMAnCTL1 = FLASHFIFO_TO_USBFIFO;
+ 1668   3                  SFR_BANK = BANK_USB;
+ 1669   3              }
+ 1670   2      
+ 1671   2              sReadSectorsToBuff((uint8*) DATABUFFER);
+ 1672   2              Wait_PrevDMA_TransEnd();
+ 1673   2      
+ 1674   2          }
+ 1675   1      
+ 1676   1          fifo_trans_mode = 0x00;
+ 1677   1      }
+ 1678          
+ 1679          /*
+ 1680           ********************************************************************************************************
+             -*
+ 1681           *                                           Udisk_FIFOMode_Write
+ 1682           *
+ 1683           * Description: Udisk下FIFO直通模式写(因Flash只有Page对齐地址才能使用快速模式读写).
+ 1684           *
+ 1685           * Arguments  : readnum: Udisk写扇区数.
+ 1686           *
+ 1687           * Returns    : None.
+ 1688           *
+ 1689           * Note(s)    :只针对Flash作此Page对齐写动作
+ 1690           ********************************************************************************************************
+             -*
+ 1691           */
+ 1692          static void Udisk_FIFOMode_Write(uint32 readnum)
+ 1693          {
+ 1694   1          DMA_DT_Trnsfr_t dma_transfer;
+ 1695   1      
+ 1696   1          fifo_trans_mode = 0x01;
+ 1697   1          while (readnum != 0)
+ 1698   1          {
+ 1699   2              ClearWatchdog();
+ 1700   2              sectors_trans_once = Ajust_Data_Length(readnum, MAX_FIFO_RW_SETCORS);
+ 1701   2      
+ 1702   2              dma_transfer.source_addr = 0;
+ 1703   2              dma_transfer.dst_addr = 0;
+ 1704   2              dma_transfer.length = (uint16) sectors_trans_once * 0x200;
+ 1705   2              dma_transfer.pagenum = USBFIFO_TO_FLASHFIFO;
+ 1706   2              if ((flashorcard_rwflag != 0) || (flash_type == 0x04))
+ 1707   2              {
+C251 COMPILER V4.55,  UDiskBulkCommand                                                     15/07/16  16:03:51  PAGE 28  
+
+ 1708   3                  dma_transfer.pagenum = USBFIFO_TO_CARDFIFO;
+ 1709   3                  DMA_Data_Transfer(&dma_transfer);
+ 1710   3              }
+ 1711   2              else
+ 1712   2              {
+ 1713   3                  SFR_BANK = BANK_DMA_CARD;
+ 1714   3                  DMAnCTL1 = USBFIFO_TO_FLASHFIFO;
+ 1715   3                  SFR_BANK = BANK_USB;
+ 1716   3              }
+ 1717   2              sProgramSectorsToStorage((uint8*) DATABUFFER);
+ 1718   2              Wait_PrevDMA_TransEnd();
+ 1719   2      
+ 1720   2              readnum = readnum - sectors_trans_once;
+ 1721   2          }
+ 1722   1          fifo_trans_mode = 0x00;
+ 1723   1      }
+ 1724          #pragma ROM(HUGE)
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      3633     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        10     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

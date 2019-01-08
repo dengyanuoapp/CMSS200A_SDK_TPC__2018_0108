@@ -1,0 +1,53 @@
+### uVision2 Project, (C) Keil Software
+### Do not modify !
+
+ cExt (*.c)
+ aExt (*.s*; *.src; *.a*)
+ oExt (*.obj)
+ lExt (*.lib)
+ tExt (*.txt; *.h; *.inc)
+ pExt (*.plm)
+ CppX (*.cpp)
+ DaveTm { 0,0,0,0,0,0,0,0 }
+
+Target (usound), 0x0001 // Tools: 'MCS-251'
+GRPOPT 1,(inc),0,0,0
+GRPOPT 2,(src),0,0,0
+GRPOPT 3,(api),0,0,0
+
+OPTFFF 1,1,5,0,0,0,0,0,<..\..\..\libsrc\usb\udisklib.h><udisklib.h> 
+OPTFFF 1,2,5,0,0,0,0,0,<..\..\..\libsrc\usb\USB.h><USB.h> 
+OPTFFF 2,3,1,0,0,0,0,0,<..\..\..\libsrc\usb\UsbInitExitFun.c><UsbInitExitFun.c> 
+OPTFFF 2,4,1,0,0,0,0,0,<..\..\..\libsrc\usb\ADFUFunc.c><ADFUFunc.c> 
+OPTFFF 2,5,2,0,0,0,0,0,<..\..\..\libsrc\usb\checkcard.A51><checkcard.A51> 
+OPTFFF 2,6,1,0,0,0,0,0,<..\..\..\libsrc\usb\ControlFun.c><ControlFun.c> 
+OPTFFF 2,7,1,0,0,0,0,0,<..\..\..\libsrc\usb\EnDecrypt.c><EnDecrypt.c> 
+OPTFFF 2,8,1,0,0,0,0,0,<..\..\..\libsrc\usb\Storage_Oper.c><Storage_Oper.c> 
+OPTFFF 2,9,1,0,0,0,0,0,<..\..\..\libsrc\usb\UDisk20IRQMain.c><UDisk20IRQMain.c> 
+OPTFFF 2,10,1,0,0,0,0,0,<..\..\..\libsrc\usb\UDisk20SetupPktParsing.c><UDisk20SetupPktParsing.c> 
+OPTFFF 2,11,1,0,0,0,0,0,<..\..\..\libsrc\usb\UDiskBulkCommand.c><UDiskBulkCommand.c> 
+OPTFFF 2,12,1,0,0,0,0,0,<..\..\..\libsrc\usb\UDiskData.c><UDiskData.c> 
+OPTFFF 2,13,1,0,0,0,0,0,<..\..\..\libsrc\usb\UdiskFS.c><UdiskFS.c> 
+OPTFFF 2,14,2,0,0,0,0,0,<..\..\..\libsrc\usb\UdiskHost.A51><UdiskHost.A51> 
+OPTFFF 2,15,1,0,0,0,0,0,<..\..\..\libsrc\usb\UdiskInit.c><UdiskInit.c> 
+OPTFFF 2,16,1,0,0,0,0,0,<..\..\..\libsrc\usb\UsbBulkTFun.c><UsbBulkTFun.c> 
+OPTFFF 3,17,4,0,0,0,0,0,<..\..\..\lib\actos30api.LIB><actos30api.LIB> 
+
+
+TARGOPT 1, (usound)
+ CLK251=16000000
+  OPTTT 0,1,1,0
+  OPTHX 0,65535,0,0,0
+  OPTLX 120,65,8,<..\..\..\obj\lib\usound\>
+  OPTOX 16
+  OPTLT 1,1,1,0,1,1,0,1,0,0,0,0
+  OPTXL 1,1,1,1,1,1,1,0,0
+  OPTFL 0,0,1
+  OPTAX 0
+  OPTDL (S251.DLL)(-Flip251)(DP51.DLL)(-p251S)(S251.DLL)()(TP51.DLL)(-p251S)
+  OPTDBG 47614,1,()()()()()()()()()() (E:\Program Files\ATD_V2.1\UDI\ActsAGDI.dll)()()()
+  OPTDF 0x0
+  OPTLE <>
+  OPTLC <>
+EndOpt
+

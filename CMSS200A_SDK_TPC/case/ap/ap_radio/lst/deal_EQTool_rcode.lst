@@ -1,0 +1,66 @@
+C251 COMPILER V4.55,  deal_EQTool_rcode                                                    23/05/16  10:42:13  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE deal_EQTool_rcode
+OBJECT MODULE PLACED IN .\obj\deal_EQTool_rcode.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\common\deal_EQTool_rcode.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIM
+                    -IZE(9,SPEED) BROWSE ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE(CHECKALARM) DEBUG PRINT(.\lst\de
+                    -al_EQTool_rcode.lst) OBJECT(.\obj\deal_EQTool_rcode.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        ap common lib file, udisk use this file too
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: deal_EQTool_cmd.c,v 1.1.1.1 2006/05/22 03:23:59 selina Exp $
+   10           *******************************************************************************
+   11           */
+   12          
+   13          #include "eqtool.h"
+   14          
+   15          #pragma name(COM_EQTOOL_RCODE)
+   16          
+   17          void deal_pc_eqsrs(uint8 aptype)
+   18          {
+   19   1          uint8 *usbtestcmd_p;
+   20   1          uint8 eqcmd;
+   21   1      
+   22   1          usbtestcmd_p = (uint8 *) USBTESTABUFFER;
+   23   1          eqcmd = *usbtestcmd_p;
+   24   1      
+   25   1          if ((eqcmd == EQSET) || (eqcmd == SRSSET) || (eqcmd == VOLUMESET) || (eqcmd == EQSAVE) || (eqcmd == S
+             -RSSAVE))
+   26   1          {
+   27   2              deal_pc_eqsrs_sub(aptype);
+   28   2          }
+   29   1          return;
+   30   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =        39     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

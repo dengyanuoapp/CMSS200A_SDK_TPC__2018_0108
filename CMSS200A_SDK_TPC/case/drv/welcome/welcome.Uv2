@@ -1,0 +1,169 @@
+### uVision2 Project, (C) Keil Software
+### Do not modify !
+
+Target (welcome), 0x0001 // Tools: 'MCS-251'
+
+Group (cfg)
+Group (ssrc)
+Group (lib)
+Group (Hd_Lcd)
+
+File 1,5,<.\welcome.lin><welcome.lin>
+File 1,5,<.\builddrv.bat><builddrv.bat>
+File 1,5,<.\welcome.drvl><welcome.drvl>
+File 2,1,<.\welcome.c><welcome.c>
+File 3,2,<.\showLogoFuncs.A51><showLogoFuncs.A51>
+File 3,4,<..\..\..\psp_rel\lib\LIBC.LIB><LIBC.LIB>
+File 3,4,<..\..\..\psp_rel\lib\APDftSeg.LIB><APDftSeg.LIB>
+File 3,4,<..\..\..\psp_rel\lib\actos30apiH.LIB><actos30apiH.LIB>
+File 4,1,<..\Ui_LED\Hdrv_HardInit.c><Hdrv_HardInit.c>
+File 4,1,<..\Ui_LED\Hdrv_HardDeal.c><Hdrv_HardDeal.c>
+File 4,1,<..\Ui_LED\Sdrv_LEDDisplay.c><Sdrv_LEDDisplay.c>
+
+
+Options 1,0,0  // Target 'welcome'
+ Device (Flip80251 Typhoon)
+ Vendor (Dolphin)
+ Cpu (IRAM(0 - 0x41F) CLOCK(16000000) IROM(0xFF0000-0xFF3FFF))
+ FlashUt ()
+ StupF ("LIB\START251.A51" ("Standard 251 Startup Code"))
+ FlashDR ()
+ DevID (3644)
+ Rgf (REG251S.H)
+ Mem ()
+ C ()
+ A ()
+ RL ()
+ OH ()
+ DBC_IFX ()
+ DBC_CMS ()
+ DBC_AMS ()
+ DBC_LMS ()
+ UseEnv=0
+ EnvBin ()
+ EnvInc ()
+ EnvLib ()
+ EnvReg (ÿIntel\)
+ OrgReg (ÿIntel\)
+ TgStat=16
+ OutDir (.\obj\)
+ OutName (welcome)
+ GenApp=1
+ GenLib=0
+ GenHex=1
+ Debug=1
+ Browse=1
+ LstDir (.\lst\)
+ HexSel=1
+ MG32K=0
+ TGMORE=0
+ RunUsr 0 1 <.\builddrv.bat evb_drv>
+ RunUsr 1 0 <>
+ BrunUsr 0 1 <.\buildlin.bat>
+ BrunUsr 1 0 <>
+ CrunUsr 0 0 <>
+ CrunUsr 1 0 <>
+ SVCSID <>
+ MODEL25=3
+ RTOS25=0
+ ROMSZ25=4
+ DHOLD25=0
+ XHOLD25=0
+ FHOLD25=0
+ T251FL=92
+ CBANKS2=5
+ RCB25 { 0,0,0,0,0,0,0,1,0 }
+ IRO25 { 1,0,0,255,0,0,64,0,0 }
+ ERA25 { 0,0,0,0,0,32,4,0,0 }
+ XRA25 { 0,0,0,0,0,0,0,0,0 }
+ OCM251 { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ C251F1=19476560
+ C251F2=0
+ C251MSC (I4 DF(DEMO_EFUSE=0) DF(DEMO_ADFU=0) DF(WELCOME=1))
+ C251DEF ()
+ C251UDF ()
+ INCC2 (..\..\..\psp_rel\inc;..\..\inc)
+ AX51FL=4
+ AX51MSC (I4 DF(DEMO_EFUSE=0) DF(DEMO_ADFU=0))
+ AX51SET ()
+ AX51RST ()
+ INCA5 (..\..\..\psp_rel\inc;..\..\inc)
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=1
+ AlwaysBuild=0
+ GenAsm=0
+ AsmAsm=0
+ PublicsOnly=0
+ StopCode=3
+ CustArgs ()
+ LibMods ()
+ BankNo=65535
+ LX51FL=301
+ LX51OVL ()
+ LX51MSC ()
+ LX51DWN ()
+ LX51LFI (.\welcome.lin)
+ LX51ASN ()
+ LX51RES ()
+ LX51CCL ()
+ LX51UCL ()
+ LX51CSC ()
+ LX51UCS ()
+ LX51COB ()
+ LX51XDB ()
+ LX51PDB ()
+ LX51BIB ()
+ LX51DAB ()
+ LX51IDB ()
+ LX51PRC ()
+ LX51STK ()
+ LX51COS ()
+ LX51XDS ()
+ LX51BIS ()
+ LX51DAS ()
+ LX51IDS ()
+  OPTDL (S251.DLL)(-Flip251)(DP51.DLL)(-p251S)(S251.DLL)()(TP51.DLL)(-p251S)
+  OPTDBG 47610,1,()()()()()()()()()(..\..\..\..\fwsp\uv2\prj\boot_from_card.ini) (C:\Program Files\ATD_V2.1\UDI\ActsAGDI.dll)()()()
+ FLASH1 { 1,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,0,0,0,0 }
+ FLASH2 ()
+ FLASH3 ("" ())
+ FLASH4 ()
+EndOpt
+
+Options 1,4,0  // Group 'Hd_Lcd'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=65535
+ C251F1=172657322
+ C251F2=0
+ C251MSC ()
+ C251DEF (welcom)
+ C251UDF ()
+ INCC2 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,3,7  // File 'APDftSeg.LIB'
+ PropFld { 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods (?C_START??)
+ BankNo=65535
+EndOpt
+

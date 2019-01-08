@@ -1,0 +1,173 @@
+C251 COMPILER V4.55,  basal_de_tts_b                                                       13/12/18  16:27:26  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE basal_de_tts_b
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\basal\basal_de_tts_b.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\audioBasal\basal_de_tts_b.c XSMALL FUNCTION
+                    -S(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) INCDIR(..\..\..\..\..\inc) DEBUG PRINT(.\list\basal_de_tts_b.lst) OBJECT(..\..\
+                    -..\..\obj\lib\basal\basal_de_tts_b.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              USDK 5102
+    3           *                            Module: POWER MANAGER
+    4           *                 Copyright(c) 2001-2009 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *      wuyueqian     2009-9-07 9:42     1.0             build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * file
+   13           * brief
+   14           * Author   wuyueqian
+   15           * par
+   16           *
+   17           *      Copyright(c) 2001-2007 Actions Semiconductor, All Rights Reserved.
+   18           *
+   19           * version 1.0
+   20           * date  2008/6/12
+   21           *******************************************************************************/
+   22          #include <basal.h>
+   23          #include <decC.h>
+   24          #include <tts_lib.h>
+   25          
+   26          #pragma name(MW_BS_AD_CMD1_TTS)
+   27          
+   28          #define DECODE_BUFFER_ADDRESS_NORMAL 0x0d80//0x1800
+   29          #define WRONG_DECODE_FILE_TYPE 0xf0
+   30          
+   31          #pragma renamecode(MW_BS_AD_CMD1_TTS)
+   32          
+   33          /*************************************************************************
+   34           * SdLoadCommand 初始化codec用的全局变量g_decInitPara，
+   35           * 包括codec的buffer、dma中断的hook函数、歌曲文件的第一帧数据地址等等
+   36           ****************************************************************************/
+   37          bool TTSLoadCommand(BYTE music_type, void *param)
+   38          {
+   39   1          param = param;
+   40   1      
+   41   1          m_deTTSDataBuffer = (BYTE *) DECODE_BUFFER_ADDRESS_NORMAL;
+   42   1      
+   43   1          g_decReadFilePara.ReadFileHandleHook = (DWORD) m_deTTSRead_Data;
+   44   1          g_decReadFilePara.ReadFileBuffAddr = (DWORD) (m_deTTSDataBuffer);
+   45   1          g_decControlInfor.SongType = music_type;
+   46   1      
+   47   1          //if(m_deTTSOpenparam != NULL){
+   48   1          //g_decSongInfor.FileHDRLen = m_deTTSOpenparam->musicframeoffset;
+   49   1          //}
+   50   1          g_decSongInfor.FileHDRLen = 0;
+   51   1      
+   52   1          TTSplay_status.speed = 0x00;
+   53   1      
+   54   1          m_de_TTS_Fp = SD_FOpen(tts_lib, 0);
+   55   1          info_TTS_Fp = SD_FOpen(tts_info, 0);
+   56   1      
+   57   1          if((m_de_TTS_Fp == NULL) || (info_TTS_Fp == NULL))
+C251 COMPILER V4.55,  basal_de_tts_b                                                       13/12/18  16:27:26  PAGE 2   
+
+   58   1          {
+   59   2              TTSplay_status.status = PLAYING_ERROR;
+   60   2              return FALSE;
+   61   2          }
+   62   1          /* 初始化TTS的头 */
+   63   1          SD_FSeek(info_TTS_Fp, SEEK_SET, 0);
+   64   1          SD_FRead(info_TTS_Fp, &tts_info_head, sizeof(tts_header_t));
+   65   1          fix_head_data(&tts_info_head);
+   66   1      
+   67   1          TTSplay_status.status = PLAYING_STOP;
+   68   1      
+   69   1          g_decReadFilePara.FileLen = m_de_TTS_Fp->endaddr - m_de_TTS_Fp->startaddr;
+   70   1          return TRUE;
+   71   1      }
+   72          
+   73          
+   74          #if 0
+               /*************************************************************************
+                * SdStopCommand 停止播放
+                *1 g_decReadFilePara.ReadFilePages在dma hook中被赋值 = deSdBreakPointSave
+                ****************************************************************************/
+               
+               bool TTSStopCommand(void *param)
+               {
+                   param = param;
+                   if(m_deTTSInitFlag)
+                   {
+                       m_deTTSInitFlag = 0;
+                       while (!decExit())
+                       {
+                           ; //qac
+                       }
+                       TM_KillTimer(m_deTTScTimer_Sav);
+                       IRQ_Release(m_deTTSOldDspIntAddrSav, IRQ_DSP);
+                       IRQ_Release(m_deTTSOldDmaIntAddrSav, IRQ_DMA2);
+               
+                       TTSplay_status.status = PLAYING_STOP;
+                   }
+                   return TRUE;
+               }
+               #endif
+   99          
+  100          /*************************************************************************
+  101           * SdPlayCommand 播放
+  102           *
+  103           ****************************************************************************/
+  104          bool TTSPlayCommand(void *param)
+  105          {
+  106   1          param = param;
+  107   1      
+  108   1          if (TTSplay_status.status == PLAYING_ERROR)
+  109   1          {
+  110   2              return FALSE;
+  111   2          }
+  112   1          TTSplay_status.status = PLAYING_PLAYING;//默认为播放状态
+  113   1      
+  114   1          //要从头开始放
+  115   1          g_decControlInfor.PlayMode = PLAY_MODE_NORMAL;
+  116   1          //SD_FSeek(m_de_TTS_Fp, 0, 0);
+  117   1      
+  118   1          //初始化读取数据变量
+  119   1          deTTSSecCount = 0;
+  120   1          deTTSSecOffset = 0;
+  121   1          prev_next_flag = 1;
+  122   1      
+  123   1          m_deTTSInitFlag = 0x1;
+C251 COMPILER V4.55,  basal_de_tts_b                                                       13/12/18  16:27:26  PAGE 3   
+
+  124   1          tts_lib_flag = *(uint8 *)param;
+  125   1      
+  126   1          decInit();
+  127   1          m_deTTSOldDspIntAddrSav = IRQ_Intercept((uint32) decAudioIntSub, IRQ_DSP);
+  128   1          m_deTTSOldDmaIntAddrSav = IRQ_Intercept((uint32) decDMAIntSub, IRQ_DMA2);
+  129   1          m_deTTScTimer_Sav = TM_SetTimer((uint32) decTimerIntSub, 2);
+  130   1          decstart();
+  131   1      
+  132   1          return TRUE;
+  133   1      }
+  134          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       320     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

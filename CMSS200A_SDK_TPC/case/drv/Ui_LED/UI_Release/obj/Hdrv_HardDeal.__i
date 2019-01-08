@@ -1,0 +1,1 @@
+"Hdrv_HardDeal.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\UI_Release\list\Hdrv_HardDeal.lst) OBJECT(.\UI_Release\obj\Hdrv_HardDeal.obj)

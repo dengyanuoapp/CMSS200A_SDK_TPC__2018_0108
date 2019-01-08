@@ -1,0 +1,424 @@
+C251 COMPILER V4.55,  enhanced_tag                                                         13/12/18  16:27:42  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE enhanced_tag
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\enhanced\enhanced_tag.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\enhanced\id3\enhanced_tag.c XSMALL INTR2 FU
+                    -NCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) INCDIR(..\..\..\..\..\inc) DEBUG PRINT(..\..\..\..\obj\lib\enhanced\enhan
+                    -ced_tag.lst) OBJECT(..\..\..\..\obj\lib\enhanced\enhanced_tag.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              USDK 5102
+    3           *                            Module: POWER MANAGER
+    4           *                 Copyright(c) 2001-2009 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *    wuyueqian     2009-9-07 9:42     1.0             build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * file
+   13           * brief
+   14           * Author   wuyueqian
+   15           * par
+   16           *
+   17           *      Copyright(c) 2001-2007 Actions Semiconductor, All Rights Reserved.
+   18           *
+   19           * version 1.0
+   20           * date  2008/6/12
+   21           *******************************************************************************/
+   22          
+   23          #include <actos.h>
+   24          #include <enhanced.h>
+   25          #include <stringH.h>
+   26          #include <lang_id.h>
+   27          
+   28          #pragma name(MW_EH_ID3)
+   29          
+   30          #pragma renamecode(MW_EH_ID3)
+   31          
+   32          #define ID3_BUFFER 0x0d80//0x1800
+   33          extern char *TempBuf; //read file buffer
+   34          
+   35          extern uint8 karaoke_flag;
+   36          extern uint8 actrec_flag;
+   37          
+   38          char far TagBuf[128];
+   39          bool FectchID3Info(const char *filename, ID3Info_t *ID3Info);
+   40          extern BOOL FetchID3_V2info(handle TagFileHandle, ID3Info_t *ID3Info);
+   41          void DealStringEnd(uint8 *str, int string_id);
+   42          void DealStrEndSpace(char *str);
+   43          
+   44          /*
+   45           ********************************************************************************
+   46           *             mp3GetTiltle
+   47           * Description :
+   48           * Arguments   :  string_id is language id(0:简体 1 英文 2 繁体),用于对最后的不完整字符进行处理。
+   49           因为最多取30个字符。而有些时候汉字里面有可能混放英文的。因此会出现最后字符只是汉字一半的情况
+   50           * Returns     : ID3ExistFlag = 0 表示没有ID3信息，1表示有
+   51           * Notes       :
+   52           ********************************************************************************
+   53           */
+   54          #ifndef PC
+   55          bool mp3GetID3Info(const char *filename, ID3Info_t *ID3Info, int string_id)
+   56          #else
+               bool mp3GetID3Info(const char *filename, ID3Info_t *ID3Info, int string_id)
+C251 COMPILER V4.55,  enhanced_tag                                                         13/12/18  16:27:42  PAGE 2   
+
+               #endif
+   59          {
+   60   1          bool ID3ExistFlag = FALSE;
+   61   1      
+   62   1          ClearWatchDog();
+   63   1      
+   64   1          karaoke_flag = 0;
+   65   1          actrec_flag = 0;
+   66   1      
+   67   1          if (!FectchID3Info(filename, ID3Info))
+   68   1          {
+   69   2              ClearWatchDog();
+   70   2              return FALSE;
+   71   2          }
+   72   1      
+   73   1          //下面处理得出的 信息的一些特殊情况
+   74   1          if (ID3Info->TIT2_length != 0)
+   75   1          {
+   76   2              DealStringEnd(ID3Info->TIT2_buffer, string_id);
+   77   2              DealStrEndSpace(ID3Info->TIT2_buffer);
+   78   2              if (ID3Info->TIT2_buffer[0] != 0)
+   79   2              {
+   80   3                  ID3ExistFlag = TRUE;
+   81   3              }
+   82   2          }
+   83   1      
+   84   1          if (ID3Info->TPE1_length != 0)
+   85   1          {
+   86   2              DealStringEnd(ID3Info->TPE1_buffer, string_id);
+   87   2              DealStrEndSpace(ID3Info->TPE1_buffer);
+   88   2              if (ID3Info->TPE1_buffer[0] != 0)
+   89   2              {
+   90   3                  ID3ExistFlag = TRUE;
+   91   3              }
+   92   2          }
+   93   1      
+   94   1          if (ID3Info->TALB_length != 0)
+   95   1          {
+   96   2              DealStringEnd(ID3Info->TALB_buffer, string_id);
+   97   2              DealStrEndSpace(ID3Info->TALB_buffer);
+   98   2              if (ID3Info->TALB_buffer[0] != 0)
+   99   2              {
+  100   3                  ID3ExistFlag = TRUE;
+  101   3              }
+  102   2          }
+  103   1      
+  104   1          if (ID3Info->TENC_length != 0)
+  105   1          {
+  106   2              DealStringEnd(ID3Info->TENC_buffer, string_id);
+  107   2              DealStrEndSpace(ID3Info->TENC_buffer);
+  108   2              if (ID3Info->TENC_buffer[0] != 0)
+  109   2              {
+  110   3                  ID3ExistFlag = TRUE;
+  111   3              }
+  112   2          }
+  113   1      
+  114   1          ClearWatchDog();
+  115   1          return ID3ExistFlag;
+  116   1      
+  117   1      }
+  118          
+  119          /*
+  120           ********************************************************************************
+  121           *             DealStringEnd
+  122           *
+  123           * Description :  处理定符串尾的不完整汉字问题
+C251 COMPILER V4.55,  enhanced_tag                                                         13/12/18  16:27:42  PAGE 3   
+
+  124           *
+  125           * Arguments   :
+  126           *
+  127           * Returns     :
+  128           *
+  129           * Notes       :
+  130           *
+  131           ********************************************************************************
+  132           */
+  133          void DealStringEnd(uint8 *str, int16 string_id)
+  134          {
+  135   1          BYTE i;
+  136   1          bool half;
+  137   1      
+  138   1          if ((string_id != CHINESE_SIMPLIFIED) && (string_id != CHINESE_TRADITIONAL))
+  139   1          {
+  140   2              return;
+  141   2          }
+  142   1      
+  143   1          if (*((uint16 *)str) == 0xfffe)
+  144   1          {
+  145   2              return;
+  146   2          }
+  147   1          //如是空串不用处理
+  148   1          if (str[0] == 0) //0 means '\0'
+  149   1          {
+  150   2              return;
+  151   2          }
+  152   1      
+  153   1          for (i = 0; i < 255; i++)
+  154   1          {
+  155   2              if (str[i] >= 0x80)
+  156   2              {
+  157   3                  half = TRUE;
+  158   3              }
+  159   2              else
+  160   2              {
+  161   3                  half = FALSE;
+  162   3              }
+  163   2      
+  164   2              //是否将结束
+  165   2              if (str[i + 1] == 0)
+  166   2              {
+  167   3                  if (FALSE != half)
+  168   3                  {
+  169   4                      str[i] = ' ';
+  170   4                  }
+  171   3                  return;
+  172   3              }
+  173   2      
+  174   2              if (FALSE != half)
+  175   2              {
+  176   3                  i++;
+  177   3                  if (str[i + 1] == 0) //刚好是完整的
+  178   3                  {
+  179   4                      return;
+  180   4                  }
+  181   3      
+  182   3                  half = FALSE;
+  183   3              }
+  184   2          }//end for
+  185   1      
+  186   1      }
+  187          /*
+  188           ********************************************************************************
+  189           *             DealStringEnd
+C251 COMPILER V4.55,  enhanced_tag                                                         13/12/18  16:27:42  PAGE 4   
+
+  190           *
+  191           * Description :  处理字符串后的空格的问题
+  192           *
+  193           * Arguments   :
+  194           *
+  195           * Returns     :
+  196           *
+  197           * Notes       :
+  198           *
+  199           ********************************************************************************
+  200           */
+  201          void DealStrEndSpace(char *str)
+  202          {
+  203   1          BYTE i, j;
+  204   1          /*统计字符串尾部的空格符号*/
+  205   1          BYTE space_num = 0;
+  206   1          /*处理unicode编码big endian的情况,去掉全是空格的问题*/
+  207   1          if (*((WORD *) &str[0]) == 0xfffe)
+  208   1          {
+  209   2              WORD codeChar;
+  210   2              for (i = 0, j = 0; i < 253; i += 2)
+  211   2              {
+  212   3                  codeChar = *((WORD *) &str[i + 2]);
+  213   3                  if (codeChar == 0x0000)
+  214   3                  {
+  215   4                      break;
+  216   4                  }
+  217   3                  /*只去掉字符尾部的空格符*/
+  218   3                  if (codeChar != 0x2000)
+  219   3                  {
+  220   4                      j = i;
+  221   4                      space_num = 0;
+  222   4                  }
+  223   3                  else
+  224   3                  {
+  225   4                      space_num++;
+  226   4                  }
+  227   3              }
+  228   2              /*处理字符全是空格的情况*/
+  229   2              if (j == 0)
+  230   2              {
+  231   3                  *((WORD *) &str[0]) = 0x0000;
+  232   3              }
+  233   2              /*去掉字符串尾部的空格*/
+  234   2              else if (j == (i - (space_num + 1) * 2))
+  235   2              {
+  236   3                  /*尾部空格数不为0才处理*/
+  237   3                  if (space_num != 0)
+  238   3                  {
+  239   4                      *((WORD *) &str[j + 2]) = 0x0000;
+  240   4                  }
+  241   3              }
+  242   2              else
+  243   2              {
+  244   3              }
+  245   2          }
+  246   1          else
+  247   1          {
+  248   2      
+  249   2              for (i = 0, j = 0; i < 255; i++)
+  250   2              {
+  251   3                  if (str[i] == 0)
+  252   3                  {
+  253   4                      break;
+  254   4                  }
+  255   3                  /*只去掉字符尾部的空格符*/
+C251 COMPILER V4.55,  enhanced_tag                                                         13/12/18  16:27:42  PAGE 5   
+
+  256   3                  if (str[i] != ' ')
+  257   3                  {
+  258   4                      j = i;
+  259   4                      space_num = 0;
+  260   4                  }
+  261   3                  else
+  262   3                  {
+  263   4                      space_num++;
+  264   4                  }
+  265   3              }
+  266   2              if (j == 0)
+  267   2              {
+  268   3                  str[j] = 0;
+  269   3              }
+  270   2              /*去掉字符串尾部的空格符号*/
+  271   2              else if (j == (i - (space_num + 1)))
+  272   2              {
+  273   3                  /*尾部空格数不为0才处理*/
+  274   3                  if (space_num != 0)
+  275   3                  {
+  276   4                      str[j + 1] = 0;
+  277   4                  }
+  278   3              }
+  279   2              else
+  280   2              {
+  281   3              }
+  282   2          }
+  283   1      }
+  284          /*
+  285           ********************************************************************************
+  286           *             FectchID3Info
+  287           *
+  288           * Description :
+  289           *
+  290           * Arguments   :  获取fileName歌曲的ID3信息，放到ID3Info_t数据结构中
+  291           *
+  292           * Returns     : ID3ExistFlag = 0 表示没有ID3信息，1表示有
+  293           *
+  294           * Notes       :
+  295           *
+  296           ********************************************************************************
+  297           */
+  298          
+  299          bool FectchID3Info(const char *filename, ID3Info_t *ID3Info)
+  300          {
+  301   1          handle TagFileHandle;//读文件指针
+  302   1          int LastPageLen; //最后一页的有效节数
+  303   1          long FileLen;
+  304   1          bool Fectch_ret;
+  305   1          char TAGString[] = "TAG"; //ID3V1的头应该是"tag"
+  306   1      
+  307   1          ClearWatchDog();
+  308   1          // TempBuf = ID3_BUFFER;
+  309   1          TempBuf = GET_REAL_ADDR(ID3_BUFFER);
+  310   1          TagFileHandle = FS_FOpen(filename, FS_OPEN_NORMAL);//打开文件
+  311   1          if (TagFileHandle == NULL)
+  312   1          {
+  313   2              return FALSE;
+  314   2          }
+  315   1      
+  316   1          Fectch_ret = FetchID3_V2info(TagFileHandle, ID3Info);
+  317   1          if(actrec_flag)
+  318   1          {
+  319   2              FS_FClose(TagFileHandle);
+  320   2              return 0;
+  321   2          }
+C251 COMPILER V4.55,  enhanced_tag                                                         13/12/18  16:27:42  PAGE 6   
+
+  322   1          if (Fectch_ret == TRUE)
+  323   1          {
+  324   2              FS_FClose(TagFileHandle);
+  325   2              return 1;
+  326   2          }
+  327   1      
+  328   1          ClearWatchDog();
+  329   1          //LastPageLen是文件最后一个簇的字节数
+  330   1          LastPageLen = FS_GetUnalignedLen(TagFileHandle);
+  331   1          //FileLen是文件的总簇数，每个簇512字节
+  332   1          FileLen = FS_GetFileLen(TagFileHandle);
+  333   1          FS_FSeek(FileLen - 2, 0, TagFileHandle); //先读一个PAGE
+  334   1          FS_FRead(TempBuf, 1, TagFileHandle); //
+  335   1      
+  336   1          if(LastPageLen == 0)
+  337   1          {
+  338   2              LastPageLen = 512;
+  339   2          }
+  340   1      
+  341   1          //这段是可以优化的，先判断是否小于128再读。如果最后一个扇区大于128，则只读一次
+  342   1          if (LastPageLen < 128)
+  343   1          {
+  344   2              //取128bytes放入 128bytes的BUFFER中
+  345   2              memcpy(TagBuf, TempBuf + 512 - 128 + LastPageLen, ((uint16)(128 - LastPageLen)));
+  346   2              FS_FRead(TempBuf, 1, TagFileHandle);
+  347   2              memcpy((TagBuf + 128 - LastPageLen), TempBuf, ((uint16)LastPageLen));
+  348   2          }
+  349   1          else
+  350   1          {
+  351   2              FS_FRead(TempBuf, 1, TagFileHandle);
+  352   2              memcpy(TagBuf, TempBuf + LastPageLen - 128, 128);
+  353   2          }
+  354   1          FS_FClose(TagFileHandle);
+  355   1      
+  356   1          if (memcmp(TagBuf, TAGString, 3) == 0)
+  357   1          {
+  358   2              memcpy(ID3Info->TIT2_buffer, (char *) &TagBuf[3], ID3Info->TIT2_length - 2);
+  359   2              *((BYTE *) (ID3Info->TIT2_buffer) + ID3Info->TIT2_length - 2) = 0x00; //这里补字符串结束
+  360   2      
+  361   2      
+  362   2              memcpy(ID3Info->TPE1_buffer, (char *) &TagBuf[33], ID3Info->TPE1_length - 2);
+  363   2              *((BYTE *) (ID3Info->TPE1_buffer) + ID3Info->TPE1_length - 2) = 0x00; //这里补字符串结束
+  364   2      
+  365   2      
+  366   2              memcpy(ID3Info->TALB_buffer, (char *) &TagBuf[63], ID3Info->TALB_length - 2);
+  367   2              *((BYTE *) (ID3Info->TALB_buffer) + ID3Info->TALB_length - 2) = 0x00; //这里补字符串结束
+  368   2      
+  369   2      
+  370   2              return 1;
+  371   2          }
+  372   1          else
+  373   1          {
+  374   2              return 0;
+  375   2          }
+  376   1      
+  377   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1207     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+C251 COMPILER V4.55,  enhanced_tag                                                         13/12/18  16:27:42  PAGE 7   
+
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =       128     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =         4     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

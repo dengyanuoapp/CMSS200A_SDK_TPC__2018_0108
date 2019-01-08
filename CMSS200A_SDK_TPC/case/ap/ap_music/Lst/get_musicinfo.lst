@@ -1,0 +1,443 @@
+C251 COMPILER V4.55,  get_musicinfo                                                        23/05/16  10:41:55  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE get_musicinfo
+OBJECT MODULE PLACED IN .\Obj\get_musicinfo.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE get_musicinfo.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,
+                    -SPEED) BROWSE INCDIR(..\..\inc;..\..\..\psp_rel\inc) I4 DEBUG PRINT(.\Lst\get_musicinfo.lst) OBJECT(.\Obj\get_musicinfo.
+                    -obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ******************************************************************************
+    3           *                               AS211A
+    4           *                            Module: music
+    5           *                 Copyright(c) 2002-2010 Actions Semiconductor,
+    6           *                            All Rights Reserved.
+    7           *
+    8           * Descripton: sub functions 3 of music
+    9           *
+   10           * History:
+   11           *      <author>    <time>           <version >             <desc>
+   12           *       xusong    2010-07-15 15:00     1.0             build this file
+   13           ******************************************************************************
+   14           */
+   15          #include "ap_music.h"
+   16          #define MusicExtNum 6
+   17          
+   18          #pragma name(GET_MUSICINFO)
+   19          
+   20          const uint8 ExtMusicstr[MusicExtNum][4] =
+   21          {
+   22              "MP1", "MP2", "MP3", "WMA", /*"ASF",*/
+   23              "WMV", "WAV"
+   24          };
+   25          
+   26          uint8 deal_change_music_msg(uint8 key)
+   27          {
+   28   1          uint8 retval = NULL;
+   29   1          if (PlayStatus > PlaySta)
+   30   1          {
+   31   2              musicpSendCommand_bank(MC_STEP, 0);
+   32   2              PlayStatus = PlaySta;
+   33   2              FF_flag = 0;
+   34   2              return NULL;
+   35   2          }
+   36   1          stop_music_play(FALSE);
+   37   1          if (key == Key_Next)
+   38   1          {
+   39   2              retval = get_next_prev_music(Music_Next, Manu_Sel);
+   40   2          }
+   41   1          else
+   42   1          {
+   43   2              retval = get_next_prev_music(Music_Prev, Manu_Sel);
+   44   2          }
+   45   1          need_draw = TRUE;
+   46   1          return retval;
+   47   1      }
+   48          
+   49          /*
+   50           *******************************************************************************
+   51           * Description : 换曲时要做的选曲，初始化动作
+   52           * Arguments   :
+   53           * Returns     : 真时表示可继续放，假时表示要停止放(播放状态)
+   54           * Notes       :
+   55           *******************************************************************************
+   56           */
+   57          uint8 ChangeMusic(uint8 Direct, Music_sel_mod_t mod)
+C251 COMPILER V4.55,  get_musicinfo                                                        23/05/16  10:41:55  PAGE 2   
+
+   58          {
+   59   1          bool result;
+   60   1          uint8 i = 0;
+   61   1          file_location_t location_tmp;
+   62   1      
+   63   1          ClearTimePara();
+   64   1      
+   65   1          //备份
+   66   1          memcpy(&location_tmp, &CurUselocation, sizeof(file_location_t));
+   67   1      
+   68   1          /*播放时手动切换按键的情况*/
+   69   1          if (mod == Manu_Sel)
+   70   1          {
+   71   2              switch (g_music_vars.repeat_mode)
+   72   2              {
+   73   3              case FSEL_ALL_REPEATONE:
+   74   3                  FSELSetMode(FSEL_ALL_REPEATALL);
+   75   3                  break;
+   76   3              default:
+   77   3                  FSELSetMode(g_music_vars.repeat_mode);
+   78   3                  break;
+   79   3              }
+   80   2          }
+   81   1          else
+   82   1          {
+   83   2              //正常播放的情况
+   84   2              if (g_music_vars.repeat_mode == FSEL_ALL_REPEATONE)
+   85   2              {
+   86   3                  return 2;
+   87   3              }
+   88   2              else
+   89   2              {
+   90   3                  FSELSetMode(g_music_vars.repeat_mode);
+   91   3              }
+   92   2          }
+   93   1      
+   94   1          switch (Direct)
+   95   1          {
+   96   2          case Music_Next:
+   97   2              result = FSELGetNext(CurUselocation.filename);
+   98   2              break;
+   99   2      
+  100   2          case Music_Prev:
+  101   2              result = FSELGetPrev(CurUselocation.filename);
+  102   2              break;
+  103   2          default:
+  104   2              return TRUE;
+  105   2          }
+  106   1      
+  107   1          if (!result)
+  108   1          {
+  109   2              memcpy(&CurUselocation, &location_tmp, sizeof(file_location_t));
+  110   2              fselSetLocation(&CurUselocation);
+  111   2              return FALSE;
+  112   2          }
+  113   1          return TRUE;
+  114   1      }
+  115          /*
+  116           ******************************************************************************
+  117           *             Music_type_t CheckMusicType(uint8   *filename)
+  118           *
+  119           * Description : 获取下一首或上一首歌曲
+  120           *
+  121           * Arguments   : direct:  文件名
+  122           *                               mod:
+  123           *
+C251 COMPILER V4.55,  get_musicinfo                                                        23/05/16  10:41:55  PAGE 3   
+
+  124           * Returns     : Music_type_t 文件类型
+  125           *
+  126           * Notes       :
+  127           *
+  128           ********************************************************************************
+  129           */
+  130          
+  131          uint8 get_next_prev_music(uint8 direct, Music_sel_mod_t mod)
+  132          {
+  133   1          uint8 g_result;
+  134   1          /* 格式错误跳到下一曲继续播放*/
+  135   1      findfileagain:
+  136   1          ClearWatchDog();
+  137   1          write_poweroff_flag(0);
+  138   1          g_result = ChangeMusic(direct, mod);
+  139   1          if (g_result == FALSE)
+  140   1          {
+  141   2              return RESULT_UI_STOP;//回到停止界面
+  142   2          }
+  143   1          //单曲循环后自动继续循环播放时，不再获取文件信息
+  144   1          if (g_result != 2)
+  145   1          {
+  146   2              get_music_location(FALSE);
+  147   2          }
+  148   1          else
+  149   1          {
+  150   2              PlayStatus = PauseSta;
+  151   2          }
+  152   1          need_draw = FALSE;
+  153   1          if (g_Openparam.typeerror == 1)
+  154   1          {
+  155   2              if(FS_GetInfo() != 0)
+  156   2              {
+  157   3                  return RESULT_UI_STOP;//回到停止界面
+  158   3              }
+  159   2              show_fileno_ui();
+  160   2              ap_sleep(4);
+  161   2              if (prev_PlayStatus != PlaySta)
+  162   2              {
+  163   3                  return NULL;
+  164   3              }
+  165   2              else
+  166   2              {
+  167   3                  if ((err_music_count++) > max_music_err)
+  168   3                  {
+  169   4                      err_music_count = 0;
+  170   4                      PlayStatus = StopSta;
+  171   4                      if (CurUselocation.disk == disk_char[0])
+  172   4                      {
+  173   5                          //如果检测不到卡或者卡与u盘已经自动切换过一轮，则直接退出music应用
+  174   5                          if((DRV_DetectUD(1) != 0x20) || (first_init == FALSE))
+  175   5                          {
+  176   6                              no_device_flag = TRUE;
+  177   6                          }
+  178   5                          else
+  179   5                          {
+  180   6                              CurUselocation.disk = disk_char[1];
+  181   6      
+  182   6                              first_init = FALSE;
+  183   6                          }
+  184   5                      }
+  185   4                      else if (CurUselocation.disk == disk_char[1])
+  186   4                      {
+  187   5                          //如果检测不到u盘或者卡与u盘已经自动切换过一轮，则直接退出music应用
+  188   5                          if((USBH_Check_Udisk() == 0) || (first_init == FALSE))
+  189   5                          {
+C251 COMPILER V4.55,  get_musicinfo                                                        23/05/16  10:41:55  PAGE 4   
+
+  190   6                              no_device_flag = TRUE;
+  191   6                          }
+  192   5                          else
+  193   5                          {
+  194   6                              CurUselocation.disk = disk_char[0];
+  195   6      
+  196   6                              first_init = FALSE;
+  197   6                          }
+  198   5                      }
+  199   4                      return NULL;
+  200   4                  }
+  201   3                  goto findfileagain;
+  202   3              }
+  203   2      
+  204   2          }
+  205   1          else if ((CurUI_Type == Music_UI) || (CurUI_Type == FileNo_UI) || (CurUI_Type == DIRNAME_UI))
+  206   1          {
+  207   2              show_ui_flag = TRUE;
+  208   2              SetCurUI_Type(FileNo_UI);
+  209   2              RefreshMainScreen();
+  210   2      #ifdef MUSIC_AP
+                       //有tts播报时，不增加延时显示文件序号
+                       if((g_TagInfoBuf[0] != 0x0) && (FF_flag == 0) && (prev_PlayStatus == PlaySta))
+                       {
+                           SetCurUI_Type(Music_UI);
+                           show_ui_flag = FALSE;
+                       }
+               #endif
+  218   2          }
+  219   1          get_fileinfo_flag = TRUE;
+  220   1          return NULL;
+  221   1      }
+  222          
+  223          /*
+  224           ******************************************************************************
+  225           *             Music_type_t CheckMusicType(uint8   *filename)
+  226           *
+  227           * Description : 检测当前是哪种类型的MUSIC文件
+  228           *
+  229           * Arguments   : uint8   *filename  文件名
+  230           *
+  231           * Returns     : Music_type_t 文件类型
+  232           *
+  233           * Notes       :
+  234           *
+  235           ********************************************************************************
+  236           */
+  237          Music_type_t near CheckMusicType(uint8 *filename)
+  238          {
+  239   1          uint8 cnt;
+  240   1          uint8 ext[4];
+  241   1          Music_type_t ret;
+  242   1          memcpy(ext, filename + 8, 3);
+  243   1          ext[0] = ((ext[0] >= 'a') && (ext[0] <= 'z')) ? (ext[0] - 'a' + 'A') : ext[0];
+  244   1          ext[1] = ((ext[1] >= 'a') && (ext[1] <= 'z')) ? (ext[1] - 'a' + 'A') : ext[1];
+  245   1          ext[2] = ((ext[2] >= 'a') && (ext[2] <= 'z')) ? (ext[2] - 'a' + 'A') : ext[2];
+  246   1          ext[3] = 0;
+  247   1      
+  248   1          for (cnt = 0; cnt < Music_TypeMax; cnt++)
+  249   1          {
+  250   2              if (strcmp(ext, ExtMusicstr[cnt]) == 0)
+  251   2              {
+  252   3                  ret = Music_NON + cnt + 1;
+  253   3                  if ((ret == Music_MP1) || (ret == Music_MP2))
+  254   3                  {
+  255   4                      return Music_MP3;
+C251 COMPILER V4.55,  get_musicinfo                                                        23/05/16  10:41:55  PAGE 5   
+
+  256   4                  }
+  257   3                  else
+  258   3                  {
+  259   4                      return ret;
+  260   4                  }
+  261   3              }
+  262   2          }
+  263   1          return Music_NON;
+  264   1      }
+  265          
+  266          /*
+  267           ********************************************************************************
+  268           *             uint16 GetInformation(void)
+  269           *
+  270           * Description : 读取歌曲信息,歌词
+  271           *
+  272           * Arguments   : void
+  273           *
+  274           * Returns     : int
+  275           *
+  276           * Notes       :
+  277           *
+  278           ********************************************************************************
+  279           */
+  280          void GetInformation(void)
+  281          {
+  282   1          uint8 first_check = TRUE;
+  283   1          audio_format_t pFormat;
+  284   1          ID3Info_t ID3;
+  285   1          g_currentMusicType = CheckMusicType(CurUselocation.filename);
+  286   1      
+  287   1          memset(g_TagInfoBuf, 0, 92);
+  288   1          ID3.TIT2_length = 30;
+  289   1          ID3.TPE1_length = 30;
+  290   1          ID3.TALB_length = 30;
+  291   1      
+  292   1          ID3.TIT2_buffer = &g_TagInfoBuf[0];
+  293   1          ID3.TPE1_buffer = &g_TagInfoBuf[30];
+  294   1          ID3.TALB_buffer = &g_TagInfoBuf[60];
+  295   1      
+  296   1          ID3.TENC_buffer = &g_TagInfoBuf[90];
+  297   1      
+  298   1          g_Openparam.typeerror = 0;
+  299   1          switch (g_currentMusicType)
+  300   1          {
+  301   2      
+  302   2          case Music_WMA:
+  303   2      WMA_check:
+  304   2              g_Openparam.typeerror = wmaCheckType(NULL, &g_Openparam.musicframeoffset,
+  305   2                                                   &g_Openparam.musictotaltime, &pFormat, &ID3);
+  306   2              //类型检查出错后，再用mp3格式检查一次，以防是后缀改动所致
+  307   2      
+  308   2              if (g_Openparam.typeerror != 0) //正常文件才操作
+  309   2              {
+  310   3                  if (first_check == TRUE)
+  311   3                  {
+  312   4                      first_check = FALSE;
+  313   4                      goto MP3_check;
+  314   4                  }
+  315   3      
+  316   3      #if 0
+                           /* 判断是否为MP3文件, 后缀改为了WMA */
+                           g_Openparam.typeerror = mp3CheckType(NULL, &g_Openparam.musicframeoffset, &g_Openparam.musict
+             -otaltime,
+                                                                &pFormat);
+                           if (g_Openparam.typeerror == 0)
+C251 COMPILER V4.55,  get_musicinfo                                                        23/05/16  10:41:55  PAGE 6   
+
+                           {
+                               g_currentMusicType = Music_MP3;
+                           }
+               #endif
+  325   3              }
+  326   2              else
+  327   2              {
+  328   3                  g_currentMusicType = Music_WMA;
+  329   3              }
+  330   2      
+  331   2      #if defined(AP_MUSIC_PEPORT_EN) && defined(AP_MUSIC_NAME)
+                       if(g_comval.SuppTTS != 0)
+                       {
+                           convert_music_id3_string(g_TagInfoBuf, 1);
+                       }
+               #endif
+  337   2              break;
+  338   2      
+  339   2          case Music_WAV:
+  340   2              g_Openparam.typeerror
+  341   2                  = wavCheckType(NULL, &g_Openparam.musicframeoffset, &g_Openparam.musictotaltime, &pFormat);
+  342   2              break;
+  343   2      
+  344   2          case Music_MP3:
+  345   2      MP3_check:
+  346   2              g_Openparam.typeerror = mp3CheckType(NULL, &g_Openparam.musicframeoffset,
+  347   2                                                   &g_Openparam.musictotaltime, &pFormat);
+  348   2              //类型检查出错后，再用WMA格式检查一次，以防是后缀改动所致
+  349   2      
+  350   2              if (g_Openparam.typeerror != 0)
+  351   2              {
+  352   3                  if (first_check == TRUE)
+  353   3                  {
+  354   4                      first_check = FALSE;
+  355   4                      goto WMA_check;
+  356   4                  }
+  357   3      
+  358   3      #if 0
+                           /* 判断是否为WMA文件, 后缀改为了MP3 */
+                           g_Openparam.typeerror = wmaCheckType(NULL, &g_Openparam.musicframeoffset, &g_Openparam.musict
+             -otaltime,
+                                                                &pFormat, &ID3);
+                           if (g_Openparam.typeerror == 0)
+                           {
+                               g_currentMusicType = Music_WMA;
+                           }
+               #endif
+  367   3              }
+  368   2              else
+  369   2              {
+  370   3                  g_currentMusicType = Music_MP3;
+  371   3              }
+  372   2      #if defined(AP_MUSIC_PEPORT_EN) && defined(AP_MUSIC_NAME)
+                       if(g_comval.SuppTTS != 0)
+                       {
+                           if ((g_Openparam.typeerror == 0) && (mp3GetID3Info(NULL, &ID3, LAN_ID_SCHINESE)))
+                           {
+                               convert_music_id3_string(g_TagInfoBuf, 0);
+                           }
+                       }
+               #endif
+  381   2              break;
+  382   2          default:
+  383   2              break;
+  384   2          }
+  385   1      
+C251 COMPILER V4.55,  get_musicinfo                                                        23/05/16  10:41:55  PAGE 7   
+
+  386   1      #if defined(AP_MUSIC_PEPORT_EN) && defined(AP_MUSIC_NAME)
+                   if((g_comval.SuppTTS != 0) && (g_TagInfoBuf[0] == 0))
+                   {
+                       memcpy(g_TagInfoBuf, CurUselocation.filename, 12);
+                       convert_music_name_string(g_TagInfoBuf);
+                   }
+               #endif
+  393   1      }
+  394          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1020     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        24     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

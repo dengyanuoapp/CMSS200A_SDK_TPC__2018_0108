@@ -1,0 +1,159 @@
+C251 COMPILER V4.55,  music_command                                                        23/05/16  10:41:54  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE music_command
+OBJECT MODULE PLACED IN .\Obj\music_command.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE music_command.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,
+                    -SPEED) BROWSE INCDIR(..\..\inc;..\..\..\psp_rel\inc) I4 DEBUG PRINT(.\Lst\music_command.lst) OBJECT(.\Obj\music_command.
+                    -obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ******************************************************************************
+    3           *                               AS211A
+    4           *                            Module: music
+    5           *                 Copyright(c) 2002-2010 Actions Semiconductor,
+    6           *                            All Rights Reserved.
+    7           *
+    8           * Descripton: sub functions 1 of music
+    9           *
+   10           * History:
+   11           *      <author>    <time>           <version >             <desc>
+   12           *       xusong    2010-07-15 15:00     1.0             build this file
+   13           ******************************************************************************
+   14           */
+   15          #include "ap_music.h"
+   16          
+   17          #pragma name(AP_SEND_COMMAND)
+   18          
+   19          //==================================================================
+   20          bool musicpSendCommand_bank(uint8 cmd, void *param)
+   21          {
+   22   1          bool result = FALSE;
+   23   1          bool drm_flag;
+   24   1          drm_flag = FALSE;
+   25   1          if (cmd == MC_PLAY)
+   26   1          {
+   27   2              if (g_Openparam.typeerror == 0) //正常文件时进行下面操作
+   28   2              {
+   29   3      #ifdef OPT_Sup_FadeIn_fun
+                           musicpSendCommand(MC_FADEINOUT, FADEIN_DEF | USE_FADEIN_TIME);
+               #endif //
+   32   3              }
+   33   2          }
+   34   1          switch (g_currentMusicType)
+   35   1          {
+   36   2          case Music_MP3: //mp3
+   37   2              result = mp3pSendCommand(cmd, param);
+   38   2      
+   39   2              break;
+   40   2      
+   41   2          case Music_WMA: //wma
+   42   2          case Music_WMV: //wmv
+   43   2              result = wmapSendCommand(cmd, param);
+   44   2              break;
+   45   2          case Music_WAV:
+   46   2              result = wavpSendCommand(cmd, param);
+   47   2              break;
+   48   2          default:
+   49   2              break;
+   50   2          }
+   51   1          if (cmd == MC_PLAY)
+   52   1          {
+   53   2              if (g_currentMusicType == Music_WAV)
+   54   2              {
+   55   3                  g_comval.eq_type = none;
+   56   3              }
+   57   2              EQMode_callback(All_EQ_Set);
+C251 COMPILER V4.55,  music_command                                                        23/05/16  10:41:54  PAGE 2   
+
+   58   2              if (g_music_vars.karaoke_flag != 0)
+   59   2              {
+   60   3                  acc_vol_callback(g_music_vars.acc_vol);
+   61   3                  deal_caraok_msg();
+   62   3              }
+   63   2              if (result != 0)
+   64   2              {
+   65   3                  PlayStatus = PlaySta;
+   66   3              }
+   67   2          }
+   68   1          if (cmd == MC_STOP)
+   69   1          {
+   70   2              PlayStatus = StopSta;
+   71   2          }
+   72   1      #if 0
+               #ifdef SuPPORTKARAOKE
+                   if(g_music_vars.Karaoke_mode != NOR_Play)
+                   {
+                       acc_vol_callback(g_music_vars.acc_vol);
+                       SpeechMute(g_music_vars.Karaoke_mode);
+                   }
+               #endif
+               #endif
+   81   1      
+   82   1          return result;
+   83   1      }
+   84          
+   85          /*
+   86           ********************************************************************************
+   87           *             bool musicpSendCommand( uint8 cmd, uint16 param )
+   88           *
+   89           * Description : 根据不同的文件类型来选择发的命令（对MODULE）
+   90           *
+   91           * Arguments   : cmd 命令 param 参数
+   92           *
+   93           * Returns     : success/fail
+   94           *
+   95           * Notes       :
+   96           *
+   97           ********************************************************************************
+   98           */
+   99          bool musicpSendCommand(uint8 cmd, void *param)
+  100          {
+  101   1          switch (cmd)
+  102   1          {
+  103   2          case MC_GETTIME:
+  104   2          case MC_GETSAPLE:
+  105   2          case MC_GETSTATUS:
+  106   2          case MC_GETAUDIOFMT:
+  107   2          case MC_FADEINOUT:
+  108   2              return wavpSendCommand(cmd, param);
+  109   2          default:
+  110   2              return musicpSendCommand_bank(cmd, param);
+  111   2          }
+  112   1          return FALSE;
+  113   1      }
+  114          
+  115          void ClearTimePara(void)
+  116          {
+  117   1          g_music_vars.MusicOpenMod = Nor_open;
+  118   1          memset(&g_music_vars.BreakPTSave, 0x0, sizeof(breakPT_t));
+  119   1          memset(&g_music_vars.BreakPTDisTime, 0x0, sizeof(time_t));
+  120   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+C251 COMPILER V4.55,  music_command                                                        23/05/16  10:41:54  PAGE 3   
+
+  code size            =    ------     ------
+  ecode size           =       200     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

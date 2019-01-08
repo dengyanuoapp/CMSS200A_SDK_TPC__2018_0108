@@ -1,0 +1,1 @@
+"..\common\ap_message.c" XSMALL NOALIAS FUNCTIONS (REENTRANT) ROM(HUGE) OPTIMIZE (9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\ap_message.lst) OBJECT(.\Obj\ap_message.obj)

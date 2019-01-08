@@ -1,0 +1,369 @@
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:43  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE main
+OBJECT MODULE PLACED IN .\Obj\main.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE main.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BR
+                    -OWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\main.lst) OBJECT(.\Obj\main.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        voice recorder main program.
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: main.c,v 1.10 2009/10/09 09:53:51 dengyulin Exp $
+   10           *******************************************************************************
+   11           */
+   12          #include "ap_record_play.h"
+   13          #include "uhdrv.h"
+   14          
+   15          #pragma name(AP_MAIN)
+   16          #define DISK_C 0
+   17          #define DISK_H 1
+   18          
+   19          /********************常量定义***********************/
+   20          
+   21          /******************全局变量定义*********************/
+   22          
+   23          //保留项
+   24          //uint8 DiskFlag = 0;
+   25          //uint16 near g_rec_event = 0;
+   26          
+   27          bool show_time = TRUE;
+   28          
+   29          /*  当前目录下录音文件总个数*/
+   30          uint8 near g_file_num;
+   31          
+   32          /* 可录总秒数*/
+   33          uint32 total_sec = 0;
+   34          
+   35          /* 配置的可录扇区数 */
+   36          uint32 total_space_setting = 0;
+   37          
+   38          /* 单次进入录音，累计已录扇区数 */
+   39          uint32 total_space_used = 0;
+   40          
+   41          /* 单个文件的扇区数 */
+   42          uint32 onefile_space = 0;
+   43          uint16 near g_rec_event = 0;
+   44          
+   45          uint32 near g_free_space; //剩余磁盘空间//remaining disk space
+   46          
+   47          /* 当前录音文件的page数*/
+   48          //uint8 near g_total_time[11]; //000:00:00
+   49          uint8 near g_now_time[10]; //000:00:00
+   50          uint8 near g_file_name_time[16]; //"WAV001 04/01/01"
+   51          
+   52          /* 当前录音比特率ASCILL , 用于显示*/
+   53          uint8 near currentBitrate[4];
+   54          
+   55          record_vars_t near g_record_vars;
+   56          //uint8 near g_rec_from; //当前的录音源 by ccm
+   57          
+   58          /*  可录音总时间*/
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:43  PAGE 2   
+
+   59          time_t_ext near g_total_time;
+   60          /*  实时显示录音的时间*/
+   61          time_t near g_rec_time;
+   62          /* 录音状态*/
+   63          wav_rec_status_t rec_stat;
+   64          
+   65          //resource_t inputSelect =
+   66          //{ 0 };
+   67          
+   68          /* 录音参数结构*/
+   69          audio_format_t Rec_format;
+   70          //bool unicodeFlagofFolder;
+   71          
+   72          /* 是否FM  录音*/
+   73          bool isFmRecord;
+   74          /* 空间是否已满*/
+   75          bool overflag;
+   76          uint8 avrEnableSave;
+   77          //ap_inputSelect_e inputSelSave;
+   78          
+   79          //uint8 dir_name[30];
+   80          
+   81          /* 录音比特率*/
+   82          ap_bitrate_e rec_bitrate;
+   83          /* 录音采样率*/
+   84          ap_samplerate_e Rec_Fsrate;
+   85          /* 录音通道数*/
+   86          channelnum_t rec_channel;
+   87          /* 指向当前默认录音目录*/
+   88          const uint8 *g_dir_voice;
+   89          
+   90          /* 磁盘状态bitmap */
+   91          uint8 g_DiskStateFlag = 0;
+   92          
+   93          /* 是否需要取剩余容量 */
+   94          bool need_fetch_space;
+   95          
+   96          bool card_exist = FALSE;
+   97          bool UDisk_exist = FALSE;
+   98          uint8 rec_status;//当前录音状态。0-停止状态;1-录音状态;2-暂停状态
+   99          uint8 need_change_rec_status;//是否需要转换录音状态标志
+  100          
+  101          //能量检测配置值
+  102          uint32 Mval = 200000;//阈值，建议值1024
+  103          uint32 Mblock = 38;//建议值60，接近1秒  Mblock=(time*256000/8)/512
+  104          
+  105          uint8 g_disk_char[MAX_DISK_NUM] =
+  106          { 'U', 'H', 'M'};
+  107          
+  108          const uint8 rec_str[4] =
+  109          { "REC" };
+  110          const uint8 nodevice_str[5] =
+  111          { "NDEV" };
+  112          const uint8 err_str[4] =
+  113          { "ERR" };
+  114          
+  115          //#pragma renamecode(AP_MAIN)
+  116          
+  117          
+  118          /*
+  119           ********************************************************************************
+  120           * Description : 使能DAC
+  121           *
+  122           * Arguments   : NULL
+  123           *
+  124           * Returns     : NULL
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:43  PAGE 3   
+
+  125           *
+  126           * Notes       :
+  127           *
+  128           ********************************************************************************
+  129           */
+  130          void near openDAC_main(void)
+  131          {
+  132   1          dac_t dacattr;
+  133   1          dacattr.dacselect = 0;
+  134   1          dacattr.rate = FS_44K1;//默认
+  135   1          EnableDAC(&dacattr);
+  136   1      
+  137   1      }
+  138          
+  139          /*
+  140           ********************************************************************************
+  141           * Description : 关闭录音通道
+  142           *
+  143           * Arguments   : NULL
+  144           *
+  145           * Returns     : NULL
+  146           *
+  147           * Notes       :
+  148           *
+  149           ********************************************************************************
+  150           */
+  151          void near Close_RecRoute(void)
+  152          {
+  153   1          if (!g_comval.KeyTone)
+  154   1          {
+  155   2      
+  156   2          }
+  157   1      }
+  158          
+  159          /*
+  160           ********************************************************************************
+  161           * Description : Record 应用参数初始化
+  162           *
+  163           * Arguments   : NULL
+  164           *
+  165           * Returns     : NULL
+  166           *
+  167           * Notes       :
+  168           *
+  169           ********************************************************************************
+  170           */
+  171          void near read_var(void)
+  172          {
+  173   1          BOOL result;
+  174   1          result = read_ap_comval();
+  175   1      
+  176   1          {
+  177   2              memset(&g_record_vars, 0, sizeof(g_record_vars));
+  178   2              g_record_vars.maigc = MAGIC_RECORD;
+  179   2              g_record_vars.location.disk = 0;
+  180   2              g_record_vars.rec_source = AP_MICIN;        //默认选择MIC录音
+  181   2      
+  182   2              g_record_vars.rec_type = RECORD_FILE_TYPE_WAV;
+  183   2              g_record_vars.rec_encode = ENCODE_WAV_PCM;
+  184   2              g_record_vars.rec_mode = 2;
+  185   2      
+  186   2              g_record_vars.wav_num = 1;
+  187   2              g_record_vars.mp2_num = 1;
+  188   2              g_record_vars.rec_InputGain = g_comval.RecordGain;
+  189   2              g_record_vars.rec_ADCGain = 3;
+  190   2              g_record_vars.rec_DSPGain = 0;
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:43  PAGE 4   
+
+  191   2              g_record_vars.rec_DelayTime = 15;
+  192   2          }
+  193   1      }
+  194          
+  195          
+  196          /*
+  197           ********************************************************************************
+  198           * Description : Record 应用入口主函数
+  199           *
+  200           * Arguments   :
+  201           param:
+  202           0, 不自动开始录音
+  203           1, 自动开始录音
+  204           RESULT_FMREC_NOSTART,  FM录音,   不自动开始
+  205           RESULT_FMREC_START,  FM录音, 自动开始
+  206           *
+  207           *
+  208           * Returns     : 结果消息或0
+  209           *
+  210           * Notes       :
+  211           *
+  212           ********************************************************************************
+  213           */
+  214          int main(int param)
+  215          {
+  216   1          BOOL mc_result;
+  217   1          BOOL ReturnToFm = 0;
+  218   1          uint8 result = 0;
+  219   1          uint8 sfr_bank;
+  220   1          overflag = FALSE;
+  221   1      
+  222   1          SetPLL(PLL_48MHZ);
+  223   1      
+  224   1          need_fetch_space = TRUE;
+  225   1          read_var();
+  226   1      
+  227   1          LEDClearScreen();
+  228   1          LEDPuts(NUMBER2, rec_str, 1);
+  229   1      
+  230   1          /* 配置只支持NOR FLASH */
+  231   1          if(g_comval.SuppNorRec == 1)
+  232   1          {
+  233   2              g_record_vars.location.disk = 'M';
+  234   2          }
+  235   1          else
+  236   1          {
+  237   2              if(USBH_Check_Udisk())
+  238   2              {
+  239   3                  g_record_vars.location.disk = 'U';
+  240   3              }
+  241   2              else if (DRV_DetectUD(1) == 0x20)
+  242   2              {
+  243   3                  g_record_vars.location.disk = 'H';
+  244   3              }
+  245   2          }
+  246   1      
+  247   1          /* 没有设备 */
+  248   1          if(g_record_vars.location.disk == 0)
+  249   1          {
+  250   2              LEDPuts(NUMBER1, nodevice_str, 1);
+  251   2              return RESULT_NULL;
+  252   2          }
+  253   1      
+  254   1          set_dac_volume(g_comval.volume);
+  255   1      
+  256   1          while(1)
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:43  PAGE 5   
+
+  257   1          {
+  258   2              enable_adda();
+  259   2              result = show_rec();
+  260   2              if((result != 0) && (result != RESULT_CURRENT_AP))
+  261   2              {
+  262   3                  break;
+  263   3              }
+  264   2              disable_adda();
+  265   2      
+  266   2              result = ui_play();
+  267   2              if((result != 0) && (result != RESULT_CURRENT_AP))
+  268   2              {
+  269   3                  break;
+  270   3              }
+  271   2          }
+  272   1      
+  273   1          if((g_record_vars.location.disk == 'H') || (g_record_vars.location.disk == 'U'))
+  274   1          {
+  275   2              DeleteRecFile();
+  276   2          }
+  277   1      
+  278   1          SetPLL(PLL_48MHZ);
+  279   1      
+  280   1          mc_result = VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval));
+  281   1      
+  282   1          if (result == RESULT_MAIN)
+  283   1          {
+  284   2              if (param != RESULT_FMREC_START)
+  285   2              {
+  286   3                  result = RESULT_NULL;
+  287   3              }
+  288   2              else
+  289   2              {
+  290   3                  result = RESULT_FMREC2FM;
+  291   3              }
+  292   2          }
+  293   1          sfr_bank = SFR_BANK;
+  294   1          SFR_BANK = BANK_CMU_RMU;
+  295   1          MRCR2 &= 0xdf;
+  296   1          SFR_BANK = sfr_bank;
+  297   1      
+  298   1          return result;
+  299   1      }
+  300          void enable_adda(void)
+  301          {
+  302   1          if(g_record_vars.rec_source != AP_FMIN)
+  303   1          {
+  304   2              return;
+  305   2          }
+  306   1          decAddainit(AD_FM);
+  307   1          set_dac_volume(g_comval.volume);
+  308   1      }
+  309          void disable_adda(void)
+  310          {
+  311   1          if(g_record_vars.rec_source != AP_FMIN)
+  312   1          {
+  313   2              return;
+  314   2          }
+  315   1          decAddaexit();
+  316   1      }
+  317          
+  318          uint8 show_err_msg(void)
+  319          {
+  320   1          LEDClearScreen();
+  321   1          LEDPuts(NUMBER2, err_str, 1);
+  322   1          ap_sleep(4);
+C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:43  PAGE 6   
+
+  323   1          return RESULT_MAIN;
+  324   1      }
+  325          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       450     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =       181     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        94     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,183 @@
+C251 COMPILER V4.55,  Hdrv_HardInit                                                        23/07/16  20:31:14  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE Hdrv_HardInit
+OBJECT MODULE PLACED IN .\UI_Release\obj\Hdrv_HardInit.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE Hdrv_HardInit.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) BROWSE INCDIR(..\..
+                    -\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\UI_Release\list\Hdrv_HardInit.lst) OBJECT(.\UI_Release\obj\Hdrv_HardInit.obj
+                    -) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************
+    3           *                       ACTOS
+    4           *                  driver demo
+    5           *
+    6           *                (c) Copyright 2002-2003, Actions Co,Ld.
+    7           *                        All Right Reserved
+    8           *
+    9           * File   : Hdrv_HardInit.c
+   10           * By     :     fiona
+   11           * Version: 1> v1.00     first version     date 2010/10/12
+   12           ********************************************************************************
+   13           */
+   14          #include "drv_led.h"
+   15          //#define EVB_MODE
+   16          #pragma name(HARD_INIT)
+   17          /************************************************************/
+   18          
+   19          ////********************************************************/
+   20          ///*    void Hdrv_SetMfpToEmif(void);
+   21          //** FUNCTION:     Hdrv_SetMfpToEmif
+   22          //**
+   23          //** Description:  select lcd segment and com
+   24          //**
+   25          //**  input
+   26          //**     none
+   27          //**
+   28          //**  output
+   29          //**     none
+   30          //**********************************************************/
+   31          void Hdrv_SetMfpToEmif(void)
+   32          {
+   33   1          uint8 sfr_bak;
+   34   1          sfr_bak = SFR_BANK;
+   35   1          //set MFP_GPIO Bank
+   36   1          SFR_BANK = BANK_GPIO;
+   37   1      #ifdef EVB_MODE
+               
+                   //select segment and com
+                   //select led_com[5,6,7]
+                   MFP_CTL0 &= 0x81;
+                   //select led_com[1,2,3,4]
+                   MFP_CTL1 = 0x15;
+                   //select led_com0
+                   MFP_CTL2 &= 0xf7;
+                   MFP_CTL2 |= 0x04;
+                   //select LED SEG4,5,6,7
+                   MFP_CTL3 &= 0xC0;
+                   MFP_CTL3 |= 0x15;
+                   //select LED SEG0,1,2,3
+                   MFP_CTL4 = 0x55;
+               #else
+   53   1          //select led_com[1,2,3,4]
+   54   1          MFP_CTL1 = 0x15;
+   55   1          //select led_com0
+   56   1          MFP_CTL2 &= 0xf7;
+   57   1          MFP_CTL2 |= 0x04;
+C251 COMPILER V4.55,  Hdrv_HardInit                                                        23/07/16  20:31:14  PAGE 2   
+
+   58   1          //select LED SEG4,5,6,7
+   59   1          MFP_CTL3 &= 0xC0;
+   60   1          MFP_CTL3 |= 0x15;
+   61   1          //select LED SEG0,1,2,3
+   62   1          MFP_CTL4 = 0x55;
+   63   1      #endif
+   64   1          SFR_BANK = sfr_bak;
+   65   1      }
+   66          
+   67          ////********************************************************/
+   68          ///*    void Hdrv_SetLED(void);
+   69          //** FUNCTION:     Hdrv_SetLED
+   70          //**
+   71          //** Description:  lcd controller reset and lcd clock select
+   72          //**
+   73          //**  input
+   74          //**     none
+   75          //**
+   76          //**  output
+   77          //**     none
+   78          //**********************************************************/
+   79          void Hdrv_SetLED(void)
+   80          {
+   81   1          uint8 sfr_bak;
+   82   1          sfr_bak = SFR_BANK;
+   83   1          //set BANK_CMU_RMU
+   84   1          SFR_BANK = BANK_CMU_RMU;
+   85   1          //enable LCD & SEG LCD clock,模块时钟使能
+   86   1          CLKENCTL2 |= 0x10;
+   87   1          // touch key controller reset,模块reset
+   88   1          MRCR3 &= 0xFD;
+   89   1          MRCR3 |= 0x02;
+   90   1      
+   91   1          //select LED &SEG LCD clock,模块时钟设置
+   92   1          LED_SEGLCDCLKCTL &= 0xF0;
+   93   1          LED_SEGLCDCLKCTL |= 0x03;
+   94   1          SFR_BANK = sfr_bak;
+   95   1      }
+   96          
+   97          ////********************************************************/
+   98          ///*    void Hdrv_HardInit(void);
+   99          //** FUNCTION:     Hdrv_HardInit
+  100          //**
+  101          //** Description:  初始化LCM的硬件设备
+  102          //**
+  103          //**  input
+  104          //**     none
+  105          //**
+  106          //**  output
+  107          //**     none
+  108          //**********************************************************/
+  109          void Hdrv_HardInit(void)
+  110          {
+  111   1              return;
+  112   1      #if 0
+                   uint8 sfr_bak = SFR_BANK;
+                   //lcd controller reset and lcd clock select
+                   Hdrv_SetLED();
+                   //select lcd segment and com
+                   Hdrv_SetMfpToEmif();
+                   SFR_BANK = BANK_LCD;
+                   //lcd_led模式选择
+                   LCD_MODE = LCD_MODE & (~0x7) | 0x07;
+                   //打开segment
+                   LCD_MODE |= 0x80;
+                   //输出使用
+C251 COMPILER V4.55,  Hdrv_HardInit                                                        23/07/16  20:31:14  PAGE 3   
+
+                   LCD_MODE |= 0x10;
+                   SFR_BANK = BANK_GPIO;
+               #if 1
+                   //使用数字部分点LED灯
+                   //降低驱动功能，也是就改变IO口的驱动等级
+                   //    PADDRV0=0x0;
+                   //    PADDRV1=0x0;
+                   LED_SEG_BIAS_EN &= 0xF7;
+               #else
+                   //使用恒流源点亮LED灯
+                   LED_SEG_BIAS_EN &= 0xF8;
+                   LED_SEG_BIAS_EN |= 0x0C;
+                   LED_SEG_RC_EN = 0x7f;
+                   PADDRV0 = 0xff;
+                   SFR_BANK = BANK_PMU;
+                   TEST_CTL |= 0x10;
+               #endif
+               
+                   SFR_BANK = sfr_bak;
+               #endif
+  144   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =        50     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,517 @@
+C251 COMPILER V4.55,  usound_irq                                                           13/12/18  14:07:01  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE usound_irq
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usound\usound_irq.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usbsound\usound_irq.c XSMALL FUNCTIONS(REENTRANT) ROM(HUG
+                    -E) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\usound_irq.lst) OBJECT(..\..\..\obj\lib\usound\usou
+                    -nd_irq.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              AS260A
+    3           *                            Module: USB Sound
+    4           *                 Copyright(c) 2001-2012 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>            <version >             <desc>
+    9           *      dengtaiping 2012-10-23 16:40     1.0                build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * \file     usound_irq.c
+   13           * \brief    .
+   14           * \author   dengtaiping
+   15           * \par      GENERAL DESCRIPTION:
+   16           *               usb中断服务程序
+   17           * \par      EXTERNALIZED FUNCTIONS:
+   18           *               这里描述调用到外面的模块
+   19           *
+   20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
+   21           *
+   22           * \version 1.0
+   23           * \date  2012/10/23
+   24           *******************************************************************************/
+   25          #include "usound_intern.h"
+   26          #include "usound_extern.h"
+   27          
+   28          #define INVALID_INT        0x00
+   29          #define SETUP_INT          0x01
+   30          #define OUT2TOKEN_INT      0x02
+   31          #define IN1TOKEN_INT       0x03
+   32          #define IN3TOKEN_INT       0x04
+   33          #define DISCONNECT_INT     0x05
+   34          
+   35          #pragma name(USC_IRQ)
+   36          #pragma renamecode(?PR?USC_IRQ)
+   37          
+   38          /******************************************************************************/
+   39          /*!
+   40           * \par  Description:
+   41           *     interrupt parse
+   42           * \param[in]    none.
+   43           * \param[out]   none.
+   44           * \return       interrupt type
+   45          
+   46           * \ingroup      module name
+   47           * \par          exmaple code
+   48           * \code
+   49           *               list example code in here
+   50           * \endcode
+   51           *******************************************************************************/
+   52          static uint8 parse_uisr_source(void)
+   53          {
+   54   1          if (0 != (Usbirq_hcusbirq & 0x01))
+   55   1          {
+   56   2              Usbirq_hcusbirq |= 0x01;
+   57   2              return SETUP_INT;
+C251 COMPILER V4.55,  usound_irq                                                           13/12/18  14:07:01  PAGE 2   
+
+   58   2          }
+   59   1          else if (0 != (Usbirq_hcusbirq & 0x80))
+   60   1          {
+   61   2              Usbirq_hcusbirq |= 0x80;
+   62   2              return DISCONNECT_INT;
+   63   2          }
+   64   1          else if (0 != (Ep03tokirq & 0x04))
+   65   1          {
+   66   2              Ep03tokirq |= 0x04;
+   67   2              return OUT2TOKEN_INT;
+   68   2          }
+   69   1          else if (0 != (Ep03tokirq & 0x20))
+   70   1          {
+   71   2              Ep03tokirq |= 0x20;
+   72   2              return IN1TOKEN_INT;
+   73   2          }
+   74   1          else if (0 != (Ep03tokirq & 0x80))
+   75   1          {
+   76   2              Ep03tokirq |= 0x80;
+   77   2              return IN3TOKEN_INT;
+   78   2          }
+   79   1          else
+   80   1          {
+   81   2              return INVALID_INT;
+   82   2          }
+   83   1      }
+   84          
+   85          #if 0
+               void adjust_audio_pll(int16 data_count, int16 high_threshold, int16 low_threshold)
+               {
+                   uint8 pll_select_low = 0, pll_select_high = 0, sfr_temp = 0;
+                   if (gud_param.play_sample_rate == SAMPLE_44K1)
+                   {
+                       pll_select_low = 0;
+                       pll_select_high = 0x06;
+                   }
+                   else
+                   {
+                       pll_select_low = 0x08;
+                       pll_select_high = 0x0e;
+                   }
+                   
+                   SFR_BANK = BANK_CMU_RMU;
+                   if (data_count >= high_threshold)
+                   {
+                       AUDIO_PLL_CTL = (AUDIO_PLL_CTL & 0xf1) | pll_select_high; //0x06; //0x0e; //adjust faster
+                   }
+                   else if (data_count <= low_threshold)
+                   {
+                       AUDIO_PLL_CTL = (AUDIO_PLL_CTL & 0xf1) | pll_select_low; //0x00; //0x08; //adjust slower
+                   }
+               
+               }
+               #endif
+  112          /******************************************************************************/
+  113          /*!
+  114           * \par  Description:
+  115           *     interrupt service
+  116           * \param[in]    none.
+  117           * \param[out]   none.
+  118           * \return       none
+  119          
+  120           * \ingroup      module name
+  121           * \par          exmaple code
+  122           * \code
+  123           *               list example code in here
+C251 COMPILER V4.55,  usound_irq                                                           13/12/18  14:07:01  PAGE 3   
+
+  124           * \endcode
+  125           *******************************************************************************/
+  126          void dma_adc_half_isr(void)
+  127          {
+  128   1          uint8 sfr_temp = SFR_BANK;
+  129   1          SFR_BANK = BANK_DMA_USB2;
+  130   1          if (0 != (0x03 & DMAnIP))
+  131   1          {
+  132   2              DMAnIP |= 0x03;
+  133   2              record_data_count += RECORD_BUFF_HALF;
+  134   2      
+  135   2              if ((record_data_count > RECORD_HIGH_OVERFLOW) || (record_data_count <= g_record_packet_size))
+  136   2              {
+  137   3                  DMAnCTL0 &= 0xfe;
+  138   3                  record_data_count = 0;
+  139   3                  start_record_flag = 0;
+  140   3                  rd_record_buff_ptr = 0;
+  141   3              }
+  142   2      
+  143   2      #ifdef __USE_ADC_SRFT__
+                       SFR_BANK = BANK_DAC_ADC;
+                       if (record_data_count >= RECORD_HIGH_THRESHOLD)
+                       {
+                           ADC_SRFT_CTL0 = (ADC_SRFT_CTL0 & 0xf9) | 0x02; //adjust slower
+                       }
+                       else if (record_data_count <= RECORD_LOW_THRESHOLD)
+                       {
+                           ADC_SRFT_CTL0 = (ADC_SRFT_CTL0 & 0xf9) | 0x04; //adjust faster
+                       }
+               #else
+  154   2              if (start_play_flag == 0) //如果没播放，就调，优先保证播放不断音
+  155   2              {
+  156   3                  
+  157   3                  //adjust_audio_pll(record_data_count, RECORD_HIGH_THRESHOLD, RECORD_LOW_THRESHOLD);
+  158   3                  SFR_BANK = BANK_CMU_RMU;
+  159   3                  if (record_data_count >= RECORD_HIGH_THRESHOLD)
+  160   3                  {
+  161   4                      AUDIO_PLL_CTL = (AUDIO_PLL_CTL & 0xf1) | 0x08; //adjust slower
+  162   4                  }
+  163   3                  else if (record_data_count <= RECORD_LOW_THRESHOLD)
+  164   3                  {
+  165   4                      AUDIO_PLL_CTL = (AUDIO_PLL_CTL & 0xf1) | 0x0e; //adjust faster
+  166   4                  }
+  167   3                  else
+  168   3                  {
+  169   4                      ;
+  170   4                  }
+  171   3              }
+  172   2      #endif
+  173   2          }
+  174   1          SFR_BANK = sfr_temp;
+  175   1      }
+  176          
+  177          /******************************************************************************/
+  178          /*!
+  179           * \par  Description:
+  180           *     interrupt service
+  181           * \param[in]    none.
+  182           * \param[out]   none.
+  183           * \return       none
+  184          
+  185           * \ingroup      module name
+  186           * \par          exmaple code
+  187           * \code
+  188           *               list example code in here
+  189           * \endcode
+C251 COMPILER V4.55,  usound_irq                                                           13/12/18  14:07:01  PAGE 4   
+
+  190           *******************************************************************************/
+  191          void dma_dac_half_isr(void)
+  192          {
+  193   1          uint8 sfr_temp = SFR_BANK;
+  194   1          SFR_BANK = BANK_DMA_USB1;
+  195   1          if (0 != (0x03 & DMAnIP))
+  196   1          {
+  197   2              DMAnIP |= 0x03;
+  198   2              play_data_count -= PLAY_BUFF_HALF;
+  199   2      
+  200   2              if ((play_data_count < PLAY_LOW_OVERFLOW) || (play_data_count > PLAY_HIGH_OVERFLOW))
+  201   2              {
+  202   3                  DMAnCTL0 &= 0xfe; //
+  203   3                  start_play_flag = 0; //
+  204   3                  play_data_count = 0;
+  205   3                  wr_play_buff_ptr = 0;
+  206   3              }
+  207   2      
+  208   2              SFR_BANK = BANK_CMU_RMU;
+  209   2              if (play_data_count >= PLAY_HIGH_THRESHOLD)
+  210   2              {
+  211   3                  AUDIO_PLL_CTL = (AUDIO_PLL_CTL & 0xf1) | 0x0e; //adjust faster
+  212   3              }
+  213   2              else if (play_data_count <= PLAY_LOW_THRESHOLD)
+  214   2              {
+  215   3                  AUDIO_PLL_CTL = (AUDIO_PLL_CTL & 0xf1) | 0x08; //adjust slower
+  216   3              }
+  217   2              else
+  218   2              {
+  219   3                  ;
+  220   3              }
+  221   2              
+  222   2              //adjust_audio_pll(play_data_count, PLAY_HIGH_THRESHOLD, PLAY_LOW_THRESHOLD);
+  223   2          }
+  224   1          SFR_BANK = sfr_temp;
+  225   1      }
+  226          
+  227          /******************************************************************************/
+  228          /*!
+  229           * \par  Description:
+  230           *     iso out token process.
+  231           * \param[in]    none.
+  232           * \param[out]   none.
+  233           * \return       none
+  234          
+  235           * \ingroup      module name
+  236           * \par          exmaple code
+  237           * \code
+  238           *               list example code in here
+  239           * \endcode
+  240           *******************************************************************************/
+  241          static void iso_out_token_isr(void)
+  242          {
+  243   1          uint16 data_lenth, dma_lenth,condition;
+  244   1          uint32 dma_address;
+  245   1          uint8 sfr_temp = SFR_BANK;
+  246   1      
+  247   1          SFR_BANK = BANK_USB;
+  248   1          while (1)
+  249   1          {
+  250   2              if (0x00 == (Out2cs_hcin2cs & 0x02))
+  251   2              {
+  252   3                  break;
+  253   3              }
+  254   2              if (0x01 == (Out2cs_hcin2cs & 0x01))
+  255   2              {
+C251 COMPILER V4.55,  usound_irq                                                           13/12/18  14:07:01  PAGE 5   
+
+  256   3                  break;
+  257   3              }
+  258   2      
+  259   2              if (USB_IS_CONNECT != is_usb_connect())
+  260   2              {
+  261   3                  break;
+  262   3              }
+  263   2          }
+  264   1          if (DOWNLOAD_BIT_DEPTH_24== gud_param.bit_depth)
+  265   1          {
+  266   2              condition = PLAY_BUFF_SIZE / 3; //0x1400;//0x800; //PLAY_BUFF_HALF)//0x554)//PLAY_BUFF_HALF)
+  267   2          } 
+  268   1          else
+  269   1          {
+  270   2              condition= PLAY_BUFF_HALF;
+  271   2          }
+  272   1          if (play_data_count >= condition)
+  273   1          {
+  274   2              usb_state |= PLAY_RUNNING;
+  275   2              if (start_play_flag == 0)
+  276   2              {
+  277   3                  dma_reload_to_dac();
+  278   3                  start_play_flag = 1;
+  279   3              }
+  280   2          }
+  281   1      
+  282   1          SFR_BANK = BANK_USB;
+  283   1          if (DOWNLOAD_BIT_DEPTH_24== gud_param.bit_depth)
+  284   1          {
+  285   2              data_lenth = (Out2bcl_hcin2bcl+(Out2bch_hcin2bch<<8));
+  286   2          }
+  287   1          else
+  288   1          {
+  289   2              //data_lenth = (Out2bcl_hcin2bcl+(Out2bch_hcin2bch<<8));
+  290   2              data_lenth = Out2bcl_hcin2bcl;
+  291   2          }
+  292   1          if (data_lenth == 0)
+  293   1          {
+  294   2              goto exit_iso_out;
+  295   2          }
+  296   1      
+  297   1          play_data_count += data_lenth;
+  298   1      
+  299   1          if (wr_play_buff_ptr + data_lenth > PLAY_BUFF_SIZE)
+  300   1          {
+  301   2              dma_address = PLAY_BUFF_START + wr_play_buff_ptr;
+  302   2              dma_lenth = PLAY_BUFF_SIZE - wr_play_buff_ptr;
+  303   2              if (0 != dma_lenth)
+  304   2              {
+  305   3                  usb_fifo_access(EP2OUT, (uint8 *) dma_address, dma_lenth);
+  306   3              }
+  307   2              dma_address = PLAY_BUFF_START;
+  308   2              dma_lenth = data_lenth - dma_lenth;
+  309   2              usb_fifo_access(EP2OUT, (uint8 *) dma_address, dma_lenth);
+  310   2              wr_play_buff_ptr = dma_lenth;
+  311   2          }
+  312   1          else
+  313   1          {
+  314   2              dma_address = PLAY_BUFF_START + wr_play_buff_ptr;
+  315   2              dma_lenth = data_lenth;
+  316   2              usb_fifo_access(EP2OUT, (uint8 *) dma_address, dma_lenth);
+  317   2              wr_play_buff_ptr += data_lenth;
+  318   2          }
+  319   1      
+  320   1      exit_iso_out:
+  321   1          Out2cs_hcin2cs |= 0x02;
+C251 COMPILER V4.55,  usound_irq                                                           13/12/18  14:07:01  PAGE 6   
+
+  322   1          SFR_BANK = sfr_temp;
+  323   1          return;
+  324   1      }
+  325          
+  326          /******************************************************************************/
+  327          /*!
+  328           * \par  Description:
+  329           *     iso in token process.
+  330           * \param[in]    none.
+  331           * \param[out]   none.
+  332           * \return       none
+  333          
+  334           * \ingroup      module name
+  335           * \par          exmaple code
+  336           * \code
+  337           *               list example code in here
+  338           * \endcode
+  339           *******************************************************************************/
+  340          static void iso_in_token_isr(void)
+  341          {
+  342   1          uint32 data_lenth, dma_lenth, dma_address;
+  343   1          uint8 sfr_temp = SFR_BANK;
+  344   1      
+  345   1          if (0 == start_record_flag)
+  346   1          {
+  347   2              dma_reload_from_adc();
+  348   2              start_record_flag = 1;
+  349   2          }
+  350   1      
+  351   1          if (record_data_count < g_record_packet_size)
+  352   1          {
+  353   2              data_lenth = record_data_count;
+  354   2          }
+  355   1          else
+  356   1          {
+  357   2              data_lenth = g_record_packet_size;
+  358   2          }
+  359   1          data_lenth <<= 1;
+  360   1          record_data_count -= data_lenth;
+  361   1      
+  362   1          SFR_BANK = BANK_USB;
+  363   1          if (rd_record_buff_ptr + data_lenth > RECORD_BUFF_SIZE)
+  364   1          {
+  365   2              dma_address = RECORD_BUFF_START + rd_record_buff_ptr;
+  366   2              dma_lenth = RECORD_BUFF_SIZE - rd_record_buff_ptr;
+  367   2              if (0 != dma_lenth)
+  368   2              {
+  369   3                  usb_fifo_access(EP1IN, (uint8 *) dma_address, dma_lenth);
+  370   3              }
+  371   2              dma_address = RECORD_BUFF_START;
+  372   2              dma_lenth = data_lenth - dma_lenth;
+  373   2              usb_fifo_access(EP1IN, (uint8 *) dma_address, dma_lenth);
+  374   2              rd_record_buff_ptr = dma_lenth;
+  375   2          }
+  376   1          else
+  377   1          {
+  378   2              dma_address = RECORD_BUFF_START + rd_record_buff_ptr;
+  379   2              dma_lenth = data_lenth;
+  380   2              usb_fifo_access(EP1IN, (uint8 *) dma_address, dma_lenth);
+  381   2              rd_record_buff_ptr += data_lenth;
+  382   2          }
+  383   1      
+  384   1          In1cs_hcout1cs |= 0x02;
+  385   1          return;
+  386   1      }
+  387          
+C251 COMPILER V4.55,  usound_irq                                                           13/12/18  14:07:01  PAGE 7   
+
+  388          /******************************************************************************/
+  389          /*!
+  390           * \par  Description:
+  391           *     interrupt transfer in token process.
+  392           * \param[in]    none.
+  393           * \param[out]   none.
+  394           * \return       none
+  395          
+  396           * \ingroup      module name
+  397           * \par          exmaple code
+  398           * \code
+  399           *               list example code in here
+  400           * \endcode
+  401           *******************************************************************************/
+  402          static void hid_in_token_isr(void)
+  403          {
+  404   1          if (hid_send_flag != 0)
+  405   1          {
+  406   2              hid_send_flag--;
+  407   2              while (0 != (0x02 & In3cs_hcout3cs))
+  408   2              {
+  409   3                  if (USB_IS_CONNECT != is_usb_connect())
+  410   3                  {
+  411   4                      break;
+  412   4                  }
+  413   3              }
+  414   2              Fifo3dat = hid_report;
+  415   2              hid_report = 0;
+  416   2              In3cs_hcout3cs |= 0x02;
+  417   2          }
+  418   1      }
+  419          
+  420          /******************************************************************************/
+  421          /*!
+  422           * \par  Description:
+  423           *     usb interrupt service func.
+  424           * \param[in]    none.
+  425           * \param[out]   none.
+  426           * \return       none
+  427          
+  428           * \ingroup      module name
+  429           * \par          exmaple code
+  430           * \code
+  431           *               list example code in here
+  432           * \endcode
+  433           *******************************************************************************/
+  434          void usound_isr(void)
+  435          {
+  436   1          uint8 int_type;
+  437   1          uint8 sfr_temp = SFR_BANK;
+  438   1          SFR_BANK = BANK_USB;
+  439   1          USBEIRQ |= 0x80;
+  440   1          int_type = parse_uisr_source();
+  441   1          switch (int_type)
+  442   1          {
+  443   2          case SETUP_INT:
+  444   2              deal_setup();
+  445   2              break;
+  446   2          case OUT2TOKEN_INT:
+  447   2              iso_out_token_isr();
+  448   2              break;
+  449   2          case IN1TOKEN_INT:
+  450   2      #ifdef _USB_RECORD_
+  451   2              iso_in_token_isr();
+  452   2      #endif
+  453   2              break;
+C251 COMPILER V4.55,  usound_irq                                                           13/12/18  14:07:01  PAGE 8   
+
+  454   2          case IN3TOKEN_INT:
+  455   2              hid_in_token_isr();
+  456   2              break;
+  457   2          case DISCONNECT_INT:
+  458   2              USBEIRQ = 0x80; //关中断，ap将退出
+  459   2              usb_state |= USOUND_PLUG_OUT;
+  460   2              break;
+  461   2          default:
+  462   2              Usbirq_hcusbirq = 0xff;
+  463   2              break;
+  464   2          }
+  465   1          SFR_BANK = sfr_temp;
+  466   1          return;
+  467   1      }
+  468          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       908     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

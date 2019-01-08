@@ -1,0 +1,204 @@
+C251 COMPILER V4.55,  usbdisk_enter2exit                                                   13/12/18  16:28:50  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE usbdisk_enter2exit
+OBJECT MODULE PLACED IN .\obj\usbdisk_enter2exit.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE usbdisk_enter2exit.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPE
+                    -ED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 ORDER DEFINE(UDISK_AP) DEBUG PRINT(.\list\usbdisk_enter2exit.lst) O
+                    -BJECT(.\obj\usbdisk_enter2exit.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              AS211A
+    3           *                            Module: USB MAIN
+    4           *                 Copyright(c) 2001-2010 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *      wanghaijing 2010-3-10         1.0                build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * \file     usbdisk_enter2exit.c
+   13           * \brief
+   14           * \author   wanghaijing
+   15           * \par      GENERAL DESCRIPTION:
+   16           *               这里对文件进行描述
+   17           * \par      EXTERNALIZED FUNCTIONS:
+   18           *               这里描述调用到外面的模块
+   19           *
+   20           *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
+   21           *
+   22           * \version 1.0
+   23           * \date  2010-3-27
+   24           *******************************************************************************/
+   25          #include "Udisk.h"
+   26          extern uint8 UdiskStatus;
+   27          extern uint8 HoldDispState;
+   28          extern uint8 IRUSBExit;
+   29          extern uint8 reckeypress;
+   30          #pragma name(AP_ENTEREXIT)
+   31          bool UDiskInitAll(int para)
+   32          {
+   33   1          bool ret;
+   34   1          //    /*低电模式下进行充电*/
+   35   1          //    if(GetBattery() < 0x13)
+   36   1          //    {
+   37   1          //       sKY_ChargeSet(1);
+   38   1          //       sKY_ChargeGetandSet();
+   39   1          //    }
+   40   1      
+   41   1          //将ram的clk均切换到mcu clk,避免应用退出到u盘,clk不对导致使用问题.
+   42   1          RamToMcu();
+   43   1      
+   44   1          if (DRV_DetectUD(0x00) == 0xff)
+   45   1          {
+   46   2              return 0;
+   47   2          }
+   48   1          else
+   49   1          {
+   50   2              DRV_ActiveUD(0x00, MODE_FAST); //快速模式ud驱动
+   51   2          }
+   52   1      
+   53   1          //read comval
+   54   1          VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval)); //读VRAM
+   55   1      
+   56   1          //==================================================================================
+   57   1          //**********************以下函数调用次序不能改动***************************************
+C251 COMPILER V4.55,  usbdisk_enter2exit                                                   13/12/18  16:28:50  PAGE 2   
+
+   58   1          //==================================================================================
+   59   1          UDiskSetDiskNum(3); //设置联机模式
+   60   1      
+   61   1          AlwaysShowCardDisk(0); //设置是否显示多盘符  //reagan modify 2009-1-6 13:39
+   62   1      
+   63   1          //U盘初始终化,输入参数:callback函数，属性...
+   64   1          UDiskInit(0, g_comval.udisk_setting);
+   65   1      
+   66   1          ret = UDiskRun(para); //启动USB引擎
+   67   1          return ret;
+   68   1      }
+   69          
+   70          extern void _nop_(void);
+   71          void power_control(void)
+   72          {
+   73   1          uint8 sfr_bak;
+   74   1          sfr_bak = SFR_BANK;
+   75   1      
+   76   1          SFR_BANK = BANK_CMU_RMU;
+   77   1          MRCR3 |= 0x08;
+   78   1          _nop_();
+   79   1          _nop_();
+   80   1          _nop_();
+   81   1          _nop_();
+   82   1          MRCR2 |= 0x08;
+   83   1          _nop_();
+   84   1          _nop_();
+   85   1      
+   86   1          SFR_BANK = BANK_PMU;
+   87   1          //VDD_DCDC_CTL = (VDD_DCDC_CTL & 0xC1)|0x16;
+   88   1          BDG_CTL |= 0x40;
+   89   1          EFUSE_CTL |= 0x40;
+   90   1          SFR_BANK = BANK_USB;
+   91   1          USB_PHYCTRL |= 0xC0;
+   92   1          USB_Efuse_Ref |= 0x40;
+   93   1          SFR_BANK = BANK_CMU_RMU;
+   94   1          MRCR1 &= 0xf7;
+   95   1          //MCSR2 &= 0xfc;
+   96   1          //    MCSR3 &= 0xbf;
+   97   1          //MCSR5 &= 0xe7;
+   98   1      
+   99   1          SFR_BANK = sfr_bak;
+  100   1      }
+  101          
+  102          int16 UdiskExitAll(void)
+  103          {
+  104   1          int16 ret;
+  105   1      
+  106   1          UDiskExit();
+  107   1      
+  108   1          DRV_ActiveUD(0x00, MODE_SLOW);
+  109   1      
+  110   1          //按Mode退出
+  111   1          if (UdiskStatus == 0x00)
+  112   1          {
+  113   2              if (reckeypress == 1)
+  114   2              {
+  115   3                  ret = RESULT_USBAUDIO_PLAY;
+  116   3              }
+  117   2              else if(reckeypress == 2)
+  118   2              {
+  119   3                  ret = RESULT_USBTEST;
+  120   3              }
+  121   2              else
+  122   2              {
+  123   3                  ret = RESULT_NULL;
+C251 COMPILER V4.55,  usbdisk_enter2exit                                                   13/12/18  16:28:50  PAGE 3   
+
+  124   3              }
+  125   2          }
+  126   1          //升级退出
+  127   1          else if (UdiskStatus == 0x50)
+  128   1          {
+  129   2              ret = RESULT_UPGRADE;
+  130   2          }
+  131   1          else
+  132   1          {
+  133   2              //拔线,弹出
+  134   2              ret = 0;
+  135   2          }
+  136   1          //MODE键功能  UHOST、CARD、FM、USBAUDIO、UDISKUSB  循环切换
+  137   1          // 对应红外遥控上面的Power键
+  138   1          if (IRUSBExit)
+  139   1          {
+  140   2              ret = RESULT_NULL;
+  141   2              //        ret = RESULT_MUSIC_PLAY; //    RESULT_MUSIC_PLAY SD Card 准备时间不够导致又进入 FM
+  142   2          }
+  143   1          power_control();
+  144   1          return ret; //RESULT_USBAUDIO_PLAY
+  145   1      }
+  146          
+  147          void RamToMcu(void)
+  148          {
+  149   1          uint8 sfr_bak;
+  150   1          sfr_bak = SFR_BANK;
+  151   1      
+  152   1          SFR_BANK = BANK_CMU_RMU;
+  153   1      #if 0
+                   MCSR11 = (uint8) (MCSR11 & 0x04);
+                   MCSR5 = (uint8) ((MCSR5 & 0xe1) | 0x34); //JRAM3Clk:MCU clk; PCMRAM:MCU clk;
+                   MCSR6 = (uint8) ((MCSR6 & 0xf0) | 0x0a); //MURAM2:MCU clk; JRAM1Clk:MCU clk;
+                   MCSR7 = 0x2a; //B1 Clk:MCU clk; MURAM1HClk:MCU clk; JRAM2Clk:MCU clk;
+                   MCSR8 = (uint8) ((MCSR8 & 0x03) | 0x48); //MURAM1MClk:MCU clk; MURAM1LClk:MCU clk;
+                   MCSR9 = 0x4a; //URAMClk:MCU clk; B2 Clk:MCU clk; DRAM251BClk:MCU clk;
+                   MCSR11 = MCSR11 | 0xfb;
+               #endif
+  162   1      
+  163   1          SFR_BANK = sfr_bak;
+  164   1      
+  165   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       215     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

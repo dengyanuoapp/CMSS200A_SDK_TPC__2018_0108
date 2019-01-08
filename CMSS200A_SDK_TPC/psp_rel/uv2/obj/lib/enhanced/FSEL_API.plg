@@ -1,0 +1,26 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\psp_rel\uv2\prj\lib\midware\enhanced\fileSelect_api.uv2
+Project File Date:  03/03/2014
+
+<h2>Output:</h2>
+Build target 'fileSelect'
+compiling enhanced_selector_api.c...
+compiling enhanced_selector_next.c...
+compiling enhanced_selector_prev.c...
+compiling enhanced_selector_sub.c...
+creating library ..\..\..\..\obj\lib\enhanced\FSEL_API.LIB...
+TRANSFER
+"..\..\..\..\obj\lib\enhanced\enhanced_selector_api.obj",
+"..\..\..\..\obj\lib\enhanced\enhanced_selector_next.obj",
+"..\..\..\..\obj\lib\enhanced\enhanced_selector_prev.obj",
+"..\..\..\..\obj\lib\enhanced\enhanced_selector_sub.obj" 
+TO "..\..\..\..\obj\lib\enhanced\FSEL_API.LIB"
+LIB251 LIBRARY MANAGER V4.24
+COPYRIGHT KEIL ELEKTRONIK GmbH 1987 - 2002
+User command #1: FILESELECT_API.bat
+已复制         1 个文件。
+"..\..\..\..\obj\lib\enhanced\FSEL_API.LIB" - 0 Error(s), 0 Warning(s).

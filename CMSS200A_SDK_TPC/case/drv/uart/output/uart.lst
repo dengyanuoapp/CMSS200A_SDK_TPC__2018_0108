@@ -1,0 +1,173 @@
+C251 COMPILER V4.55,  uart                                                                 13/12/18  16:28:37  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE uart
+OBJECT MODULE PLACED IN .\output\uart.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE uart.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) BROWSE INCDIR(..\..\..\psp_r
+                    -el\inc;..\..\inc) I4 DEBUG PRINT(.\output\uart.lst) OBJECT(.\output\uart.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              AS260A
+    3           *                            Module: USB Sound
+    4           *                 Copyright(c) 2001-2012 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>            <version >             <desc>
+    9           *      dengtaiping 2012-10-23 16:40     1.0                build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * \file     usound_init.c
+   13           * \brief    .
+   14           * \author   dengtaiping
+   15           * \par      GENERAL DESCRIPTION:
+   16           *               usb、AUDIO等模块初始化
+   17           * \par      EXTERNALIZED FUNCTIONS:
+   18           *               这里描述调用到外面的模块
+   19           *
+   20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
+   21           *
+   22           * \version 1.0
+   23           * \date  2012/10/23
+   24           *******************************************************************************/
+   25          #include "uart.h"
+   26          
+   27          #pragma name(UART)
+   28          
+   29          uint32 uart_isr_no;
+   30          uart_fifo_t uart_fifo;
+   31          SD_FILE *uart_data1_fp;
+   32          SD_FILE *uart_data2_fp;
+   33          uint8* head1_read_buf;
+   34          uint8* head2_read_buf;
+   35          uint8* data_read_buf;
+   36          uart_data_t* uart_data;
+   37          uint8 uart_timer_id;
+   38          uint8 delay_timer_id;
+   39          uint8 trans_1st_finish_flag;
+   40          uint8 trans_2nd_start_flag;
+   41          uint8 trans_last_data_flag;
+   42          uint8 tmp_count;
+   43          uint8 drop_flag;
+   44          void get_uart_data(uint8 index);
+   45          void init_uart_info(void);
+   46          void send_first_msg(void);
+   47          
+   48          const uint8 uart_data1_str[] = "U_DATA1.BIN";
+   49          const uint8 uart_data2_str[] = "U_DATA2.BIN";
+   50          
+   51          uint8 uart_init(void)
+   52          {
+   53   1              uint8 sfr_temp = SFR_BANK;
+   54   1      
+   55   1              SFR_BANK = BANK_CMU_RMU;
+   56   1              MRCR1 &= 0xf7;
+   57   1              MRCR1 |= 0x08;
+   58   1              CLKENCTL1 |= 0x01;
+C251 COMPILER V4.55,  uart                                                                 13/12/18  16:28:37  PAGE 2   
+
+   59   1      
+   60   1              SFR_BANK = BANK_GPIO;
+   61   1              GPIOCOUTEN &= 0xe7;
+   62   1              GPIOCINEN &= 0xe7;
+   63   1          GPIOCDAT &= 0xe7;
+   64   1              MFP_CTL5 &= 0xf0;
+   65   1              MFP_CTL5 |= 0x05;       
+   66   1      
+   67   1              SFR_BANK = BANK_UART;
+   68   1              UART_BR = 0x05;
+   69   1              UART_MODE = 0x00;
+   70   1              UART_CTL = 0xc0;        // enable TX & RX
+   71   1              UART_DRQ = 0x05;        // disable TX IRQ, enable RX IRQ
+   72   1              SFR_BANK = sfr_temp;
+   73   1      
+   74   1              send_first_msg();
+   75   1              
+   76   1              init_uart_info();
+   77   1              memset(&uart_fifo, 0x0, UART_FIFO_CNT);
+   78   1              trans_1st_finish_flag = FALSE;
+   79   1              trans_2nd_start_flag  = FALSE;
+   80   1              trans_last_data_flag  = FALSE;
+   81   1              tmp_count = 0;
+   82   1              drop_flag = FALSE;
+   83   1              SFR_BANK = BANK_UART;
+   84   1              IE0 &= 0x7f;
+   85   1              uart_isr_no = IRQ_Intercept((uint32) uart_isr, IRQ_UART);
+   86   1              IE0 = IE0 | 0x80;
+   87   1              IE0 |= 0x10; //enable UART/IRC interrupt
+   88   1              SFR_BANK = sfr_temp;
+   89   1      
+   90   1          return 1;
+   91   1      }
+   92          
+   93          void uart_exit(void)
+   94          {
+   95   1              IRQ_Release(uart_isr_no, IRQ_UART);
+   96   1              SD_FClose(uart_data2_fp);
+   97   1              SD_FClose(uart_data1_fp);
+   98   1              return;
+   99   1      }
+  100          
+  101          void init_uart_info(void)
+  102          {   
+  103   1          head1_read_buf = (uint8*)0x1180;
+  104   1          head2_read_buf = (uint8*)0x1280;
+  105   1          data_read_buf = (uint8*)0x1380;
+  106   1          uart_data1_fp = SD_FOpen(uart_data1_str, MODE_READ);
+  107   1          SD_FRead(uart_data1_fp, head1_read_buf, 256);
+  108   1          uart_data2_fp = SD_FOpen(uart_data2_str, MODE_READ);
+  109   1          SD_FRead(uart_data2_fp, head2_read_buf, 256);
+  110   1      }
+  111          
+  112          void get_uart_data(uint8 index)
+  113          {    
+  114   1          if(index >= TOTAL_COUNT_NUM)
+  115   1          {
+  116   2             return;
+  117   2          }
+  118   1          
+  119   1          if (uart_fifo.rx_count < SKIP_COUNT_NUM)
+  120   1              {
+  121   2                      uart_data = (uart_data_t*)&head1_read_buf[index * sizeof(uart_data_t)];
+  122   2                      SD_FSeek(uart_data1_fp, SEEK_SET, (0x100 + uart_data->offset));
+  123   2                      memset(data_read_buf, 0x0, (uart_data->length + 2));
+  124   2                      SD_FRead(uart_data1_fp, data_read_buf, uart_data->length);
+C251 COMPILER V4.55,  uart                                                                 13/12/18  16:28:37  PAGE 3   
+
+  125   2              }
+  126   1              else
+  127   1              {
+  128   2                      uart_data = (uart_data_t*)&head2_read_buf[(index-SKIP_COUNT_NUM) * sizeof(uart_data_t)];
+  129   2                  SD_FSeek(uart_data2_fp, SEEK_SET, (0x100 + uart_data->offset));
+  130   2                  memset(data_read_buf, 0x0, (uart_data->length + 2));
+  131   2                  SD_FRead(uart_data2_fp, data_read_buf, uart_data->length);
+  132   2              }
+  133   1          uart_fifo.putP = uart_data->length; 
+  134   1          uart_fifo.used = 0;
+  135   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       484     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        52     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        24     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

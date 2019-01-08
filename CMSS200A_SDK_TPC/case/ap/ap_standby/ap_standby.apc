@@ -1,0 +1,10 @@
+hexfile=.\Obj\ap_standby.hex
+mask=0x0
+hextype=intel
+mapfile=.\Obj\ap_standby.map
+apfile=.\standby.ap
+entry=main
+seg_text=API30,?HC?AP_STANDBY,?PR?AP_STANDBY,?FD?AP_STANDBY,?PR?COM_MSG2,?PR?COM_COM2,?PR?COM_MSG,?HC?COM_MSG2,?PR?COM_COM
+seg_text=?C_INITEDATA
+seg_text=?C_C51STARTUP
+seg_data=?ED?COM_COM

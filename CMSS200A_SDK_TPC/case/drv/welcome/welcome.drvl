@@ -1,0 +1,33 @@
+#/*****************************************************************************************
+#*                                 asdk 5102
+#*                            Module: key drv
+#*                 Copyright(c) 2001-2009 Actions Semiconductor,
+#*                            All Rights Reserved. 
+#*
+#* History:         
+#*      <author>       <time>             <version >           <desc>
+#*       steven    2012-8-14 11:36          1.0             build this file 
+#*
+#* Description: key drv的链接脚本。
+#*					 		
+#*******************************************************************************************/  
+#
+#
+#/****************************************************************************************** 
+# * common settting 
+# ******************************************************************************************/
+linkcfg0=begin
+NOOVERLAY 
+NOJMPTAB
+NODEFAULTLIBRARY
+CLASSES(ECODE(0x800000-0xFFFFFF))
+CLASSES(HCONST(0x800000-0xFFFFFF))
+linkcfg0=end
+
+#/***************************************************************************************** 
+# * Program Memory  
+# *****************************************************************************************/
+#
+#/******************************************常驻内存代码段*************************************/
+seg_text(0xFF2000-0xFF24FF)=?PR?CODEDISPSTART,CODEDISPSTART,?PR?HARD_INIT,?PR?HARD_DEAL,?HC?SDRV_DISPLAY,?PR?SDRV_DISPLAY,?HC?CODEDISPSTART
+seg_data(0x0a80-0xb2f)=?ED?CODEDISPSTART

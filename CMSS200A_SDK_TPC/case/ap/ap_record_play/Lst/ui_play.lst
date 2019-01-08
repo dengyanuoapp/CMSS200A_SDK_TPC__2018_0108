@@ -1,0 +1,332 @@
+C251 COMPILER V4.55,  ui_play                                                              23/05/16  10:42:44  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE ui_play
+OBJECT MODULE PLACED IN .\Obj\ui_play.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ui_play.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED)
+                    - BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\ui_play.lst) OBJECT(.\Obj\ui_play.obj) 
+
+stmt  level    source
+
+    1          #include "ap_record_play.h"
+    2          
+    3          #pragma name(UI_PLAY)
+    4          
+    5          //#define MUSIC_MP3
+    6          
+    7          Open_param_t g_Openparam;
+    8          breakPT_t BreakPTSave;
+    9          uint8 *name = "TEST    WAV";
+   10          
+   11          void ShowNowTime(void);
+   12          void ui_draw_play_music(void);
+   13          uint8 deal_play_status(void);
+   14          bool musicpSendCommand_bank(uint8 cmd, void *param);
+   15          
+   16          
+   17          uint8 ui_play(void)
+   18          {
+   19   1          uint8 result = 0;
+   20   1          uint8 need_draw;
+   21   1          uint8 key;
+   22   1      
+   23   1          memset(&BreakPTSave, 0, sizeof(breakPT_t));
+   24   1          g_Openparam.filename = g_record_vars.location.filename;//文件名地址
+   25   1          g_Openparam.BreakPTSave = &BreakPTSave;//备份参数地址
+   26   1          g_Openparam.typeerror = 0;//默认为正常格式文件
+   27   1          g_Openparam.SoftVolumeMax = 0;
+   28   1          g_Openparam.FadeInTime = 0x03;
+   29   1      #ifndef MUSIC_MP3
+   30   1          g_Openparam.musicframeoffset = 0x200;
+   31   1      #endif
+   32   1      
+   33   1          if(!DRV_ActiveDrive(g_record_vars.location.disk, 1))
+   34   1          {
+   35   2              result = RESULT_MAIN;
+   36   2              goto play_exit;
+   37   2          }
+   38   1          if((g_record_vars.location.disk != 'M') && \
+   39   1                  (FALSE == FS_CD(FS_CD_ROOT))) //避免处于最后的目录项时调用FS_SetCurDir出错
+   40   1          {
+   41   2              result = RESULT_MAIN;
+   42   2              goto play_exit;
+   43   2          }
+   44   1      
+   45   1          musicpSendCommand_bank(MC_OPEN, (void *) &g_Openparam);
+   46   1      
+   47   1          if(!musicpSendCommand_bank(MC_LOAD, NULL))
+   48   1          {
+   49   2              result = RESULT_CURRENT_AP;
+   50   2              goto play_exit;
+   51   2          }
+   52   1      
+   53   1          if (!musicpSendCommand_bank(MC_PLAY, (void *) Nor_open))
+   54   1          {
+   55   2              musicpSendCommand_bank(MC_STOP, NULL);
+   56   2              musicpSendCommand_bank(MC_CLOSE, NULL);
+   57   2              result = RESULT_CURRENT_AP;
+   58   2              goto play_exit;
+C251 COMPILER V4.55,  ui_play                                                              23/05/16  10:42:44  PAGE 2   
+
+   59   2          }
+   60   1      
+   61   1          while(1)
+   62   1          {
+   63   2              if (need_draw)
+   64   2              {
+   65   3                  ui_draw_play_music();
+   66   3                  need_draw = FALSE;
+   67   3              }
+   68   2      
+   69   2              key = ap_get_message();
+   70   2              switch (key)
+   71   2              {
+   72   3              case AP_MSG_RTC:
+   73   3              case AP_MSG_WAIT_TIMEOUT:
+   74   3                  ShowNowTime();
+   75   3                  break;
+   76   3      
+   77   3              case AP_KEY_PLAY | AP_KEY_UP:
+   78   3                  result = RESULT_CURRENT_AP;
+   79   3                  break;
+   80   3      
+   81   3                  /*case AP_KEY_VOLADD | AP_KEY_UP:
+   82   3                  case AP_KEY_VOLADD | AP_KEY_LONG:
+   83   3                      if (g_comval.volume < g_comval.VolumeMax)
+   84   3                      {
+   85   3                          g_comval.volume++;
+   86   3                          set_dac_volume(g_comval.volume);
+   87   3                      }
+   88   3                      break;
+   89   3                  case AP_KEY_VOLSUB | AP_KEY_UP:
+   90   3                  case AP_KEY_VOLSUB | AP_KEY_LONG:
+   91   3                      if (g_comval.volume > 0)
+   92   3                      {
+   93   3                          g_comval.volume--;
+   94   3                          set_dac_volume(g_comval.volume);
+   95   3                      }
+   96   3                      break;*/
+   97   3      
+   98   3              case AP_KEY_MODE | AP_KEY_UP:
+   99   3                  result = RESULT_MAIN;
+  100   3                  break;
+  101   3      
+  102   3              case AP_MSG_SD_OUT:
+  103   3                  if (g_record_vars.location.disk == g_disk_char[1])
+  104   3                  {
+  105   4                      show_err_msg();
+  106   4                      result = RESULT_MAIN;
+  107   4                  }
+  108   3                  break;
+  109   3              case AP_MSG_UH_OUT:
+  110   3                  if (g_record_vars.location.disk == g_disk_char[0])
+  111   3                  {
+  112   4                      show_err_msg();
+  113   4                      result = RESULT_MAIN;
+  114   4                  }
+  115   3                  break;
+  116   3      
+  117   3              case AP_MSG_SD_IN:
+  118   3                  result = RESULT_MUSIC_CPLAY;
+  119   3                  break;
+  120   3              case AP_MSG_UH_IN:
+  121   3                  result = RESULT_MUSIC_UPLAY;
+  122   3                  break;
+  123   3              case AP_MSG_LINEIN_IN:
+  124   3                  result = RESULT_LINEIN;
+C251 COMPILER V4.55,  ui_play                                                              23/05/16  10:42:44  PAGE 3   
+
+  125   3                  break;
+  126   3      
+  127   3              case AP_KEY_USBTEST | AP_KEY_LONG:
+  128   3                  /* do nothing */
+  129   3                  break;
+  130   3      
+  131   3              default:
+  132   3                  result = ap_handle_hotkey(key);
+  133   3                  break;
+  134   3              }//switch
+  135   2              if (result != NULL)
+  136   2              {
+  137   3                  musicpSendCommand_bank(MC_STOP, NULL);
+  138   3                  musicpSendCommand_bank(MC_CLOSE, NULL);
+  139   3                  break;
+  140   3              }
+  141   2              result = deal_play_status();
+  142   2              if (result != NULL)
+  143   2              {
+  144   3                  musicpSendCommand_bank(MC_STOP, NULL);
+  145   3                  musicpSendCommand_bank(MC_CLOSE, NULL);
+  146   3                  break;
+  147   3              }
+  148   2          }
+  149   1      play_exit:
+  150   1          return result;
+  151   1      }
+  152          
+  153          /*
+  154           ********************************************************************************
+  155           * Description : 显示当前的时间
+  156           *
+  157           * Arguments   : mode   刷新模式  0--只刷当前时间   1--刷当前时间和剩余可录时间
+  158           *
+  159           * Returns     :  NULL
+  160           *
+  161           * Notes       :
+  162           *
+  163           ********************************************************************************
+  164           */
+  165          void ShowNowTime(void)
+  166          {
+  167   1          Full_time_t curtime_buf;
+  168   1          time_t BreakPTDisTime;
+  169   1          uint8 temp_buffer[5];
+  170   1      
+  171   1      #ifdef MUSIC_MP3
+                   if (mp3pSendCommand(MC_GETTIME, (void *)&curtime_buf) == 0) //直接调用apSendCommand防止切bank（AP_UI_
+             -PLY本身被切出去），在高比特率歌曲时防止有卡音现象
+               #else
+  174   1          if (wavpSendCommand(MC_GETTIME, (void *)&curtime_buf) == 0)
+  175   1      #endif
+  176   1          {
+  177   2              return;
+  178   2          }
+  179   1          BreakPTDisTime.hour = curtime_buf.TimeHour;
+  180   1          BreakPTDisTime.minute = curtime_buf.TimeMinute;
+  181   1          BreakPTDisTime.second = curtime_buf.TimeSecond;
+  182   1      
+  183   1          itoa_2(BreakPTDisTime.minute, temp_buffer);
+  184   1          itoa_2(BreakPTDisTime.second, &temp_buffer[2]);
+  185   1          LEDPuts(NUMBER1, temp_buffer, 1);
+  186   1          LEDDisplay(LED_COL, 0xff, 1);
+  187   1      }
+  188          
+  189          /*
+C251 COMPILER V4.55,  ui_play                                                              23/05/16  10:42:44  PAGE 4   
+
+  190           ********************************************************************************
+  191           * Description : UI界面显示
+  192           *
+  193           * Arguments   : NULL
+  194           *
+  195           * Returns     :  NULL
+  196           *
+  197           * Notes       :
+  198           *
+  199           ********************************************************************************
+  200           */
+  201          void ui_draw_play_music(void)
+  202          {
+  203   1          uint8 tmp;
+  204   1      
+  205   1          LEDDisplay(LED_PAUSE, 0xff, 0);
+  206   1          LEDDisplay(LED_PLAY, 0xff, 1);
+  207   1      
+  208   1          /*  显示录音目标存储介质 */
+  209   1          if(g_record_vars.location.disk == 'M')
+  210   1          {
+  211   2              LEDDisplay(LED_USB, 0xff, 0);
+  212   2              LEDDisplay(LED_SD, 0xff, 0);
+  213   2          }
+  214   1          else
+  215   1          {
+  216   2              tmp = (g_record_vars.location.disk == 'H') ? 1 : 0;
+  217   2              LEDDisplay(LED_USB, 0xff, !tmp);
+  218   2              LEDDisplay(LED_SD, 0xff, tmp);
+  219   2          }
+  220   1      
+  221   1          ShowNowTime();
+  222   1      }
+  223          
+  224          bool musicpSendCommand_bank(uint8 cmd, void *param)
+  225          {
+  226   1          bool result = FALSE;
+  227   1      
+  228   1      #ifdef MUSIC_MP3
+                   result = mp3pSendCommand(cmd, param);
+               #else
+  231   1          result = wavpSendCommand(cmd, param);
+  232   1      #endif
+  233   1      
+  234   1          return result;
+  235   1      }
+  236          
+  237          
+  238          /*
+  239           ********************************************************************************
+  240           *             void deal_play_status(void)
+  241           *
+  242           * Description : 处理播放过程中的异常情况
+  243           *
+  244           *
+  245           * Arguments   : void
+  246           *
+  247           * Returns     : void
+  248           *
+  249           * Notes       :1.如果非播放状态下，则直接返回
+  250           *                         2.如果播放出错，则转到出错处理函数处理
+  251           *                         3.如果播放到尾，则转到文件尾处理函数处理
+  252           *                         4.如果播放到头，则转到文件头处理函数处理
+  253           *                         5.正常情况下不断刷新播放时间
+  254           ********************************************************************************
+  255           */
+C251 COMPILER V4.55,  ui_play                                                              23/05/16  10:42:44  PAGE 5   
+
+  256          uint8 deal_play_status(void)
+  257          {
+  258   1          uint8 retval = 0;
+  259   1          music_play_status_t status_buf;
+  260   1      
+  261   1          apSendCommand(MC_GETSTATUS, Music_WAV, (void *)(&status_buf)); //直接调用apSendCommand防止切bank（AP_
+             -UI_PLY本身被切出去），在高比特率歌曲时防止有卡音现象
+  262   1          if (status_buf.status == PLAYING_ERROR)
+  263   1          {
+  264   2              ap_sleep(3);
+  265   2              if ((g_record_vars.location.disk == 'U') && !USBH_Check_Udisk())
+  266   2              {
+  267   3                  retval = RESULT_MAIN;
+  268   3              }
+  269   2              else if (g_record_vars.location.disk == 'H' && (DRV_DetectUD(1) != 0x20))
+  270   2              {
+  271   3                  retval = RESULT_MAIN;
+  272   3              }
+  273   2              else
+  274   2              {
+  275   3                  retval = RESULT_CURRENT_AP;
+  276   3              }
+  277   2          }
+  278   1          else if (status_buf.status == PLAYING_REACH_END)
+  279   1          {
+  280   2              retval = RESULT_CURRENT_AP;
+  281   2          }
+  282   1          else if (status_buf.status == PLAYING_REACH_HEAD)
+  283   1          {
+  284   2              retval = 0;
+  285   2          }
+  286   1          return retval;
+  287   1      }
+  288          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       690     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        51     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        22     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

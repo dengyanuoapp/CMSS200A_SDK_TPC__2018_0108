@@ -1,0 +1,813 @@
+$NOMACRO
+$MODSRC
+$MODEL(6)
+$INTR4
+$CASE
+
+;
+; 'hd_lcd.SRC' generated from 'hd_lcd.c'
+; COMPILER INVOKED BY:
+;        C:\Keil\C251\BIN\C251.EXE hd_lcd.c XSMALL FUNCTIONS(REENTRANT) ROM(MEDIUM) OPTIMIZE(9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DF(DEMO_EFUSE=0) DF(DEMO_ADFU=0) DEBUG PRINT(.\lst\hd_lcd.lst) OBJECT(.\obj\hd_lcd.obj) 
+;
+                NAME HD_LCD
+
+        EXTRN         ECODE : FAR (memset??)
+
+                   HD_LCD  SEGMENT  CODE INBLOCK 
+               ?HC?HD_LCD  SEGMENT  HCONST  
+
+        RSEG       ?HC?HD_LCD
+
+window_buf:
+        DB  000H
+        DB  000H
+        DB  080H
+        DB  0A0H
+
+LcdInitBuf:
+        DB  0FDH
+        DB  011H
+        DB  0FDH
+        DB  03AH
+        DB  055H
+        DB  0FDH
+        DB  0C0H
+        DB  00BH
+        DB  007H
+        DB  0FDH
+        DB  0C2H
+        DB  005H
+        DB  001H
+        DB  0FDH
+        DB  0C3H
+        DB  007H
+        DB  0FDH
+        DB  0C5H
+        DB  085H
+        DB  0FDH
+        DB  0C6H
+        DB  005H
+        DB  0FDH
+        DB  0F0H
+        DB  05AH
+        DB  0FDH
+        DB  0F2H
+        DB  000H
+        DB  0FDH
+        DB  0F3H
+        DB  031H
+        DB  0FDH
+        DB  0B4H
+        DB  004H
+        DB  0FDH
+        DB  0E0H
+        DB  000H
+        DB  003H
+        DB  000H
+        DB  02DH
+        DB  02AH
+        DB  006H
+        DB  01AH
+        DB  002H
+        DB  003H
+        DB  001H
+        DB  00FH
+        DB  00FH
+        DB  000H
+        DB  003H
+        DB  003H
+        DB  003H
+        DB  0FEH
+        DB  0B2H
+        DB  0FDH
+        DB  0E1H
+        DB  006H
+        DB  02AH
+        DB  02DH
+        DB  000H
+        DB  003H
+        DB  000H
+        DB  001H
+        DB  01AH
+        DB  003H
+        DB  003H
+        DB  003H
+        DB  000H
+        DB  00FH
+        DB  00FH
+        DB  001H
+        DB  003H
+        DB  0FEH
+        DB  0B2H
+        DB  0FDH
+        DB  036H
+        DB  0D8H
+        DB  0FDH
+        DB  029H
+        DB  0FDH
+        DB  02AH
+        DB  000H
+        DB  002H
+        DB  000H
+        DB  081H
+        DB  0FDH
+        DB  02BH
+        DB  000H
+        DB  001H
+        DB  000H
+        DB  0A0H
+        DB  0FFH
+
+;--- special function registers and bits:
+         MFPSEL2  DATA  0CCH
+         MFPSEL1  DATA  0CBH
+         MFPSEL0  DATA  0CAH
+           MCSR4  DATA  0ACH
+        SFR_BANK  DATA  080H
+       EXTMEM_WT  DATA  0FDH
+          ExWait  DATA  096H
+        GPIOCDAT  DATA  0ABH
+       EXTMEM_DL  DATA  0FFH
+             IE0  DATA  0A8H
+      EXTMEM_CTL  DATA  0FCH
+      GPIOCOUTEN  DATA  0A9H
+             ACC  DATA  0E0H
+             PSW  DATA  0D0H
+             DPL  DATA  082H
+             DPH  DATA  083H
+               B  DATA  0F0H
+              SP  DATA  081H
+            PSW1  DATA  0D1H
+               Z  BIT   0D1H.1
+              EA  BIT   0A8H.7
+;--- end of special function registers and bits.
+
+        PUBLIC        Hdrv_BuffDataTrans?_
+        PUBLIC        Hdrv_LcdReset?_
+        PUBLIC        Hdrv_SetMfpToEmif?_
+        PUBLIC        StoreCE?_
+        PUBLIC        Hdrv_SetWindow?_
+        PUBLIC        Write_Command?_
+        PUBLIC        Hdrv_SetDrawMode?_
+        PUBLIC        Hdrv_BackLightOnOff?_
+        PUBLIC        Hdrv_LcdInitBuf?_
+        PUBLIC        Delay_NMS?_
+        PUBLIC        Hdrv_ClearScreen?_
+        PUBLIC        Write_Display_Ram?_
+        PUBLIC        Hdrv_LCDInit?_
+        PUBLIC        Write_Data?_
+        PUBLIC        RestoreCE?_
+        PUBLIC        window_buf
+        PUBLIC        LcdInitBuf
+
+; line 1: #include "ak211x.h"
+; line 2: //#include <intrins.h>
+; line 3: #include "typeext.h"
+; line 4: //#include "lcd.h"
+; line 5: #include "string.h"
+; line 6: #include "display.h"
+; line 7: 
+; line 8: #pragma src
+; line 9: extern void _nop_(void);
+; line 10: 
+; line 11: #pragma name(HD_LCD)
+; line 12: #pragma renamecode(HD_LCD)
+; line 13: 
+; line 14: //extern void *memset  (void *s, int8 val, uint16 n) reentrant;
+; line 15: 
+; line 16: //8 BITS LCD
+; line 17: const char far LcdInitBuf[] =
+; line 18: {
+; line 19:     0xfd,0x11,
+; line 20:     0xfd,0x3A,0x55,
+; line 21:     0xfd,0xC0,0x0b,0x07,
+; line 22:     0xfd,0xc2,0x05,0x01,
+; line 23:     0xfd,0xc3,0x07,
+; line 24:     0xfd,0xc5,0x85,
+; line 25:     0xfd,0xc6,0x05,
+; line 26:     0xfd,0xf0,0x5a,
+; line 27:     0xfd,0xf2,0x00,
+; line 28:     0xfd,0xf3,0x31,
+; line 29:     0xfd,0xb4,0x04,
+; line 30:     0xfd,0xE0,0x00,0x03,0x00,0x2D,0x2A,0x06,0x1A,0x02,0x03,0x01,0x0F,0x0F,0x00,0x03,0x03,0x03,
+; line 31:     /*0xfe,0xb2,*/
+; line 32:     0xfe,0xb2,
+; line 33:     0xfd,0xE1,0x06,0x2A,0x2D,0x00,0x03,0x00,0x01,0x1A,0x03,0x03,0x03,0x00,0x0F,0x0F,0x01,0x03,
+; line 34:     0xfe,0xb2,
+; line 35:     /*0xfe,0xb2,*/
+; line 36:     0xfd,0x36,0xd8,
+; line 37:     0xfd,0x29,
+; line 38:     0xfd,0x2A,0x00,0x02,0x00,0x81,
+; line 39:     0xfd,0x2B,0x00,0x01,0x00,0xa0,
+; line 40:     /*0xfd,0x2c,*/
+; line 41:     0xff
+; line 42: };
+; line 43: //uint8 cesel;
+; line 44: //uint8 mcsr_9;
+; line 45: const uint8 far window_buf[] =
+; line 46: {   0,0,Display_Length,Display_Height};
+; line 47: void Hdrv_SetMfpToEmif(void)
+
+        RSEG       HD_LCD
+        Hdrv_SetMfpToEmif?_ PROC
+; line 48: {
+; line 49:     uint8 sfr_bak;
+; line 50:     sfr_bak = SFR_BANK;
+        MOV      A,SFR_BANK                     ; A=R11
+;---- Variable 'sfr_bak' assigned to Register 'R11' ----
+; line 51:     SFR_BANK = BANK_GPIO;
+        MOV      SFR_BANK,#06H
+; line 52:     MFPSEL0 |= 0xa1;
+        ORL      MFPSEL0,#0A1H
+; line 53:     MFPSEL0 &= 0xbd;
+        ANL      MFPSEL0,#0BDH
+; line 54:     MFPSEL2 &= 0x7f;
+        ANL      MFPSEL2,#07FH
+; line 55:     MFPSEL1 |= 0x02;
+        ORL      MFPSEL1,#02H
+; line 56:     MFPSEL1 &= 0xfe;
+        ANL      MFPSEL1,#0FEH
+; line 57:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,A                     ; A=R11
+; line 58: }
+        RET      
+        ENDP
+        StoreCE?_ PROC
+; line 59: void StoreCE(uint8* cesel)
+;---- Variable 'cesel' assigned to Register 'DR0' ----
+; line 60: {
+; line 61:     uint8 sfr_bak;
+; line 62:     disable_interrupt(); //关中断
+        CLR      EA
+; line 63:     sfr_bak = SFR_BANK;
+        MOV      R10,SFR_BANK
+;---- Variable 'sfr_bak' assigned to Register 'R10' ----
+; line 64:     Hdrv_SetMfpToEmif(); //set MFP to External Memory I/F
+        ACALL    Hdrv_SetMfpToEmif?_
+; line 65:     SFR_BANK = BANK_LCD;
+        MOV      SFR_BANK,#06H
+; line 66:     *cesel = EXTMEM_CTL & 0x7;
+        MOV      A,EXTMEM_CTL                   ; A=R11
+        ANL      A,#07H                         ; A=R11
+        MOV      @DR0,R11                       ; A=R11
+; line 67:     EXTMEM_CTL = (EXTMEM_CTL & 0xf8) | 0x5;
+        MOV      A,EXTMEM_CTL                   ; A=R11
+        ANL      A,#0F8H                        ; A=R11
+        ORL      A,#05H                         ; A=R11
+        MOV      EXTMEM_CTL,A                   ; A=R11
+; line 68:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,R10
+; line 69: }
+        RET      
+        ENDP
+        RestoreCE?_ PROC
+; line 70: void RestoreCE(uint8 cesel)
+        MOV      R7,R11                         ; A=R11
+;---- Variable 'cesel' assigned to Register 'R7' ----
+; line 71: {
+; line 72:     uint8 sfr_bak;
+; line 73:     sfr_bak = SFR_BANK;
+        MOV      R10,SFR_BANK
+;---- Variable 'sfr_bak' assigned to Register 'R10' ----
+; line 74:     SFR_BANK = BANK_LCD;
+        MOV      SFR_BANK,#06H
+; line 75:     EXTMEM_CTL = (EXTMEM_CTL & 0xf8) | cesel;
+        MOV      A,EXTMEM_CTL                   ; A=R11
+        ANL      A,#0F8H                        ; A=R11
+        ORL      R11,R7                         ; A=R11
+        MOV      EXTMEM_CTL,A                   ; A=R11
+; line 76:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,R10
+; line 77:     enable_interrupt(); //开中断
+        SETB     EA
+; line 78: }
+        RET      
+        ENDP
+        Write_Command?_ PROC
+; line 79: void Write_Command(uint8 cmd)
+        MOV      R7,R11                         ; A=R11
+;---- Variable 'cmd' assigned to Register 'R7' ----
+; line 80: {
+; line 81:     uint8 sfr_bak;
+; line 82:     sfr_bak = SFR_BANK;
+        MOV      R10,SFR_BANK
+;---- Variable 'sfr_bak' assigned to Register 'R10' ----
+; line 83:     SFR_BANK = BANK_LCD;
+        MOV      SFR_BANK,#06H
+; line 84:     EXTMEM_CTL &= ~(1 << 3);
+        ANL      EXTMEM_CTL,#0F7H
+; line 85:     EXTMEM_DL = cmd;
+        MOV      EXTMEM_DL,R7
+; line 86:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,R10
+; line 87: }
+        RET      
+        ENDP
+        Write_Data?_ PROC
+; line 88: void Write_Data(uint8 mydata)
+        MOV      R7,R11                         ; A=R11
+;---- Variable 'mydata' assigned to Register 'R7' ----
+; line 89: {
+; line 90:     uint8 sfr_bak;
+; line 91:     sfr_bak = SFR_BANK;
+        MOV      R10,SFR_BANK
+;---- Variable 'sfr_bak' assigned to Register 'R10' ----
+; line 92:     SFR_BANK = BANK_LCD;
+        MOV      SFR_BANK,#06H
+; line 93:     EXTMEM_CTL |= (1 << 3);
+        ORL      EXTMEM_CTL,#08H
+; line 94:     EXTMEM_DL = mydata;
+        MOV      EXTMEM_DL,R7
+; line 95:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,R10
+; line 96: }
+        RET      
+        ENDP
+        Delay_NMS?_ PROC
+; line 97: void Delay_NMS(uint8 delay_ms)
+; line 98: {
+; line 99:     delay_ms = delay_ms;
+; line 100: #pragma ASM
+; line 101:     push R0
+        push R0
+; line 102:     mov R0, R11
+        mov R0, R11
+; line 103:     contiune_delay_1:
+        contiune_delay_1:
+; line 104:     push R0
+        push R0
+; line 105:     mov R0,#0x14
+        mov R0,#0x14
+; line 106:     contiune_delay_2:
+        contiune_delay_2:
+; line 107:     push R0
+        push R0
+; line 108:     mov R0,#0xbd
+        mov R0,#0xbd
+; line 109:     continue_delay_3:
+        continue_delay_3:
+; line 110:     djnz R0,continue_delay_3
+        djnz R0,continue_delay_3
+; line 111:     pop R0
+        pop R0
+; line 112:     djnz R0,contiune_delay_2
+        djnz R0,contiune_delay_2
+; line 113:     pop R0
+        pop R0
+; line 114:     djnz R0,contiune_delay_1
+        djnz R0,contiune_delay_1
+; line 115:     pop R0
+        pop R0
+; line 116:     ret
+        ret
+; line 117: #pragma ENDASM
+; line 118: }
+        RET      
+        ENDP
+        Hdrv_LcdReset?_ PROC
+; line 119: void Hdrv_LcdReset(void)
+; line 120: {
+; line 121:     uint8 sfr_bak = SFR_BANK;
+        MOV      R10,SFR_BANK
+;---- Variable 'sfr_bak' assigned to Register 'R10' ----
+; line 122:     uint8 i = 0;
+; line 123:     SFR_BANK = BANK_GPIO; //set GPIO Bank
+        MOV      SFR_BANK,#06H
+; line 124:     GPIOCOUTEN |= 0x01; //ENABLE GPIOC.0
+        ORL      GPIOCOUTEN,#01H
+; line 125:     GPIOCDAT |= 0x01; //SETB GPIOC0.0
+        ORL      GPIOCDAT,#01H
+; line 126:     Delay_NMS(1);
+        MOV      A,#01H                         ; A=R11
+        ACALL    Delay_NMS?_
+; line 127:     GPIOCDAT &= ~(0x01); //clr GPIOC0.0
+        ANL      GPIOCDAT,#0FEH
+; line 128:     Delay_NMS(20);
+        MOV      A,#014H                        ; A=R11
+        ACALL    Delay_NMS?_
+; line 129:     GPIOCDAT |= 0x01; //SETB GPIOC0.0
+        ORL      GPIOCDAT,#01H
+; line 130:     Delay_NMS(60);
+        MOV      A,#03CH                        ; A=R11
+        ACALL    Delay_NMS?_
+; line 131:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,R10
+; line 132:     return;
+; line 133: }
+        RET      
+        ENDP
+        Hdrv_LcdInitBuf?_ PROC
+; line 134: void Hdrv_LcdInitBuf(void)
+; line 135: {
+; line 136:     uint8 sfr_bak = SFR_BANK;
+        MOV      R6,SFR_BANK
+;---- Variable 'sfr_bak' assigned to Register 'R6' ----
+; line 137:     uint8 i = 0;
+        XRL      R5,R5
+;---- Variable 'i' assigned to Register 'R5' ----
+; line 138:     SFR_BANK = BANK_LCD; //set LCD Bank
+        MOV      SFR_BANK,#06H
+; line 139:     while (LcdInitBuf[i] != 0xff)
+        SJMP     ?C0002
+?C0004:
+; line 140:     {
+; line 141:         if (LcdInitBuf[i] == 0xfd)
+        MOVZ     WR2,R5
+        MOV      WR30,#WORD0 LcdInitBuf
+        MOV      WR28,#WORD2 LcdInitBuf
+        ADD      WR2,WR30
+        MOV      WR0,WR28
+        MOV      R4,@DR0
+        CJNE     R4,#0FDH,?C0006
+; line 142:         {
+; line 143:             i++;
+        INC      R5,#01H
+; line 144:             Write_Command(LcdInitBuf[i]); //写CMD
+        MOVZ     WR2,R5
+        ADD      WR2,WR30
+        MOV      WR0,WR28
+        MOV      R11,@DR0                       ; A=R11
+        ACALL    Write_Command?_
+; line 145:         }
+        SJMP     ?C0007
+?C0006:
+; line 146:         else if (LcdInitBuf[i] == 0xfe)
+        CJNE     R4,#0FEH,?C0008
+; line 147:         {
+; line 148:             i++;
+        INC      R5,#01H
+; line 149:             Delay_NMS(1);
+        MOV      A,#01H                         ; A=R11
+        ACALL    Delay_NMS?_
+; line 150:         }
+        SJMP     ?C0007
+?C0008:
+; line 151:         else
+; line 152:         {
+; line 153:             Write_Data(LcdInitBuf[i]); //写data
+        MOV      R11,R4                         ; A=R11
+        ACALL    Write_Data?_
+; line 154:         }
+?C0007:
+; line 155:         i++;
+        INC      R5,#01H
+; line 156:     }
+?C0002:
+        MOVZ     WR10,R5
+        MOV      WR2,#WORD0 LcdInitBuf
+        MOV      WR0,#WORD2 LcdInitBuf
+        ADD      WR2,WR10
+        MOV      R11,@DR0                       ; A=R11
+        CJNE     A,#0FFH,?C0004                 ; A=R11
+; line 157:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,R6
+; line 158: }
+        RET      
+        ENDP
+        Write_Display_Ram?_ PROC
+; line 159: void Write_Display_Ram(void)
+; line 160: {
+; line 161:     uint8 sfr_bak;
+; line 162:     sfr_bak = SFR_BANK;
+        MOV      A,SFR_BANK                     ; A=R11
+;---- Variable 'sfr_bak' assigned to Register 'R11' ----
+; line 163:     SFR_BANK = BANK_LCD;
+        MOV      SFR_BANK,#06H
+; line 164:     EXTMEM_CTL |= (1 << 3);
+        ORL      EXTMEM_CTL,#08H
+; line 165:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,A                     ; A=R11
+; line 166: }
+        RET      
+        ENDP
+        Hdrv_BuffDataTrans?_ PROC
+; line 167: void Hdrv_BuffDataTrans(uint8* pbuf, uint16 len)
+        MOV      WR4,WR6
+;---- Variable 'len' assigned to Register 'WR4' ----
+        MOV      DR28,DR0
+;---- Variable 'pbuf' assigned to Register 'DR28' ----
+        INC      DR60,#01H
+; line 168: {
+; line 169:     uint8 sfr_bak;
+; line 170:     uint8 tmp_cesel;
+; line 171:     sfr_bak = SFR_BANK;
+        MOV      R6,SFR_BANK
+;---- Variable 'sfr_bak' assigned to Register 'R6' ----
+; line 172:     StoreCE(&tmp_cesel);
+        MOV      DR0,DR60
+        ACALL    StoreCE?_
+; line 173:     Write_Display_Ram(); //RS=1
+        ACALL    Write_Display_Ram?_
+; line 174:     while (len--)
+        SJMP     ?C0010
+?C0012:
+; line 175:     {
+; line 176:         Write_Data(*pbuf);
+        MOV      R11,@DR28                      ; A=R11
+        ACALL    Write_Data?_
+; line 177:         pbuf++;
+        INC      WR30,#01H
+; line 178:     }
+?C0010:
+        MOV      WR2,WR4
+        DEC      WR4,#01H
+        ORL      WR2,WR2
+        JNE      ?C0012
+; line 179:     RestoreCE(tmp_cesel);
+        MOV      R11,@DR60                      ; tmp_cesel
+        ACALL    RestoreCE?_
+; line 180:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,R6
+; line 181: }
+        DEC      DR60,#01H
+        RET      
+        ENDP
+        Hdrv_ClearScreen?_ PROC
+; line 182: void Hdrv_ClearScreen(void)
+        PUSH     DR12
+        INC      DR60,#01H
+; line 183: {
+; line 184:     uint8* databuf = (uint8*) 0x3000;
+        MOV      DR12,#03000H
+;---- Variable 'databuf' assigned to Register 'DR12' ----
+; line 185:     uint8 loopcnt = 16;
+        MOV      A,#010H                        ; A=R11
+        MOV      @DR60,R11                      ; loopcnt
+; line 186:     memset((void*) databuf, 0, 0xA71);
+        MOV      DR0,DR12
+        MOV      WR6,#0A71H
+        CLR      A                              ; A=R11
+        ECALL    memset??
+; line 187:     while (loopcnt != 0)
+?C0016:
+; line 188:     {
+; line 189:         Hdrv_BuffDataTrans(databuf, 0xA71);
+        MOV      DR0,DR12
+        MOV      WR6,#0A71H
+        ACALL    Hdrv_BuffDataTrans?_
+; line 190:         loopcnt--;
+        MOV      R11,@DR60                      ; loopcnt
+        DEC      A                              ; A=R11
+        MOV      @DR60,R11                      ; loopcnt
+; line 191:     }
+        JNZ      ?C0016
+; line 192: }
+        DEC      DR60,#01H
+        POP      DR12
+        RET      
+        ENDP
+        Hdrv_LCDInit?_ PROC
+; line 193: 
+; line 194: void Hdrv_LCDInit(void)
+        PUSH     R15
+        INC      DR60,#01H
+; line 195: {
+; line 196:     uint8 sfr_bak = SFR_BANK;
+        MOV      R15,SFR_BANK
+;---- Variable 'sfr_bak' assigned to Register 'R15' ----
+; line 197:     uint8 tmp_cesel;
+; line 198:     //uint8 i;
+; line 199:     //uint8 j=0;
+; line 200: 
+; line 201:     SFR_BANK = BANK_CMU_RMU;
+        MOV      SFR_BANK,#01H
+; line 202:     MCSR4 |= 1 << 1;
+        ORL      MCSR4,#02H
+; line 203:     MCSR4 &= ~1;
+        ANL      MCSR4,#0FEH
+; line 204: 
+; line 205:     /*******EMIF Write Command********/
+; line 206:     ExWait = 0x06; //升频
+        MOV      ExWait,#06H
+; line 207:     SFR_BANK = BANK_LCD; //set LCD Bank
+        MOV      SFR_BANK,#06H
+; line 208:     EXTMEM_WT = 0x23; //升频
+        MOV      EXTMEM_WT,#023H
+; line 209: 
+; line 210:     StoreCE(&tmp_cesel); //片选CE5
+        MOV      DR0,DR60
+        ACALL    StoreCE?_
+; line 211:     Hdrv_LcdReset(); //LCD RESET
+        ACALL    Hdrv_LcdReset?_
+; line 212:     Hdrv_LcdInitBuf(); //write lcd init buf
+        ACALL    Hdrv_LcdInitBuf?_
+; line 213:     //Hdrv_BackLightOnOff(TRUE);	//开背光
+; line 214:     /**********test data*************
+; line 215:      Write_Command(LCD_CMD_WRITE);
+; line 216:      Write_Display_Ram(); //RS=1
+; line 217: 
+; line 218:      SFR_BANK = LCD_PAGE_P;
+; line 219:      for(i=0; i<100; i++)
+; line 220:      {
+; line 221:      for(j=0; j<50; j++)
+; line 222:      {
+; line 223:      //EXTMEM_DL = 0;
+; line 224:      //EXTMEM_DL = 0x1f;
+; line 225:      Write_Data(0);
+; line 226:      Write_Data(0x1f);
+; line 227:      }
+; line 228:      }
+; line 229:      */
+; line 230:     Hdrv_ClearScreen();
+        ACALL    Hdrv_ClearScreen?_
+; line 231:     RestoreCE(tmp_cesel); //片选CE5
+        MOV      R11,@DR60                      ; tmp_cesel
+        ACALL    RestoreCE?_
+; line 232:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,R15
+; line 233: }
+        DEC      DR60,#01H
+        POP      R15
+        RET      
+        ENDP
+        Hdrv_BackLightOnOff?_ PROC
+; line 234: 
+; line 235: //back light control
+; line 236: void Hdrv_BackLightOnOff(bool blctl)
+        MOV      R7,R11                         ; A=R11
+;---- Variable 'blctl' assigned to Register 'R7' ----
+; line 237: {
+; line 238:     uint8 sfr_bak = SFR_BANK;
+        MOV      R10,SFR_BANK
+;---- Variable 'sfr_bak' assigned to Register 'R10' ----
+; line 239: 
+; line 240:     SFR_BANK = BANK_GPIO; //set GPIO Bank
+        MOV      SFR_BANK,#06H
+; line 241:     GPIOCOUTEN |= (1 << 1); //ENABLE GPIOC.1
+        ORL      GPIOCOUTEN,#02H
+; line 242: 
+; line 243:     if (blctl == TRUE) //开背光
+        CJNE     R7,#01H,?C0018
+; line 244:     {
+; line 245:         GPIOCDAT |= (1 << 1); //SETB GPIOC.1
+        ORL      GPIOCDAT,#02H
+; line 246:     }
+        SJMP     ?C0019
+?C0018:
+; line 247:     else //关背光
+; line 248:     {
+; line 249:         GPIOCDAT &= ~(1 << 1); //clr GPIOC.1
+        ANL      GPIOCDAT,#0FDH
+; line 250:     }
+?C0019:
+; line 251: 
+; line 252:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,R10
+; line 253: }
+        RET      
+        ENDP
+        Hdrv_SetWindow?_ PROC
+; line 254: 
+; line 255: //void Hdrv_SetWindow(const uint8 *pic)
+; line 256: void Hdrv_SetWindow(void)
+        INC      DR60,#01H
+; line 257: {
+; line 258:     //设窗
+; line 259:     uint8 sfr_bak;
+; line 260:     uint8 tmp_cesel;
+; line 261:     uint8 x_start, x_end;
+; line 262:     uint8 y_start, y_end;
+; line 263:     sfr_bak = SFR_BANK;
+        MOV      R6,SFR_BANK
+;---- Variable 'sfr_bak' assigned to Register 'R6' ----
+; line 264: 
+; line 265:     //Hdrv_SetMfpToEmif();
+; line 266:     StoreCE(&tmp_cesel);
+        MOV      DR0,DR60
+        ACALL    StoreCE?_
+; line 267: 
+; line 268:     x_start = window_buf[0] + 2;
+        MOV      WR2,#WORD0 window_buf
+        MOV      WR0,#WORD2 window_buf
+        MOV      R7,@DR0
+        MOVZ     WR0,R7
+        MOV      WR2,WR0
+        INC      WR2,#02H
+        MOV      R2,R3
+;---- Variable 'x_start' assigned to Register 'R2' ----
+; line 269:     x_end = window_buf[0] + window_buf[2] + 1;
+        MOV      WR10,#WORD0 window_buf+2
+        MOV      WR8,#WORD2 window_buf+2
+        MOV      R7,@DR8
+        MOVZ     WR4,R7
+        ADD      WR4,WR0
+        INC      WR4,#01H
+        MOV      R3,R5
+;---- Variable 'x_end' assigned to Register 'R3' ----
+; line 270: 
+; line 271:     y_start = window_buf[1] + 1;
+        MOV      WR10,#WORD0 window_buf+1
+        MOV      WR8,#WORD2 window_buf+1
+        MOV      R7,@DR8
+        MOVZ     WR10,R7
+        MOV      WR4,WR10
+        INC      WR4,#01H
+        MOV      R4,R5
+;---- Variable 'y_start' assigned to Register 'R4' ----
+; line 272:     y_end = window_buf[1] + window_buf[3];
+        MOV      WR30,#WORD0 window_buf+3
+        MOV      WR28,#WORD2 window_buf+3
+        MOV      R7,@DR28
+        MOVZ     WR0,R7
+        ADD      WR0,WR10
+        MOV      R5,R1
+;---- Variable 'y_end' assigned to Register 'R5' ----
+; line 273: 
+; line 274:     //set x start and end
+; line 275:     Write_Command(LCD_CMD_SETX);
+        MOV      A,#02AH                        ; A=R11
+        ACALL    Write_Command?_
+; line 276:     Write_Data(0);
+        CLR      A                              ; A=R11
+        ACALL    Write_Data?_
+; line 277:     Write_Data(x_start);
+        MOV      R11,R2                         ; A=R11
+        ACALL    Write_Data?_
+; line 278:     Write_Data(0);
+        CLR      A                              ; A=R11
+        ACALL    Write_Data?_
+; line 279:     Write_Data(x_end);
+        MOV      R11,R3                         ; A=R11
+        ACALL    Write_Data?_
+; line 280: 
+; line 281:     //set y start and end
+; line 282:     Write_Command(LCD_CMD_SETY);
+        MOV      A,#02BH                        ; A=R11
+        ACALL    Write_Command?_
+; line 283:     Write_Data(0);
+        CLR      A                              ; A=R11
+        ACALL    Write_Data?_
+; line 284:     Write_Data(y_start);
+        MOV      R11,R4                         ; A=R11
+        ACALL    Write_Data?_
+; line 285:     Write_Data(0);
+        CLR      A                              ; A=R11
+        ACALL    Write_Data?_
+; line 286:     Write_Data(y_end);
+        MOV      R11,R5                         ; A=R11
+        ACALL    Write_Data?_
+; line 287: 
+; line 288:     Write_Command(LCD_CMD_WRITE); //设完窗后应开始写屏
+        MOV      A,#02CH                        ; A=R11
+        ACALL    Write_Command?_
+; line 289: 
+; line 290:     RestoreCE(tmp_cesel);
+        MOV      R11,@DR60                      ; tmp_cesel
+        ACALL    RestoreCE?_
+; line 291:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,R6
+; line 292: }
+        DEC      DR60,#01H
+        RET      
+        ENDP
+        Hdrv_SetDrawMode?_ PROC
+; line 293: void Hdrv_SetDrawMode(uint8 mode)
+        MOV      R4,R11                         ; A=R11
+;---- Variable 'mode' assigned to Register 'R4' ----
+        INC      DR60,#01H
+;---- Variable 'data_mode' assigned to Register 'R6' ----
+; line 294: {
+; line 295:     //设置刷屏模式
+; line 296:     uint8 sfr_bak = SFR_BANK;
+        MOV      R5,SFR_BANK
+;---- Variable 'sfr_bak' assigned to Register 'R5' ----
+; line 297:     uint8 data_mode;
+; line 298:     uint8 tmp_cesel;
+; line 299:     sfr_bak = SFR_BANK;
+        MOV      R5,SFR_BANK
+; line 300: 
+; line 301:     //Hdrv_SetMfpToEmif();	   //切MFP到EXT
+; line 302:     StoreCE(&tmp_cesel);
+        MOV      DR0,DR60
+        ACALL    StoreCE?_
+; line 303: 
+; line 304:     Write_Command(LCD_CMD_SETMODE);
+        MOV      A,#036H                        ; A=R11
+        ACALL    Write_Command?_
+; line 305:     //LCDDrawMode = mode;
+; line 306: 
+; line 307:     if (mode == DrawModeH_def)
+        CJNE     R4,#00H,?C0020
+; line 308:     {
+; line 309:         data_mode = 0x40 | RGBFLAG;
+        MOV      R6,#048H
+; line 310:         //PicMode = 0;
+; line 311:     }
+?C0020:
+; line 312:     Write_Data(data_mode);
+        MOV      R11,R6                         ; A=R11
+        ACALL    Write_Data?_
+; line 313:     RestoreCE(tmp_cesel);
+        MOV      R11,@DR60                      ; tmp_cesel
+        ACALL    RestoreCE?_
+; line 314: 
+; line 315:     SFR_BANK = sfr_bak;
+        MOV      SFR_BANK,R5
+; line 316: }
+        DEC      DR60,#01H
+        RET      
+        ENDP
+; line 317: 
+
+        END
+

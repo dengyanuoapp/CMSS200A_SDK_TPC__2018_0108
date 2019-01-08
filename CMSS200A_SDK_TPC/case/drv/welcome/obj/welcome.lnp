@@ -1,0 +1,16 @@
+".\obj\welcome.obj",
+".\obj\showLogoFuncs.obj",
+"..\..\..\psp_rel\lib\LIBC.LIB",
+"..\..\..\psp_rel\lib\APDftSeg.LIB"(?C_START??),
+"..\..\..\psp_rel\lib\actos30apiH.LIB",
+".\obj\Hdrv_HardInit.obj",
+".\obj\Hdrv_HardDeal.obj",
+".\obj\Sdrv_LEDDisplay.obj" 
+TO ".\obj\welcome"
+NOOVERLAY 
+NOJMPTAB
+NODEFAULTLIBRARY
+CLASSES(ECODE(0x800000-0xFFFFFF))
+CLASSES(HCONST(0x800000-0xFFFFFF))
+SEGMENTS(?PR?CODEDISPSTART(0xFF2000),CODEDISPSTART,?PR?HARD_INIT,?PR?HARD_DEAL,?HC?SDRV_DISPLAY,?PR?SDRV_DISPLAY,?HC?CODEDISPSTART,C_RESERVE0(^0xFF24FF))
+SEGMENTS(?ED?CODEDISPSTART(0xA80),D_RESERVE0(^0xB2F))

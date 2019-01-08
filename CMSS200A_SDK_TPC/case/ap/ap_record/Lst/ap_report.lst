@@ -1,0 +1,679 @@
+C251 COMPILER V4.55,  ap_report                                                            23/05/16  10:42:23  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE ap_report
+OBJECT MODULE PLACED IN .\Obj\ap_report.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\common\ap_report.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIM
+                    -IZE(9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\ap_report.lst) OBJECT(.\Obj\ap_report.ob
+                    -j) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        ap common lib file, udisk use this file too
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *******************************************************************************
+   10           */
+   11          #include "actos.h"
+   12          #include "ap_common.h"
+   13          #include "ap_report.h"
+   14          #include "common.h"
+   15          
+   16          #if defined(MAIN_AP) || defined(MUSIC_AP) || defined(RADIO_AP) || defined(LINEIN_AP)|| defined(RECORD_AP)
+             - || defined(USOUND_AP)
+               #pragma name(COM_REPORT)
+               
+               //使用磁条的方式播报时间和日期
+               //磁条中的字符串部分
+               const char info_str[10] =
+               {
+                   EXTEND_TIME_INFO, EXTEND_DAWN, EXTEND_MORNING, EXTEND_AFTERNOON,
+                   EXTEND_NIGHT, EXTEND_HOUR, EXTEND_MINUTE, EXTEND_MHZ,
+                   EXTEND_STATION, EXTEND_FREQUENCY
+               };
+               //磁条中的数字部分
+               const char num_unit[15] =
+               {
+                   EXTEND_ZERO, EXTEND_ONE, EXTEND_TWO, EXTEND_THREE, EXTEND_FOUR,
+                   EXTEND_FIVE, EXTEND_SIX, EXTEND_SEVEN, EXTEND_EIGHT, EXTEND_NINE,
+                   EXTEND_TEN, EXTEND_TWENTY, EXTEND_THIRTY, EXTEND_FORTY, EXTEND_FIFTY
+               };
+               //磁条 “音量最大”和“音量最小”
+               //const char volume_info[][2] = {{EXTEND_VOLUME_MAX, 0}, {EXTEND_VOLUME_MIN, 0}};
+               
+               
+               bool report_stats; //当前播放状态  0:停止  1:播放
+               BOOL pa_close_flag; //播报前PA的状态
+               
+               unsigned char ext_report_msg; //返回的其它消息值。位图消息
+               
+               //Open_param_t g_Openparam_TTS;               //播放参数, 供Basel层使用
+               
+               void ClearWatchdog(void);
+               bool pSdTtsSendCommand(BYTE cmd, BYTE music_type, void *param);
+               bool unitochar(char *str, int len, unsigned char lang_id);
+               
+               //判断字符是否为数字
+               
+               #pragma renamecode(COM_REPORT)
+               
+               /********************************************************************************
+                * Description : 延时函数
+                *
+                * Arguments   : count：需要延时的次数
+C251 COMPILER V4.55,  ap_report                                                            23/05/16  10:42:23  PAGE 2   
+
+                *
+                * Returns     : 无
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               void delay_report(int count)
+               {
+                   int i;
+                   for (i = 0; i < count; i++)
+                   {
+                       ClearWatchdog();
+                   }
+               }
+               /********************************************************************************
+                * Description : 打开DAC
+                *
+                * Arguments   : 无
+                *
+                * Returns     : 无
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               void TTSOpenDAC(void)
+               {
+               
+               }
+               /********************************************************************************
+                * Description : 打开PA
+                *
+                * Arguments   : uchar volume 音量的大小，0-15级
+                *
+                * Returns     : 无
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               void TTSOpenPA(uchar volume)
+               {
+                   volume = volume;
+               }
+               
+               /********************************************************************************
+                * Description : 初始化播报数据的变量
+                *
+                * Arguments   : char *buf 数据指针
+                *
+                * Returns     : 无
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               void init_report_param(void)
+               {
+                   report_stats = FALSE;
+               }
+               
+               /********************************************************************************
+                * Description : 结束当前的播放状态
+                *
+                * Arguments   : 无
+                *
+                * Returns     : 1：播放状态错误  0：正常结束播放
+                *
+                * Notes       : 判断当前是否处于播报状态，如果处于播放状态，结束当前的播放
+C251 COMPILER V4.55,  ap_report                                                            23/05/16  10:42:23  PAGE 3   
+
+                *
+                ********************************************************************************/
+               unsigned char stop_report(void)
+               {
+                   if(report_stats)
+                   {
+                       report_stats = FALSE;
+                       pSdTtsSendCommand(MC_STOP, TYPE_MP3, NULL);
+                       pSdTtsSendCommand(MC_CLOSE, TYPE_MP3, NULL);
+                       if(pa_close_flag)
+                       {
+                           //将PA的音量设置为0，减小关闭PA时产生的噪声。
+                           TTSOpenPA(0);
+                           delay_report(20);
+                           //            DisablePA();
+                       }
+                       return 0;
+                   }
+                   return 1;
+               }
+               
+               /********************************************************************************
+                * Description : 开始播放数据
+                *
+                * Arguments   : 无
+                *
+                * Returns     : 无
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               void start_report(info_report_t *info)
+               {
+                   if(!report_stats)
+                   {
+                       //pSdTtsSendCommand(MC_OPEN, TYPE_MP3, &g_Openparam_TTS);
+                       pSdTtsSendCommand(MC_OPEN, TYPE_MP3, NULL);
+                       pSdTtsSendCommand(MC_LOAD, TYPE_MP3, NULL);
+                       pSdTtsSendCommand(MC_SET_TTS, TYPE_MP3, info->report_buf);
+                       pSdTtsSendCommand(MC_PLAY, TYPE_MP3, (void *)&info->tts_lib_flag);
+                       report_stats = TRUE;
+                   }
+               }
+               
+               /********************************************************************************
+                * Description : 检查当前播放状态
+                *
+                * Arguments   : 无
+                *
+                * Returns     : 0:结束播放 1：播放中 2:无播放状态
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               BOOL check_report_state(info_report_t *info)
+               {
+                   uint8 sfr_bank;
+                   music_play_status_t status_buf_report; //存储播放状态的buffer, 供Basel层使用。
+                   if(info)
+                   {
+                       stop_report();
+               
+                       pa_close_flag = 0x0;
+                       if(info->open_pa_flag)
+                       {
+                           pa_close_flag = 0x1;
+C251 COMPILER V4.55,  ap_report                                                            23/05/16  10:42:23  PAGE 4   
+
+                           //开启PA，设置音量
+                           TTSOpenDAC();
+                           if(g_comval.vol_display < 10)
+                               TTSOpenPA(10);
+                           else
+                               TTSOpenPA(g_comval.vol_display);
+                           OpenSPK(sfr_bank);
+                       }
+               
+                       //g_Openparam_TTS.filename = NULL;
+                       //g_Openparam_TTS.typeerror = 0;
+                       //g_Openparam_TTS.musicframeoffset = 0;
+               
+                       //开始播放
+                       start_report(info);
+                   }
+                   //是否处于播放状态
+                   if(report_stats)
+                   {
+                       //检查是否播放结束
+                       pSdTtsSendCommand(MC_GETSTATUS, TYPE_MP3, &status_buf_report);
+                       if(status_buf_report.status == PLAYING_ERROR)
+                       {
+                           stop_report();
+                           return 0;
+                       }
+                       return 1;
+                   }
+                   return 2;
+               }
+               
+               /********************************************************************************
+                * Description : 等待播放结束
+                *
+                * Arguments   : void *param 可选参数,在播放音乐的时候用于识别当前播放的盘符。
+                *
+                * Returns     : 0:无收到特殊的按键消息 其它：特殊的消息需要上层处理
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               uint8 wait_report_end(void *param)
+               {
+                   char key;
+                   BOOL ret = FALSE;
+                   BOOL vol_keyup = FALSE;
+                   uint8 result = 0;
+                   uint8 delay_result = NULL; //需要延时发送的消息。
+                   music_play_status_t status_buf_report; //存储播放状态的buffer, 供Basel层使用。
+                   bool long_key_valid = FALSE;
+               
+                   param = param;
+                   ext_report_msg = 0;
+               
+                   while(report_stats)
+                   {
+                       ClearWatchdog();
+                       //检查是否播放结束
+                       pSdTtsSendCommand(MC_GETSTATUS, TYPE_MP3, &status_buf_report);
+                       if(status_buf_report.status == PLAYING_ERROR)
+                       {
+                           stop_report();
+                           delay_result = ext_report_msg;
+                           return delay_result;
+                       }
+                       key = ap_get_message();
+C251 COMPILER V4.55,  ap_report                                                            23/05/16  10:42:23  PAGE 5   
+
+                       switch (key)
+                       {
+                       case AP_MSG_RTC:
+                           //need_draw = TRUE;
+                           break;
+               
+                           //处理next按键和音量+按键
+               
+                       case AP_KEY_NEXT | AP_KEY_LONG:
+                       case AP_KEY_MODE| AP_KEY_LONG:
+                       case AP_KEY_PREV | AP_KEY_LONG:
+                           longkey_flag = 1;
+                       case AP_KEY_PLAY | AP_KEY_UP:
+                       case AP_KEY_NEXT | AP_KEY_UP:
+                       case AP_KEY_PREV | AP_KEY_UP:
+                           ret = TRUE;
+                           break;
+                           //单独处理music下的操作。
+               #ifdef  MUSIC_AP
+                       case AP_MSG_SD_IN:
+                           delay_result = AP_MSG_SD_IN;
+                           ext_report_msg = 0;
+                           ret = TRUE;
+                           break;
+                       case AP_MSG_UH_IN:
+                           delay_result = AP_MSG_UH_IN;
+                           ext_report_msg = 0;
+                           ret = TRUE;
+                           break;
+                       case AP_MSG_UH_OUT:
+                           if(*(uint8 *)param == 'U')
+                           {
+                               delay_result = AP_MSG_UH_OUT;
+                               ret = TRUE;
+                           }
+                           break;
+                       case AP_MSG_SD_OUT:
+                           if(*(uint8 *)param == 'H')
+                           {
+                               delay_result = AP_MSG_SD_OUT;
+                               ret = TRUE;
+                           }
+                           break;
+               #else
+               #ifdef RECORD_AP
+                       case AP_KEY_REC|AP_KEY_UP:
+                           break;
+                       case AP_MSG_SD_IN:
+                           delay_result = RESULT_MUSIC_CPLAY;
+                           ext_report_msg = 0;
+                           ret = TRUE;
+                           break;
+                       case AP_MSG_UH_IN:
+                           delay_result = RESULT_MUSIC_UPLAY;
+                           ext_report_msg = 0;
+                           ret = TRUE;
+                           break;
+                       case AP_MSG_UH_OUT:
+                           if(*(uint8 *)param == 'U')
+                           {
+                               delay_result = AP_MSG_UH_OUT;
+                               ret = TRUE;
+                           }
+                           break;
+                       case AP_MSG_SD_OUT:
+                           if(*(uint8 *)param == 'H')
+C251 COMPILER V4.55,  ap_report                                                            23/05/16  10:42:23  PAGE 6   
+
+                           {
+                               delay_result = AP_MSG_SD_OUT;
+                               ret = TRUE;
+                           }
+                           break;
+               #else
+                       case AP_MSG_UH_OUT:
+                       case AP_MSG_SD_OUT:
+                           break;
+               #endif
+               #endif
+               #ifdef  LINEIN_AP
+                       case AP_MSG_LINEIN_OUT:
+                           delay_result = RESULT_LINEIN;
+                           ret = TRUE;
+                           break;
+               #endif
+                       case AP_KEY_MODE|AP_KEY_UP:
+                           stop_report();
+                           return RESULT_MAIN;
+                       default:
+                           delay_result = ap_handle_hotkey(key);
+                           if (delay_result != 0)
+                           {
+                               ret = TRUE;
+                           }
+                           break;
+                       }
+                       if(ret == TRUE)
+                       {
+                           stop_report();
+                           return delay_result;
+                       }
+                   }
+                   return delay_result;
+               }
+               /********************************************************************************
+                * Description : 增加静音数据帧
+                *
+                * Arguments   : char *str 需要处理的字符串
+                *
+                * Returns     : NULL
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               void report_str_fix(char *str)
+               {
+                   unsigned char i, j;
+               
+                   //增加静音数据帧
+                   j = strlen(str);
+                   //无数据直接返回
+                   if(!j)
+                   {
+                       return;
+                   }
+                   for(i = j; i > 0; i--)
+                   {
+                       str[i] = str[i - 1];
+                   }
+                   str[0] = ' ';
+               
+                   if(str[j] != ' ')
+                   {
+                       str[j + 1] = ' ';
+C251 COMPILER V4.55,  ap_report                                                            23/05/16  10:42:23  PAGE 7   
+
+                       str[j + 2] = ' ';
+                       str[j + 3] = 0;
+                   }
+                   else
+                   {
+                       //删除字符串最后多余的空格
+                       for(i = j - 2; i > 0; i--)
+                       {
+                           if(str[i] != ' ')
+                               break;
+                       }
+                       str[i + 3] = 0;
+                   }
+               }
+               
+               #if defined(DATE_REPORT_EN)
+               /********************************************************************************
+                * Description : 日期转换函数，获取系统日期并转换为TTS可识别的字符串
+                *
+                * Arguments   : char *buffer、存储数据的buffer
+                *
+                * Returns     : 无
+                *
+                * Notes       : buffer必须定义得比实际的大，否则会出现溢出
+                *
+                ********************************************************************************/
+               void report_date(char *buffer)
+               {
+                   buffer[0] = 0;
+                   buffer[1] = 0;
+                   citiao_play_flag = 1;
+               }
+               #endif //DATE_REPORT_EN
+               #if defined(TIME_REPORT_EN)
+               /********************************************************************************
+                * Description : 时间转换函数，获取系统时间并转换为TTS可识别的字符串
+                *
+                * Arguments   : char *buffer、存储数据的buffer
+                *
+                * Returns     : 无
+                *
+                * Notes       : buffer必须定义得比实际的大，否则会出现溢出
+                *
+                ********************************************************************************/
+               void conver_time_to_string(char *buffer)
+               {
+                   time_t time;
+                   unsigned char i;
+                   unsigned char *buf = buffer;
+                   unsigned char count = 0;
+               
+                   //获取系统时间
+                   TM_GetTime(&time);
+               
+                   //开始添加静音数据
+                   buffer[count++] = ' ';
+               
+                   buffer[count++] = info_str[0];
+                   i = time.hour / 6;
+                   buffer[count++] = info_str[1 + i];
+                   if(time.hour < 10)
+                   {
+                       buffer[count++] = num_unit[time.hour];
+                   }
+                   else
+                   {
+C251 COMPILER V4.55,  ap_report                                                            23/05/16  10:42:23  PAGE 8   
+
+                       i = time.hour / 10;
+                       buffer[count++] = num_unit[9 + i];
+                       i = time.hour % 10;
+                       if(i)
+                           buffer[count++] = num_unit[i];
+                   }
+                   buffer[count++] = info_str[5];
+                   if(time.minute < 10)
+                   {
+                       //处理分钟不为零的情况。
+                       if(time.minute)
+                           buffer[count++] = num_unit[0];
+                       buffer[count++] = num_unit[time.minute];
+                   }
+                   else
+                   {
+                       i = time.minute / 10;
+                       buffer[count++] = num_unit[9 + i];
+                       i = time.minute % 10;
+                       if(i)
+                           buffer[count++] = num_unit[i];
+                   }
+                   buffer[count++] = info_str[6];
+                   buffer[count] = 0;
+               
+                   report_str_fix(buffer);
+                   //citiao_play_flag = 1;
+               }
+               #endif //TIME_REPORT_EN
+               #if defined(AP_RADIO_REPORT_EN) && defined(RADIO_AP)
+               /********************************************************************************
+                * Description :
+                *
+                * Arguments   :
+                *
+                * Returns     :
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               int report_tag(char *report_buf)
+               {
+                   int result = 0;
+                   info_report_t info;
+               
+                   if(report_buf[0])
+                   {
+                       info.report_buf = report_buf;
+                       info.tts_lib_flag = 1;
+                       info.open_pa_flag = FALSE;
+                       check_report_state(&info);
+                       result = wait_report_end(NULL);
+                   }
+                   return result;
+               }
+               /********************************************************************************
+                * Description : 播报当前FM频点信息
+                *
+                * Arguments   : char *info tag 信息
+                *
+                * Returns     : 0:无收到特殊的按键消息 其它：特殊的消息需要上层处理
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               int report_frequency(fm_status_t *fm_status, char *str)
+C251 COMPILER V4.55,  ap_report                                                            23/05/16  10:42:23  PAGE 9   
+
+               {
+                   char buf[5];
+                   int dat;
+                   unsigned char count;
+                   info_report_t info;
+               
+                   //获取电台频率并保存到dat中
+                   //if (fm_status->mode == 0)
+                   //    dat = fm_status->freq + 87*10;
+                   //else
+                   //    dat = fm_status->freq + 76*10;
+               
+                   dat = fm_status->freq;
+                   itoa4(dat, buf);
+                   for(count = 0; count < 4; count++)
+                   {
+                       buf[count] -= '0';
+                   }
+                   count = 0;
+               
+                   //当前频率
+                   str[count++] = info_str[9];
+                   //区别两位数的频率和三位数的频率
+                   if(buf[0])
+                   {
+                       str[count++] = num_unit[buf[0]];
+                       str[count++] = num_unit[buf[1]];
+                       str[count++] = num_unit[buf[2]];
+                   }
+                   else
+                   {
+                       str[count++] = num_unit[buf[1]];
+                       str[count++] = EXTEND_TEN;
+                       str[count++] = num_unit[buf[2]];
+                   }
+                   str[count++] = info_str[5];
+                   str[count++] = num_unit[buf[3]];
+                   str[count++] = info_str[7];
+               
+                   //字符串结束标志
+                   str[count] = 0;
+               
+                   info.report_buf = str;
+                   info.tts_lib_flag = 0;
+                   info.open_pa_flag = FALSE;
+                   check_report_state(&info);
+                   return wait_report_end((void *)NULL);
+               }
+               #endif
+               
+               /********************************************************************************
+                * Description : 播报词条
+                *
+                * Arguments   : char type: 词条在TTS库中的编码
+                *
+                * Returns     : 0:无收到特殊的按键消息 其它：特殊的消息需要上层处理
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               int report_fix_info(char type, char pa_open_flag, void *param)
+               {
+                   int result = 0;
+                   info_report_t info;
+                   char buf[3];
+               
+C251 COMPILER V4.55,  ap_report                                                            23/05/16  10:42:23  PAGE 10  
+
+                   buf[0] = type;
+                   buf[1] = 0;
+                   buf[2] = 0;
+               
+                   info.report_buf = buf;
+                   info.tts_lib_flag = 0;
+                   info.open_pa_flag = pa_open_flag;
+                   check_report_state(&info);
+                   result = wait_report_end(param);
+               
+                   return result;
+               }
+               
+               /********************************************************************************
+                * Description : 播报词条
+                *
+                * Arguments   : char pa_open_flag: 是否需要开关PA操作
+                *
+                * Returns     : 0:无收到特殊的按键消息 其它：特殊的消息需要上层处理
+                *
+                * Notes       :
+                *
+                ********************************************************************************/
+               uint8 report_time_info(uint8 disk_char, uint8 pa_open_flag)
+               {
+                   int result = 0;
+                   info_report_t info;
+                   char buf[16];
+               
+                   conver_time_to_string(buf);
+               
+                   info.report_buf = buf;
+                   info.tts_lib_flag = 0;
+                   info.open_pa_flag = pa_open_flag;
+                   check_report_state(&info);
+                   result = wait_report_end((void *)&disk_char);
+               
+                   return result;
+               }
+               
+               #endif
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =    ------     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,325 @@
+C251 COMPILER V4.55,  basal_de_b                                                           13/12/18  16:27:20  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE basal_de_b
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\basal\basal_de_b.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\audioBasal\basal_de_b.c XSMALL FUNCTIONS(RE
+                    -ENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) INCDIR(..\..\..\..\..\inc) DEBUG PRINT(.\basal_de_b.lst) OBJECT(..\..\..\..\obj\lib
+                    -\basal\basal_de_b.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              USDK 5102
+    3           *                            Module: POWER MANAGER
+    4           *                 Copyright(c) 2001-2009 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>           <version >             <desc>
+    9           *      wuyueqian     2009-9-07 9:42     1.0             build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * file
+   13           * brief
+   14           * Author   wuyueqian
+   15           * par
+   16           *
+   17           *      Copyright(c) 2001-2007 Actions Semiconductor, All Rights Reserved.
+   18           *
+   19           * version 1.0
+   20           * date  2008/6/12
+   21           *******************************************************************************/
+   22          #include "basal.h"
+   23          #include "decC.h"
+   24          
+   25          #ifdef PC
+               extern void decAudioIntSub(void);
+               extern void decDMAIntSub(void);
+               extern void decTimerIntSub(void);
+               #endif
+   30          
+   31          #pragma name(MW_BS_AD_CMD1)
+   32          
+   33          //#define DECODE_BUFFER_ADDRESS_NORMAL 0xD80    //原0x600改为使用code ram
+   34          #define WRONG_DECODE_FILE_TYPE 0xf0
+   35          
+   36          #define CAN_NOT_CALL_RESERVE_INTERFACE() while(1){;}
+   37          
+   38          extern HANDLE m_deFileHandle;
+   39          extern Open_param_t *m_deOpenparam; //参数表地址
+   40          
+   41          extern uint32 deBpointerSave;
+   42          extern uint32 deBreakPointSave;
+   43          extern decBreakPointInfor_t m_breakPointInfo;
+   44          extern uint32 deApointerSave;
+   45          extern uint32 deFilepages;
+   46          extern BYTE m_backupmode;
+   47          extern play_status_t play_status;
+   48          extern bool m_deABok_sav;
+   49          extern BYTE *m_deDataBuffer;
+   50          extern uint32 m_deOldDspIntAddrSav;
+   51          extern uint32 m_deOldDmaIntAddrSav;
+   52          extern time_t m_Totaltimelength;
+   53          extern uint8 m_decTimer_Sav;
+   54          
+   55          
+   56          bool CaltimeCommand(void *param);
+   57          bool RestoreCommand(void *param);
+C251 COMPILER V4.55,  basal_de_b                                                           13/12/18  16:27:20  PAGE 2   
+
+   58          bool BackupCommand(void);
+   59          bool APointPlayCommand(void);
+   60          #pragma ROM(huge)
+   61          #ifndef PC
+   62          //#pragma ROM(large)
+   63          extern uint8 m_deRead_Data(uchar readFileDirection, DWORD position);
+   64          #pragma ROM(huge)
+   65          #else
+               extern uint8 m_deRead_Data(uchar readFileDirection, DWORD position);
+               #endif
+   68          
+   69          #pragma renamecode(MW_BS_AD_CMD1)
+   70          
+   71          
+   72          /*************************************************************************
+   73           * CaltimeCommand 通过AUDIO IP来计算歌曲的时间
+   74           *现在WMA WAV MP3均可以通过软件来计算总时间
+   75           ****************************************************************************/
+   76          
+   77          bool CaltimeCommand(void *param)
+   78          {
+   79   1      
+   80   1          param = param;
+   81   1          if (play_status.status == PLAYING_ERROR)
+   82   1          {
+   83   2              return FALSE;
+   84   2          }
+   85   1          g_decControlInfor.PlayMode = PLAY_MODE_CALTIME; //  codec 会根据这个进行配置
+   86   1          decInit();
+   87   1      
+   88   1          m_deOldDspIntAddrSav = IRQ_Intercept((uint32)(decAudioIntSub), IRQ_DSP);
+   89   1          m_deOldDmaIntAddrSav = IRQ_Intercept((uint32)(decDMAIntSub), IRQ_DMA2);
+   90   1          m_decTimer_Sav = TM_SetTimer((uint32) decTimerIntSub, 2);
+   91   1      
+   92   1          decstart();
+   93   1          do
+   94   1          {
+   95   2              ClearWatchDog();
+   96   2              if (g_decCurStatus.Status >= WRONG_DECODE_FILE_TYPE)
+   97   2              {
+   98   3                  play_status.status = PLAYING_ERROR;
+   99   3                  break;
+  100   3              }
+  101   2      
+  102   2          }
+  103   1          while (g_decCurStatus.GetSongInfo != 0xff);  //while(0);
+  104   1      
+  105   1          memcpy(&m_Totaltimelength, &(g_decSongInfor.TotalPlayTime.TimeHour), sizeof(time_t));
+  106   1      
+  107   1          decExit();
+  108   1          TM_KillTimer(m_decTimer_Sav);
+  109   1          IRQ_Release(m_deOldDspIntAddrSav, IRQ_DSP);
+  110   1          IRQ_Release(m_deOldDmaIntAddrSav, IRQ_DMA2);
+  111   1      
+  112   1          return TRUE;
+  113   1      
+  114   1      }
+  115          
+  116          
+  117          BOOL apSendCommand_bank(BYTE cmd, void *param)
+  118          {
+  119   1          switch(cmd)
+  120   1          {
+  121   2          case MC_SETPOWERCOUNT:
+  122   2              g_decControlInfor.EnergyOutFlag = (uint8)param;
+  123   2              break;
+C251 COMPILER V4.55,  basal_de_b                                                           13/12/18  16:27:20  PAGE 3   
+
+  124   2      
+  125   2          case MC_GETPOWERVALUE:
+  126   2              *((uint8 *)param) = g_decCurStatus.EnergyLevel;
+  127   2              break;
+  128   2      
+  129   2          case MC_SETSOFTVOLUMEMAX:
+  130   2              if (((uint8) param) != 0)
+  131   2              {
+  132   3                  g_decControlInfor.SoftVolumeMax = 40;
+  133   3              }
+  134   2              else
+  135   2              {
+  136   3                  g_decControlInfor.SoftVolumeMax = 0;
+  137   3              }
+  138   2      
+  139   2              break;
+  140   2      
+  141   2          case MC_SET_CHANNEL:
+  142   2      
+  143   2              g_decControlInfor.ChannelSelect = (uint8) param;
+  144   2      
+  145   2              break;
+  146   2      
+  147   2          case MC_SETVOLUME:
+  148   2              g_decControlInfor.Volume = (uint8)param;
+  149   2              decSetVolume();
+  150   2              break;
+  151   2      
+  152   2          case MC_SETA_B:
+  153   2              switch((uint8)param)
+  154   2              {
+  155   3              case ClrABPoint://本命令不再使用，AP在signal = reach_B时检测到复读次数-1就发AB_FINISHED命令
+  156   3                  if (play_status.status == PLAYING_WAIT_A)
+  157   3                  {
+  158   4                      APointPlayCommand();
+  159   4                  }
+  160   3                  play_status.status = PLAYING_PLAYING;
+  161   3                  g_decControlInfor.ABSetFlag = AB_CLEAR;
+  162   3                  play_status.signal = 0;
+  163   3                  m_deABok_sav = FALSE;//退出AB时要清此标志,否则下次AB只能一次
+  164   3                  break;
+  165   3      
+  166   3              case SetAPoint://SET A
+  167   3                  g_decControlInfor.ABSetFlag = AB_SET_A;
+  168   3                  break;
+  169   3      
+  170   3              case SetBPoint://SET B
+  171   3                  g_decControlInfor.ABSetFlag = AB_SET_B;
+  172   3                  break;
+  173   3      
+  174   3              case ReturnApoint://返回A点播放
+  175   3                  if(play_status.status == PLAYING_WAIT_A)
+  176   3                  {
+  177   4                      play_status.status = PLAYING_AB;
+  178   4                      APointPlayCommand();
+  179   4                  }
+  180   3                  break;
+  181   3              case StopBPlay:
+  182   3                  decExit();
+  183   3                  play_status.status = PLAYING_WAIT_A;
+  184   3                  break;
+  185   3              case ABFinished:
+  186   3                  m_deABok_sav = TRUE;
+  187   3                  break;
+  188   3      
+  189   3              default:
+C251 COMPILER V4.55,  basal_de_b                                                           13/12/18  16:27:20  PAGE 4   
+
+  190   3                  break;
+  191   3              }
+  192   2              break;
+  193   2      
+  194   2          case MC_FADEINOUT:
+  195   2              //                if(play_status.status == PLAYING_ERROR)
+  196   2              //                              {
+  197   2              //                                      return FALSE;
+  198   2              //                              }
+  199   2              if (((uint8)param & 0xf0) == FADEIN_DEF)
+  200   2              {
+  201   3                  g_decControlInfor.FadeInTime = (uint8)param & 0x0f;//设置淡入标志
+  202   3                  return TRUE;
+  203   3              }
+  204   2              else if (((uint8)param & 0xf0) == FADEOUT_DEF)
+  205   2              {
+  206   3                  g_decControlInfor.FadeOutTime = (uint8)param & 0x0f;//设置淡出标志
+  207   3                  return TRUE;
+  208   3              }
+  209   2              else
+  210   2              {
+  211   3      
+  212   3              }
+  213   2              break;
+  214   2      
+  215   2          case MC_AUTO_AB:
+  216   2              g_decControlInfor.SentDectFlag = (uint8)param;
+  217   2              break;
+  218   2      
+  219   2          case MC_PAUSE:
+  220   2              CAN_NOT_CALL_RESERVE_INTERFACE()
+  221   2      
+  222   2          case MC_RESTORE:
+  223   2              CAN_NOT_CALL_RESERVE_INTERFACE()
+  224   2              //return RestoreCommand();
+  225   2          case MC_SETSPEED:
+  226   2              CAN_NOT_CALL_RESERVE_INTERFACE()
+  227   2              /*
+  228   2               play_status.speed = (uint8)param;
+  229   2               g_decControlInfor.PlaySpeed = (uint8)param;
+  230   2               break;
+  231   2               */
+  232   2      
+  233   2          case MC_SETCALLBACK:
+  234   2              break;
+  235   2      
+  236   2      
+  237   2          }
+  238   1          return TRUE;
+  239   1      }
+  240          
+  241          
+  242          
+  243          //other bank combine
+  244          /*
+  245          
+  246           bool BackupCommand(void)
+  247           {
+  248           m_deOpenparam->BreakPTSave->ApointSave = deApointerSave;
+  249           m_deOpenparam->BreakPTSave->BpointSave = deBpointerSave;
+  250           m_deOpenparam->BreakPTSave->breakPT = deBreakPointSave;
+  251           if(m_backupmode == 0)//断点续播备份
+  252           {
+  253           memcpy(&(m_deOpenparam->BreakPTSave->breakPointInfor), &g_decBreakPointInfor, sizeof(decBreakPointInfor_
+             -t));
+  254           }
+C251 COMPILER V4.55,  basal_de_b                                                           13/12/18  16:27:20  PAGE 5   
+
+  255           else//AB 复读过程中的断点不保存，只是保存A点，以后断点续播从A点开始
+  256           {
+  257           memcpy(&(m_deOpenparam->BreakPTSave->breakPointInfor), &m_breakPointInfo, sizeof(decBreakPointInfor_t));
+  258           }
+  259           return TRUE;
+  260           }
+  261          
+  262           bool RestoreCommand(void)
+  263           {
+  264           deApointerSave = m_deOpenparam->BreakPTSave->ApointSave;
+  265           deBpointerSave = m_deOpenparam->BreakPTSave->BpointSave;
+  266           deBreakPointSave = m_deOpenparam->BreakPTSave->breakPT;
+  267           memcpy(&m_breakPointInfo, &(m_deOpenparam->BreakPTSave->breakPointInfor), sizeof(decBreakPointInfor_t));
+  268           return TRUE;
+  269           }
+  270          
+  271           bool APointPlayCommand(void)
+  272           {
+  273           g_decControlInfor.PlayMode = PLAY_MODE_BREAK;
+  274           memcpy(&g_decBreakPointInfor, &m_breakPointInfo, sizeof(decBreakPointInfor_t));
+  275           FS_FSeek(0, FS_SEEK_FFROMSTART, m_deFileHandle);
+  276           decInit();//计算时间不淡入
+  277           decstart();
+  278           return TRUE;
+  279           }
+  280          
+  281           */
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       462     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

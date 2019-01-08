@@ -1,0 +1,648 @@
+C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  16:03:48  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE UdiskInit
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usb\UdiskInit.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usb\UdiskInit.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) INC
+                    -DIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usb\UdiskInit.lst) OBJECT(..\..\..\obj\lib\usb\UdiskInit.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************************************
+             -*
+    3           *                                       ACTOS GL3976
+    4           *
+    5           *
+    6           *                           (c) Copyright 2002-2007, Actions Co,Ld.
+    7           *                                   All Right Reserved
+    8           *
+    9           * File   : Udiskinit.msa
+   10           * By     : zhouxl
+   11           * Version: v1.02     first version     2004-12-20 08:09
+   12           ********************************************************************************************************
+             -*
+   13           */
+   14          
+   15          #include "udisklib.h"
+   16          
+   17          #pragma name(UDISK_INIT)
+   18          void sFlashCapCheck(void);
+   19          void sPartitionTableCheck(void);
+   20          void sSetLUN(void);
+   21          void sFlashBootSectorCheck(void);
+   22          void Vram_Init(void);
+   23          void Vram_Update(void);
+   24          void sFillDiskACap(uint32 udiskcap);
+   25          
+   26          #pragma renamecode(?PR?UDISK_INIT)
+   27          
+   28          /*
+   29           ********************************************************************************************************
+             -*
+   30           *                                           UDiskInit
+   31           *
+   32           * Description: Udisk init.
+   33           *
+   34           * Arguments  : None.
+   35           *
+   36           * Returns    : None.
+   37           *
+   38           * Note(s)    : None.
+   39           ********************************************************************************************************
+             -*
+   40           */
+   41          uint8 UDiskInit(void *pcallback, int8 udisk_set)
+   42          {
+   43   1          uint8 sfrbak;
+   44   1      
+   45   1          if (pcallback != 0)
+   46   1          {
+   47   2              sFlashLedFlag = 1; //÷√“™…¡µ∆±Í÷æ
+   48   2              sFlashLed = (uint8 *) pcallback; //±£¥Êµÿ÷∑µΩRcode
+   49   2          }
+   50   1      
+   51   1          udisk_setting = (uint8) udisk_set & 0x03;
+   52   1          if (udisk_setting == 0)
+   53   1          {
+   54   2              HS_Device_Dscrptr.iSerialNumber = 0;
+C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  16:03:48  PAGE 2   
+
+   55   2          }
+   56   1      
+   57   1          GetUsbVidPid((vidpid_t *) &HS_Device_Dscrptr.idVendor);
+   58   1          GetUsbAttribute((usbattri_t *) (&(CMD_Inquiry_information_FOB + 8)));
+   59   1      
+   60   1      #ifdef USB_HOST_SUPPORT
+   61   1          //    usb_detectfunc_dereg(); //◊¢œ˙Timer÷–∂œ÷–USB≤È—Ø¥¶¿Ì»Îø⁄
+   62   1      #endif
+   63   1      
+   64   1          /*fixme:needœµÕ≥∂¡≥ˆ≤ª∂‘
+   65   1           Vram_Init();                    //«Â≥˝Vram÷–Flash∫Õø®¥ÿ¡¥”––ß±Íº«,≤¢‘⁄ÕÀ≥ˆ∫Û∏˘æ› «∑Ò”––¥FlashªÚø®÷ÿ–
+             -¬÷√…œ±Í÷æŒª
+   66   1           */
+   67   1      
+   68   1          //◊∞‘ÿusbµƒø‚code
+   69   1          sfrbak = SFR_BANK;
+   70   1          SFR_BANK = BANK_CMU_RMU;
+   71   1          //    MemBankCtl = MemBankCtl & (uint8)0xf7; //PCMRAM and MURAM2 to code FF9000H~FFBFFFH
+   72   1          //    MCSR5 = (MCSR5 & (uint8)0xf9) | 0x04; //PCMRAM:MCU clk
+   73   1          //    MCSR6 = (MCSR6 & (uint8)0xf3) | 0x08; //MURAM2:MCU clk
+   74   1          MEMCLKSELCTL1 = 0x00; //PCMRAM and URAM to MCU clk
+   75   1      
+   76   1          return UDiskInitInternal();
+   77   1      }
+   78          
+   79          /*
+   80           ********************************************************************************************************
+             -*
+   81           *                                           UDiskInitInternal
+   82           *
+   83           * Description: Udisk init.
+   84           *
+   85           * Arguments  : None.
+   86           *
+   87           * Returns    : None.
+   88           *
+   89           * Note(s)    : None.
+   90           ********************************************************************************************************
+             -*
+   91           */
+   92          uint8 UDiskInitInternal(void)
+   93          {
+   94   1          ClearWatchdog();
+   95   1      
+   96   1          USB_State = 0; //◊¥Ã¨Ω·ππ∂®“Â   0:ø’œ–◊¥Ã¨ ‘Ÿµ˜”√ ±“™≥ı ºªØ
+   97   1          illegalLBAFlag = 0; //LBA «∑Ò∑«∑®,”√”⁄∑¿∑∂∑¢√¸¡ÓΩ¯––∑«∑®∂¡
+   98   1          //∑µªÿ÷µ ∑«MLC flash:0  MLC flash:1; 2:SPI Nor flash; 3:LBA flash; 4:card base; 5:TLC flash; 6:Toshib
+             -a 24nm flash
+   99   1          flash_type = (uint8) UD_GetFlashType();
+  100   1      
+  101   1          //SectorType flash…»«¯¥Û–°,1=512bytes/sector, 2=1024bytes/sector,4=2048bytes/sector;
+  102   1          //UD_GetSctrSize ∑µªÿ÷µ:0=512bytes/sector; 1=1024bytes/sector; 2=2048bytes/sector;
+  103   1          if ((flash_type != 2) && (flash_type != 4))
+  104   1          {
+  105   2              SectorType = (1 << ((uint8) UD_GetSctrSize()));
+  106   2          }
+  107   1      
+  108   1          //SectorType = 0x02; //flash…»«¯¥Û–°,1=512bytes/sector, 2=1024bytes/sector,4=2048bytes/sector;
+  109   1          if (flash_type == 4)//∂‘”⁄ø®base≤ª◊ˆ8k∂‘∆Î£¨ƒ«√¥–Ë“™ª÷∏¥√ø∏ˆ…»«¯µƒ¥Û–°“‘º∞◊Ó∫Û“ª∏ˆ…»«¯µƒµÿ÷∑
+  110   1          {
+  111   2              SectorType = 0x01;
+  112   2          }
+  113   1      
+  114   1          if (fake_udisk_cap != 0x00)
+  115   1          {
+  116   2              //…Ë÷√Udisk…œ±®∏¯PCµƒ»›¡ø,sFillDiskACapµƒ≤Œ ˝“‘512byteŒ™µ•Œª,∂¯fake_udisk_cap“‘MŒ™µ•Œª
+C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  16:03:48  PAGE 3   
+
+  117   2              //note:…Ë÷√A≈Ã»›¡ø≤¢÷√ºŸ»›¡ø±Íº«,¥ÀΩ”ø⁄±ÿ–Î‘⁄UDiskInit÷Æ«∞µ˜”√,∑Ò‘Úº”√‹≈Ãª·“˝∆Œ Ã‚.
+  118   2              sFillDiskACap((uint32) fake_udisk_cap << 11);
+  119   2              set_fake_ucap_flag = 0x01;
+  120   2          }
+  121   1      
+  122   1          sFlashCapCheck(); //Flash∫Õø®»›¡øºÏ≤È£¨”√”⁄…œ±®PC
+  123   1      
+  124   1          flash_page_sctrnum = 0x0002; // need fix ???  //Get_Flash_Page_Size();
+  125   1      
+  126   1          //ª·◊∞…œø®«˝∂Ø
+  127   1          sCardCapCheck();
+  128   1      
+  129   1          if (flash_type != 2)
+  130   1          {
+  131   2              sPartitionTableCheck(); //∑÷«¯±ÌºÏ≤È£¨»∑»œ «∑Ò‘⁄º”√‹◊¥Ã¨
+  132   2              sFlashBootSectorCheck(); //“˝µº…»«¯ºÏ≤È,»Ù≤ªæﬂ±∏¥≈≈ÃΩ·ππ±„∆∆ªµ π∆‰Œ™Œ¥∏Ò ΩªØ
+  133   2              if (flash_type != 0x04)
+  134   2              {
+  135   3                  Partion_MBR_Initial(); //ºÏ≤ÈFAT MBR/DBR,≤¢º∆À„≥ˆDBR∆´“∆, ˝æ›«¯∆ ºµÿ÷∑
+  136   3              }
+  137   2          }
+  138   1      
+  139   1          sSetLUN(); //ºÏ≤È”√ªß…Ë÷√µƒ¥≈≈Ã ˝ƒø,…Ë÷√’˝»∑µƒLUN
+  140   1      
+  141   1          ClearWatchdog();
+  142   1      
+  143   1          return 1;
+  144   1      }
+  145          
+  146          /*
+  147           ********************************************************************************************************
+             -*
+  148           *                                           sFlashCapCheck
+  149           *
+  150           * Description: Flash Capacity Check
+  151           *
+  152           * Arguments  : None.
+  153           *
+  154           * Returns    : None.
+  155           *
+  156           * Note(s)    :
+  157           *            ‘§¡Ù40h∏ˆ…»«¯≤ª”√, «Œ™¡À∆ªπ˚œµÕ≥∏Ò ΩªØ
+  158           *            ∆ªπ˚∏Ò ΩªØ∫Û‘⁄XP∏Ò ΩªØµ⁄“ª¥Œ≤ª≥…π¶,µ⁄∂˛¥Œ≤≈≥…π¶
+  159           *            ∑¢œ÷Œ Ã‚ «:‘⁄MACœ¬∏Ò ΩªØ–°ª˙ ±,ª·–¥MBR÷¡…Ë±∏¡„…»«¯,‘⁄MBRµƒ∑÷«¯±Ì¿Ô–¥»ÎDBRµƒ∆ º…»«¯
+  160           *            Œ™0X3F…»«¯(1¥≈Õ∑0÷˘√Ê1…»«¯)ø™ º,≤¢Ω´…Ë±∏±®…œ¿¥µƒ»›¡ø»œŒ™ «¥”DBRø™ ºø…”√µƒ…»«¯ ˝,–¥÷¡MBRµ⁄“ª
+             -∏ˆ∑÷«¯±ÌœÓ¿Ô.
+  161           *            …Ë±∏‘Ÿ≤Â»ÎXPœµÕ≥Ω¯––∏Ò ΩªØ ±,XPœµÕ≥ ◊œ»ª·∏˘æ›MBR÷–µƒƒ⁄»›»•º∆À„µ√µΩ◊Ó∫Û“ª∏ˆ…»«¯µƒLBA(0x3F + 
+             -…Ë±∏»›¡ø),≤¢
+  162           *            –¥µ⁄0∏ˆ…»«¯∫Õ◊Ó∫Û“ª∏ˆ…»«¯,»ª∂¯XP∏˘æ›MBRº∆À„µ√µΩµƒ◊Ó∫Û“ª∏ˆ…»«¯µƒLBA≥¨≥ˆ¡ÀFlashµƒ»›¡ø,µº÷¬∂¡–
+             -¥…Ë±∏◊Ó∫Û“ª∏ˆ
+  163           *            …»«¯≤ª“ª÷¬,Ω¯∂¯±®∏Ò ΩªØ ß∞‹¥ÌŒÛ.≤¢÷¬ π«˝∂Ø–¥ªµ¡ÀFlash0…»«¯ø™ ºµƒ“ª–©ƒ⁄»›,À˘“‘µ⁄∂˛¥Œ∏Ò ΩªØª·
+             -≥…π¶.
+  164           *            Ω‚æˆ∑Ω∑®£∫‘⁄…Ë±∏ ∂±≥ˆ «MACœµÕ≥ ±£¨±®…Ë±∏»›¡øŒ™ µº »›¡ø - 0x40
+  165           ********************************************************************************************************
+             -*
+  166           */
+  167          static void sFlashCapCheck(void)
+  168          {
+  169   1          uint32 tmp;
+  170   1      
+  171   1          SDDiskCap = (uint32) GetSDCap();
+  172   1          VMCap = (uint32) GetVMCap();
+  173   1          //    MICap = (uint32)GetMICap();
+  174   1          UICap = (uint32) GetUICap();
+  175   1      
+  176   1          if (flash_type != 2)
+C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  16:03:48  PAGE 4   
+
+  177   1          {
+  178   2              EncryptInfoSector = SDDiskCap + VMCap + MICap + UICap - 1;
+  179   2      
+  180   2              tmp = (uint32) GetHideDiskCap(); //∑µªÿ“˛≤ÿ≈Ãµƒ»›¡ø(…»«¯Œ™µ•Œª)
+  181   2              AutoRunDiskStartAddr = SDDiskCap + VMCap + MICap + UICap + tmp;
+  182   2      
+  183   2              AutoRunDiskCapacity = (uint32) GetAutoRunDiskCap(); //∑µªÿAutoRunπ‚≈Ãµƒ»›¡ø(…»«¯Œ™µ•Œª)
+  184   2              if (AutoRunDiskCapacity == 0)
+  185   2              {
+  186   3                  AutoRunDiskFlag = 0; //AutoRunπ‚≈Ã¥Ê‘⁄±Í÷æ: 0:≤ª¥Ê‘⁄; ∑«0:¥Ê‘⁄
+  187   3              }
+  188   2              else
+  189   2              {
+  190   3                  AutoRunDiskFlag = 0xff;
+  191   3              }
+  192   2      
+  193   2              UdiskStartAddr = (AutoRunDiskStartAddr + AutoRunDiskCapacity);
+  194   2              //U≈Ãµƒ∆ º…»«¯∫≈, πU≈Ã∆ º…»«¯ƒ£16Œ™¡„(“ÚFlash«˝∂Ø∂¡–¥“‘16sectorŒ™µ•Œª,«“ ˝æ›“™∂‘∆Î)
+  195   2              if ((UdiskStartAddr & 0x0000000f) != 0x00)
+  196   2              {
+  197   3                  UdiskStartAddr = (UdiskStartAddr & (uint32) 0xfffffff0) + 0x10;
+  198   3              }
+  199   2      
+  200   2              Cap_cmd_info_DiskCDROM.LastLogBlockAddr = AutoRunDiskCapacity >> 2;
+  201   2      
+  202   2              sFlashDrvCheck(); //«–ªªFlash Driver
+  203   2      
+  204   2              tmp = (uint32) UD_GetCap(); //“‘1MByteŒ™µ•Œª
+  205   2              flash_capacity = tmp << 3; //“‘128KŒ™µ•Œª
+  206   2      
+  207   2              //±£¥ÊU≈Ã◊‹ø…”√…»«¯◊‹ ˝,≤¢‘§¡Ù0x40∏ˆ…»«¯≤ª”√.
+  208   2              udisk_total_capacity = (tmp << 11) - UdiskStartAddr - 0x100;
+  209   2      
+  210   2              if (set_fake_ucap_flag == 0x00)
+  211   2              {
+  212   3                  sFillDiskACap(udisk_total_capacity);
+  213   3              }
+  214   2      
+  215   2              //U≈Ã∂¡–¥ ±ª·∂‘µÿ÷∑◊ˆ∂‘∆Î∂Ø◊˜,∂¡–¥µÿ÷∑º”∆´“∆DataAreaOffset,∂¯¥≈≈Ã◊‹»›¡ø“≤–ËÕ¨≤Ω,∑¿÷πº∆À„ «∑Ò‘ΩΩÁ 
+             -±¥ÌŒÛ
+  216   2              udisk_total_capacity = udisk_total_capacity + 0x100;
+  217   2          }
+  218   1      }
+  219          
+  220          /*
+  221           ********************************************************************************************************
+             -*
+  222           *                                           sPartitionTableCheck
+  223           *
+  224           * Description: Partition Table Check, »∑»œ «∑Ò‘⁄º”√‹◊¥Ã¨.
+  225           *
+  226           * Arguments  : None.
+  227           *
+  228           * Returns    : None.
+  229           *
+  230           * Note(s)    : None.
+  231           ********************************************************************************************************
+             -*
+  232           */
+  233          static void sPartitionTableCheck(void)
+  234          {
+  235   1          encrypt_info *encrypt_info_p;
+  236   1          uint32 tmp;
+  237   1      
+  238   1          //≥ı ºªØ∑÷«¯±Í÷æ
+  239   1          SplitDiskFlag = 0;
+C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  16:03:48  PAGE 5   
+
+  240   1          EncryptFlag = 0;
+  241   1          PasswdPassOk = 0;
+  242   1      
+  243   1          //…Ë÷√ºŸ»›¡ø∫Û≤ª‘Ÿ÷ß≥÷º”√‹∑÷«¯π¶ƒ‹
+  244   1          if (set_fake_ucap_flag == 0x00)
+  245   1          {
+  246   2              encrypt_info_p = (encrypt_info *) DATABUFFER;
+  247   2              //∂¡Flash 1…»«¯ ˝æ›µΩUram÷–UramRWStartAdd∆ ºµƒµÿ∑Ω»•
+  248   2              sFlash_Rds(RW_FIX, EncryptInfoSector, DATABUFFER);
+  249   2      
+  250   2              // «∑Ò”–∑÷«¯
+  251   2              if (encrypt_info_p->SplitDiskRecord == 0x01)
+  252   2              {
+  253   3                  sFlash_Rds(RW_FIX, UdiskStartAddr, DATABUFFER);
+  254   3      
+  255   3                  // «∑ÒActions∑÷«¯±Ì, 0: «  ∆ º÷µ£∫≤ª «; ∑«Actions MBR£¨º¥∑«º”√‹
+  256   3                  if (memcmp(MBR_Bak, DATABUFFER, 0xe0) == 0)
+  257   3                  {
+  258   4                      //∑÷«¯”––ß£¨÷√±Í÷æŒª
+  259   4                      SplitDiskFlag = 1;
+  260   4      
+  261   4                      sFlash_Rds(RW_FIX, EncryptInfoSector, DATABUFFER);
+  262   4                      // «∑Ò”–√‹¬Î
+  263   4                      EncryptFlag = encrypt_info_p->IfEncryptRecord;
+  264   4      
+  265   4                      //ª÷∏¥A≈Ã»›¡ø
+  266   4                      tmp = encrypt_info_p->DiskACapacityRecord;
+  267   4                      EndianReverse((uint8 *) &tmp, sizeof(tmp));
+  268   4                      tmp = tmp / SectorType;
+  269   4                      Cap_cmd_info_DiskA.LastLogBlockAddr = tmp;
+  270   4                      Formatcap_cmd_info_DiskA.CurrentCap = tmp;
+  271   4                      Formatcap_cmd_info_DiskA.FomatableCap = tmp;
+  272   4      
+  273   4                      //À„≥ˆDiskB‘⁄Flashµƒ’Ê’˝∆ ºµÿ÷∑
+  274   4                      tmp = encrypt_info_p->DiskBStartAddrRecord;
+  275   4                      EndianReverse((uint8 *) &tmp, sizeof(tmp));
+  276   4                      EncryptDiskBStartAddr = tmp + UdiskStartAddr;
+  277   4                      //ª÷∏¥B≈Ã»›¡ø
+  278   4                      tmp = encrypt_info_p->DiskBCapacityRecord;
+  279   4                      EndianReverse((uint8 *) &tmp, sizeof(tmp));
+  280   4                      Cap_cmd_info_DiskB.LastLogBlockAddr = tmp;
+  281   4                      Formatcap_cmd_info_DiskB.CurrentCap = tmp;
+  282   4                      Formatcap_cmd_info_DiskB.FomatableCap = tmp;
+  283   4      
+  284   4                      //À„≥ˆDiskC‘⁄Flashµƒ’Ê’˝∆ ºµÿ÷∑
+  285   4                      tmp = encrypt_info_p->DiskCStartAddrRecord;
+  286   4                      EndianReverse((uint8 *) &tmp, sizeof(tmp));
+  287   4                      EncryptDiskCStartAddr = tmp + UdiskStartAddr;
+  288   4                      //ª÷∏¥C≈Ã»›¡ø
+  289   4                      tmp = encrypt_info_p->DiskCCapacityRecord;
+  290   4                      EndianReverse((uint8 *) &tmp, sizeof(tmp));
+  291   4                      Cap_cmd_info_DiskC.LastLogBlockAddr = tmp;
+  292   4                      Formatcap_cmd_info_DiskC.CurrentCap = tmp;
+  293   4                      Formatcap_cmd_info_DiskC.FomatableCap = tmp;
+  294   4      
+  295   4                      if (encrypt_info_p->DataSectorsForEncOkRecord != 0xddcc)
+  296   4                      {
+  297   5                          encrypt_info_p->DataSectorsForEncOkRecord = 0xddcc;
+  298   5                          //Ω´∂¡÷¡Uram Buffer÷–1…»«¯ ˝æ›‘Ÿ–¥÷¡∂‘”¶¥À ˝æ›µƒFlash÷–
+  299   5                          sFlash_Wrts(RW_FIX, EncryptInfoSector, DATABUFFER);
+  300   5                      }
+  301   4                  }
+  302   3                  else
+  303   3                  {
+  304   4                      memset(DATABUFFER, 0, 0x200);
+  305   4                      //Ω´∂¡÷¡Uram Buffer÷–1…»«¯ ˝æ›‘Ÿ–¥÷¡∂‘”¶¥À ˝æ›µƒFlash÷–
+C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  16:03:48  PAGE 6   
+
+  306   4                      sFlash_Wrts(RW_FIX, EncryptInfoSector, DATABUFFER);
+  307   4                  }
+  308   3              }
+  309   2          }
+  310   1      }
+  311          
+  312          /*
+  313           ********************************************************************************************************
+             -*
+  314           *                                           sSetLUN
+  315           *
+  316           * Description: ºÏ≤È”√ªß…Ë÷√µƒ¥≈≈Ã ˝ƒø,Set LUN Number.
+  317           *
+  318           * Arguments  : None.
+  319           *
+  320           * Returns    : None.
+  321           *
+  322           * Note(s)    : None.
+  323           ********************************************************************************************************
+             -*
+  324           */
+  325          static void sSetLUN(void)
+  326          {
+  327   1          uint8 cLun;
+  328   1      
+  329   1          cLun = 0;
+  330   1      
+  331   1          if (DiskAppearSelect == 0) //”√ªßµƒ≈Ã∑˚—°‘Ò  0:∂‡≈Ã∑˚(ƒ¨»œ)  01h:∆’Õ®≈Ã  02h:º”√‹≈Ã  03h:≤Âø®
+  332   1          {
+  333   2              cLun = SplitDiskFlag;
+  334   2              if (ShowMultiDiskFlag == 0) // «∑Ò–Ë“™œ‘ æø®≈Ã∑˚
+  335   2              {
+  336   3                  cLun += CardExistFlag;
+  337   3              }
+  338   2              else
+  339   2              {
+  340   3                  cLun++; //Œﬁ¬€ «∑Ò≤Âø®£¨∂º“™œ‘ æ≈Ã∑˚£¨“Ú¥ÀLUN÷¡…ŸŒ™1
+  341   3              }
+  342   2          }
+  343   1      
+  344   1          //for autorun
+  345   1          if (AutoRunDiskFlag != 0x00) //AutoRunπ‚≈Ã¥Ê‘⁄±Í÷æ: 0:≤ª¥Ê‘⁄; ∑«0:¥Ê‘⁄
+  346   1          {
+  347   2              cLun = cLun + 1;
+  348   2          }
+  349   1      
+  350   1          MaxLUN = cLun;
+  351   1      }
+  352          
+  353          /*
+  354           ********************************************************************************************************
+             -*
+  355           *                                           sFlashBootSectorCheck
+  356           *
+  357           * Description: Flash Udisk“˝µº…»«¯ºÏ≤È,»Ù≤ªæﬂ±∏¥≈≈ÃΩ·ππ±„∆∆ªµ π∆‰Œ™Œ¥∏Ò ΩªØ.
+  358           *
+  359           * Arguments  : None.
+  360           *
+  361           * Returns    : None.
+  362           *
+  363           * Note(s)    : None.
+  364           ********************************************************************************************************
+             -*
+  365           */
+  366          static void sFlashBootSectorCheck(void)
+  367          {
+C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  16:03:48  PAGE 7   
+
+  368   1          char *pcDataBuffer;
+  369   1      
+  370   1          //«ÂŒÔ¿Ì0…»«¯”Î¬ﬂº≠0…»«¯ «∑Ò÷ÿ∫œ±‰¡ø
+  371   1          Phy0EquLog0Flag = 0;
+  372   1          //DATABUFFERŒ™sFlash_Lgcl_RdFix∫Ø ˝∂¡µΩUram B2÷–µƒ∆ ºµÿ÷∑
+  373   1          pcDataBuffer = DATABUFFER;
+  374   1          //∂¡MBR
+  375   1          sFlash_Rds(RW_FIX, UdiskStartAddr, DATABUFFER);
+  376   1      
+  377   1          if ((*pcDataBuffer == 0xeb) && (*(pcDataBuffer + 2) == 0x90))
+  378   1          {
+  379   2              //¥≈≈Ã’˝»∑,ŒÔ¿Ì0…»«¯”Î¬ﬂº≠0…»«¯÷ÿ∫œ
+  380   2              Phy0EquLog0Flag = 1;
+  381   2          }
+  382   1          // «∑ÒActions∑÷«¯±Ì, 0: «  ∑«0:≤ª «; ∑«Actions MBR£¨º¥∑«º”√‹
+  383   1          else if (memcmp(MBR_Bak, UDISKSTARTADDRURAMADD, 0xe0) != 0)
+  384   1          {
+  385   2              //¥≈≈ÃŒ¥∏Ò ΩªØ,ŒÔ¿Ì0…»«¯”Î¬ﬂº≠0…»«¯÷ÿ∫œ
+  386   2              Phy0EquLog0Flag = 0x01;
+  387   2              if ((*(pcDataBuffer + 510) != 0x55) || (*(pcDataBuffer + 511) != 0xaa))
+  388   2              {
+  389   3                  //∂¡fat±Ì
+  390   3                  sFlash_Rds(RW_FIX, UdiskStartAddr + 1, DATABUFFER);
+  391   3                  if ((*pcDataBuffer != 0xff) || (*(pcDataBuffer + 1) != 0xf8))
+  392   3                  {
+  393   4                      memset(DATABUFFER, 0, 0x200);
+  394   4                      //∆∆ªµBoot«¯, π∆‰Œ¥∏Ò ΩªØ
+  395   4                      sFlash_Wrts(RW_FIX, UdiskStartAddr, DATABUFFER);
+  396   4                      sFlash_Wrts(RW_FIX, UdiskStartAddr + 1, DATABUFFER);
+  397   4                  }
+  398   3              }
+  399   2          }
+  400   1          else
+  401   1          {
+  402   2          }
+  403   1      }
+  404          
+  405          /*
+  406           ********************************************************************************************************
+             -*
+  407           *                                           UDiskSetDiskNum
+  408           *
+  409           * Description: …Ë÷√¥≈≈Ã≥ˆœ÷ ˝ƒø,“™‘⁄µ˜”√UdiskInit«∞µ˜”√ 0:∂‡≈Ã∑˚(ƒ¨»œ)  01h:∆’Õ®≈Ã  02h:º”√‹≈Ã  03h:≤Âø®
+             -.
+  410           *
+  411           * Arguments  : None.
+  412           *
+  413           * Returns    : None.
+  414           *
+  415           * Note(s)    : None.
+  416           ********************************************************************************************************
+             -*
+  417           */
+  418          void UDiskSetDiskNum(int8 selector)
+  419          {
+  420   1          DiskAppearSelect = 0;
+  421   1          if (selector < 4)
+  422   1          {
+  423   2              DiskAppearSelect = (uint8) selector;
+  424   2          }
+  425   1      }
+  426          
+  427          /*
+  428           ********************************************************************************************************
+             -*
+  429           *                                           UDiskSetWP
+C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  16:03:48  PAGE 8   
+
+  430           *
+  431           * Description: …Ë÷√¥≈≈Ã–¥±£ª§,”¶‘⁄UDiskRun«∞µ˜”√.
+  432           *
+  433           * Arguments  : None.
+  434           *
+  435           * Returns    : None.
+  436           *
+  437           * Note(s)    : None.
+  438           ********************************************************************************************************
+             -*
+  439           */
+  440          uint8 UDiskSetWP(int8 letter)
+  441          {
+  442   1          uint8 ret;
+  443   1      
+  444   1          ret = 0;
+  445   1          if (letter == 'C')
+  446   1          {
+  447   2              FlashWPFlag = 0x01;
+  448   2              ret = 1;
+  449   2          }
+  450   1          if (letter == 'H')
+  451   1          {
+  452   2              CardWPFlag = 0x01;
+  453   2              ret = 1;
+  454   2          }
+  455   1      
+  456   1          return ret;
+  457   1      }
+  458          
+  459          /*
+  460           ********************************************************************************************************
+             -*
+  461           *                                           Vram_Init
+  462           *
+  463           * Description: «Â≥˝Vram÷–Flash∫Õø®¥ÿ¡¥”––ß±Íº«,≤¢‘⁄ÕÀ≥ˆ∫Û∏˘æ› «∑Ò”––¥FlashªÚø®÷ÿ–¬÷√…œ±Í÷æŒª.
+  464           *
+  465           * Arguments  : None.
+  466           *
+  467           * Returns    : None.
+  468           *
+  469           * Note(s)    : None.
+  470           ********************************************************************************************************
+             -*
+  471           */
+  472          /*
+  473           void Vram_Init(void)
+  474           {
+  475           sFlash_Rds(RW_FIX,(SDDiskCap + VM_FS_FLAG/0x200), DATABUFFER);
+  476           flash_vram_vld =  *((uint8*)DATABUFFER+0x04);
+  477           *((uint8*)DATABUFFER+0x04) = 0xff;                //Flash¥ÿ¡¥”––ß±Íº«
+  478           *((uint8*)DATABUFFER+0x0C) = 0xff;                //ø®¥ÿ¡¥”––ß±Íº«
+  479           sFlash_Wrts(RW_FIX,(SDDiskCap + VM_FS_FLAG/0x200), DATABUFFER);
+  480           }
+  481           */
+  482          
+  483          /*
+  484           ********************************************************************************************************
+             -*
+  485           *                                           Udisk_Exit_Handle
+  486           *
+  487           * Description: Udisk’˝≥£ÕÀ≥ˆ ±¥¶¿Ì»Îø⁄,»ÁVram±Íº«ªÿ–¥,USBœ˚œ¢¥¶¿ÌTimer÷–∂œ÷ÿ–¬◊¢≤·.
+  488           *
+  489           * Arguments  : None.
+  490           *
+  491           * Returns    : None.
+C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  16:03:48  PAGE 9   
+
+  492           *
+  493           * Note(s)    : None.
+  494           ********************************************************************************************************
+             -*
+  495           */
+  496          void Udisk_Exit_Handle(void)
+  497          {
+  498   1          /*fixme:needœµÕ≥∂¡≥ˆ≤ª∂‘
+  499   1           Vram_Update();
+  500   1           */
+  501   1      #ifdef USB_HOST_SUPPORT
+  502   1          //    USB_DetectFnc_Initial();
+  503   1      #endif
+  504   1      }
+  505          
+  506          /*
+  507           ********************************************************************************************************
+             -*
+  508           *                                           Vram_Update
+  509           *
+  510           * Description: «Â≥˝Vram÷–Flash∫Õø®¥ÿ¡¥”––ß±Íº«,≤¢‘⁄ÕÀ≥ˆ∫Û∏˘æ› «∑Ò”––¥FlashªÚø®÷ÿ–¬÷√…œ±Í÷æŒª.
+  511           *
+  512           * Arguments  : None.
+  513           *
+  514           * Returns    : None.
+  515           *
+  516           * Note(s)    : None.
+  517           ********************************************************************************************************
+             -*
+  518           */
+  519          /*
+  520           void Vram_Update(void)
+  521           {
+  522           //∑¢…˙π˝Udisk–¥∂Ø◊˜,“ÚVram±Íº«‘⁄Ω¯»Î ±“—æ≠±ª«ÎµÙ≤ª–Ë“™ª÷∏¥;√ª”––¥∂Ø◊˜,µ´ «∆‰Vram±Íº«±æ¿¥æÕ√ª”–,“≤≤ª–Ë“™ª
+             -÷∏¥
+  523           if ((flash_disk_write_flag==0x00) && (flash_vram_vld!=0x00))
+  524           {
+  525           sFlash_Rds(RW_FIX,(SDDiskCap + VM_FS_FLAG/0x200), DATABUFFER);
+  526           //Flash¥ÿ¡¥”––ß±Íº«
+  527           *((uint8*)DATABUFFER+0x04) = flash_vram_vld;
+  528           sFlash_Wrts(RW_FIX,(SDDiskCap + VM_FS_FLAG/0x200), DATABUFFER);
+  529           }
+  530           }
+  531           */
+  532          
+  533          /*
+  534           ********************************************************************************************************
+             -*
+  535           *                                           sFillDiskACap
+  536           *
+  537           * Description: Fill DiskA Capacity.
+  538           *
+  539           * Arguments  : udiskcap:DiskA Capacity,512byteµ•Œª
+  540           *
+  541           * Returns    : None.
+  542           *
+  543           * Note(s)    : None.
+  544           ********************************************************************************************************
+             -*
+  545           */
+  546          void sFillDiskACap(uint32 udiskcap)
+  547          {
+  548   1          //≥ı ºªØblocklength
+  549   1          Cap_cmd_info_DiskA.BlockLengthInBytes = 0x200;
+  550   1      
+  551   1          Cap_cmd_info_DiskA.BlockLengthInBytes = Cap_cmd_info_DiskA.BlockLengthInBytes * SectorType;
+C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  16:03:48  PAGE 10  
+
+  552   1          Cap_cmd_info_DiskA.LastLogBlockAddr = udiskcap / SectorType - 1;
+  553   1          Formatcap_cmd_info_DiskA.CurrentCapBlockLength[0] = 0x00;
+  554   1          Formatcap_cmd_info_DiskA.CurrentCapBlockLength[1] = 0x02 * SectorType;
+  555   1          Formatcap_cmd_info_DiskA.CurrentCapBlockLength[2] = 0x00;
+  556   1          Formatcap_cmd_info_DiskA.FomatableCapBlockLength[0] = 0x00;
+  557   1          Formatcap_cmd_info_DiskA.FomatableCapBlockLength[1] = 0x02 * SectorType;
+  558   1          Formatcap_cmd_info_DiskA.FomatableCapBlockLength[2] = 0x00;
+  559   1          Formatcap_cmd_info_DiskA.CurrentCap = udiskcap / SectorType;
+  560   1          Formatcap_cmd_info_DiskA.FomatableCap = udiskcap / SectorType;
+  561   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1363     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

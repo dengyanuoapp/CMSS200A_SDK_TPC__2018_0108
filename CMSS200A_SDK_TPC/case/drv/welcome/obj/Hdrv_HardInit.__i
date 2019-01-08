@@ -1,0 +1,1 @@
+"..\Ui_LED\Hdrv_HardInit.c" XSMALL FUNCTIONS (REENTRANT) ROM(HUGE) OPTIMIZE (9,SPEED) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DF(DEMO_EFUSE=0) DF(DEMO_ADFU=0) DF(WELCOME=1) DEFINE (welcom) DEBUG PRINT(.\lst\Hdrv_HardInit.lst) OBJECT(.\obj\Hdrv_HardInit.obj)

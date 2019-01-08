@@ -1,0 +1,1426 @@
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE UDisk20IRQMain
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usb\UDisk20IRQMain.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usb\UDisk20IRQMain.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE
+                    -) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\UDisk20IRQMain.lst) OBJECT(..\..\..\obj\lib\usb\UDis
+                    -k20IRQMain.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************************************
+             -*
+    3           *                                       ACTOS GL3976
+    4           *
+    5           *
+    6           *                           (c) Copyright 2002-2007, Actions Co,Ld.
+    7           *                                   All Right Reserved
+    8           *
+    9           * File   : Udisk20IRQMain.msa
+   10           * By     : zhouxl
+   11           * Version: v1.02     first version     2004-12-13 12:45
+   12           ********************************************************************************************************
+             -*
+   13           */
+   14          
+   15          #include "udisklib.h"
+   16          
+   17          STG_INFO edata StorageInfor _at_ 0x00E0;
+   18          #pragma name(RCODE)
+   19          
+   20          #ifndef UDISK_AP
+   21          #pragma asm
+*** ERROR C5 IN LINE 21 OF ..\..\..\LIBSRC\USB\UDISK20IRQMAIN.C: 'asm/endasm' requires src-control to be active
+   22          EXTRN EDATA(SP_Keeper)
+   23          #pragma endasm
+   24          #endif
+   25          
+   26          #pragma ROM(HUGE)
+   27          void Reset_Recover(void);
+   28          void USB_Bus_Reset_ISR(void);
+   29          void VBus_Change_Handle(void);
+   30          void Suspend_ISR(void);
+   31          void Hs_mode_ISR(void);
+   32          void Other_ISR(void);
+   33          #pragma ROM(HUGE)
+   34          
+   35          void ADFUHandle(void);
+   36          void sFWUpgOkDelay(uint8 fwup_direction);
+   37          void sDelete_FlashVram(uint8 sectorNum, uint32 lbaAddr);
+   38          void sState_0_Handle(void);
+   39          void sState_10_Handle(void);
+   40          void sState_20_Handle(void);
+   41          void sGoInState0(void);
+   42          void sSplitDiskEject(void);
+   43          void UdiskReady(void);
+   44          void UdiskUnReady(void);
+   45          static uint8 CheckTimer(uint8 *timerrecord, uint8 *countrecord, uint8 count);
+   46          
+   47          #pragma renamecode(?PR?RCODE)
+   48          #pragma ROM(HUGE)
+   49          
+   50          //´Ë¶¨ÒåÎª±ÜÃâÆÁ±Îµô´òÓ¡ºó£¬udiskÓ¦ÓÃ±àÒë³£Á¿¶Î¶¨ÒåÎ´Ê¹ÓÃµ¼ÖÂµÄ±àÒë´íÎó¡£
+   51          #ifndef _PRINT_DEBUG_
+   52          const uint8 ConstSeg3 = 'A';
+   53          #endif
+   54          /*
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 2   
+
+   55           ********************************************************************************************************
+             -*
+   56           *                                           U20_ISRMain
+   57           *
+   58           * Description: USB2.0 Interrupt Server Entry.
+   59           *
+   60           * Arguments  : None.
+   61           *
+   62           * Returns    : None.
+   63           *
+   64           * Note(s)    : None.
+   65           ********************************************************************************************************
+             -*
+   66           */
+   67          
+   68          void U20_ISRMain(void) //interrupt 8
+   69          {
+   70   1      #ifndef UDISK_AP
+   71   1      #pragma asm
+*** ERROR C5 IN LINE 71 OF ..\..\..\LIBSRC\USB\UDISK20IRQMAIN.C: 'asm/endasm' requires src-control to be active
+   72   1          MOV SP_Keeper, DR60
+   73   1      #pragma endasm
+   74   1      #endif
+   75   1      
+   76   1          sfr_bak = SFR_BANK;
+   77   1          SFR_BANK = BANK_USB;
+   78   1      
+   79   1          ClearWatchdog();
+   80   1      
+   81   1          USBEIRQ = USBEIRQ | (uint8) 0x80;
+   82   1      
+   83   1          if ((SHORTPCKIRQ & 0x20) != 0x00)
+   84   1          {
+   85   2              Bulk_Out_Handle();
+   86   2          }
+   87   1          else if ((Usbirq_hcusbirq & 0x01) != 0x00)
+   88   1          {
+   89   2              Setup_Packet_Handle();
+   90   2          }
+   91   1          else if ((Usbirq_hcusbirq & 0x10) != 0x00)
+   92   1          {
+   93   2              USB_Bus_Reset_ISR();
+   94   2          }
+   95   1      
+   96   1          else if ((Usbirq_hcusbirq & 0x80) != 0x00)
+   97   1          {
+   98   2              VBus_Change_Handle();
+   99   2          }
+  100   1      
+  101   1          else if ((Usbirq_hcusbirq & 0x08) != 0x00)
+  102   1          {
+  103   2              Suspend_ISR();
+  104   2          }
+  105   1      
+  106   1          else if ((Usbirq_hcusbirq & 0x20) != 0x00)
+  107   1          {
+  108   2              Hs_mode_ISR();
+  109   2          }
+  110   1          else
+  111   1          {
+  112   2              Other_ISR();
+  113   2          }
+  114   1      
+  115   1          Reset_Recover();
+  116   1      }
+  117          
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 3   
+
+  118          void Reset_Recover(void)
+  119          {
+  120   1          SFR_BANK = sfr_bak;
+  121   1      #ifndef UDISK_AP
+  122   1      #pragma asm
+*** ERROR C5 IN LINE 122 OF ..\..\..\LIBSRC\USB\UDISK20IRQMAIN.C: 'asm/endasm' requires src-control to be active
+  123   1          MOV DR60, SP_Keeper
+  124   1      #pragma endasm
+  125   1      #endif
+  126   1      }
+  127          
+  128          /*
+  129           ********************************************************************************************************
+             -*
+  130           *                                           IfIsConnect
+  131           *
+  132           * Description: ÅÐ¶ÏÊÇ·ñÁªÏß»ò´«ÊäTimeout, Èç¹ûÓÐÒì³£, ¾ÍÖ±½ÓÍË³öÖÐ¶Ï·þÎñ³ÌÐò.
+  133           *
+  134           * Arguments  : None.
+  135           *
+  136           * Returns    : None.
+  137           *
+  138           * Note(s)    : Êý¾Ý´«ÊäÊ§°ÜÊ±,PC»á·¢ËÍBus Resetµ½Ð¡»ú;»òÕß¶ÁÐ´¹ý³ÌÖÐ°ÎÏß.
+  139           ********************************************************************************************************
+             -*
+  140           */
+  141          void ifIsConnect(void)
+  142          {
+  143   1          uint8 usbrstflag, disconnectflag;
+  144   1          uint8 sfrbak;
+  145   1          ClearWatchdog();
+  146   1      
+  147   1          sfrbak = SFR_BANK;
+  148   1          usbrstflag = 0x00;
+  149   1          disconnectflag = 0x00;
+  150   1          SFR_BANK = BANK_USB;
+  151   1          if ((Usbirq_hcusbirq & 0x10) != 0x00)
+  152   1          {
+  153   2              usbrstflag = 0x01;
+  154   2          }
+  155   1      #ifndef _FPGA_VERTION_
+  156   1          if ((DPDMCTRL & 0x40) == 0x00)
+  157   1          {
+  158   2              disconnectflag = 0x01;
+  159   2          }
+  160   1      #endif
+  161   1      
+  162   1          //USB disconnect or usb reset
+  163   1          if ((usbrstflag == 0x01) || (disconnectflag == 0x01))
+  164   1          {
+  165   2      #ifdef _PRINT_DEBUG_
+                       prints("timeout\n");
+               #endif
+  168   2      
+  169   2              if (fifo_trans_mode == 0x01)
+  170   2              {
+  171   3                  SFR_BANK = BANK_DMA_CARD;
+  172   3              }
+  173   2              else
+  174   2              {
+  175   3                  SFR_BANK = BANK_DMA0;
+  176   3              }
+  177   2              //½«DMAÍ£Ö¹
+  178   2              DMAnCTL0 = DMA0CTL0 & (uint8) 0xfe;
+  179   2              //FIFOÖ±Í¨Ä£Ê½½áÊøºó¹Ø±ÕÖ±Í¨ÅäÖÃ£¬±ÜÃâDMAµÄÅäÖÃ´¦ÓÚfifoÖ±Í¨Ä£Ê½,µ¼ÖÂºóÐø´æ´¢½éÖÊ´¦ÀíÒì³£
+  180   2              DMAnCTL1 = 0x00;
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 4   
+
+  181   2              fifo_trans_mode = 0x00;
+  182   2      
+  183   2              SFR_BANK = BANK_USB;
+  184   2                      UDMAM = 0x0c;
+  185   2              //ÇåFIFOºÍEPAÖÐ¶ÏÎªÏÂÒ»¸öCBW×¼±¸
+  186   2              EPB_OutRdy_ShortPacketNAK();
+  187   2          }
+  188   1      
+  189   1          if (usbrstflag == 0x01)
+  190   1          {
+  191   2              USB_Bus_Reset_ISR();
+  192   2              Reset_Recover();
+  193   2          }
+  194   1          else if (disconnectflag == 0x01)
+  195   1          {
+  196   2              VBus_Change_Handle();
+  197   2              Reset_Recover();
+  198   2          }
+  199   1          else
+  200   1          {
+  201   2          }
+  202   1          SFR_BANK = sfrbak;
+  203   1      }
+  204          
+  205          /*
+  206           ********************************************************************************************************
+             -*
+  207           *                                           USB_Bus_Reset_ISR
+  208           *
+  209           * Description: Root Port Reset Interrupt handle.
+  210           *
+  211           * Arguments  : None.
+  212           *
+  213           * Returns    : None.
+  214           *
+  215           * Note(s)    : None.
+  216           ********************************************************************************************************
+             -*
+  217           */
+  218          void USB_Bus_Reset_ISR(void)
+  219          {
+  220   1          Usbirq_hcusbirq |= 0x10;
+  221   1      
+  222   1          //Õý³£UdiskÃ¶¾ÙÖ»»á·¢ËÍÁ½´ÎReset,Ö®ºóµÄReset¾ùÎª´íÎóºóPC·¢ËÍµÄ
+  223   1          usb_reset_enter_cnt++;
+  224   1      
+  225   1          //·¢Éúbus resetºó¶Ô²¿·Ö±äÁ¿½øÐÐÖØÖÃ£¬½â¾ö´«ÊäÖÐ·¢Éúbus resetºóÍË³öuÅÌÎÊÌâ¡£
+  226   1          Suspend_Flag = 0x00;
+  227   1      
+  228   1          ConfigValue = 0;
+  229   1          AlternateSetting = 0;
+  230   1          DeviceStatus = 0;
+  231   1          InterfaceStatus = 0;
+  232   1          EndPoint1Status = 0;
+  233   1          EndPoint2Status = 0;
+  234   1      }
+  235          
+  236          /*
+  237           ********************************************************************************************************
+             -*
+  238           *                                           VBus_Change_Handle
+  239           *
+  240           * Description: Connect/Disconnect Interrupt.
+  241           *
+  242           * Arguments  : None.
+  243           *
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 5   
+
+  244           * Returns    : None.
+  245           *
+  246           * Note(s)    : None.
+  247           ********************************************************************************************************
+             -*
+  248           */
+  249          void VBus_Change_Handle(void)
+  250          {
+  251   1          smDelay(3);
+  252   1      
+  253   1          PullLineFlag = 0x00;
+  254   1      
+  255   1      #ifdef _PRINT_DEBUG_
+                   prints("L1\n");
+               #endif
+  258   1      
+  259   1          if ((DPDMCTRL & 0x40) == 0x00)
+  260   1          {
+  261   2      #ifdef _PRINT_DEBUG_
+                       prints("L2\n");
+               #endif
+  264   2      
+  265   2              PullLineFlag = 0x01;
+  266   2          }
+  267   1      
+  268   1          //clear VBus interrupt
+  269   1          Usbirq_hcusbirq |= (uint8) 0x80;
+  270   1      }
+  271          
+  272          /*
+  273           ********************************************************************************************************
+             -*
+  274           *                                           Suspend_ISR
+  275           *
+  276           * Description: Suspend Interrupt handle.
+  277           *
+  278           * Arguments  : None.
+  279           *
+  280           * Returns    : None.
+  281           *
+  282           * Note(s)    : None.
+  283           ********************************************************************************************************
+             -*
+  284           */
+  285          void Suspend_ISR(void)
+  286          {
+  287   1          uint8 tmp;
+  288   1          Usbirq_hcusbirq |= 0x08;
+  289   1      
+  290   1          //bit[7]:1 need process suspend,0 don't process suspend; bit[1:0]:0 no suspend; 1 recieve suspend; 2 
+             -has handle suspend
+  291   1          if ((Suspend_Flag & 0x80) == 0x00)
+  292   1          {
+  293   2          }
+  294   1          else if (detach_cmd_rcv != 0x00)
+  295   1          {
+  296   2              FWOpStatus = 1;
+  297   2              IsAdfuCondition = 1;
+  298   2          }
+  299   1          else
+  300   1          {
+  301   2      #ifdef _PRINT_DEBUG_
+                       prints("S1\n");
+               #endif
+  304   2              //USB plug-in±êÖ¾·´Ó³ÕæÊµÇé¿öÐèÒª×î³¤3msÑÓ³ÙÊ±¼ä
+  305   2              smDelay(3);
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 6   
+
+  306   2      
+  307   2              //if plug off usb line,don't send suspend message to AP
+  308   2              if ((DPDMCTRL & 0x40) != 0x00)
+  309   2              {
+  310   3                  //ESD²âÊÔ²úÉúsuspend£¬ÑÓÊ±1s×óÓÒ,ÈçPC·¢ËÍbus reset,Ôò²»´¦Àísuspend
+  311   3                  tmp = 4;
+  312   3                  while ((tmp--) != 0x00)
+  313   3                  {
+  314   4                      if ((Usbirq_hcusbirq & 0x10) != 0x00)
+  315   4                      {
+  316   5                          break;
+  317   5                      }
+  318   4                      TM_DelayMS(250);
+  319   4                      ClearWatchdog();
+  320   4                  }
+  321   3      
+  322   3                  if ((Usbirq_hcusbirq & 0x10) == 0x00)
+  323   3                  {
+  324   4                      //ÕæÕýµÄsuspend×´Ì¬,Ó²¼þ»Ö¸´Ä¬ÈÏ×´Ì¬
+  325   4                      usb_pwr_suspnd_fnsh = 0;
+  326   4                      //Çåreset±ê¼Ç,²»ÈÃÉè±¸ÇáÒ×½øÈëFull SpeedÄ£Ê½
+  327   4                      usb_reset_enter_cnt = 0;
+  328   4                      //0:no suspend; 1:recieve suspend; 2:has handle suspend
+  329   4                      Suspend_Flag++;
+  330   4      
+  331   4                      //enable high speed
+  332   4                      BKDOOR = (BKDOOR & 0x7f) | 0x10;
+  333   4                  }
+  334   3                  else
+  335   3                  {
+  336   4      #ifdef _PRINT_DEBUG_
+                               prints("S2\n");
+               #endif
+  339   4                  }
+  340   3              }
+  341   2              //Èç¹û·¢ÉúÐ´²Ù×÷,°Ñ×îºóÒ»´Î´«ÊäÊý¾ÝÐ´ÈëFlash
+  342   2              UD_Update();
+  343   2          }
+  344   1      }
+  345          
+  346          /*
+  347           ********************************************************************************************************
+             -*
+  348           *                                           Hs_mode_ISR
+  349           *
+  350           * Description: Enter high speed mode interrupt occur.
+  351           *
+  352           * Arguments  : None.
+  353           *
+  354           * Returns    : None.
+  355           *
+  356           * Note(s)    : Éè±¸ÔÚÊÕµ½Bus reset,²¢Íê³ÉChirp J/KµÄ·¢ËÍºó,»á²úÉúHigh SpeedÖÐ¶Ï.
+  357           ********************************************************************************************************
+             -*
+  358           */
+  359          void Hs_mode_ISR(void)
+  360          {
+  361   1          Usbirq_hcusbirq |= 0x20;
+  362   1      
+  363   1          //the first connect to PC,usb reset has more than twice,change to full speed
+  364   1          //after setting config,don't change to full speed
+  365   1          if (usb_pwr_suspnd_fnsh == 0x00)
+  366   1          {
+  367   2              if (usb_reset_enter_cnt >= 2)
+  368   2              {
+  369   3                  //disable high speed,bit4Éè¼Æ´íÎó,´ËÎ»Ó¦Ð´1,µ«Ã¿´Î¶Á³ö¾ùÊÇ0
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 7   
+
+  370   3      #ifdef _PRINT_DEBUG_
+                           prints("set fs \n");
+               #endif
+  373   3                  BKDOOR = BKDOOR | (uint8) 0x90;
+  374   3              }
+  375   2          }
+  376   1      }
+  377          
+  378          /*
+  379           ********************************************************************************************************
+             -*
+  380           *                                           Other_ISR
+  381           *
+  382           * Description: Other ISR handle.
+  383           *
+  384           * Arguments  : None.
+  385           *
+  386           * Returns    : None.
+  387           *
+  388           * Note(s)    : None.
+  389           ********************************************************************************************************
+             -*
+  390           */
+  391          void Other_ISR(void)
+  392          {
+  393   1          Usbirq_hcusbirq = Usbirq_hcusbirq;
+  394   1      }
+  395          #pragma ROM(HUGE)
+  396          
+  397          /*
+  398           ********************************************************************************
+  399           *                           OTG_PHY_Setting
+  400           * Description : USB PHYÉèÖÃ
+  401           * Arguments   : d: address; e: value.
+  402           * Returns     : none
+  403           * Notes       : FPGA version, Just for GL6005 PHY setting.
+  404           ********************************************************************************
+  405           */
+  406          void OTG_PHY_Setting(unsigned char addr, unsigned char value)
+  407          {
+  408   1          unsigned char tmp;
+  409   1      
+  410   1          VDSTAT = value; //set Value
+  411   1      
+  412   1          tmp = addr;
+  413   1          VDCTRL = tmp & 0x0f; //set low addr
+  414   1          VDCTRL = tmp | 0x10;
+  415   1      
+  416   1          tmp = (addr >> 4);
+  417   1          VDCTRL = tmp & 0x0f; //set high addr
+  418   1          VDCTRL = tmp | 0x10;
+  419   1      }
+  420          
+  421          /*
+  422           ********************************************************************************************************
+             -*
+  423           *                                           UDiskHandle
+  424           *
+  425           * Description: ²éÑ¯¡¢¸üÐÂUDisk×´Ì¬£¬²¢¸ù¾Ý×´Ì¬×÷ÏàÓ¦´¦Àí.
+  426           *
+  427           * Arguments  : None.
+  428           *
+  429           * Returns    : None.
+  430           *
+  431           * Note(s)    : None.
+  432           ********************************************************************************************************
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 8   
+
+             -*
+  433           */
+  434          void UDiskHandle(void)
+  435          {
+  436   1          uint8 IE0bak, sfrbak, timecount;
+  437   1      
+  438   1          IE0bak = IE0;
+  439   1          IE0 = IE0 & 0x7f;
+  440   1          StatusCheckFlag = 0x01;
+  441   1          IE0 = IE0bak;
+  442   1      
+  443   1          adfu_flag = USB_State;
+  444   1      
+  445   1          if (IsAdfuCondition == 0x00)
+  446   1          {
+  447   2              //set config Ö®ºóÉèÖÃusb_reset_enter_cntÎª0x00,²»ÔÙ½øÐÐ³äµçÆ÷ÅÐ¶Ï
+  448   2              if (usb_pwr_suspnd_fnsh == 0x00)
+  449   2              {
+  450   3                  //Suspend_Flag 0:no suspend; 81:recieve suspend; 82:has handle suspend
+  451   3                  if ((usb_reset_enter_cnt == 0x00) && (Suspend_Flag == 0x00))
+  452   3                  {
+  453   4                      //²é¶¨Ê±,connect_idle_cnt:¼ÆÊýÆ÷Ö¸Õë  prv_connect_idle_tm:1Hz±ä»¯¼ÇÂ¼±äÁ¿  c-1:¼ÆÊýÖµ,µ¥Î
+             -»Îª1Ãë
+  454   4      
+  455   4                      timecount = 15;
+  456   4                      if (SplitDiskFlag != 0x00)
+  457   4                      {
+  458   5                          timecount = 0x05;
+  459   5                      }
+  460   4                      if (CheckTimer(&connect_idle_cnt, &prv_connect_idle_tm, timecount) != 0x00)
+  461   4                      {
+  462   5                          //²åÈëµÄÊÇ³äµçÆ÷,³¤Ê±¼äÃ»ÓÐbus reset
+  463   5      #ifdef _PRINT_DEBUG_
+                                   prints("IsCharge?-");
+               #endif
+  466   5                          USB_State = 0x70;
+  467   5                          return;
+  468   5                      }
+  469   4                  }
+  470   3              }
+  471   2          }
+  472   1          else
+  473   1          {
+  474   2              //ADFU status
+  475   2              ADFUHandle();
+  476   2              return;
+  477   2          }
+  478   1      
+  479   1          //°ÎÏß±êÖ¾
+  480   1          if (PullLineFlag != 0x00)
+  481   1          {
+  482   2              //½øÈëÍË³ö×´Ì¬
+  483   2              USB_State = 0x40;
+  484   2              TransferFlag = 0x40;
+  485   2              return;
+  486   2          }
+  487   1          else if ((Suspend_Flag & 0x7f) == 0x01)
+  488   1          {
+  489   2              //Suspend_Flag 0:no suspend; 81:recieve suspend; 82:has handle suspend
+  490   2              Suspend_Flag++;
+  491   2              USB_State = 0x80;
+  492   2              return;
+  493   2          }
+  494   1          else if (SwitchToADFUFlag != 0x00)
+  495   1          {
+  496   2              SwitchToADFUFlag = 0x00;
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 9   
+
+  497   2              //ÇÐ»»µ½ADFU
+  498   2              USB_State = 0x51;
+  499   2              TransferFlag = 0x51;
+  500   2              return;
+  501   2          }
+  502   1          //PCµ¯³ö±êÖ¾
+  503   1          else if (PcEjectFlag != 0x00)
+  504   1          {
+  505   2              //½øÈëÍË³ö×´Ì¬
+  506   2              USB_State = 0x30;
+  507   2              return;
+  508   2          }
+  509   1          else if (PartiEjectFlag != 0x00)
+  510   1          {
+  511   2              PartiEjectFlag = 0x00;
+  512   2              //½øÈë·ÖÇøÍË³ö×´Ì¬
+  513   2              USB_State = 0x60;
+  514   2              return;
+  515   2          }
+  516   1          else
+  517   1          {
+  518   2          }
+  519   1      
+  520   1          switch (USB_State)
+  521   1          {
+  522   2          case 0x00:
+  523   2              //¿ÕÏÐ×´Ì¬
+  524   2              sState_0_Handle();
+  525   2              break;
+  526   2          case 0x10:
+  527   2              //ÉÏ´«×´Ì¬
+  528   2              sState_10_Handle();
+  529   2              break;
+  530   2          case 0x20:
+  531   2              //ÏÂ´«×´Ì¬
+  532   2              sState_20_Handle();
+  533   2              break;
+  534   2          case 0x51:
+  535   2              //¸Ã×´Ì¬Ö÷Òª´¦ÀíÇÐ»»µ½ADFUºó£¬ÊÕµ½µÄµÚÒ»¸ö CMD_TestUnitReady_ÃüÁî,»Ö¸´ÖÐ¶Ï
+  536   2              UdiskReady();
+  537   2              break;
+  538   2          case 0x60:
+  539   2              //·ÖÇøµ¯³ö´¦Àí
+  540   2              sSplitDiskEject();
+  541   2              break;
+  542   2          case 0x80:
+  543   2              USB_State = 0x90;
+  544   2              break;
+  545   2          default:
+  546   2              sfrbak = SFR_BANK;
+  547   2              SFR_BANK = BANK_USB;
+  548   2              if ((DPDMCTRL & 0x40) == 0x00)
+  549   2              {
+  550   3                  //ÒÑ°Î³ö
+  551   3                  USB_State = 0x40;
+  552   3              }
+  553   2              else
+  554   2              {
+  555   3                  //¿ÕÏÐ×´Ì¬
+  556   3                  USB_State = 0x00;
+  557   3              }
+  558   2              SFR_BANK = sfrbak;
+  559   2              break;
+  560   2          }
+  561   1      }
+  562          
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 10  
+
+  563          /*
+  564           ********************************************************************************************************
+             -*
+  565           *                                           ADFUHandle
+  566           *
+  567           * Description: ²éÑ¯¡¢¸üÐÂADFU×´Ì¬£¬²¢¸ù¾Ý×´Ì¬×÷ÏàÓ¦´¦Àí.
+  568           *
+  569           * Arguments  : None.
+  570           *
+  571           * Returns    : None.
+  572           *
+  573           * Note(s)    : None.
+  574           ********************************************************************************************************
+             -*
+  575           */
+  576          void ADFUHandle(void)
+  577          {
+  578   1          uint32 callentryRetValue;
+  579   1      
+  580   1          //ÊÇ·ñÒÑ¾­°ÎÏß 55h±íÊ¾Á¬½Ó£¬77h±íÊ¾²»Á¬½Ó
+  581   1          if (PullLineFlag == 0x00)
+  582   1          {
+  583   2              //FWOpStatus:ÉÏÔØ»¹ÊÇÏÂÔØ²Ù×÷Íê³É 01:ÏÂÔØ 02:ÉÏÔØ
+  584   2              if (FWOpStatus != 0x00)
+  585   2              {
+  586   3                  //FWÉÏÔØ»òÏÂÔØÍê³ÉÑÓÊ±2Ãë
+  587   3                  sFWUpgOkDelay(FWOpStatus);
+  588   3              }
+  589   2              else
+  590   2              {
+  591   3                  //ÊÇ·ñÓÐ¹¦ÄÜµ÷ÓÃÈÎÎñ
+  592   3                  if (CallingTaskFlag != 0x00)
+  593   3                  {
+  594   4                      CallingTaskFlag = 0x00;
+  595   4                      callentryRetValue = (*((uint32( *)()) (CallingTaskAdd)))(); //¹¦ÄÜµ÷ÓÃÈë¿ÚµØÖ·
+  596   4                      CallingTaskResult = callentryRetValue >> 16; //×´Ì¬½á¹¹µÄµØÖ·
+  597   4                      StatusLength = (uint16) callentryRetValue; //×´Ì¬½á¹¹µÄ³¤¶È
+  598   4                  }
+  599   3              }
+  600   2              UdiskReady();
+  601   2          }
+  602   1          else
+  603   1          {
+  604   2              //prints("ADFU PullLine-");
+  605   2              PullLineFlag = 0x00;
+  606   2              FWOpStatus = 0x01;
+  607   2              TransferFlag = 0x61; //ADFUµÄ×´Ì¬
+  608   2          }
+  609   1      }
+  610          
+  611          /*
+  612           ********************************************************************************************************
+             -*
+  613           *                                           sFWUpgOkDelay
+  614           *
+  615           * Description: FWÉÏÔØ»òÏÂÔØÍê³ÉÑÓÊ±2Ãë.
+  616           *
+  617           * Arguments  : fwup_direction: ÉÏÔØ»¹ÊÇÏÂÔØ²Ù×÷Íê³É 01:ÏÂÔØ 02:ÉÏÔØ.
+  618           *
+  619           * Returns    : None.
+  620           *
+  621           * Note(s)    : None.
+  622           ********************************************************************************************************
+             -*
+  623           */
+  624          void sFWUpgOkDelay(uint8 fwup_direction)
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 11  
+
+  625          {
+  626   1          if (fwup_direction == 0x01) //need reboot
+  627   1          {
+  628   2              //ÉýÍê¼¶²»ÔÙÏìÓ¦ÖÐ¶Ï
+  629   2              IE0 &= 0x7f;
+  630   2              //²»ÔÊÐíÔÚUdiskReady´ò¿ªÖÐ¶Ï
+  631   2              StatusCheckFlag = 0x00;
+  632   2      
+  633   2              if (CheckTimer(&AdfuTimerCtl, &PrevRTCTimerValue1, USBIDLECOUNTERVALUE) != 0x00)
+  634   2              {
+  635   3                  //prints("udisk exit -");
+  636   3                  ClearWatchdog();
+  637   3                  if (AccessFlash != 0x00)
+  638   3                  {
+  639   4                      UD_ClrVram();
+  640   4                  }
+  641   3                  UDiskExit();
+  642   3                  //UD_Exit();
+  643   3      
+  644   3                  //LBA-NAND flash²»Ö§³Ö0xFFÃüÁî£¬ËùÒÔÌØ´ËÐÞ¸Ä
+  645   3                  if (flash_type == 0x03)
+  646   3                  {
+  647   4                      /*fixme:need
+  648   4                       reboot_flash();
+  649   4                       */
+  650   4                  }
+  651   3                  //prints("watchdog-");
+  652   3                  IE0 &= 0x7f;
+  653   3      
+  654   3                  SFR_BANK = BANK_RTC;
+  655   3      
+  656   3                  WDCTL =  0x8a; //watchdogÊ¹ÄÜ²¢ÖØÆô
+  657   3      
+  658   3                  while (1)
+  659   3                  {
+  660   4                      ; //Watch DogÆðÀ´»áÖØÆô
+  661   4                  }
+  662   3              }
+  663   2          }
+  664   1          else
+  665   1          {
+  666   2              //prints("go idle-");
+  667   2              //ÑÓÊ±ËÄÃë,»Ø¿ÕÏÐ×´Ì¬
+  668   2              if (CheckTimer(&AdfuTimerCtl, &PrevRTCTimerValue1, USBIDLECOUNTERVALUE * 2) != 0x00)
+  669   2              {
+  670   3                  FWOpStatus = 0x00;
+  671   3                  TransferFlag = 0x00; //»Øµ½Ready×´Ì¬
+  672   3              }
+  673   2          }
+  674   1      }
+  675          
+  676          /*
+  677           ********************************************************************************************************
+             -*
+  678           *                                           sState_0_Handle
+  679           *
+  680           * Description: ¿ÕÏÐ×´Ì¬´¦Àíº¯Êý.
+  681           *
+  682           * Arguments  : None.
+  683           *
+  684           * Returns    : None.
+  685           *
+  686           * Note(s)    : None.
+  687           ********************************************************************************************************
+             -*
+  688           */
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 12  
+
+  689          void sState_0_Handle(void)
+  690          {
+  691   1          //ÊÇ·ñ¿ªÊ¼Ã¦,UpOrDownLoad»¹Î´±»³õÊ¼»¯,EP1ÔÚ×ö³ýread,writeÍâµÄ½»Á÷,01:ÉÏ´«  02:ÏÂ´«
+  692   1          if ((USBBusy == 0x00) || (UpOrDownLoad == 0x00))
+  693   1          {
+  694   2              //ÎªÏÂÒ»´ÎÊÕCBW×¼±¸Ep1
+  695   2              UdiskReady();
+  696   2          }
+  697   1          else
+  698   1          {
+  699   2              if (UpOrDownLoad == 0x01)
+  700   2              {
+  701   3                  //½øÈëÉÏ´«×´Ì¬
+  702   3                  USB_State = 0x10;
+  703   3              }
+  704   2              else if (UpOrDownLoad == 0x02)
+  705   2              {
+  706   3                  //½øÈëÏÂ´«×´Ì¬
+  707   3                  USB_State = 0x20;
+  708   3              }
+  709   2              else
+  710   2              {
+  711   3              }
+  712   2          }
+  713   1      }
+  714          
+  715          /*
+  716           ********************************************************************************************************
+             -*
+  717           *                                           sState_10_Handle
+  718           *
+  719           * Description: ÉÏ´«×´Ì¬.
+  720           *
+  721           * Arguments  : None.
+  722           *
+  723           * Returns    : None.
+  724           *
+  725           * Note(s)    : None.
+  726           ********************************************************************************************************
+             -*
+  727           */
+  728          void sState_10_Handle(void)
+  729          {
+  730   1          //01:ÉÏ´«  02:ÏÂ´«
+  731   1          if (UpOrDownLoad == 0x01)
+  732   1          {
+  733   2              //²é¶¨Ê±,UsbIdleCounter:¼ÆÊýÆ÷Ö¸Õë  PrevRTCTimerValue1:1Hz±ä»¯¼ÇÂ¼±äÁ¿  USBIDLECOUNTERVALUE:¼ÆÊýÖ
+             -µ,µ¥Î»Îª1Ãë
+  734   2              if (CheckTimer(&UsbIdleCounter, &PrevRTCTimerValue1, USBIDLECOUNTERVALUE) == 0x00)
+  735   2              {
+  736   3                  //ÎªÏÂÒ»´ÎÊÕCBW×¼±¸Ep1¡£ÏÔÊ¾²»Õ¼ÓÃDMA£¬¿ÉÒÔÓëUÅÌÏìÓ¦Ò»Æð½øÐÐ
+  737   3                  UdiskReady();
+  738   3              }
+  739   2              else
+  740   2              {
+  741   3                  //Ò»¶ÎÊ±¼äÊÕ²»µ½USBÖÐ¶Ï,½øÈëµ½¿ÕÏÐ×´Ì¬
+  742   3                  sGoInState0();
+  743   3              }
+  744   2          }
+  745   1          else
+  746   1          {
+  747   2              USB_State = 0x20;
+  748   2          }
+  749   1      }
+  750          
+  751          /*
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 13  
+
+  752           ********************************************************************************************************
+             -*
+  753           *                                           sState_20_Handle
+  754           *
+  755           * Description: ÏÂ´«×´Ì¬´¦Àíº¯Êý.
+  756           *
+  757           * Arguments  : None.
+  758           *
+  759           * Returns    : None.
+  760           *
+  761           * Note(s)    : None.
+  762           ********************************************************************************************************
+             -*
+  763           */
+  764          void sState_20_Handle(void)
+  765          {
+  766   1          if (UpOrDownLoad == 0x02)
+  767   1          {
+  768   2              //ÊÇ·ñ½øÈë¿ÕÏÐ
+  769   2              if (CheckTimer(&Counter_30s, &PrevRTCTimerValue2, COUNTERVALUE_30S) == 0x00)
+  770   2              {
+  771   3                  //·¢ÁË¿É°ÎUÅÌÃüÁîÃ»ÓÐ  0:²»¿É°ÎÏß£¬01h:¿É°ÎÏß¡£²»¿ÉÒÀ¿¿¸Ã±äÁ¿¾ö¶¨ÊÇ·ñ°ÎÏß
+  772   3                  //ÒòÎªÔÚXPÏÂÔÚ´«Êä¹ý³ÌÖÐÈç¹ûÓÐ°ü²å½ø(ÎÒÃÇµÄ¹¤¾ßÈí¼þ)Ò²»á·¢¿É°ÎÏß
+  773   3                  if ((Removable == 0x00) || (CheckTimer(&UsbIdleCounter, &PrevRTCTimerValue1, USBIDLECOUNTERVA
+             -LUE) == 0x00))
+  774   3                  {
+  775   4                      UdiskReady();
+  776   4                  }
+  777   3                  else
+  778   3                  {
+  779   4                      //Ò»¶ÎÊ±¼äÊÕ²»µ½USBÖÐ¶Ï,½øÈëµ½¿ÕÏÐ×´Ì¬
+  780   4                      sGoInState0();
+  781   4                  }
+  782   3              }
+  783   2              else
+  784   2              {
+  785   3                  //Ò»¶ÎÊ±¼äÊÕ²»µ½USBÖÐ¶Ï,½øÈëµ½¿ÕÏÐ×´Ì¬
+  786   3                  sGoInState0();
+  787   3              }
+  788   2          }
+  789   1          else
+  790   1          {
+  791   2              USB_State = 0x10;
+  792   2          }
+  793   1      }
+  794          
+  795          /*
+  796           ********************************************************************************************************
+             -*
+  797           *                                           sGoInState0
+  798           *
+  799           * Description: Ò»¶ÎÊ±¼äÊÕ²»µ½USBÖÐ¶Ï, ½øÈëµ½¿ÕÏÐ×´Ì¬.
+  800           *
+  801           * Arguments  : None.
+  802           *
+  803           * Returns    : None.
+  804           *
+  805           * Note(s)    : None.
+  806           ********************************************************************************************************
+             -*
+  807           */
+  808          void sGoInState0(void)
+  809          {
+  810   1          //Èç¹û·¢ÉúÐ´²Ù×÷,°Ñ×îºóÒ»´Î´«ÊäÊý¾ÝÐ´ÈëFlash
+  811   1          UD_Update();
+  812   1      
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 14  
+
+  813   1          //Îª½øÈë¿ÕÏÐ×´Ì¬µÄÏÔÊ¾¶ø²»ÏìÓ¦USBÖÐ¶Ï
+  814   1          UdiskUnReady();
+  815   1          USB_State = 0x00;
+  816   1          USBBusy = 0x00;
+  817   1          //´Ó¿ÕÏÐµ½¶ÁÐ´µÄÏÔÊ¾±ØÐë·¢ÔÚ¹ØUSBÖÐ¶ÏÌõ¼þÏÂ(for brom can't run at 48M clock)
+  818   1          UpOrDownLoadBak = 0x00;
+  819   1      }
+  820          
+  821          /*
+  822           ********************************************************************************************************
+             -*
+  823           *                                           sCardCapCheck
+  824           *
+  825           * Description: Card Capacity Check
+  826           *
+  827           * Arguments  : None.
+  828           *
+  829           * Returns    : None.
+  830           *
+  831           * Note(s)    : Èç¹û±¨ÉÏ¿¨ÅÌ·û,PC¾Í»á¶Á¿¨ÅÌ,ÔÚU-modeÄ£Ê½ÏÂ,±ØÐë¶Á¿¨²ÅÄÜ½áÊø,¹Ê±ØÐë°²×°¿¨Çý¶¯.
+  832           ********************************************************************************************************
+             -*
+  833           */
+  834          void sCardCapCheck(void)
+  835          {
+  836   1          uint8 reg_bak, drv_install_flag;
+  837   1          reg_bak = IE0;
+  838   1          IE0 = IE0 & 0x7f;
+  839   1          //single lun of card mode need install card driver
+  840   1          if ((DiskAppearSelect != 0x03) && (ShowMultiDiskFlag == 0))
+  841   1          {
+  842   2              CardExistFlag = 0; //°²×°Ê§°Ü,ÎÞ¿¨±êÖ¾
+  843   2      
+  844   2          }
+  845   1          else
+  846   1          {
+  847   2              if(StorageInfor.ce_info[0].type == 3)
+  848   2              {
+  849   3                        drv_install_flag = (uint8) DRV_Install(FFCardBaseDrvName, 0);
+  850   3              }
+  851   2              else
+  852   2              {
+  853   3                  if (DRV_CheckCard(1) == 2) //¼ì²â¿¨ÊÇ·ñ²åÉÏºÍ¿¨ÀàÐÍ:0:¿¨²»´æÔÚ; 1:MS¿¨; 2:SD/MMC¿¨,ÎÞÐ´±£»¤; 
+             -0x11:Ð´±£»¤µÄSD¿¨.
+  854   3                  {
+  855   4                      //char DRV_Install(const char *filename, word param);; param=0:¿ìËÙ 01:ÂýËÙ
+  856   4                      drv_install_flag = (uint8) DRV_Install(FFSDCardDrvName, 0);
+  857   4                  }
+  858   3                  else
+  859   3                  {
+  860   4                      drv_install_flag = 0;
+  861   4                  }
+  862   3              }
+  863   2      
+  864   2              //0:Ê§°Ü  01h:³É¹¦
+  865   2              if (drv_install_flag == 0x01)
+  866   2              {
+  867   3                  CardCapacity = (uint32) UD_SDCardGetCap(); //ÒÔÉÈÇøÎªµ¥Î»
+  868   3                  CardExistFlag = 1; //ÓÐ¿¨±êÖ¾
+  869   3                  RWCardError = 0; //Çåcard¶ÁÐ´´íÎó±êÖ¾
+  870   3      
+  871   3                  Formatcap_cmd_info_DiskCard.CurrentCap = CardCapacity;
+  872   3                  Formatcap_cmd_info_DiskCard.FomatableCap = CardCapacity;
+  873   3                  Cap_cmd_info_DiskCard.LastLogBlockAddr = CardCapacity - 1;
+  874   3              }
+  875   2              else
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 15  
+
+  876   2              {
+  877   3                  CardExistFlag = 0;
+  878   3              }
+  879   2          }
+  880   1          IE0 = reg_bak;
+  881   1      }
+  882          
+  883          /*
+  884           ********************************************************************************************************
+             -*
+  885           *                                           UDiskGetDiskInfo
+  886           *
+  887           * Description: È¡µÃ´ÅÅÌÊýÄ¿Çé¿ö,ÒªÔÚµ÷ÓÃUdiskInitºóµ÷ÓÃ.
+  888           *
+  889           * Arguments  : None.
+  890           *
+  891           * Returns    : None.
+  892           *
+  893           * Note(s)    : None.
+  894           ********************************************************************************************************
+             -*
+  895           */
+  896          int8 UDiskGetDiskInfo(void)
+  897          {
+  898   1          int8 cDiskInfo;
+  899   1      
+  900   1          cDiskInfo = 0;
+  901   1          if (SplitDiskFlag != 0)
+  902   1          {
+  903   2              cDiskInfo = cDiskInfo | 0x80; //bit7:ÊÇ·ñ·ÖÇø
+  904   2          }
+  905   1          if (EncryptFlag != 0)
+  906   1          {
+  907   2              cDiskInfo = cDiskInfo | 0x40; //bit6:ÊÇ·ñ¼ÓÃÜ
+  908   2          }
+  909   1          if (CardExistFlag != 0)
+  910   1          {
+  911   2              cDiskInfo = cDiskInfo | 0x20; //bit5:ÊÇ·ñ²å¿¨
+  912   2          }
+  913   1      
+  914   1          return cDiskInfo;
+  915   1      }
+  916          
+  917          /*
+  918           ********************************************************************************************************
+             -*
+  919           *                                           UDiskCheckWP
+  920           *
+  921           * Description: ÉèÖÃ´ÅÅÌÐ´±£»¤¼ì²é.
+  922           *
+  923           * Arguments  : e:Card Or Flash.
+  924           *
+  925           * Returns    : l:0 Not Write Protect.
+  926           *
+  927           * Note(s)    : None.
+  928           ********************************************************************************************************
+             -*
+  929           */
+  930          uint8 UDiskCheckWP(int8 letter)
+  931          {
+  932   1          uint8 ret;
+  933   1      
+  934   1          ret = 0;
+  935   1          if (letter == 'C')
+  936   1          {
+  937   2              ret = FlashWPFlag;
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 16  
+
+  938   2          }
+  939   1          if (letter == 'H')
+  940   1          {
+  941   2              ret = CardWPFlag;
+  942   2          }
+  943   1      
+  944   1          return ret;
+  945   1      }
+  946          
+  947          /*
+  948           ********************************************************************************************************
+             -*
+  949           *                                           UDiskGetStatus
+  950           *
+  951           * Description: Return the Udisk transfer status.
+  952           *
+  953           * Arguments  : None.
+  954           *
+  955           * Returns    : a: the status.
+  956           *
+  957           * Note(s)    : None.
+  958           ********************************************************************************************************
+             -*
+  959           */
+  960          uint8 UDiskGetStatus(void)
+  961          {
+  962   1          uint8 ret;
+  963   1      
+  964   1          ret = USB_State;
+  965   1          if (IsAdfuCondition != 0x00 && TransferFlag != 0)
+  966   1          {
+  967   2              ret = TransferFlag;
+  968   2          }
+  969   1          return ret;
+  970   1      }
+  971          
+  972          /*
+  973           ********************************************************************************************************
+             -*
+  974           *                                           DisableSuspend
+  975           *
+  976           * Description: ½ûÖ¹suspend.
+  977           *
+  978           * Arguments  : None.
+  979           *
+  980           * Returns    : None.
+  981           *
+  982           * Note(s)    : None.
+  983           ********************************************************************************************************
+             -*
+  984           */
+  985          void DisableSuspend(void)
+  986          {
+  987   1          DisableSuspendFlag = 0x01;
+  988   1      }
+  989          
+  990          /*
+  991           ********************************************************************************************************
+             -*
+  992           *                                           AlwaysShowCardDisk
+  993           *
+  994           * Description: ²åÏß¼´ÏÔÊ¾¿¨ÅÌ·û.
+  995           *
+  996           * Arguments  : 0: disable 1: enable.
+  997           *
+  998           * Returns    : None.
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 17  
+
+  999           *
+ 1000           * Note(s)    : None.
+ 1001           ********************************************************************************************************
+             -*
+ 1002           */
+ 1003          void AlwaysShowCardDisk(uint8 para)
+ 1004          {
+ 1005   1          ShowMultiDiskFlag = para;
+ 1006   1      }
+ 1007          
+ 1008          /*
+ 1009           ********************************************************************************************************
+             -*
+ 1010           *                                           UDiskGetCardStatus
+ 1011           *
+ 1012           * Description: ²éÑ¯¿¨ÊÇ·ñ´æÔÚ.
+ 1013           *
+ 1014           * Arguments  : 0: disable 1: enable.
+ 1015           *
+ 1016           * Returns    : None.
+ 1017           *
+ 1018           * Note(s)    : None.
+ 1019           ********************************************************************************************************
+             -*
+ 1020           */
+ 1021          uint8 UDiskGetCardStatus(void)
+ 1022          {
+ 1023   1          return CardExistFlag;
+ 1024   1      }
+ 1025          
+ 1026          /*
+ 1027           ********************************************************************************************************
+             -*
+ 1028           *                                           UDiskCardInitInternal
+ 1029           *
+ 1030           * Description: ¿¨ÖØ³õÊ¼»¯.
+ 1031           *
+ 1032           * Arguments  : None.
+ 1033           *
+ 1034           * Returns    : None.
+ 1035           *
+ 1036           * Note(s)    : None.
+ 1037           ********************************************************************************************************
+             -*
+ 1038           */
+ 1039          void UDiskCardInitInternal(void)
+ 1040          {
+ 1041   1          sCardCapCheck();
+ 1042   1      
+ 1043   1          ClearWatchdog();
+ 1044   1      
+ 1045   1          CardWPCheck();
+ 1046   1      }
+ 1047          
+ 1048          /*
+ 1049           ********************************************************************************************************
+             -*
+ 1050           *                                           smDelay
+ 1051           *
+ 1052           * Description: Delay n ms.
+ 1053           *
+ 1054           * Arguments  : e: n.
+ 1055           *
+ 1056           * Returns    : None.
+ 1057           *
+ 1058           * Note(s)    : None.
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 18  
+
+ 1059           ********************************************************************************************************
+             -*
+ 1060           */
+ 1061          void smDelay(uint8 mscount)
+ 1062          {
+ 1063   1          long count;
+ 1064   1          count = 0x00004000 * mscount;
+ 1065   1          while (count != 0x00)
+ 1066   1          {
+ 1067   2              count = count - 1;
+ 1068   2          }
+ 1069   1      }
+ 1070          
+ 1071          /*
+ 1072           ********************************************************************************
+ 1073           *                           EndianReverse
+ 1074           * Description : Endian reverse
+ 1075           * Arguments   : none
+ 1076           * Returns     : none
+ 1077           * Notes       :
+ 1078           ********************************************************************************
+ 1079           */
+ 1080          void EndianReverse(uint8 *data_p, uint16 data_length)
+ 1081          {
+ 1082   1          char tmp;
+ 1083   1          char *head_p, *end_p;
+ 1084   1          head_p = data_p;
+ 1085   1          end_p = data_p + data_length - 1;
+ 1086   1      
+ 1087   1          for (; head_p < end_p; ++head_p, --end_p)
+ 1088   1          {
+ 1089   2              tmp = *end_p;
+ 1090   2              *end_p = *head_p;
+ 1091   2              *head_p = tmp;
+ 1092   2          }
+ 1093   1      }
+ 1094          
+ 1095          /*
+ 1096           ********************************************************************************************************
+             -*
+ 1097           *                                           CheckTimer
+ 1098           *
+ 1099           * Description: ²é¶¨Ê±.
+ 1100           *
+ 1101           * Arguments  : hl: ¼ÆÊýÆ÷Ö¸Õë; de: 1Hz±ä»¯¼ÇÂ¼±äÁ¿; c-1: ¼ÆÊýÖµ, µ¥Î»Îª1Ãë.
+ 1102           *
+ 1103           * Returns    : a: Ö¸¶¨Ê±¼äÊÇ·ñÒÑµ½: 1:yes; 0:no.
+ 1104           *
+ 1105           * Note(s)    : None.
+ 1106           ********************************************************************************************************
+             -*
+ 1107           */
+ 1108          static uint8 CheckTimer(uint8 *timerrecord, uint8 *countrecord, uint8 count)
+ 1109          {
+ 1110   1          uint8 ret = 0;
+ 1111   1          uint8 sfrbak;
+ 1112   1      
+ 1113   1          sfrbak = SFR_BANK;
+ 1114   1          SFR_BANK = BANK_RTC;
+ 1115   1          if (RTCTimeS == *timerrecord)
+ 1116   1          {
+ 1117   2              // not reach one second
+ 1118   2              ret = 0;
+ 1119   2          }
+ 1120   1          else
+ 1121   1          {
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 19  
+
+ 1122   2              *timerrecord = RTCTimeS;
+ 1123   2              //Óëµ½´ï¿ÕÏÐÊ±µÄÊýÖµ±È½Ï
+ 1124   2              if (*countrecord < count)
+ 1125   2              {
+ 1126   3                  *countrecord += 1;
+ 1127   3                  ret = 0;
+ 1128   3              }
+ 1129   2              else
+ 1130   2              {
+ 1131   3                  *countrecord = 0;
+ 1132   3                  ret = 1;
+ 1133   3              }
+ 1134   2          }
+ 1135   1          SFR_BANK = sfrbak;
+ 1136   1          return ret;
+ 1137   1      }
+ 1138          
+ 1139          /*
+ 1140           ********************************************************************************************************
+             -*
+ 1141           *                                           sSplitDiskEject
+ 1142           *
+ 1143           * Description: ¼ÓÃÜÅÌÍê³Éºó, ·ÖÇøµ¯³ö´¦Àí.
+ 1144           *
+ 1145           * Arguments  : None.
+ 1146           *
+ 1147           * Returns    : None.
+ 1148           *
+ 1149           * Note(s)    : None.
+ 1150           ********************************************************************************************************
+             -*
+ 1151           */
+ 1152          void sSplitDiskEject(void)
+ 1153          {
+ 1154   1          if (EjectFlag == 0x00)
+ 1155   1          {
+ 1156   2              EjectFlag++;
+ 1157   2      
+ 1158   2              //ÍË³öÇ°ÇåÀíÏÖ³¡³ÌÐòÈë¿Ú
+ 1159   2              UDiskExit();
+ 1160   2              UDiskInitInternal();
+ 1161   2              //»Ö¸´initÊ±±»ÇåµÄ×´Ì¬
+ 1162   2              USB_State = 0x60;
+ 1163   2          }
+ 1164   1          else
+ 1165   1          {
+ 1166   2              if (CheckTimer(&EjectTimeCtr, &PrevRTCTimerValue1, USBEJECTCTRVALUE) != 0x00)
+ 1167   2              {
+ 1168   3                  EjectTimeCtr = 0x00;
+ 1169   3                  USB_State = 0x00;
+ 1170   3                  EjectFlag = 0x00;
+ 1171   3      
+ 1172   3                  UDiskRun(0x00);
+ 1173   3              }
+ 1174   2          }
+ 1175   1      }
+ 1176          
+ 1177          /*
+ 1178           ********************************************************************************************************
+             -*
+ 1179           *                                           UdiskReady
+ 1180           *
+ 1181           * Description: For the next usb transfer.
+ 1182           *
+ 1183           * Arguments  : None.
+ 1184           *
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 20  
+
+ 1185           * Returns    : None.
+ 1186           *
+ 1187           * Note(s)    : None.
+ 1188           ********************************************************************************************************
+             -*
+ 1189           */
+ 1190          void UdiskReady(void)
+ 1191          {
+ 1192   1          uint8 IE0bak;
+ 1193   1          //Global Interrupt Disable
+ 1194   1          IE0bak = IE0;
+ 1195   1          IE0 = IE0 & 0x7f;
+ 1196   1      
+ 1197   1          //ÔÚ×´Ì¬²éÑ¯¹ý³Ì·¢ÉúÁËÖÐ¶Ï£¬Ó¦³öÈ¥ÅÜÒ»ÏÂÏÔÊ¾ÈÎÎñÔÙ´ò¿ªUSB£¬±£Ö¤ÏÔÊ¾¼°Ê±
+ 1198   1          if (StatusCheckFlag != 0x00)
+ 1199   1          {
+ 1200   2              //ÅÜµ½ÕâÀïÐÂµÄCBWÊµ¼ÊÒÑ¾­ÊÕµ½EPA FIFO£¬Ö»Ðè¿ªÖÐ¶ÏÏìÓ¦¼´¿É,Enable USB Interrupt
+ 1201   2              AIE = AIE | 0x01;
+ 1202   2          }
+ 1203   1      
+ 1204   1          //Global Interrupt Enable
+ 1205   1          IE0 = IE0bak;
+ 1206   1      }
+ 1207          
+ 1208          /*
+ 1209           ********************************************************************************************************
+             -*
+ 1210           *                                           UdiskReady
+ 1211           *
+ 1212           * Description: For the next usb transfer.
+ 1213           *
+ 1214           * Arguments  : None.
+ 1215           *
+ 1216           * Returns    : None.
+ 1217           *
+ 1218           * Note(s)    : None.
+ 1219           ********************************************************************************************************
+             -*
+ 1220           */
+ 1221          void UdiskUnReady(void)
+ 1222          {
+ 1223   1          //Îª½øÈë¿ÕÏÐ×´Ì¬µÄÏÔÊ¾¶ø²»ÏìÓ¦USBÖÐ¶Ï,Disable USB Interrupt
+ 1224   1          AIE = AIE & (uint8) 0xfe;
+ 1225   1      }
+ 1226          
+ 1227          /*
+ 1228           ********************************************************************************************************
+             -*
+ 1229           *                                           UDiskPullCardOut
+ 1230           *
+ 1231           * Description: Handle the card plug out message.
+ 1232           *
+ 1233           * Arguments  : None.
+ 1234           *
+ 1235           * Returns    : None.
+ 1236           *
+ 1237           * Note(s)    : None.
+ 1238           ********************************************************************************************************
+             -*
+ 1239           */
+ 1240          uint8 UDiskPullCardOut(void)
+ 1241          {
+ 1242   1          uint8 IE0bak;
+ 1243   1          IE0bak = IE0;
+ 1244   1          IE0 = IE0 & 0x7f;
+ 1245   1      
+C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 21  
+
+ 1246   1          //  mydisable_interrupt();
+ 1247   1      
+ 1248   1          //0: mac OSX system    1: windows system
+ 1249   1          if (OSType == 0x00)
+ 1250   1          {
+ 1251   2              //usb disconnect,ÊµÏÖÔÚÆ»¹ûÏµÍ³ÏÂ¿¨°ÎµôºóÅÌ·ûÏûÊ§Ð§¹û
+ 1252   2              UsbCTRL_STUS |= 0x40;
+ 1253   2          }
+ 1254   1      
+ 1255   1          //¿¨ID
+ 1256   1          if (DRV_DetectUD(1) != 0x20)
+ 1257   1          {
+ 1258   2              CardExistFlag = 0x00; //Çå¿Õ¿¨´æÔÚ±êÖ¾
+ 1259   2      
+ 1260   2              //¿¨ÔÚ×öumodeÐ´Ê±£¬°Î¿¨£¬»áÓÐ¼ÌÐøÐ´µÄ¶¯×÷£¬Èç¹ûÐ¶ÔØ¿¨Çý¶¯£¬»áµ¼ÖÂºóÐøµÄumodeÐ´´í£¬¹Ê×¢ÊÍÐ¶ÔØ¶¯×÷
+ 1261   2              //DRV_UnInstall(DRV_SDFF); //Ð¶ÔØ¿¨Çý¶¯£¬±ÜÃâ¿¨µçÔ´Ã»ÓÐ¹Ø±Õ£¬µ¼ÖÂ²å¿¨Ê±Ð¡»úÖØÆô
+ 1262   2          }
+ 1263   1      
+ 1264   1          //¿ªUSBÖÐ¶Ï
+ 1265   1          AIE = AIE | 0x01;
+ 1266   1      
+ 1267   1          //0: mac OSX system    1: windows system
+ 1268   1          if (OSType == 0x00)
+ 1269   1          {
+ 1270   2              //D+ Pull high, ´ËÊ±£¬PC ²Å¼ì²âµ½ÓÐusb device ²åÉÏ
+ 1271   2              UsbCTRL_STUS &= (uint8) 0xbf;
+ 1272   2          }
+ 1273   1          IE0 = IE0bak;
+ 1274   1      
+ 1275   1          //  myenable_interrupt();
+ 1276   1      
+ 1277   1          return 0x01;
+ 1278   1      }
+ 1279          
+ 1280          /*
+ 1281           ********************************************************************************************************
+             -*
+ 1282           *                                           CardWPCheck
+ 1283           *
+ 1284           * Description: Check is the sdcard is write protected.
+ 1285           *
+ 1286           * Arguments  : None.
+ 1287           *
+ 1288           * Returns    : None.
+ 1289           *
+ 1290           * Note(s)    : None.
+ 1291           ********************************************************************************************************
+             -*
+ 1292           */
+ 1293          uint8 CardWPCheck(void)
+ 1294          {
+ 1295   1          CardWPFlag = 0;
+ 1296   1          //Èç¹û¿¨²»´æÔÚ¾Í²»ÓÃÅÐ¶Ï¿¨µÄÐ´±£»¤±êÖ¾£¬·ÀÖ¹¿¨µÄÇý¶¯Ã»°²×°³É¹¦Ê±£¬µ÷ÓÃmUD_SDCardWPDetectÊ±³ÌÐòÅÜ·É
+ 1297   1          if (CardExistFlag != 0x00)
+ 1298   1          {
+ 1299   2              //½«¼ì²â½á¹û·ÅÈë¿¨Ð´±£»¤±êÖ¾
+ 1300   2              //        CardWPFlag = (uint8)UD_SDCardWPDetect();              // not support
+ 1301   2          }
+ 1302   1      
+ 1303   1          return CardWPFlag;
+ 1304   1      }
+ 1305          
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  3 ERROR(S)

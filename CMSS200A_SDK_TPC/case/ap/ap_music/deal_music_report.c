@@ -1,0 +1,265 @@
+/*
+ *******************************************************************************
+ *                ACTOS AP
+ *        ap common lib file, udisk use this file too
+ *
+ *        (c) Copyright, Actions Co,Ld.
+ *             All Right Reserved
+ *
+ *******************************************************************************
+ */
+#include "actos.h"
+#include "ap_common.h"
+#include "ap_report.h"
+#include "common.h"
+
+#if defined(MUSIC_AP)
+#pragma name(MUSIC_REPORT)
+unsigned char far name_buf[63];
+//判断字符是否为数字
+#define data_is_num(dat)        ((dat>='0') && (dat<='9'))
+//判断字符是否为字母
+#define data_is_alpha(dat)      (((dat>='a') && (dat<='z')) || ((dat>='A') && (dat<='Z')))
+/********************************************************************************
+ * Description : 播报当前音乐tag信息
+ *
+ * Arguments   : char *report_buf 歌曲的需要播报的tag
+ *               char cur_disk 当前的盘符
+ * Returns     : 0:无收到特殊的按键消息 其它：特殊的消息需要上层处理
+ *
+ * Notes       :
+ *
+ ********************************************************************************/
+int report_music_tag(char *report_buf, char cur_disk)
+{
+    int result = 0;
+    info_report_t info;
+
+    if(report_buf[0])
+    {
+        info.report_buf = report_buf;
+        info.tts_lib_flag = 1;
+        info.open_pa_flag = FALSE;
+        check_report_state(&info);
+        result = wait_report_end((void *)&cur_disk);
+    }
+    return result;
+}
+/********************************************************************************
+ * Description : 检查ID3数据的buffer是否为unicode,并删除unicode标志
+ *
+ * Arguments   : char *buf 存放ID3数据的buffer
+ *
+ * Returns     : bit0 0：TITE不是UNICODE
+ *                    1：TITE是UNICODE
+ *               bit1 0：TPE1不是UNICODE
+ *                    1：TPE1是UNICODE
+ * Notes       :
+ *
+ ********************************************************************************/
+BOOL check_MP3_id3(unsigned char *buf)
+{
+    BOOL ret = 0;
+    unsigned char i;
+    if((buf[0] == (unsigned char)0xff) && (buf[1] == (unsigned char)0xfe))
+    {
+        ret |= 0x1;
+        for(i = 2; i < 30; i++)
+        {
+            buf[i - 2] = buf[i];
+        }
+    }
+    if((buf[30] == (unsigned char)0xff) && (buf[31] == (unsigned char)0xfe))
+    {
+        ret |= 0x2;
+        for(i = 32; i < 60; i++)
+        {
+            buf[i - 2] = buf[i];
+        }
+    }
+    return ret;
+}
+/********************************************************************************
+ * Description : 处理歌曲的ID3信息，只处理TITE和TPE1，并去掉ASCII
+ *
+ * Arguments   : char *g_TagInfoBuf ID3信息
+ *               char type: 0(MP3) 1(wma)
+ * Returns     : 暂时没有使用
+ *
+ * Notes       :
+ *
+ ********************************************************************************/
+int convert_music_id3_string(char *report_buf, char type)
+{
+    int result = 0;
+    char uni_flag = FALSE;
+    unsigned char i, j;
+
+    memcpy(name_buf, report_buf, 60);
+    //wma的ID3信息为UNICODE
+    if(type == 1)
+    {
+        uni_flag = 0x3;
+    }
+    else
+    {
+        uni_flag = check_MP3_id3(name_buf);
+    }
+
+    //语言为中文，并且TITE（歌曲标题）不为空的时候
+    if((uni_flag && (name_buf[0] || name_buf[1])) ||
+            (!uni_flag && name_buf[0]) || (uni_flag && (name_buf[30] || name_buf[31])) ||
+            (!uni_flag && name_buf[30]))
+    {
+        //如果是unicode，转化为内码
+        if(uni_flag)
+        {
+            if(uni_flag & 0x1)
+            {
+                unitochar(name_buf, 30, LAN_ID_SCHINESE);
+            }
+            if(uni_flag & 0x2)
+            {
+                unitochar(&name_buf[30], 30, LAN_ID_SCHINESE);
+            }
+        }
+
+        //连接title和artist，并删除内码中的ascii部分(数字除外)
+        for(i = 0, j = 0; i < 58;)
+        {
+            if(!name_buf[i])
+            {
+                if(i < 30)
+                {
+                    i = 30;
+                    //如果title不为空，在title和artist中间增加两个空格（静音数据帧）
+                    if(j)
+                    {
+                        report_buf[j++] = ' ';
+                        report_buf[j++] = ' ';
+                    }
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else if(data_is_num(name_buf[i])) //保留数字部分
+
+            {
+                report_buf[j++] = name_buf[i++];
+                continue;
+            }
+            else if(name_buf[i] < (unsigned char)0x80)
+            {
+                i++;
+                continue;
+            }
+            else
+            {
+                report_buf[j++] = name_buf[i++];
+                //处理半个中文字符的情况
+                if(name_buf[i])
+                {
+                    report_buf[j++] = name_buf[i++];
+                }
+                else
+                {
+                    j--;
+                }
+            }
+        }
+        report_buf[j] = 0;
+    }
+
+    //增加静音数据帧(字符串开头加一个空格，最后加两个空格)
+    //report_str_fix(report_buf);
+
+    return result;
+}
+/********************************************************************************
+ * Description : 处理歌曲的长名，如果长名为空，则使用短名,
+ *               并将数据暂存在report_buf中
+ * Arguments   : char *name 音乐的短文件名
+ *
+ * Returns     : 暂时没有使用
+ *
+ * Notes       :
+ *
+ ********************************************************************************/
+int convert_music_name_string(char *report_buf)
+{
+    int result = 0;
+    unsigned char i, j;
+    unsigned char len;
+
+    {
+        result = FS_GetName(report_buf, 29); //取出长名
+
+        memcpy(name_buf, report_buf, 60);
+        if (result != 0)
+        {
+            unitochar(name_buf, 60, LAN_ID_SCHINESE);
+            //MangeRes(name_buf, 60, UNICODELANGUAGE, 0);
+            len = strlen(name_buf);
+            if(name_buf[len - 4] == '.')
+                len -= 4;
+        }
+        else
+        {
+            len = 8;
+        }
+
+        //删除歌曲的后缀
+        name_buf[len] = 0;
+        //name_buf[len+1] = 0;
+        for(i = 0, j = 0; (j < len) && (i < 57);)
+        {
+            if(data_is_num(name_buf[j])) //处理文件名的数字部分
+
+            {
+                report_buf[i++] = name_buf[j++];
+                continue;
+            }
+            else if(data_is_alpha(name_buf[j]))
+            {
+                j++;
+                continue;
+            }
+            else if(name_buf[j] < (unsigned char)0x80) //删除掉所有的ASCII(数字除外),将ASCII 转化为空格
+
+            {
+                //空格添加去除两种情况，1、非文件名开头 2、上一个字符不是空格
+                if((i) && (report_buf[i - 1] != ' '))
+                {
+                    report_buf[i++] = ' ';
+                    report_buf[i++] = ' ';
+                }
+                j++;
+            }
+            else
+            {
+                report_buf[i++] = name_buf[j++];
+                if(name_buf[j])
+                {
+                    report_buf[i++] = name_buf[j++];
+                }
+                else
+                {
+                    //处理半个中文字符的情况
+                    i--;
+                }
+            }
+        }
+
+        //添加结束符
+        report_buf[i] = 0;
+    }
+
+    //增加静音数据帧(字符串开头加一个空格，最后加两个空格)
+    //report_str_fix(report_buf);
+
+    return result;
+}
+#endif

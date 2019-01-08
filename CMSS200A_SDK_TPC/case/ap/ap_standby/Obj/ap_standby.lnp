@@ -1,0 +1,21 @@
+".\Obj\main.obj",
+".\Obj\ap_common.obj",
+".\Obj\ap_message.obj",
+".\Obj\ap_message2.obj",
+".\Obj\ap_common2.obj",
+"..\..\..\psp_rel\lib\LIBC.LIB",
+"..\..\lib\displayapi.LIB",
+"..\..\..\psp_rel\lib\APDftSeg.LIB",
+"..\..\..\psp_rel\lib\actos30api.LIB" 
+TO ".\Obj\ap_standby"
+CASE
+NOOVERLAY
+NOJMPTAB
+NODEFAULTLIBRARY
+CLASSES(BIT(0x21-0x2f))
+CLASSES(ECODE(0x800000-0xFFFFFF))
+CLASSES(HCONST(0x800000-0xFFFFFF))
+SEGMENTS(API30(0xFF2000),?HC?AP_STANDBY,?PR?AP_STANDBY,?FD?AP_STANDBY,?PR?COM_MSG2,?PR?COM_COM2,?PR?COM_MSG,?HC?COM_MSG2,?PR?COM_COM,C_RESERVE0(^0xFF3FFF))
+SEGMENTS(?C_INITEDATA(0xFEA000))
+SEGMENTS(?C_C51STARTUP(0xFFF000))
+SEGMENTS(?ED?COM_COM(0x680),D_RESERVE0(^0xA80))

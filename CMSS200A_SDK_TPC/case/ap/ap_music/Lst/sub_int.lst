@@ -1,0 +1,226 @@
+C251 COMPILER V4.55,  sub_int                                                              23/05/16  10:41:53  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE sub_int
+OBJECT MODULE PLACED IN .\Obj\sub_int.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE sub_int.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED)
+                    - BROWSE INCDIR(..\..\inc;..\..\..\psp_rel\inc) I4 DEBUG PRINT(.\Lst\sub_int.lst) OBJECT(.\Obj\sub_int.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ******************************************************************************
+    3           *                               AS211A
+    4           *                            Module: music
+    5           *                 Copyright(c) 2002-2010 Actions Semiconductor,
+    6           *                            All Rights Reserved.
+    7           *
+    8           * Descripton: timer ISR module of music
+    9           *
+   10           * History:
+   11           *      <author>    <time>           <version >             <desc>
+   12           *       xusong    2010-07-15 15:00     1.0             build this file
+   13           ******************************************************************************
+   14           */
+   15          #include "ap_music.h"
+   16          
+   17          #pragma name(AP_SUB_INT)
+   18          /*
+   19           ********************************************************************************
+   20           *             void stop_music_play(void)
+   21           *
+   22           * Description : ½«²¥·Å×´Ì¬ÇÐ»»µ½ÔÝÍ£×´Ì¬
+   23           *
+   24           *
+   25           * Arguments   : void
+   26           *
+   27           * Returns     : void
+   28           *
+   29           * Notes       :1.Èç¹ûÊÇÍ£Ö¹×´Ì¬ÏÂ£¬ÔòÖ±½Ó·µ»Ø
+   30           2.Í£Ö¹½âÂë£¬¹Ø±ÕÎÄ¼þ¾ä±ú
+   31           ********************************************************************************
+   32           */
+   33          
+   34          void stop_music_play(uint8 bakup_flag)
+   35          {
+   36   1          if (PlayStatus < PlaySta)
+   37   1          {
+   38   2              return;
+   39   2          }
+   40   1          FadeOut(TRUE);
+   41   1          musicpSendCommand_bank(MC_STOP, NULL);
+   42   1          if (bakup_flag == TRUE)
+   43   1          {
+   44   2              BackupCurrentTime();
+   45   2              musicpSendCommand_bank(MC_BACKUP, NULL);
+   46   2          }
+   47   1          musicpSendCommand_bank(MC_CLOSE, NULL);
+   48   1          if (bakup_flag == TRUE)
+   49   1          {
+   50   2              if (g_music_vars.cur_disk == disk_char[0])
+   51   2              {
+   52   3                  memcpy(&g_music_vars.BreakPoit[0], &g_music_vars.BreakPTSave, sizeof(breakPT_t));
+   53   3              }
+   54   2              else
+   55   2              {
+   56   3                  memcpy(&g_music_vars.BreakPoit[1], &g_music_vars.BreakPTSave, sizeof(breakPT_t));
+   57   3              }
+   58   2              VMWrite(&g_music_vars, VM_AP_MUSIC_CARD, sizeof(g_music_vars));
+C251 COMPILER V4.55,  sub_int                                                              23/05/16  10:41:53  PAGE 2   
+
+   59   2          }
+   60   1          VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval));
+   61   1      }
+   62          /*ÏÔÊ¾µ±Ç°²¥·ÅÊ±¼ä*/
+   63          void ShowNowTime(void)
+   64          {
+   65   1          itoa_2(g_music_vars.BreakPTDisTime.minute, temp_buffer);
+   66   1          itoa_2(g_music_vars.BreakPTDisTime.second, &temp_buffer[2]);
+   67   1          LEDPuts(NUMBER1, temp_buffer, 1);
+   68   1          LEDDisplay(LED_COL, 0xff, 1);
+   69   1      }
+   70          /*
+   71           ********************************************************************************
+   72           *             void RealDisplay(void)
+   73           *
+   74           * Description : ½«²¥·ÅÊ±¼äÊµÏÖÐ´Èë¼Ä´æÆ÷ÖÐ£¬ÒÔ±¸Í»È»¶Ïµçºó£¬ÖØÆô¿ÉÒÔ½øÐÐ¶ÏµãÐø²¥
+   75           *
+   76           *
+   77           * Arguments   : void
+   78           *
+   79           * Returns     : void
+   80           *
+   81           * Notes       :1.Ö÷ÒªÊÇ±¸·ÝÊ±£¬·Ö£¬Ãë£¬ÓÃÓÚÖØÆôºóÊ±¼äµÄÏÔÊ¾
+   82          
+   83           ********************************************************************************
+   84           */
+   85          
+   86          void time_writetoreg(void)
+   87          {
+   88   1          uint8 sfr_bak;
+   89   1          romDI();
+   90   1          //¶ÏµãÊ±¼äÐ´Èë¼Ä´æÆ÷£¬ÒÔ·ÀÓ²¼þ¶Ïµç
+   91   1          sfr_bak = SFR_BANK;
+   92   1          SFR_BANK = 0x0c;
+   93   1          RTCRDM19 = g_music_vars.BreakPTDisTime.hour;
+   94   1          RTCRDM20 = g_music_vars.BreakPTDisTime.minute;
+   95   1          RTCRDM21 = g_music_vars.BreakPTDisTime.second;
+   96   1          SFR_BANK = sfr_bak;
+   97   1          romEI();
+   98   1      }
+   99          /* »ñÈ¡¸èÇúµ±Ç°²¥·ÅÊ±¼ä */
+  100          void BackupCurrentTime(void)
+  101          {
+  102   1          Full_time_t curtime_buf;
+  103   1      
+  104   1          if (apSendCommand(MC_GETTIME, g_currentMusicType, (void *) &curtime_buf) == 0) //Ö±½Óµ÷ÓÃapSendComman
+             -d·ÀÖ¹ÇÐbank£¨AP_UI_PLY±¾Éí±»ÇÐ³öÈ¥£©£¬ÔÚ¸ß±ÈÌØÂÊ¸èÇúÊ±·ÀÖ¹ÓÐ¿¨ÒôÏÖÏó
+  105   1          {
+  106   2              return;
+  107   2          }
+  108   1          g_music_vars.BreakPTDisTime.hour = curtime_buf.TimeHour;
+  109   1          g_music_vars.BreakPTDisTime.minute = curtime_buf.TimeMinute;
+  110   1          g_music_vars.BreakPTDisTime.second = curtime_buf.TimeSecond;
+  111   1          time_writetoreg();
+  112   1          return;
+  113   1      }
+  114          /*
+  115           ********************************************************************************
+  116           *             void deal_play_status(void)
+  117           *
+  118           * Description : ´¦Àí²¥·Å¹ý³ÌÖÐµÄÒì³£Çé¿ö
+  119           *
+  120           *
+  121           * Arguments   : void
+  122           *
+  123           * Returns     : void
+C251 COMPILER V4.55,  sub_int                                                              23/05/16  10:41:53  PAGE 3   
+
+  124           *
+  125           * Notes       :1.Èç¹û·Ç²¥·Å×´Ì¬ÏÂ£¬ÔòÖ±½Ó·µ»Ø
+  126           *                         2.Èç¹û²¥·Å³ö´í£¬Ôò×ªµ½³ö´í´¦Àíº¯Êý´¦Àí
+  127           *                         3.Èç¹û²¥·Åµ½Î²£¬Ôò×ªµ½ÎÄ¼þÎ²´¦Àíº¯Êý´¦Àí
+  128           *                         4.Èç¹û²¥·Åµ½Í·£¬Ôò×ªµ½ÎÄ¼þÍ·´¦Àíº¯Êý´¦Àí
+  129           *                         5.Õý³£Çé¿öÏÂ²»¶ÏË¢ÐÂ²¥·ÅÊ±¼ä
+  130           ********************************************************************************
+  131           */
+  132          
+  133          uint8 deal_play_status(void)
+  134          {
+  135   1          uint8 retval;
+  136   1          music_play_status_t status_buf;
+  137   1          if (PlayStatus < PlaySta)
+  138   1          {
+  139   2              return NULL;
+  140   2          }
+  141   1          apSendCommand(MC_GETSTATUS, g_currentMusicType, (void *) (&status_buf)); //Ö±½Óµ÷ÓÃapSendCommand·ÀÖ¹Ç
+             -Ðbank£¨AP_UI_PLY±¾Éí±»ÇÐ³öÈ¥£©£¬ÔÚ¸ß±ÈÌØÂÊ¸èÇúÊ±·ÀÖ¹ÓÐ¿¨ÒôÏÖÏó
+  142   1          if (status_buf.status == PLAYING_ERROR)
+  143   1          {
+  144   2              return deal_playing_err();
+  145   2          }
+  146   1          else if (status_buf.status == PLAYING_REACH_END)
+  147   1          {
+  148   2              retval = DealMusicFileEnd(0);
+  149   2              if (retval != NULL)
+  150   2              {
+  151   3                  return retval;
+  152   3              }
+  153   2          }
+  154   1          //×¢£¬ÏÂÃæÊÇÎª½â¾öÒ»ÖÖÌØÊâÇé¿ö¶ø×ö³öµÄÌØÊâ´¦Àí£¬ÔÚÒ»°ãÇé¿öÏÂ¿É²»·Öµ½Í·£¬µ½Î²
+  155   1          //     ±êÖ¾£¬Í³Ò»ÓÃ PLAYING_REACH_END ±êÖ¾¾Í¿ÉÒÔÁË£¬ÒòÎª¿ÉÍ¨¹ý PlayStatus
+  156   1          //     Õâ¸ö±êÖ¾ÅÐ¶ÏÊÇ¿ì½ø»¹ÊÇ¿ìÍË£¬¾Í¿ÉÖªµÀÊÇµ½ÁËÎÄ¼þÍ·»¹ÊÇÎÄ¼þÎ²£¬µ«Èç¹ûÔÚ
+  157   1          //     ¿ìÍËµ½²î²»¶àµ½Í·Ê±Í£Ö¹¿ìÍË£¬ÕâÊ±ÒÑ·¢Í£Ö¹ÃüÁî£¬µ«ÓÉÓÚÄ£¿é²ãÔÚ½ÓÊÕÕâ¸ö
+  158   1          //     ÃüÁîºóµ½ÕæÕýÍ£Ö¹¿ìÍËÒªÓÐÒ»¸öÊ±¼ä²î£¬ÈçÔÚÕâ¸öÊ±¼ä²îÖÐµ½ÎÄ¼þÍ·£¬Èç»¹ÊÇ
+  159   1          //     ÓÃ PLAYING_REACH_END ±êÖ¾ÄÇ¾Í·Ö²»ÇåÊÇµ½Í·»¹ÊÇµ½Î²£¬ËùÒÔÒª¼ÓÒ»¸ö±êÖ¾
+  160   1          //     PLAYING_REACH_HEAD ±íÊ¾ÊÇµ½Í·¡£
+  161   1          else if (status_buf.status == PLAYING_REACH_HEAD)
+  162   1          {
+  163   2              retval = deal_music_filehead();
+  164   2              if (retval != NULL)
+  165   2              {
+  166   3                  return retval;
+  167   3              }
+  168   2          }
+  169   1          else
+  170   1          {
+  171   2              if (g_music_vars.BreakPTDisTime.second > 1)
+  172   2              {
+  173   3                  prev_key_direc = Key_Next;
+  174   3                  err_music_count = 0;
+  175   3              }
+  176   2          }
+  177   1          if (CurUI_Type == Music_UI)
+  178   1          {
+  179   2              BackupCurrentTime();
+  180   2              ShowNowTime();
+  181   2          }
+  182   1          return retval;
+  183   1      }
+  184          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+C251 COMPILER V4.55,  sub_int                                                              23/05/16  10:41:53  PAGE 4   
+
+  ecode size           =       440     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

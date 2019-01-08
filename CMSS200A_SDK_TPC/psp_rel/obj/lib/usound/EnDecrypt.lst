@@ -1,0 +1,473 @@
+C251 COMPILER V4.55,  EnDecrypt                                                            15/07/16  15:45:42  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE EnDecrypt
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usb\EnDecrypt.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usb\EnDecrypt.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) INC
+                    -DIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\EnDecrypt.lst) OBJECT(..\..\..\obj\lib\usb\EnDecrypt.obj)
+                    - 
+
+stmt  level    source
+
+    1          ///*
+    2          //*******************************************************************************************************
+             -**
+    3          //*                                       ACTOS GL3976
+    4          //*
+    5          //*
+    6          //*                           (c) Copyright 2002-2007, Actions Co,Ld.
+    7          //*                                   All Right Reserved
+    8          //*
+    9          //* File   : EnDecrypt.msa
+   10          //* By     : zhouxl
+   11          //* Version: v1.02     first version     2004-12-13 12:45
+   12          //*******************************************************************************************************
+             -**
+   13          //*/
+   14          
+   15          #include "udisklib.h"
+   16          #pragma name(UDISKENCRYP_C)
+   17          
+   18          #pragma ROM(HUGE)
+   19          static uint8 sEncrypParseInRD(void);
+   20          static void sActWrite(void);
+   21          #pragma ROM(HUGE)
+   22          
+   23          #pragma renamecode(?PR?UDISKENCRYP_C)
+   24          #pragma ROM(HUGE)
+   25          /*
+   26           ********************************************************************************************************
+             -*
+   27           *                                           Encrypt_Read_Check
+   28           *
+   29           * Description: 为加密送伪数据.
+   30           *
+   31           * Arguments  : None.
+   32           *
+   33           * Returns    : a=0: 读  01h:不读.
+   34           *
+   35           * Note(s)    : None.
+   36           ********************************************************************************************************
+             -*
+   37           */
+   38          uint8 sReadCheckForEncryp(void)
+   39          {
+   40   1          uint8 ret = 0;
+   41   1      
+   42   1          if (AccessFlashPhySec1 != 0x00)
+   43   1          {
+   44   2              AccessFlashPhySec1 = 0;
+   45   2              //输出参数a  0:要读 01:不读
+   46   2              ret = sEncrypParseInRD();
+   47   2          }
+   48   1          else
+   49   1          {
+   50   2              //读其他扇区，清读物理扇区0计数标志
+   51   2              Phy0Sec1RdCounter1 = 0;
+   52   2              if (EncryptFlag != 0x00)
+   53   2              {
+C251 COMPILER V4.55,  EnDecrypt                                                            15/07/16  15:45:42  PAGE 2   
+
+   54   3                  //LBA与DiskB扇区比较  a=0,小于  01h:大于或等于,
+   55   3                  //为了防止软件破解者从LUN0发DiskB的LBA来读取加密盘数据
+   56   3                  //LBA与DiskC扇区比较  a=0,小于  01h:大于或等于
+   57   3                  if ((PasswdPassOk != 0x00) || (LBA < EncryptDiskBStartAddr) || (LBA >= EncryptDiskCStartAddr)
+             -)
+   58   3                  {
+   59   4                      ret = 0x00;
+   60   4                  }
+   61   3                  else
+   62   3                  {
+   63   4                      //清Uram Buffer 2Kbytes数据为零
+   64   4                      memset(DATABUFFER, 0x00, 0x200);
+   65   4                      ret = 0x01;
+   66   4                  }
+   67   3              }
+   68   2              else
+   69   2              {
+   70   3                  ret = 0x00;
+   71   3              }
+   72   2          }
+   73   1          return ret;
+   74   1      }
+   75          
+   76          /*
+   77           ********************************************************************************************************
+             -*
+   78           *                                           sWriteCheckForEncryp
+   79           *
+   80           * Description: 判定是否为加密盘上的操作.
+   81           *
+   82           * Arguments  : None.
+   83           *
+   84           * Returns    : a=0: 不是  01h:是.
+   85           *
+   86           * Note(s)    : 默认数据是在中.
+   87           ********************************************************************************************************
+             -*
+   88           */
+   89          uint8 sWriteCheckForEncryp(void)
+   90          {
+   91   1          uint8 ret = 0;
+   92   1          if (AccessFlashPhySec1 != 0x00)
+   93   1          {
+   94   2              AccessFlashPhySec1 = 0;
+   95   2              ret = 0x01;
+   96   2          }
+   97   1      
+   98   1          //是有分区
+   99   1          if ((ret == 0x00) && (SplitDiskFlag != 0x00))
+  100   1          {
+  101   2              ret = 0x00;
+  102   2              //LBA与DiskC扇区比较  a=0,小于  01h:大于或等于
+  103   2              if (LBA >= EncryptDiskCStartAddr)
+  104   2              {
+  105   3                  ret = 0x01;
+  106   3              }
+  107   2          }
+  108   1      
+  109   1          return ret;
+  110   1      }
+  111          
+  112          /*
+  113           ********************************************************************************************************
+             -*
+  114           *                                           sEncrypParseInWR
+  115           *
+C251 COMPILER V4.55,  EnDecrypt                                                            15/07/16  15:45:42  PAGE 3   
+
+  116           * Description: 判断是否写加密盘
+  117           *
+  118           * Arguments  : None.
+  119           *
+  120           * Returns    : a=0:写  01h:不写.
+  121           *
+  122           * Note(s)    : 默认协议数据收到B2中.
+  123           ********************************************************************************************************
+             -*
+  124           */
+  125          uint8 sEncrypParseInWR(void)
+  126          {
+  127   1          uint8 ret = 0x01;
+  128   1          encrypt_info *encrypt_info_p;
+  129   1      
+  130   1          encrypt_info_p = (encrypt_info *) DATABUFFER;
+  131   1          if (ActWRLength != 0x00)
+  132   1          {
+  133   2              //分区软件写磁盘,只是累加ActWRLBA,数据写还需在后续过程中完成
+  134   2              sActWrite();
+  135   2              ret = 0x00;
+  136   2          }
+  137   1          else if (memcmp(&encrypt_info_p->CMDSignature, &ActCMDSignatureC, 7) != 0x00)
+  138   1          {
+  139   2              ret = 0x00;
+  140   2          }
+  141   1          else
+  142   1          {
+  143   2              ret = 0x01;
+  144   2              switch (encrypt_info_p->CMDIDRecord)
+  145   2              {
+  146   3                  //取得磁盘信息
+  147   3              case 0x05:
+  148   3                  CMDPerformCondition = GETDISKINFO;//GETDISKINFO;
+  149   3                  break;
+  150   3                  //设置用户名密码
+  151   3              case 0x08:
+  152   3                  //prints("set name&passwd -");
+  153   3                  memcpy(TempBuffer, &encrypt_info_p->OldUserNameLengthRecord, 0x40);
+  154   3                  //读加密情况记录扇区
+  155   3                  sFlash_Rds(RW_FIX, EncryptInfoSector, DATABUFFER);
+  156   3                  //检测旧密码
+  157   3                  if (encrypt_info_p->IfEncryptRecord == 0x01) //处于没加密状态?
+  158   3                  {
+  159   4                      //检测旧用户名,长度加1，加上长度记录本身1字节
+  160   4                      if (0x00 != memcmp(&encrypt_info_p->UserNameLengthRecord, TempBuffer,
+  161   4                                         encrypt_info_p->UserNameLengthRecord + 1))
+  162   4                      {
+  163   5                          //prints("set name fail-");
+  164   5                          CMDPerformCondition = SETNAMEORPASSWDFAIL;
+  165   5                          break;
+  166   5                      }
+  167   4                      //检测旧密码,长度加1，加上长度记录本身1字节
+  168   4                      if (0x00 != memcmp(&encrypt_info_p->PasswdLengthRecord, TempBuffer + 0x10,
+  169   4                                         (encrypt_info_p->PasswdLengthRecord + 1)))
+  170   4                      {
+  171   5                          //prints("set passwd fail-");
+  172   5                          CMDPerformCondition = SETNAMEORPASSWDFAIL;
+  173   5                          break;
+  174   5                      }
+  175   4                  }
+  176   3                  //记录新密码
+  177   3                  memcpy(&encrypt_info_p->UserNameLengthRecord, TempBuffer + 0x20, 0x20);
+  178   3                  //设密码设置成功标记,并写回flash
+  179   3                  encrypt_info_p->IfEncryptRecord = 0x01;
+  180   3                  sFlash_Wrts(RW_FIX, EncryptInfoSector, DATABUFFER);
+C251 COMPILER V4.55,  EnDecrypt                                                            15/07/16  15:45:42  PAGE 4   
+
+  181   3                  CMDPerformCondition = SETPASSWDOK;
+  182   3                  break;
+  183   3                  //写u盘,加密盘写总是只写LBA1，且每次写一个扇区，数据放在B2种
+  184   3              case 0x15:
+  185   3                  EndianReverse((uint8 *) & (encrypt_info_p->PhySecWRAddrRecord), sizeof(encrypt_info_p->PhySec
+             -WRAddrRecord));
+  186   3                  ActWRLBA = UdiskStartAddr + encrypt_info_p->PhySecWRAddrRecord;
+  187   3                  EndianReverse((uint8 *) & (encrypt_info_p->PhySecWRLengthRecord),
+  188   3                                sizeof(encrypt_info_p->PhySecWRLengthRecord));
+  189   3                  ActWRLength = encrypt_info_p->PhySecWRLengthRecord;
+  190   3                  //不允许拔线，即不进入Ready显示，否则进入主循环耗费了显示时间
+  191   3                  Removable = 0x00;
+  192   3                  break;
+  193   3                  //设置加密盘大小
+  194   3              case 0x18:
+  195   3                  memcpy(&TempBuffer, &encrypt_info_p->DiskACapacityRecord, 0x30);
+  196   3                  memset(DATABUFFER, 0, 0x200);
+  197   3                  memcpy(&encrypt_info_p->DiskACapacityRecord, TempBuffer, 0x30);
+  198   3                  if (encrypt_info_p->DiskBCapacityRecord != 0x00)
+  199   3                  {
+  200   4                      //已分成DiskA,B,C结构
+  201   4                      encrypt_info_p->SplitDiskRecord = 0x01;
+  202   4                  }
+  203   3                  sFlash_Wrts(RW_FIX, EncryptInfoSector, DATABUFFER);
+  204   3                  break;
+  205   3                  //置分区弹出标志
+  206   3              case 0x20:
+  207   3                  PartiEjectFlag = 0x01;
+  208   3                  break;
+  209   3                  //检测用户输入的用户名和密码
+  210   3              case 0x80:
+  211   3                  //prints("check name&passwd -");
+  212   3                  memcpy(TempBuffer, &encrypt_info_p->UserNameLengthRecord, 0x20);
+  213   3                  //读加密情况记录扇区
+  214   3                  sFlash_Rds(RW_FIX, EncryptInfoSector, DATABUFFER);
+  215   3                  //检测用户名,长度加1，加上长度记录本身1字节
+  216   3                  if (0x00 != memcmp(&encrypt_info_p->UserNameLengthRecord, TempBuffer, encrypt_info_p->UserNam
+             -eLengthRecord
+  217   3                                     + 1))
+  218   3                  {
+  219   4                      //prints("name fail-");
+  220   4                      CMDPerformCondition = NAMEORPASSWDFAIL;
+  221   4                      break;
+  222   4                  }
+  223   3                  //检测密码,长度加1，加上长度记录本身1字节
+  224   3                  if (0x00 != memcmp(&encrypt_info_p->PasswdLengthRecord, TempBuffer + 0x10,
+  225   3                                     encrypt_info_p->PasswdLengthRecord + 1))
+  226   3                  {
+  227   4                      //prints("passwd fail-");
+  228   4                      CMDPerformCondition = NAMEORPASSWDFAIL;
+  229   4                      break;
+  230   4                  }
+  231   3                  //密码通过,允许报错,以引发PC重读LUN2磁盘结构
+  232   3                  MediaChgFlag = 0x01;
+  233   3                  CMDPerformCondition = NAMEANDPASSWDOK;
+  234   3                  break;
+  235   3              case 0xa0:
+  236   3                  //是否Ready显示。为了XP的TestReady
+  237   3                  if (USB_State == 0x00)
+  238   3                  {
+  239   4                      CMDPerformCondition = UDBUSYINSWITCH2ADFU;
+  240   4                  }
+  241   3                  //是否Win98系统,0:Win2000 (XP)系统1:Win98系统 2:Linux系统
+  242   3                  else if (encrypt_info_p->SystemInfoRecord == 0x02)
+  243   3                  {
+  244   4                      //不忙,可以切换。Linux系统下不需要读(没法读，读出的是缓存内容)即弹出切换
+C251 COMPILER V4.55,  EnDecrypt                                                            15/07/16  15:45:42  PAGE 5   
+
+  245   4                      SwitchToADFUFlag = 0x01;
+  246   4                  }
+  247   3                  else
+  248   3                  {
+  249   4                      CMDPerformCondition = UDUNBUSYINSWITCH2ADFU;
+  250   4                  }
+  251   3                  break;
+  252   3              default:
+  253   3                  break;
+  254   3              }
+  255   2          }
+  256   1      
+  257   1          return ret;
+  258   1      }
+  259          
+  260          /*
+  261           ********************************************************************************************************
+             -*
+  262           *                                           sActWrite
+  263           *
+  264           * Description: 分区软件写磁盘,将B2中的1 block数据按ActWRLBA%4对齐搬到B1中,然后写入Flash.
+  265           *
+  266           * Arguments  : None.
+  267           *
+  268           * Returns    : None.
+  269           *
+  270           * Note(s)    : None.
+  271           ********************************************************************************************************
+             -*
+  272           */
+  273          static void sActWrite(void)
+  274          {
+  275   1          //将真正要写入的地址更新到LBA中,写动作不在加密协议处理中完成
+  276   1          LBA = ActWRLBA;
+  277   1          ActWRLBA++;
+  278   1      
+  279   1          ActWRLength--;
+  280   1          if (ActWRLength == 0x00)
+  281   1          {
+  282   2              //分区软件写完磁盘，进入Ready显示
+  283   2              Removable = 0x01;
+  284   2          }
+  285   1      }
+  286          
+  287          /*
+  288           ********************************************************************************************************
+             -*
+  289           *                                           sEncrypParseInRD
+  290           *
+  291           * Description: 判断是否加密盘协议.
+  292           *
+  293           * Arguments  : None.
+  294           *
+  295           * Returns    : a: 0:要读 01:不读.
+  296           *
+  297           * Note(s)    : sEncrypParseInRD不支持linux读,buffer指针不是0x4800
+  298           ********************************************************************************************************
+             -*
+  299           */
+  300          static uint8 sEncrypParseInRD(void)
+  301          {
+  302   1          uint8 ret = 0x01, tmp, tmp1;
+  303   1          encrypt_info *encrypt_info_p;
+  304   1      
+  305   1          encrypt_info_p = (encrypt_info *) DATABUFFER;
+  306   1      
+C251 COMPILER V4.55,  EnDecrypt                                                            15/07/16  15:45:42  PAGE 6   
+
+  307   1          if (CMDPerformCondition != 0x00)
+  308   1          {
+  309   2              //要返回内容,把ix起始地址(ix值不会被改动) 0.5KbytesUram Buffer清0，防止把加密信息扇区返回了
+  310   2              memset(DATABUFFER, 0, 0x200);
+  311   2          }
+  312   1      
+  313   1          switch (CMDPerformCondition)
+  314   1          {
+  315   2          case 0x00:
+  316   2              Phy0Sec1RdCounter1++;
+  317   2              //=================识别命令读重复次数=================
+  318   2              if (Phy0Sec1RdCounter1 == 0x05)
+  319   2              {
+  320   3                  //prints("Phy0Sec1RdCounter1=0x05-");
+  321   3                  Phy0Sec1RdCounter1 = 0;
+  322   3                  sFlash_Rds(RW_FIX, LBA, DATABUFFER);
+  323   3                  sectors_trans_once = 0x01;
+  324   3                  memcpy(&encrypt_info_p->PhysicsSec0TagRecord, Phy0DiskTag, 0x04);
+  325   3                  //写保护信息
+  326   3                  encrypt_info_p->WRProtectInfoRecord = FlashWPFlag;
+  327   3                  ret = 0x01;
+  328   3              }
+  329   2              else
+  330   2              {
+  331   3                  ret = 0x00;
+  332   3              }
+  333   2      
+  334   2              tmp = 0;
+  335   2              break;
+  336   2          case 0x01: //GetDiskInfo
+  337   2              if (SplitDiskFlag != 0x00) //是有分区
+  338   2              {
+  339   3                  //读加密情况记录扇区
+  340   3                  sFlash_Rds(RW_FIX, EncryptInfoSector, DATABUFFER);
+  341   3                  //把DiskABC地址和容量保存在加密信息扇区
+  342   3                  memcpy(TempBuffer, &encrypt_info_p->DiskACapacityRecord, 0x30);
+  343   3                  //是否下密码了
+  344   3                  tmp1 = encrypt_info_p->IfEncryptRecord;
+  345   3                  //要返回内容,把ix起始地址(ix值不会被改动) 2KbytesUram Buffer清0，防止把加密信息扇区返回了.
+  346   3                  memset(DATABUFFER, 0, 0x200);
+  347   3                  encrypt_info_p->IfEncryptRecord = tmp1;
+  348   3                  encrypt_info_p->SplitDiskRecord = 0x01;
+  349   3                  memcpy(&encrypt_info_p->DiskACapacityRecord, TempBuffer, 0x30);
+  350   3              }
+  351   2              encrypt_info_p->CMDIDRecord = 0x00;
+  352   2              encrypt_info_p->Phy0EquLog0Record = Phy0EquLog0Flag;
+  353   2              //磁盘总容量
+  354   2              encrypt_info_p->FormatCapacityRecord = udisk_total_capacity;
+  355   2              EndianReverse((uint8 *) & (encrypt_info_p->FormatCapacityRecord), sizeof(encrypt_info_p->FormatCa
+             -pacityRecord));
+  356   2              //vidpidstring
+  357   2              memcpy(&encrypt_info_p->VidPidRecord, &HS_Device_Dscrptr.idVendor, 0x04);
+  358   2              //卡磁盘容量
+  359   2              encrypt_info_p->CardCapacityRecord = CardCapacity;
+  360   2              EndianReverse((uint8 *) & (encrypt_info_p->CardCapacityRecord), sizeof(encrypt_info_p->CardCapaci
+             -tyRecord));
+  361   2              encrypt_info_p->CardExistRecord = CardExistFlag;
+  362   2              tmp = 0x01;
+  363   2              break;
+  364   2          case 0x02: //SETPASSWDOK
+  365   2              encrypt_info_p->CMDIDRecord = 0x05;
+  366   2              tmp = 0x01;
+  367   2              break;
+  368   2          case 0x03: //SetNameOrPasswdFail
+  369   2              encrypt_info_p->CMDIDRecord = 0x06;
+  370   2              tmp = 0x01;
+C251 COMPILER V4.55,  EnDecrypt                                                            15/07/16  15:45:42  PAGE 7   
+
+  371   2              break;
+  372   2          case 0x04: //NameAndPasswdOk
+  373   2              encrypt_info_p->CMDIDRecord = 0x10;
+  374   2              tmp = 0x02;
+  375   2              break;
+  376   2          case 0x05: //NameOrPasswdFail
+  377   2              encrypt_info_p->CMDIDRecord = 0x11;
+  378   2              tmp = 0x02;
+  379   2              break;
+  380   2          case 0x06: //lsReplyUdUnBusyInSwitch2ADFU
+  381   2              encrypt_info_p->CMDIDRecord = 0x20;
+  382   2              //不忙,可以切换
+  383   2              SwitchToADFUFlag = 0x01;
+  384   2              tmp = 0x02;
+  385   2              break;
+  386   2          default: //lsReplyUdBusyInSwitch2ADFU
+  387   2              encrypt_info_p->CMDIDRecord = 0x21;
+  388   2              tmp = 0x02;
+  389   2              break;
+  390   2          }
+  391   1      
+  392   1          if (tmp != 0x00)
+  393   1          {
+  394   2              if (tmp == 0x01)
+  395   2              {
+  396   3                  Phy0Sec1RdCounter2++;
+  397   3                  //=================普通命令读重复次数+1=================
+  398   3                  if (Phy0Sec1RdCounter2 == 0x08)
+  399   3                  {
+  400   4                      Phy0Sec1RdCounter2 = 0x00;
+  401   4                  }
+  402   3              }
+  403   2              memcpy(DATABUFFER, ActCMDSignatureS, 0x07);
+  404   2              CMDPerformCondition = 0x00;
+  405   2          }
+  406   1      
+  407   1          return ret;
+  408   1      }
+  409          #pragma ROM(HUGE)
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1371     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

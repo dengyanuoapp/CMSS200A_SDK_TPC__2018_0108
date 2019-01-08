@@ -1,0 +1,532 @@
+C251 COMPILER V4.55,  key_rcode                                                            13/12/18  16:28:32  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE key_rcode
+OBJECT MODULE PLACED IN .\Obj\key_rcode.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE key_rcode.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BROWS
+                    -E INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\key_rcode.lst) OBJECT(.\Obj\key_rcode.obj) 
+
+stmt  level    source
+
+    1          #include "drv_key.h"
+    2          #include "ap_common.h"
+    3          
+    4          #pragma name(KEY_RCODE)
+    5          
+    6          uint8 oldkey;
+    7          uint8 tmpkey;
+    8          uint8 tmp_count, hold_count;
+    9          uint8 wait_keyup;
+   10          
+   11          uint8 const key_map[16];
+   12          uint8 IR_KEY;
+   13          uint8 Low_power_count;
+   14          uint8 TheCharge; //充电标识，0,低电；1，充电中，2.满电。3.有DC5V
+   15          uint8 onoff_flag;
+   16          uint8 cur_keyval;
+   17          
+   18          #ifdef EVB_KEY
+               #define MAX_KEYVAL  7
+               #else
+   21          #ifdef ONE_KEY
+               #define MAX_KEYVAL  1
+               #else
+   24          #define MAX_KEYVAL  3
+   25          #endif
+   26          #endif
+   27          
+   28          uint8 adctab[MAX_KEYVAL];
+   29          #ifdef SUPPORT_APPLE_KEY
+               uint8 adctab_A[MAX_KEYVAL];
+               #endif
+   32          
+   33          const uint8 insert_msg[MAX_TYPE] =
+   34          { AP_MSG_LINEIN_IN, AP_MSG_MIC_IN, AP_MSG_USB_PLUGIN};
+   35          const uint8 pull_out_msg[MAX_TYPE] =
+   36          { AP_MSG_LINEIN_OUT, AP_MSG_MIC_OUT, USB_PLUGIN_FINISH };
+   37          
+   38          //获取LRADC1值，用以判断低电和满电
+   39          //低电：小于3.3V    ，约等于0X50，小于等于这个值认为低电
+   40          //接近低电提示:小于3.4V,约等于0x54
+   41          //大于4.2V   约等于0X76，大于等于这个值认为满电
+   42          const uint8 bat_vol[3] =
+   43          {
+   44              0x50, 0x54, 0x76
+   45          };
+   46          
+   47          void key_scan(void)
+   48          {
+   49   1          uint8 sfr_bak;
+   50   1          uint8 key_val = 0, key_offset;
+   51   1          uint8 row, tmp_adc;
+   52   1      #ifdef EVB_KEY
+                       uint8 lradc1_data;
+               #endif
+   55   1              uint8 lradc4_data;
+   56   1              uint8 lradc5_data;
+   57   1      #ifdef SUPPORT_APPLE_KEY
+                       uint8 det_lradc4_key   = FALSE;
+C251 COMPILER V4.55,  key_rcode                                                            13/12/18  16:28:32  PAGE 2   
+
+               #endif
+   60   1              uint8 det_lradc5_key = FALSE;
+   61   1              
+   62   1          sfr_bak = (uint8) SFR_BANK;
+   63   1      
+   64   1      #ifndef NONE_ONOFF
+                   //检测on/off按键
+                   SFR_BANK = BANK_PMU;
+                   if ((SYSTEM_ONOFF & 0x08) != 0)
+                   {
+                               key_val = 1;            
+                       goto get_key;
+                   }
+               #endif
+   73   1      
+   74   1      #ifdef EVB_KEY
+                       SFR_BANK = BANK_PMU;
+                   //检测LRADC1(sem_con)
+                   lradc1_data = LRADC1_DATA & 0x3f;
+                   lradc5_data = LRADC5_DATA & 0x3f;
+                   //优化检测LRADC1,如果lRADC1有按键键，则不再检测LRADC5
+                   if(lradc1_data < adctab[MAX_KEYVAL - 2])
+                   {
+                       key_offset = 0;
+                       tmp_adc = lradc1_data;
+                   }
+                   else if(lradc5_data < adctab[MAX_KEYVAL - 1])
+                   {
+                       key_offset = MAX_KEYVAL - 1;
+                       tmp_adc = lradc5_data;
+                   }
+                   else
+                   {
+                       key_val = NO_KEY;
+                       goto get_key;
+                   }
+               #else
+   96   1              SFR_BANK = BANK_PMU;
+   97   1      
+   98   1      #ifdef SUPPORT_APPLE_KEY
+                       lradc4_data = LRADC4_DATA & 0x3F;
+                       if(lradc4_data < adctab[MAX_KEYVAL - 1])
+                       {
+                               key_offset = 0;
+                               tmp_adc = lradc4_data;
+                               det_lradc4_key = TRUE;
+                               goto check_key;
+                       }
+                       else
+                       {
+                               key_val = NO_KEY;
+                       }
+               #endif
+  112   1      
+  113   1              lradc5_data = LRADC5_DATA & 0x3f;
+  114   1      #ifdef SUPPORT_APPLE_KEY
+                       if(lradc5_data < adctab_A[MAX_KEYVAL - 1])
+               #else
+  117   1              if(lradc5_data < adctab[MAX_KEYVAL - 1])
+  118   1      #endif
+  119   1          {
+  120   2              key_offset = 0;
+  121   2              tmp_adc = lradc5_data;
+  122   2                      det_lradc5_key = TRUE;
+  123   2                      goto check_key;
+  124   2          }
+C251 COMPILER V4.55,  key_rcode                                                            13/12/18  16:28:32  PAGE 3   
+
+  125   1          else
+  126   1          {
+  127   2              key_val = NO_KEY;
+  128   2          }
+  129   1      
+  130   1              if (key_val == NO_KEY)
+  131   1              {
+  132   2                      goto get_key;
+  133   2              }
+  134   1      #endif
+  135   1      
+  136   1      check_key:
+  137   1              if (det_lradc5_key == TRUE)
+  138   1              {
+  139   2                      for(row = 0; row < MAX_KEYVAL; row++)
+  140   2                      {
+  141   3      #ifdef SUPPORT_APPLE_KEY
+                                       if(tmp_adc < adctab_A[row])
+               #else
+  144   3                              if(tmp_adc < adctab[row])
+  145   3      #endif
+  146   3                              {
+  147   4                                      key_val = row + 1 + key_offset;
+  148   4                                      goto get_key;
+  149   4                              }               
+  150   3                      }
+  151   2              }
+  152   1      
+  153   1      #ifdef SUPPORT_APPLE_KEY
+                       if (det_lradc4_key == TRUE)
+                       {
+                           for(row = 0; row < MAX_KEYVAL; row++)
+                           {
+                                       if(tmp_adc < adctab[row])
+                               {
+                                               key_val = row + 1 + key_offset;
+                                   goto get_key;
+                                       }               
+                           }
+                       }
+               #endif
+  166   1      
+  167   1          key_val = NO_KEY;
+  168   1              
+  169   1      get_key:
+  170   1          if (key_val == Msg_KeyNull)
+  171   1          {
+  172   2              key_val = NO_KEY;
+  173   2          }
+  174   1          if (key_val != oldkey) //如果本次扫描值不等于上次按键值
+  175   1          {
+  176   2              if (key_val == tmpkey) //如果本次键值等于前次扫描值
+  177   2              {
+  178   3                  tmp_count++; //累加扫描次数
+  179   3                  if (tmp_count >= 2) //扫描三次，是同一键值，确定有按键按下
+  180   3                  {
+  181   4                     if (key_val != NO_KEY) //如果本次扫描捕获键值不为空
+  182   4                      {
+  183   5                          oldkey = tmpkey;
+  184   5                          wait_keyup = 1;
+  185   5                                              PutSysMsg(key_map[oldkey - 1]);
+  186   5                      }
+  187   4                      else //本次键值为NO_KEY
+  188   4                      {
+  189   5                          if (IR_KEY)
+  190   5                          {
+C251 COMPILER V4.55,  key_rcode                                                            13/12/18  16:28:32  PAGE 4   
+
+  191   6                              if (tmp_count == 14)
+  192   6                              {
+  193   7                                  wait_keyup = 0;
+  194   7                                  tmp_count = 0; //清扫描次数
+  195   7                                  PutSysMsg(Msg_KeyShortUp); //发keyup消息
+  196   7                                  IR_KEY = 0;
+  197   7                                  hold_count = 0;
+  198   7                                  oldkey = NO_KEY;
+  199   7                                  tmpkey = NO_KEY;
+  200   7                              }
+  201   6                          }
+  202   5                          else
+  203   5                          {
+  204   6                              if (wait_keyup) //等待KEYUP
+  205   6                              {
+  206   7                                  wait_keyup = 0;
+  207   7                                  tmp_count = 0; //清扫描次数
+  208   7                                  PutSysMsg(Msg_KeyShortUp); //发keyup消息
+  209   7                                  hold_count = 0;
+  210   7                                  oldkey = NO_KEY;
+  211   7                                  tmpkey = NO_KEY;
+  212   7                              }
+  213   6      
+  214   6                          }
+  215   5                      }
+  216   4                  }
+  217   3              }
+  218   2              else //如果本次扫描值不等于前次扫描值，则重置键值，重新计数
+  219   2              {
+  220   3                  tmpkey = key_val;
+  221   3                  //if (!wait_keyup)
+  222   3                  {
+  223   4                      tmp_count = 0;
+  224   4                  }
+  225   3              }
+  226   2          }
+  227   1          else //如果本次键值等于上次按键值,累计16次(320ms)，发一次按键消息
+  228   1          {
+  229   2              if (key_val != NO_KEY) //
+  230   2              {
+  231   3                  hold_count++;
+  232   3      
+  233   3                  if (hold_count == 12)
+  234   3                  {
+  235   4                      hold_count = 0;
+  236   4                      PutSysMsg(key_map[oldkey - 1]); //发键值消息
+  237   4                  }
+  238   3              }
+  239   2              else
+  240   2              {
+  241   3                  tmpkey = key_val;
+  242   3                  hold_count = 0;
+  243   3                  if (!wait_keyup)
+  244   3                  {
+  245   4                      tmp_count = 0;
+  246   4                  }
+  247   3              }
+  248   2          }
+  249   1          SFR_BANK = sfr_bak;
+  250   1      }
+*** WARNING C47 IN LINE 55 OF KEY_RCODE.C: 'lradc4_data': unreferenced local variable
+  251          
+  252          void check_bat_status(void)
+  253          {
+  254   1      #if 0
+                   uint8 sfr_bak;
+C251 COMPILER V4.55,  key_rcode                                                            13/12/18  16:28:32  PAGE 5   
+
+                   uint8 batval;
+                   sfr_bak = SFR_BANK;
+                   //如果有DC5V,则不需要判断低电状态
+                   SFR_BANK = BANK_PMU;
+                   batval = BATADC_DATA & 0x7f;
+                   SFR_BANK = sfr_bak;
+                   if(batval <= bat_vol[1])
+                   {
+                       //        onoff_flag = !onoff_flag;
+                       TheCharge = 0;
+                       if(batval <= bat_vol[0])
+                       {
+                           Low_power_count++;
+                       }
+                       else
+                       {
+                           Low_power_count = 0;
+                       }
+                       if (Low_power_count > 0x10)
+                       {
+                           PutSysMsg(MSG_LOW_POWER); //send 2-hz msg
+                       }
+                   }
+                   else if(batval >= bat_vol[2])
+                   {
+                       //        onoff_flag = 0;
+                       Low_power_count = 0;
+                       TheCharge = 2;
+                   }
+                   else
+                   {
+                       //        onoff_flag = 1;
+                       Low_power_count = 0;
+                       TheCharge = 1;
+                   }
+                   //    switch_red_light(onoff_flag);
+               #endif
+  293   1      }
+  294          
+  295          uint8 get_usbcable_status(void)
+  296          {
+  297   1      #if 1
+  298   1          uint8 sfr_bak, dpdm_status;
+  299   1          uint8 usb_status;
+  300   1      
+  301   1          sfr_bak = SFR_BANK;
+  302   1          SFR_BANK = BANK_USB;
+  303   1          dpdm_status = DPDMCTRL;
+  304   1      
+  305   1          DPDMCTRL = 0x1f;
+  306   1          usb_status = 0x80;
+  307   1          while(usb_status--)
+  308   1          {
+  309   2              ;
+  310   2          }
+  311   1          if((USBSTATUS & 0x18) != 0x18)
+  312   1          {
+  313   2              usb_status = 0xff;
+  314   2              while(usb_status--)
+  315   2              {
+  316   3                  ;
+  317   3              }
+  318   2              if((USBSTATUS & 0x18) != 0x18) //软件去抖
+  319   2              {
+  320   3                  usb_status = 0x40;
+  321   3              }
+C251 COMPILER V4.55,  key_rcode                                                            13/12/18  16:28:32  PAGE 6   
+
+  322   2              else
+  323   2              {
+  324   3                  usb_status = 0x00;
+  325   3              }
+  326   2          }
+  327   1          else
+  328   1          {
+  329   2              usb_status = 0x00;
+  330   2          }
+  331   1          DPDMCTRL = dpdm_status;
+  332   1      
+  333   1          SFR_BANK = BANK_PMU;
+  334   1          usb_status |= (TEST_CTL & 0x80);
+  335   1      
+  336   1          SFR_BANK = sfr_bak;
+  337   1          return usb_status;
+  338   1      #else
+                   uint8 sfr_bak;
+                   cmd = cmd;
+                   bool dpdm_status;
+                   sfr_bak = SFR_BANK;
+                   SFR_BANK = BANK_USB;
+                   dpdm_status = DPDMCTRL & 0x40;
+                   SFR_BANK = BANK_PMU;
+                   dpdm_status |= (TEST_CTL & (uint8)0x80);
+                   SFR_BANK = sfr_bak;
+                   return dpdm_status;
+               #endif
+  350   1      }
+  351          uint8 drv_check_plug_device_msg(uint8 api_no, uint8 *cur_status, Plug_Device_t plug_dev_type)
+  352          {
+  353   1      #if 0
+                   uint8 status, utest_status;
+                   uint8 sfr_bak;
+                   api_no = api_no;
+                   sfr_bak = SFR_BANK;
+                   if(plug_dev_type == LINEIN)
+                   {
+                               #if 0
+                       SFR_BANK = BANK_PMU;
+                       status = LRADC1_DATA & 0x3f;
+                       SFR_BANK = sfr_bak;
+                       //过渡处于按键区域的ADC值
+                       if(status <= adctab[MAX_KEYVAL - 2])
+                       {
+                           return AP_MSG_RTC;
+                       }
+                       if ((status > adctab[MAX_KEYVAL - 2]) && (status <= adctab[MAX_KEYVAL - 1]))
+                       {
+                           status = 0;//说明linein线存在
+                       }
+                       else
+                       {
+                           status = 1;
+                       }
+                               #endif
+                   }
+                   else if(plug_dev_type == MIC_IN)
+                   {
+                       //如果该GPIO口一直都是高，说明没有mic线在，如果为低，说明有mic线在。
+                       //   SFR_BANK = BANK_GPIO;
+                       // status = MIC_IN_GPIO_DAT & (1 << MIC_IN_GPIO_NUM);
+                       //    status=1;
+                       //    SFR_BANK = sfr_bak;
+                   }
+                   else if(plug_dev_type == USB_IN)
+C251 COMPILER V4.55,  key_rcode                                                            13/12/18  16:28:32  PAGE 7   
+
+                   {
+                       SFR_BANK = BANK_USB;
+                       utest_status = Usbien_hcusbien;
+                       SFR_BANK = sfr_bak;
+                       //usb处utest状态时，不进行udisk状态检测
+                       if (utest_status == 0xb9)
+                       {
+                           return AP_MSG_RTC;
+                       }
+                       status =0;//get_usbcable_status();// GetUsbCableStatus();
+                       //1)如果检测到USB线，则先进udisk
+                       //2)如果没有接usb线，先检测uhost,再检测卡
+                       //3)即无uhost也无卡则进FM
+                       if (((status & 0x40) == 0x40))
+                       {
+                           status = 0;
+                       }
+                       else
+                       {
+                           status = 1;
+                       }
+                   }
+                   else
+                   {
+                       return AP_MSG_RTC;
+                   }
+                   //Line线已经接上，并且检测到status被置起来了，则说明LINEIN线或MIC线已经拔掉
+                   if ((*cur_status == 1) && (status != 0))
+                   {
+                       *cur_status = 0;
+                       return pull_out_msg[plug_dev_type];
+                   } //Line线没有接上，并且检测到status被清零，则说明LINEIN线或MIC线插入，需要切换到linein或MIC功能
+                   else if ((*cur_status == 0) && (status == 0))
+                   {
+                       *cur_status = 1;
+                       return insert_msg[plug_dev_type];
+                   }//Line线没有接上，并且检测到status被置起来了，则说明不存在LINEIN线或MIC线
+                   else if ((*cur_status == 0) && (status != 0))
+                   {
+                       return AP_MSG_RTC;
+                   }
+                   else //Line线已经接上，并且检测到status被清零，则说明LINEIN线或MIC线一直存在
+                   {
+                       return AP_MSG_RTC;
+                   }
+               #else
+  434   1              return AP_MSG_RTC;
+  435   1      #endif
+  436   1      }
+*** WARNING C47 IN LINE 351 OF KEY_RCODE.C: 'api_no': unreferenced parameter
+*** WARNING C47 IN LINE 351 OF KEY_RCODE.C: 'cur_status': unreferenced parameter
+*** WARNING C47 IN LINE 351 OF KEY_RCODE.C: 'plug_dev_type': unreferenced parameter
+  437          
+  438          //cts isr, send 2hz msg
+  439          void ctc_isr(void)
+  440          {
+  441   1          //send 2-hz msg
+  442   1          uint8 sfr_bak;
+  443   1      
+  444   1          PutSysMsg(Msg_HalfSecond); //send 2-hz msg
+  445   1          sfr_bak = SFR_BANK;
+  446   1          SFR_BANK = BANK_RTC;
+  447   1      
+  448   1          CTCCTL |= 1 << 7; //enable ctc
+  449   1          SFR_BANK = sfr_bak;
+  450   1          //check_bat_status();
+C251 COMPILER V4.55,  key_rcode                                                            13/12/18  16:28:32  PAGE 8   
+
+  451   1      }
+  452          
+  453          void adjust_key_sequence()
+  454          {
+  455   1              adctab[0] = KEY_PLAY_TH;
+  456   1              if (KEY_VOLSUB_TH < KEY_VOLADD_TH)
+  457   1              {
+  458   2                      adctab[1] = KEY_VOLSUB_TH;
+  459   2                      adctab[2] = KEY_VOLADD_TH;
+  460   2              }
+  461   1              else
+  462   1              {
+  463   2                      adctab[1] = KEY_VOLADD_TH;
+  464   2                      adctab[2] = KEY_VOLSUB_TH;
+  465   2              }
+  466   1      
+  467   1      #ifdef SUPPORT_APPLE_KEY
+                       adctab_A[0] = KEY_PLAY_TH_A;
+                       if (KEY_VOLSUB_TH_A < KEY_VOLADD_TH_A)
+                       {
+                               adctab_A[1] = KEY_VOLSUB_TH_A;
+                               adctab_A[2] = KEY_VOLADD_TH_A;
+                       }
+                       else
+                       {
+                               adctab_A[1] = KEY_VOLADD_TH_A;
+                               adctab_A[2] = KEY_VOLSUB_TH_A;
+                       }
+               #endif
+  480   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       427     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        13     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        25     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  4 WARNING(S),  0 ERROR(S)

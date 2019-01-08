@@ -1,0 +1,19 @@
+SET C251INC=E:\Keil\C251\INC\Intel\;E:\Keil\C251\INC\
+SET C251LIB=E:\Keil\C251\LIB
+SET CPU_TYPE=Flip80251 Typhoon
+SET CPU_VENDOR=Dolphin
+SET UV2_TARGET=main
+SET CPU_XTAL=0x00F42400
+E:\Keil\C251\BIN\C251.EXE @.\Obj\main.__i
+E:\Keil\C251\BIN\C251.EXE @.\Obj\SYSTEM~1.__I
+E:\Keil\C251\BIN\C251.EXE @.\Obj\AP_EXE~1.__I
+E:\Keil\C251\BIN\C251.EXE @.\Obj\AP_REP~1.__I
+E:\Keil\C251\BIN\C251.EXE @.\Obj\AP_COM~1.__I
+E:\Keil\C251\BIN\C251.EXE @.\Obj\AP_COM~2.__I
+E:\Keil\C251\BIN\C251.EXE @.\Obj\AP_MES~1.__I
+E:\Keil\C251\BIN\C251.EXE @.\Obj\AP_MES~2.__I
+E:\Keil\C251\BIN\C251.EXE @.\Obj\ui_clock.__i
+E:\Keil\C251\BIN\C251.EXE @.\Obj\UI_CLO~1.__I
+E:\Keil\C251\BIN\L251.EXE @.\Obj\ap_main.lnp
+"E:\Keil\C251\BIN\OH251.EXE" ".\Obj\ap_main" H386 RANGE (0 - 0xFFFFFF)
+.\buildap.bat

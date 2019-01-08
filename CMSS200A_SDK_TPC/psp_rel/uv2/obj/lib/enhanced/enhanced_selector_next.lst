@@ -1,0 +1,731 @@
+C251 COMPILER V4.55,  enhanced_selector_next                                               13/12/18  16:27:38  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE enhanced_selector_next
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\enhanced\enhanced_selector_next.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\enhanced\fsel\enhanced_selector_next.c XSMA
+                    -LL INTR2 FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) ORDER INCDIR(..\..\..\..\..\inc) DEFINE(_ACTIVE_USERPL,_ACTIVE
+                    -_SHUFFLE,_ACTIVE_DIRL) DEBUG PRINT(..\..\..\..\obj\lib\enhanced\enhanced_selector_next.lst) OBJECT(..\..\..\..\obj\lib\e
+                    -nhanced\enhanced_selector_next.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                File selector
+    4           *            enhanced library
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *******************************************************************************
+   10           */
+   11          #include <actos.h>
+   12          #include <enhanced.h>
+   13          #include <stringH.h>
+   14          #include <sysdef.h>
+   15          #include <rand.h>
+   16          
+   17          #define DIR_NEXT 0
+   18          #define DIR_PREV 1
+   19          
+   20          #pragma name(MW_EH_FSEL_NEXT)
+   21          
+   22          extern uint8 fselMode; //Mode of select, Sequence, repeat one ...
+   23          extern uint8 fselPLOrCommonDir; //playlist or common operation
+   24          extern uint8 fselType; //Type of select,  Music or voice.
+   25          extern uint8 fselError; // store error id;
+   26          extern int8 fselDiskLetter;
+   27          extern int8 fselDirLayer; //dir  layer
+   28          extern bool select_file_begin_flag;
+   29          
+   30          extern uint16 fselFileNoInDisk;// 文件在全盘的序号
+   31          extern uint16 fselTotalInDisk;// 全盘文件总数
+   32          extern uint16 CurDirFileNum;
+   33          extern uint16 fselDirNoInDisk;
+   34          extern uint16 fselTotalDir;
+   35          extern uint32 CurDirClusNo;
+   36          extern uint8 dir_list_flag;
+   37          extern bool fselGetPrev(uint8 *strFile);
+   38          extern uint16 shuffle_next_file(void);
+   39          extern bool init_shuffle(uint16 num_total);
+   40          
+   41          #ifdef _ACTIVE_DIRL
+   42          extern uint8  support_fav;
+   43          dir_location_t Dirlocation[DIR_PRE_SEC];
+   44          #endif
+   45          
+   46          const uint8 ExtMusicNext[][4] =
+   47          { "MP3", "WMA", "WAV", "MP1", "MP2" };
+   48          //const uint8 ExtVoiceNext[][4] =
+   49          //{ "WAV", "MP3" };
+   50          const uint8 IgnoreExtNext[4] =
+   51          { "*  " };
+   52          const uint8 ExtAllNext[][4] =
+   53          { "*  " };
+   54          
+   55          extern uint16 GetFileTotal(uint8 *strDir, bool bCheckValidDir);
+   56          extern bool SelectPrev_8Layer(uint8 *strFile);
+C251 COMPILER V4.55,  enhanced_selector_next                                               13/12/18  16:27:38  PAGE 2   
+
+   57          
+   58          bool fselGetFileByNoInDiskC (char *strFile, const uint16 Num);
+   59          
+   60          #ifdef _ACTIVE_DIRL
+   61          static bool Fast_SelectNext_8Layer(uint8 *strFile);
+   62          static bool ReadDir();
+   63          #endif
+   64          
+   65          #pragma renamecode(MW_EH_FSEL_NEXT)
+   66          
+   67          static uint8 GetExtSize(void)
+   68          {
+   69   1          if (fselType == FSEL_TYPE_MUSIC)
+   70   1          {
+   71   2              return sizeof(ExtMusicNext) / 4;
+   72   2          }
+   73   1          //    else if (fselType == FSEL_TYPE_VOICE)
+   74   1          //    {
+   75   1          //        return sizeof(ExtVoiceNext) / 4;
+   76   1          //    }
+   77   1          else
+   78   1          {
+   79   2              return 0;
+   80   2          }
+   81   1          return 0;
+   82   1      }
+   83          
+   84          /********************************************************************************
+   85           * Description : Get name buffer of current extend
+   86           *
+   87           * Arguments  :  获得歌曲扩展名
+   88           * Returns     :  the buffer of current file extend name
+   89           * Notes       :     None
+   90           *
+   91           ********************************************************************************/
+   92          static const uint8 *GetExtBuf(void)
+   93          {
+   94   1          ClearWatchDog();
+   95   1          if (fselType == FSEL_TYPE_MUSIC)
+   96   1          {
+   97   2              return ExtMusicNext[0];
+   98   2          }
+   99   1          //    else if (fselType == FSEL_TYPE_VOICE)
+  100   1          //    {
+  101   1          //        return ExtVoiceNext[0];
+  102   1          //    }
+  103   1          else if (fselType == DIRECTORY_ALL)
+  104   1          {
+  105   2              return ExtAllNext[0];
+  106   2          }
+  107   1          else
+  108   1          {
+  109   2              return 0;
+  110   2          }
+  111   1      }
+  112          /*
+  113           *******************************************************************************
+  114           * Description : select the next file and get the file name
+  115           *
+  116           * Arguments   :
+  117           * Returns     :文件初始化时 fselFileNo = 0；调用SelectNext获得第一个文件后，fselFileNo = 1；因此fselFile
+             -No
+  118           * Notes       : 表示将要读的那个文件序号(从0开始)，每调用一次select，fselFileNo都会加1
+  119           *
+  120           *******************************************************************************
+  121           */
+C251 COMPILER V4.55,  enhanced_selector_next                                               13/12/18  16:27:38  PAGE 3   
+
+  122          bool SelectNext(uint8 *strFile)
+  123          {
+  124   1          BYTE select_type;
+  125   1          if (FALSE != select_file_begin_flag)
+  126   1          {
+  127   2              select_type = FS_DIR_FILE;  //从目录首开始
+  128   2          }
+  129   1          else
+  130   1          {
+  131   2              select_type = FS_DIR_FILE_CONT;
+  132   2          }
+  133   1          select_file_begin_flag = FALSE;
+  134   1          return FS_Dir(strFile, GetExtBuf(), select_type, GetExtSize());
+  135   1      }
+  136          
+  137          /*
+  138           *******************************************************************************
+  139           * Description : Select the next directory of current select directory
+  140           * 选择上下文件夹的时候 fselDirno[fselDirlayer] != 0    ,其他情况是等于0的
+  141           * Arguments  : 进入下一个目录，并修改fselDirNo[fselDirLayer]
+  142           *                 strDir: Dos 8.3 directory name of the next.
+  143           *
+  144           * Returns     :
+  145           *    TRUE:  success.
+  146           *    FALSE: fail, detail info store in fselError.
+  147           * Notes       :  None
+  148           *这里的实现是查找下一个目录时根据目录数，每次都从第一个开始dir，dir到所需的目录序号，太慢了
+  149           *******************************************************************************
+  150           */
+  151          bool fselNextDir(uint8 *strDir)
+  152          {
+  153   1          return FS_Dir(strDir, IgnoreExtNext, FS_DIR_DIR_CONT, 1);
+  154   1      }
+  155          
+  156          /********************************************************************************
+  157           * Description : 获得当前目录的某种类型文件的总数
+  158           * Arguments  :
+  159           *            strDir: Dos 8.3 directory name
+  160           *            bCheckValidDir: if check valid directory only
+  161           * Returns     :
+  162           *            The file total of current directory when bCheckValidDir = FALSE
+  163           or Vaild BOOL flag when bCheckValidDir = TRUE
+  164           * Notes       : None
+  165           *
+  166           ********************************************************************************/
+  167          static uint16 ScanCurDir_FileNum(uint8 *strFile)
+  168          {
+  169   1          int32 ClusterNo;
+  170   1          int32 DirEntry;
+  171   1          uint16 FileNum = 1;
+  172   1          uint8 dir_buf[74];
+  173   1      
+  174   1          FS_GetCurDir_layer(dir_buf);
+  175   1          ClusterNo = FS_GetCurDir();
+  176   1          DirEntry = FS_GetCurDirEntry();
+  177   1      
+  178   1          FS_Dir(strFile, GetExtBuf(), FS_DIR_FILE, GetExtSize());
+  179   1          while(FS_Dir(strFile, GetExtBuf(), FS_DIR_FILE_CONT, GetExtSize()))
+  180   1          {
+  181   2              FileNum++;
+  182   2          }
+  183   1      
+  184   1          FS_SetCurDir(ClusterNo);
+  185   1          FS_SetCurDirEntry(DirEntry);
+  186   1          FS_SetCurDir_layer(dir_buf);
+  187   1      
+C251 COMPILER V4.55,  enhanced_selector_next                                               13/12/18  16:27:38  PAGE 4   
+
+  188   1          return FileNum;
+  189   1      }
+  190          
+  191          /********************************************************************************
+  192           * Description : Seek to the next file
+  193           *
+  194           * Arguments  :
+  195           strFile:output file name
+  196           * Returns     :
+  197           TRUE: Successful
+  198           FALSE: fail.
+  199           * Notes       :  目录树查找,先检查父目录再检查子目录(子目录1 -- 子目录99)
+  200           *
+  201           ********************************************************************************/
+  202          bool SelectNext_8Layer(uint8 *strFile)
+  203          {
+  204   1          //在当前目录向下找文件
+  205   1          char m_szTemp[12];
+  206   1          fselError = 0;
+  207   1      
+  208   1          if (!SelectNext(strFile))
+  209   1          {
+  210   2      CurrentDiragain:
+  211   2              ClearWatchDog();
+  212   2      
+  213   2              //寻找该目录的第一个子文件夹
+  214   2              if (FALSE != FS_Dir(m_szTemp, IgnoreExtNext, FS_DIR_DIR, 1))
+  215   2              {
+  216   3                  if(fselDirLayer < TOTALDIRLAYER)
+  217   3                  {
+  218   4                      if (FALSE != FS_CD(FS_CD_SON))
+  219   4                      {
+  220   5                          //进入子文件夹，获得该子文件夹的该种文件类型数
+  221   5                          fselDirLayer++;
+  222   5                          select_file_begin_flag = TRUE;
+  223   5                          // 检查当前目录是否有合适的文件.
+  224   5                          if (FALSE != SelectNext(strFile))
+  225   5                          {
+  226   6                              //fselError = 0;
+  227   6                              fselDirNoInDisk++;
+  228   6                              return TRUE;
+  229   6                          }
+  230   5                          else //子目录下的子目录循环查找
+  231   5                          {
+  232   6                              goto CurrentDiragain;
+  233   6                          }
+  234   5                      }
+  235   4                      else //出错了
+  236   4                      {
+  237   5                          fselError = FSEL_ERR_OUTOF;
+  238   5                          return FALSE;
+  239   5                      }
+  240   4                  }
+  241   3                  else
+  242   3                  {
+  243   4                      goto ParentDiragainNext;
+  244   4                  }
+  245   3              }
+  246   2              else //如果没有子文件夹，则向上跳一层，寻找当前目录的下一个目录（平级寻找）
+  247   2              {
+  248   3      ParentDiragainNext:
+  249   3      
+  250   3                  ClearWatchDog();
+  251   3                  if (FALSE != FS_DirParNext())//回到父目录的下一个
+  252   3                  {
+  253   4                      fselDirLayer--;
+C251 COMPILER V4.55,  enhanced_selector_next                                               13/12/18  16:27:38  PAGE 5   
+
+  254   4                      if (FALSE != fselNextDir(m_szTemp))
+  255   4                      {
+  256   5      
+  257   5                          FS_CD(FS_CD_SON);
+  258   5                          fselDirLayer++;
+  259   5                          select_file_begin_flag = TRUE;
+  260   5                          if (FALSE != SelectNext(strFile))
+  261   5                          {
+  262   6                              //fselError = 0;
+  263   6                              fselDirNoInDisk++;
+  264   6                              return TRUE;
+  265   6                          }
+  266   5                          // 检查子目录.
+  267   5                          goto CurrentDiragain;
+  268   5                      }
+  269   4                      else //平级没有下一级目录，到上级目录
+  270   4                      {
+  271   5                          goto ParentDiragainNext;
+  272   5                      }
+  273   4                  }
+  274   3                  else
+  275   3                  {
+  276   4                      fselError = FSEL_ERR_OUTOF;
+  277   4                      return FALSE;
+  278   4                  }
+  279   3              }
+  280   2          }
+  281   1          return TRUE;
+  282   1      }
+  283          /********************************************************************************
+  284           * Description : Select the next file according to type & mode, then get the name of file.
+  285           *
+  286           * Arguments  :
+  287           *            strFile:  msdos 8.3  file name of next file
+  288           * Returns     :true表示成功，false表示失败
+  289           *            TRUE: Successful
+  290           *            FALSE: Fail, detail information in fselError
+  291           * Notes       :  None
+  292           *
+  293           ********************************************************************************/
+  294          
+  295          bool fselGetNext(uint8 *strFile)
+  296          {
+  297   1          uint16 num;
+  298   1          uint8 fileNameTmp[12];
+  299   1          bool result;
+  300   1          uint32 TempClusNo;
+  301   1      
+  302   1          ClearWatchDog();
+  303   1      
+  304   1          if((fselTotalInDisk == 0) && (fselMode != FSEL_ALL_SEQUENCE)) //非初始化遍历时
+  305   1          {
+  306   2              return FALSE;
+  307   2          }
+  308   1          switch (fselMode)
+  309   1          {
+  310   2              //重复当前一个文件
+  311   2          case FSEL_ALL_REPEATONE:
+  312   2          {
+  313   3              if (!FS_GetName(strFile, 0))
+  314   3              {
+  315   4                  return FALSE;
+  316   4              }
+  317   3              return TRUE;
+  318   3          }
+  319   2      
+C251 COMPILER V4.55,  enhanced_selector_next                                               13/12/18  16:27:38  PAGE 6   
+
+  320   2          //当前目录下的随机播放
+  321   2          case FSEL_ALL_RANDOM:
+  322   2          {
+  323   3      #ifdef _ACTIVE_SHUFFLE
+  324   3              num = shuffle_next_file();
+  325   3              if(num == 0)
+  326   3              {
+  327   4                  init_shuffle(fselTotalInDisk);
+  328   4              }
+  329   3      #else
+                       num = (rand() % fselTotalInDisk) + 1;
+               #endif
+  332   3              fselMode = FSEL_ALL_REPEATALL;
+  333   3              result = fselGetFileByNoInDiskC(strFile, num);
+  334   3              fselMode = FSEL_ALL_RANDOM;
+  335   3              return result;
+  336   3          }
+  337   2      
+  338   2          //所有文件顺序读取，不重复
+  339   2          case FSEL_ALL_SEQUENCE:
+  340   2          {
+  341   3              if (FALSE != SelectNext_8Layer(strFile))
+  342   3              {
+  343   4                  fselFileNoInDisk++;
+  344   4                  if((fselTotalInDisk != 0) && (fselFileNoInDisk > fselTotalInDisk))
+  345   4                  {
+  346   5                      return FALSE;
+  347   5                  }
+  348   4                  else
+  349   4                  {
+  350   5                      return TRUE;
+  351   5                  }
+  352   4              }
+  353   3              else
+  354   3              {
+  355   4                  return FALSE;
+  356   4              }
+  357   3          }
+  358   2      
+  359   2          //所有文件顺序读取，重复
+  360   2          case FSEL_ALL_REPEATALL:
+  361   2          {
+  362   3              if(dir_list_flag == 0)
+  363   3              {
+  364   4                  result = SelectNext_8Layer(strFile);
+  365   4              }
+  366   3      #ifdef _ACTIVE_DIRL
+  367   3              else if(dir_list_flag == 1)
+  368   3              {
+  369   4                  result = Fast_SelectNext_8Layer(strFile);
+  370   4              }
+  371   3      #endif
+  372   3              else
+  373   3              {
+  374   4                  return FALSE;
+  375   4              }
+  376   3      
+  377   3              if (FALSE != result)
+  378   3              {
+  379   4                  fselFileNoInDisk++;
+  380   4                  if(fselFileNoInDisk > fselTotalInDisk)
+  381   4                  {
+  382   5                      return FALSE;
+  383   5                  }
+  384   4                  else
+  385   4                  {
+C251 COMPILER V4.55,  enhanced_selector_next                                               13/12/18  16:27:38  PAGE 7   
+
+  386   5                      return TRUE;
+  387   5                  }
+  388   4              }
+  389   3              else
+  390   3              {
+  391   4                  fselError = 0;
+  392   4                  fselFileNoInDisk = 0;
+  393   4      
+  394   4                  if(dir_list_flag == 0)
+  395   4                  {
+  396   5                      if(FALSE == FS_CD(":"))
+  397   5                      {
+  398   6                          return FALSE;
+  399   6                      }
+  400   5                      if(FS_Dir(fileNameTmp, GetExtBuf(), FS_DIR_FILE, GetExtSize()))
+  401   5                      {
+  402   6                          fselDirNoInDisk = 1;    //根目录有文件，目录序号先加1
+  403   6                      }
+  404   5                      else
+  405   5                      {
+  406   6                          fselDirNoInDisk = 0;
+  407   6                      }
+  408   5                  }
+  409   4      #ifdef _ACTIVE_DIRL
+  410   4                  else if(dir_list_flag == 1)
+  411   4                  {
+  412   5                      fselDirNoInDisk = 1;
+  413   5                      if(ReadDir() == 0)
+  414   5                      {
+  415   6                          return FALSE;
+  416   6                      }
+  417   5                  }
+  418   4      #endif
+  419   4                  else
+  420   4                  {
+  421   5                      return FALSE;
+  422   5                  }
+  423   4      
+  424   4                  select_file_begin_flag = TRUE;
+  425   4                  if (FALSE != SelectNext_8Layer(strFile))
+  426   4                  {
+  427   5                      fselFileNoInDisk++;
+  428   5                      return TRUE;
+  429   5                  }
+  430   4                  else
+  431   4                  {
+  432   5                      return FALSE;
+  433   5                  }
+  434   4              }
+  435   3          }
+  436   2      
+  437   2          //当前目录重复播放
+  438   2          case FSEL_DIR_REPEATALL:
+  439   2          {
+  440   3              TempClusNo = FS_GetCurDir();
+  441   3              if(CurDirClusNo != TempClusNo)
+  442   3              {
+  443   4                  CurDirClusNo = TempClusNo;
+  444   4                  CurDirFileNum = ScanCurDir_FileNum(strFile);
+  445   4              }
+  446   3              if(FS_Dir(strFile, GetExtBuf(), FS_DIR_FILE_CONT, GetExtSize()))
+  447   3              {
+  448   4                  fselFileNoInDisk++;
+  449   4              }
+  450   3              else    //已经到当前目录最后一首歌，返回目录首开始
+  451   3              {
+C251 COMPILER V4.55,  enhanced_selector_next                                               13/12/18  16:27:38  PAGE 8   
+
+  452   4                  if(!FS_Dir(strFile, GetExtBuf(), FS_DIR_FILE, GetExtSize()))
+  453   4                  {
+  454   5                      return FALSE;
+  455   5                  }
+  456   4                  fselFileNoInDisk = fselFileNoInDisk - CurDirFileNum + 1;
+  457   4              }
+  458   3              return TRUE;
+  459   3          }
+  460   2      
+  461   2          default:
+  462   2              return FALSE;
+  463   2          }
+  464   1      }
+  465          
+  466          bool fselGetFileByNoInDiskC (char *strFile, const uint16 Num)
+  467          {
+  468   1          uint16 dir_num;
+  469   1          bool dir_flag;
+  470   1          uint8 fileNameTmp[12];
+  471   1          if ((Num == 0) || (Num > fselTotalInDisk))
+  472   1          {
+  473   2              return FALSE;
+  474   2          }
+  475   1      
+  476   1          if (fselFileNoInDisk < Num)
+  477   1          {
+  478   2              dir_num = Num - fselFileNoInDisk;
+  479   2              dir_flag = DIR_NEXT;
+  480   2          }
+  481   1          else if (fselFileNoInDisk > Num)
+  482   1          {
+  483   2              //该条件是为了解决数字点歌时，如果目录过多，VRAM存放不了那么多文件信息后
+  484   2              //选择通过往前往后dir的方式选择选择时，往前切换文件慢的问题。
+  485   2              if(dir_list_flag == 0)
+  486   2              {
+  487   3                  fselDirLayer = 0;
+  488   3                  fselFileNoInDisk = 0;
+  489   3                  fselDirNoInDisk = 0;
+  490   3                  CurDirClusNo = 0xfffffff0;  //初始化文件不可能使用的簇号
+  491   3                  CurDirFileNum = 0;   //当前目录循环播放时使用
+  492   3                  select_file_begin_flag = TRUE;
+  493   3                  if(FALSE == FS_CD(":"))
+  494   3                  {
+  495   4                      return FALSE;
+  496   4                  }
+  497   3                  if(FS_Dir(fileNameTmp, GetExtBuf(), FS_DIR_FILE, GetExtSize()))
+  498   3                  {
+  499   4                      fselDirNoInDisk = 1;    //根目录有文件，目录序号先加1
+  500   4                  }
+  501   3                  else
+  502   3                  {
+  503   4                      fselDirNoInDisk = 0;
+  504   4                  }
+  505   3                  dir_num = Num - fselFileNoInDisk;
+  506   3                  dir_flag = DIR_NEXT;
+  507   3              }
+  508   2              else
+  509   2              {
+  510   3                  dir_num = fselFileNoInDisk - Num;
+  511   3                  dir_flag = DIR_PREV;
+  512   3              }
+  513   2      
+  514   2          }
+  515   1          else
+  516   1          {
+  517   2              return FS_GetName(strFile, 0);
+C251 COMPILER V4.55,  enhanced_selector_next                                               13/12/18  16:27:38  PAGE 9   
+
+  518   2          }
+  519   1      
+  520   1          while(dir_num > 0)
+  521   1          {
+  522   2              if (dir_flag == DIR_NEXT)
+  523   2              {
+  524   3                  if(FALSE == fselGetNext(strFile))
+  525   3                  {
+  526   4                      return FALSE;
+  527   4                  }
+  528   3              }
+  529   2              else
+  530   2              {
+  531   3                  if(FALSE == fselGetPrev(strFile))
+  532   3                  {
+  533   4                      return FALSE;
+  534   4                  }
+  535   3              }
+  536   2              dir_num--;
+  537   2          }
+  538   1          fselFileNoInDisk = Num;
+  539   1          return TRUE;
+  540   1      }
+  541          void get_total_num_from_disk(file_location_t *location)
+  542          {
+  543   1          uint8 fileNameTmp[12];
+  544   1          memset(fileNameTmp, 0x0, 12);
+  545   1          while(FALSE != SelectNext_8Layer(fileNameTmp))
+  546   1          {
+  547   2              fselTotalInDisk++;
+  548   2              if(fselTotalInDisk == location->fselFileNo)
+  549   2              {
+  550   3                  if(memcmp(fileNameTmp, location->filename, 12) != 0)
+  551   3                  {
+  552   4                      location->fselTotal = 0;
+  553   4                  }
+  554   3              }
+  555   2              memset(fileNameTmp, 0x0, 12);
+  556   2          }
+  557   1          fselTotalDir = fselDirNoInDisk;
+  558   1      }
+  559          #ifdef _ACTIVE_DIRL
+  560          void get_total_num_from_list(file_location_t *location)
+  561          {
+  562   1          uint8 fileNameTmp[12];
+  563   1          uint8 dir_buf[74];
+  564   1          uint16 TempfselDirNoInDisk = 0;
+  565   1          uint16 VramPage = 0;
+  566   1          memset(fileNameTmp, 0x0, 12);
+  567   1          memset(Dirlocation, 0, 512);
+  568   1          memset(dir_buf, 0, 74);
+  569   1          while(FALSE != SelectNext_8Layer(fileNameTmp))
+  570   1          {
+  571   2              if((fselDirNoInDisk != TempfselDirNoInDisk))
+  572   2              {
+  573   3                  fselTotalDir++;
+  574   3                  Dirlocation[fselDirNoInDisk - 1].ClusterNo = FS_GetCurDir();
+  575   3                  Dirlocation[fselDirNoInDisk - 1].dirLayer = fselDirLayer;
+  576   3                  FS_GetCurDir_layer(dir_buf);
+  577   3                  memcpy(Dirlocation[fselDirNoInDisk - 1].MulLayer, dir_buf, 74);
+  578   3                  if(fselDirNoInDisk % DIR_PRE_SEC == 0)
+  579   3                  {
+  580   4                      if(VramPage < 0x1400)
+  581   4                      {
+  582   5                          VMWrite((uint8 *)Dirlocation, VM_DIR_LIST + VramPage, 512);
+  583   5                          VramPage += 512;
+C251 COMPILER V4.55,  enhanced_selector_next                                               13/12/18  16:27:38  PAGE 10  
+
+  584   5                      }
+  585   4                      else
+  586   4                      {
+  587   5                          dir_list_flag = 0;
+  588   5                      }
+  589   4      
+  590   4                      fselDirNoInDisk = 0;
+  591   4                  }
+  592   3                  TempfselDirNoInDisk = fselDirNoInDisk;
+  593   3              }
+  594   2              fselTotalInDisk++;
+  595   2              if(fselTotalInDisk == location->fselFileNo)
+  596   2              {
+  597   3                  if(memcmp(fileNameTmp, location->filename, 12) != 0)
+  598   3                  {
+  599   4                      location->fselTotal = 0;
+  600   4                  }
+  601   3              }
+  602   2          }
+  603   1          if(VramPage < 0x1400)
+  604   1          {
+  605   2              VMWrite((uint8 *)Dirlocation, VM_DIR_LIST + VramPage, 512);
+  606   2          }
+  607   1      }
+  608          #endif
+  609          
+  610          /********************************************************************************
+  611           * Description : Select the next folder file
+  612           *
+  613           * 切换到其他存在歌曲文件的目录，可能是平级目录或父目录或子目录
+  614           ********************************************************************************/
+  615          bool fselGetNextFolder (uint8 *strFile)
+  616          {
+  617   1          bool result;
+  618   1          uint8 mode = fselMode;
+  619   1          fselMode = FSEL_ALL_REPEATALL;
+  620   1      
+  621   1          while(1)
+  622   1          {
+  623   2              if (FALSE != FS_Dir(strFile, GetExtBuf(), FS_DIR_FILE_CONT, GetExtSize()))
+  624   2              {
+  625   3                  fselFileNoInDisk++;
+  626   3              }
+  627   2              else
+  628   2              {
+  629   3                  break;
+  630   3              }
+  631   2          }
+  632   1          result = fselGetNext(strFile);
+  633   1          fselMode = mode;
+  634   1          return result;
+  635   1      }
+  636          
+  637          #ifdef _ACTIVE_DIRL
+  638          bool Fast_SelectNext_8Layer(uint8 *strFile)
+  639          {
+  640   1          if(FALSE != SelectNext(strFile))
+  641   1          {
+  642   2              return TRUE;
+  643   2          }
+  644   1          if(fselDirNoInDisk == fselTotalDir)
+  645   1          {
+  646   2              return FALSE;
+  647   2          }
+  648   1          fselDirNoInDisk++;
+  649   1      
+C251 COMPILER V4.55,  enhanced_selector_next                                               13/12/18  16:27:38  PAGE 11  
+
+  650   1          ReadDir();
+  651   1          if(FALSE != SelectNext(strFile))
+  652   1          {
+  653   2              return TRUE;
+  654   2          }
+  655   1          else
+  656   1          {
+  657   2              return FALSE;
+  658   2          }
+  659   1      }
+  660          
+  661          bool ReadDir()
+  662          {
+  663   1          uint16 fselDirNoInDiskTemp;
+  664   1          fselDirNoInDiskTemp = fselDirNoInDisk - 1;
+  665   1      
+  666   1          VMRead((uint8 *)Dirlocation, VM_DIR_LIST + (512 * (fselDirNoInDiskTemp / DIR_PRE_SEC)), 512);
+  667   1      
+  668   1          FS_SetCurDir_layer(Dirlocation[fselDirNoInDiskTemp % DIR_PRE_SEC].MulLayer);
+  669   1          FS_SetCurDir(Dirlocation[fselDirNoInDiskTemp % DIR_PRE_SEC].ClusterNo);
+  670   1          FS_SetCurDirEntry(0);
+  671   1          fselDirLayer = Dirlocation[fselDirNoInDiskTemp % DIR_PRE_SEC].dirLayer;
+  672   1          return 1;
+  673   1      }
+  674          #endif
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1995     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =       474     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        32     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

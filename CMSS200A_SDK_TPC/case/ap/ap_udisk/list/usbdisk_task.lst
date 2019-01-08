@@ -1,0 +1,203 @@
+C251 COMPILER V4.55,  usbdisk_task                                                         13/12/18  16:28:50  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE usbdisk_task
+OBJECT MODULE PLACED IN .\obj\usbdisk_task.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE usbdisk_task.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BR
+                    -OWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 ORDER DEFINE(UDISK_AP) DEBUG PRINT(.\list\usbdisk_task.lst) OBJECT(.\obj\
+                    -usbdisk_task.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************
+    3           *                       ACTOS
+    4           *                      usbfunctions
+    5           *
+    6           *                (c) Copyright 2002-2009, Actions Co,Ld.
+    7           *                        All Right Reserved
+    8           *
+    9           * File   : usbdisk_2.c
+   10           * By     : Mars
+   11           * Version: v1.00     first version     2009-11-10 14:05  by Mars
+   12           ********************************************************************************
+   13           */
+   14          #include <reg251s.h>
+   15          #include "Udisk.h"
+   16          
+   17          #pragma name(AP_TASK)
+   18          
+   19          extern uint8 UdiskStatus;
+   20          extern uint8 MenuKeyPress;
+   21          extern uint8 IsCardOut;
+   22          //extern uint8 ChargeCheckCounter;
+   23          //extern uint8 gRtcCounter;
+   24          extern uint8 IRUSBExit;
+   25          extern uint8 reckeypress;
+   26          #pragma renamecode(?PR?AP_TASK)
+   27          const uint8 display_str[3][4] =
+   28          { "RDY", "UPZ", "DON" };//ready,upload,download
+   29          
+   30          
+   31          void MsgManager(uint8 dispIndi)
+   32          {
+   33   1          uint8 i;
+   34   1      
+   35   1          if (MenuKeyPress == 1)
+   36   1          {
+   37   2              return;
+   38   2          }
+   39   1      
+   40   1          i = GetSysMsg();
+   41   1          if (i == Msg_KeyPower) //MODE键功能  UHOST、CARD、FM、USBAUDIO、UDISKUSB  循环切换
+   42   1          {
+   43   2              // 对应红外遥控上面的Power键
+   44   2              IRUSBExit = 1;
+   45   2              return;
+   46   2          }
+   47   1      #if 0
+                       else if (i == Msg_KeyVolAdd)
+                   {
+                               MenuKeyPress = 1;
+                       return;
+                   }
+               #endif
+   54   1              else if (i == Msg_KeyMenu) //收到Menu键
+   55   1          {
+   56   2      #ifdef  BACKLIGHTCTL
+                       if(UdiskStatus == 0)
+C251 COMPILER V4.55,  usbdisk_task                                                         13/12/18  16:28:50  PAGE 2   
+
+               #else
+   59   2              if (UdiskStatus == 0)
+   60   2      #endif
+   61   2              {
+   62   3                  MenuKeyPress = 1;
+   63   3              }
+   64   2              return;
+   65   2          }
+   66   1          else if (i == MSG_SD_OUT)
+   67   1          {
+   68   2              IsCardOut = 1;
+   69   2              return;
+   70   2          }
+   71   1          else if (i == Msg_KeyNext)
+   72   1          {
+   73   2              if (UdiskStatus == 0)
+   74   2              {
+   75   3                  MenuKeyPress = 1;
+   76   3                  reckeypress = 1;
+   77   3              }
+   78   2              return;
+   79   2          }
+   80   1          else if (i == Msg_KeyUSBTest)
+   81   1          {
+   82   2              if (UdiskStatus == 0)
+   83   2              {
+   84   3                  MenuKeyPress = 1;
+   85   3                  reckeypress = 2;
+   86   3              }
+   87   2              return;
+   88   2          }
+   89   1      #ifdef  BACKLIGHTCTL
+                   else if((i == Msg_KeyLongUp) || (i == Msg_KeyShortUp))
+                   {
+                       g_rtc_counter = 0;
+                       if (!g_light_flag)
+                       {
+                           LightOnOff(TRUE);//开关背光（TRUE: 开, FALSE:关)
+                           g_light_flag = TRUE;
+                       }
+                   }
+               #endif
+  100   1      
+  101   1          else if ((i == MSG_RTC2HZ) && (dispIndi < 0x10)) //dispIndi>=0x10，升级状态,不能调用涉及到读flashSD区
+             -的操做.
+  102   1          {
+  103   2      #ifdef  BACKLIGHTCTL
+                       g_rtc_counter++;
+                       if(g_rtc_counter >= 120) //自动关背光
+               
+                       {
+                           //关背光
+                           g_rtc_counter = 130;
+                           LightOnOff(FALSE); //开关背光（true: 开, false:关)
+                           g_light_flag = FALSE;
+                       }
+               #endif
+  114   2      
+  115   2          }
+  116   1      }
+  117          
+  118          void Display(uint8 dispIndi)
+  119          {
+  120   1      
+  121   1      #if 0
+                   uint8 disptemp = dispIndi & 0x0f;
+C251 COMPILER V4.55,  usbdisk_task                                                         13/12/18  16:28:50  PAGE 3   
+
+                   uint8 IE0Bak;
+                   dispIndi = dispIndi;
+                   IE0Bak = IE0;
+                   IE0 = IE0 & 0x7f; //显示时不开中断，避免低频跑中断服务（下面代码会降频），降低效率
+               
+                   if (dispIndi < 0x10)
+                   {
+                       if (dispIndi <= 2)
+                       {
+                           LEDClearScreen();
+                           LEDPuts(NUMBER2, display_str[dispIndi], 1);
+                       }
+               
+               #if 0
+                       if(dispIndi == 0x00) //显示任务指示 0:无显示动作  01:上传  02:下传  03:传输结束
+               
+                       {
+                           ResShowPic(UDISKRDY, 0, 16);
+                       }
+                       if(dispIndi == 0x01)
+                       {
+                           ResShowPic(UDISKUPL, 0, 16);
+                       }
+                       if(dispIndi == 0x02)
+                       {
+                           ResShowPic(UDISKDL, 0, 16);
+                       }
+               #endif
+                   }
+                   else
+                   {
+                   }
+               
+                   IE0 = IE0Bak; //恢复中断
+               #endif
+  158   1      }
+*** WARNING C47 IN LINE 118 OF USBDISK_TASK.C: 'dispIndi': unreferenced parameter
+  159          
+  160          void FlashLed(void)
+  161          {
+  162   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       105     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        12     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

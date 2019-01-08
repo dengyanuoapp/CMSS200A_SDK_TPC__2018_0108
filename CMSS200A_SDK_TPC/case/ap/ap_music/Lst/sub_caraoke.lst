@@ -1,0 +1,429 @@
+C251 COMPILER V4.55,  sub_caraoke                                                          23/05/16  10:41:54  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE sub_caraoke
+OBJECT MODULE PLACED IN .\Obj\sub_caraoke.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE sub_caraoke.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SP
+                    -EED) BROWSE INCDIR(..\..\inc;..\..\..\psp_rel\inc) I4 DEBUG PRINT(.\Lst\sub_caraoke.lst) OBJECT(.\Obj\sub_caraoke.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        voice player stop program.
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *******************************************************************************
+   10           */
+   11          #include "ap_music.h"
+   12          //#include "AppDef.h"
+   13          
+   14          #pragma name(AP_KALACBK)
+   15          
+   16          int8 MicVolEar = 0x05; //输出到耳机的时候Mic的默认音量0~7
+   17          //int8 far MicVolSpe = 0x03;              //输出到喇叭的时候Mic的默认音量0~7
+   18          int8 DECGainEar = 0x40; //耳机状态下默认DEC增益Q2.6格式
+   19          //int8 far DECGainSpe = 0x80;              //喇叭状态下默认DEC增益Q2.6格式
+   20          const uint8 KALAEQtemp[4][10] =
+   21          {
+   22              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 1
+   23              5, 3, 0, -1, 0, 4, 5, 6, 0, 0, // 2
+   24              0, 0, 0, -1, -1, -2, -4, 6, 0, 0, // 3
+   25              5, 2, 0, 0, 0, 0, 0, 6, 0, 0 // 4
+   26          };
+   27          const uint16 CH_strint[] =
+   28          { LEARNMOD, SINGMOD };//切换卡拉OK模式
+   29          const uint16 karaoke_EQ[] =
+   30          { SOUEFF1, SOUEFF2, SOUEFF3, SOUEFF4 };
+   31          const uint8 adc_param[10] =
+   32          { 0, 0x0c, 0x30, 0, 0, 0, 0, 0, 0, 0x80 };
+   33          
+   34          /*
+   35           ********************************************************************************************************
+             -*********
+   36           *             void openMicRoute(char micgain)
+   37           *
+   38           * Description : 打开MIC通路，并根据micgain设定MIC增益
+   39           *
+   40           * Arguments   : micgain = 0~7（20db~40db）
+   41           *
+   42           *
+   43           * Returns     : void
+   44           *
+   45           * Notes       :
+   46           *
+   47           ********************************************************************************************************
+             -*********
+   48           */
+   49          void OpenMicRoute(int16 gain)
+   50          {
+   51   1          uint8 cur_sample = 48;
+   52   1          adc_t adcparam;
+   53   1          if (PlayStatus != PlaySta)
+   54   1          {
+   55   2              return;
+   56   2          }
+C251 COMPILER V4.55,  sub_caraoke                                                          23/05/16  10:41:54  PAGE 2   
+
+   57   1          EnableAIN(AD_MIC);
+   58   1          TM_DelayMS(20);
+   59   1          memcpy(&adcparam, adc_param, sizeof(adc_t));
+   60   1          musicpSendCommand(MC_GETSAPLE, (void *) &cur_sample);
+   61   1          adcparam.rate = cur_sample;
+   62   1          EnableADC(&adcparam);
+   63   1          SetAINGain(0, gain);
+   64   1      }
+   65          /*
+   66           ********************************************************************************************************
+             -*********
+   67           *             void CloseMicRoute(char micgain)
+   68           *
+   69           * Description : 关闭MIC通路
+   70           *
+   71           * Arguments   : NULL
+   72           *
+   73           *
+   74           * Returns     : void
+   75           *
+   76           * Notes       :
+   77           *
+   78           ********************************************************************************************************
+             -*********
+   79           */
+   80          void CloseMicRoute(void)
+   81          {
+   82   1          DisableAIN();
+   83   1          DisableADC();
+   84   1      }
+   85          /*
+   86           ********************************************************************************
+   87           *             void acc_vol_callback(int8 CNT)
+   88           *
+   89           * Description : 回调函数，设置卡拉OK伴音等级
+   90           *
+   91           * Arguments   :int8 Vol  伴音等级(-1 ~ 1)
+   92           *
+   93           * Returns     :
+   94           *
+   95           * Notes       :
+   96           *
+   97           ********************************************************************************
+   98           */
+   99          void acc_vol_callback(int16 vol)
+  100          {
+  101   1          uint8 acc_vol;
+  102   1          if (vol == 0)
+  103   1          {
+  104   2              acc_vol = 0x10;
+  105   2          }
+  106   1          else if (vol == 1)
+  107   1          {
+  108   2              acc_vol = 0x30;
+  109   2          }
+  110   1          else
+  111   1          {
+  112   2              acc_vol = 0x08;
+  113   2          }
+  114   1          setDECGain(acc_vol);
+  115   1      }
+  116          /*
+  117           ********************************************************************************************************
+             -*********
+  118           *             void SpeechMute(bool flag)
+  119           *
+C251 COMPILER V4.55,  sub_caraoke                                                          23/05/16  10:41:54  PAGE 3   
+
+  120           * Description : 打开或关闭人声消除电路
+  121           *
+  122           * Arguments   : flag = 0 关闭人声消除电路
+  123           *               flag = 1 打开人声消除电路
+  124           *
+  125           * Returns     : void
+  126           *
+  127           * Notes       :
+  128           *
+  129           ********************************************************************************************************
+             -*********
+  130           */
+  131          void SpeechMute(uint16 flag)
+  132          {
+  133   1          //uint8 sfr_bak;
+  134   1          //sfr_bak = SFR_BANK;
+  135   1          //SFR_BANK = BANK_AUIP;
+  136   1          if (flag == 0) //学习模式, 关闭人声消除
+  137   1          {
+  138   2              //DAC_CTL3 &= 0xbf;
+  139   2              sCaraokeDisable();
+  140   2          }
+  141   1          else //演唱模式, 打开人声消除
+  142   1          {
+  143   2              //DAC_CTL3 |= 0x40;
+  144   2              /* 获取当前歌曲采样率 */
+  145   2              musicpSendCommand(MC_GETSAPLE, (void *) (&g_Openparam.current_samplerate));
+  146   2              sCaraokeEnable(g_Openparam.current_samplerate, 1);
+  147   2          }
+  148   1          //SFR_BANK = sfr_bak;
+  149   1      }
+  150          /*
+  151           ********************************************************************************************************
+             -*********
+  152           *             void setDECGain(int8 DecGain)
+  153           *
+  154           * Description : 设置DEC的增益，在卡拉OK状态下调节伴奏音量
+  155           *
+  156           * Arguments   : DecGain  ,USE Q4.20格式
+  157           *
+  158           * Returns     : void
+  159           *
+  160           * Notes       :
+  161           *
+  162           ********************************************************************************************************
+             -*********
+  163           */
+  164          void setDECGain(uint8 DecGain)
+  165          {
+  166   1          uint8 sfr_bak;
+  167   1          sfr_bak = SFR_BANK;
+  168   1          SFR_BANK = BANK_AUIP;
+  169   1      
+  170   1          GlobalGainH = DecGain;
+  171   1          GlobalGainM = 0x00;
+  172   1          GlobalGainL = 0x00;
+  173   1      
+  174   1          SFR_BANK = sfr_bak;
+  175   1      }
+  176          /*
+  177           ********************************************************************************************************
+             -*********
+  178           *             void SetCaraokeEq(int8 eqmode,int8 eqval)
+  179           *
+  180           * Description : 卡拉OK模式下的ＥＱ
+  181           *
+C251 COMPILER V4.55,  sub_caraoke                                                          23/05/16  10:41:54  PAGE 4   
+
+  182           * Arguments   :  int8 eqmode  :提供0~6共7个频段供EQ设置
+  183           *                int8 eqval 当前频段的EQ数值
+  184           * Returns     : void
+  185           *
+  186           * Notes       :
+  187           *
+  188           ********************************************************************************************************
+             -*********
+  189           */
+  190          /*void SetCaraokeEq(int8 eqmode,int8 eqval)
+  191           {
+  192           BYTE eqvaltemp;
+  193           if(eqval < 25)
+  194           {
+  195           eqvaltemp = 64 + eqval;
+  196           }
+  197           else
+  198           {
+  199           eqvaltemp = eqval;
+  200           }
+  201           if(eqmode!=0xff);
+  202           {
+  203           UserEQTable[eqmode] = eqvaltemp;
+  204           }
+  205           //    if(eqmode!=0x55)
+  206           //    {
+  207           pSendCommand(MC_SETUSEREQ, 0, (int8) &DISEQTable);
+  208           //    }
+  209           //    else
+  210           //    {
+  211           //        pSendCommand(MC_SETUSEREQ, 0, (int8) &UserEQTable);
+  212           //    }
+  213           acc_vol_callback(g_music_vars.acc_vol);
+  214           } */
+  215          /*
+  216           ********************************************************************************************************
+             -*********
+  217           *             void SetCaraokeEq(BYTE eqmode,BYTE eqval)
+  218           *
+  219           * Description : 卡拉OK模式下的ＥＱ
+  220           *
+  221           * Arguments   :  BYTE eqmode  :提供0~3共4个频段供EQ模式设置 设置固定的EQ值
+  222           *
+  223           * Returns     : void
+  224           *
+  225           * Notes       :
+  226           *
+  227           ********************************************************************************************************
+             -*********
+  228           */
+  229          
+  230          void SetCaraokeEqMode(uint16 eqmode)
+  231          {
+  232   1          uint8 temp[12];
+  233   1          memset(temp, 0, 12);
+  234   1          if (eqmode == 0)
+  235   1          {
+  236   2              musicpSendCommand(MC_SETEQ, 0);
+  237   2          }
+  238   1          else
+  239   1          {
+  240   2              memcpy(temp, (void *) KALAEQtemp[eqmode], 10);
+  241   2              musicpSendCommand(MC_SETUSEREQ, (void *) temp);
+  242   2              musicpSendCommand(MC_SETEQ, 0x07);
+  243   2          }
+  244   1          //acc_vol_callback(g_music_vars.acc_vol);
+C251 COMPILER V4.55,  sub_caraoke                                                          23/05/16  10:41:54  PAGE 5   
+
+  245   1      }
+  246          /*
+  247           ********************************************************************************************************
+             -*********
+  248           *             void SetVol(int8 volmode)
+  249           *
+  250           * Description : 打开MIC电路，并根据VOLMODE设定默认的MIC音量和DEC音量
+  251           *
+  252           * Arguments   : volmode，根据volmode判断当前是耳机模式还是喇叭模式，从而设置不同的mic，dec参数
+  253           *               volmode = 0,或者大于2，关闭micin，将dec Vol设置成不进行放大或缩小
+  254           *               volmode = 1，表示拉卡OK模式
+  255           *
+  256           * Returns     : void
+  257           *
+  258           * Notes       :
+  259           *
+  260           ********************************************************************************************************
+             -*********
+  261           */
+  262          void SetVol(int8 volmode)
+  263          {
+  264   1          if (volmode == 0) //非卡拉OK模式，正常播放歌曲
+  265   1          {
+  266   2              CloseMicRoute(); //关闭MIC通道
+  267   2              acc_vol_callback(0);
+  268   2          }
+  269   1          else if (volmode == 1)
+  270   1          {
+  271   2              acc_vol_callback(g_music_vars.acc_vol);
+  272   2              OpenMicRoute(0x02); //打开Mic通道并设定其增益为默认增益
+  273   2          }
+  274   1          else
+  275   1          {
+  276   2              CloseMicRoute();
+  277   2              acc_vol_callback(0);
+  278   2          }
+  279   1      }
+  280          
+  281          /*
+  282           ********************************************************************************************************
+             -*********
+  283           *             void CaraokeEnable(int8 volmode)
+  284           *
+  285           * Description : 打开人声消除模块，Micin模块，并将EQ设置成卡拉OK模式
+  286           *
+  287           * Arguments   : volmode，根据volmode判断当前是耳机模式还是喇叭模式，从而设置不同的mic，dec参数
+  288           *               volmode = 0,关闭micin，将dec Vol设置成不进行放大或缩小
+  289           *               volmode = 1，表示喇叭模式
+  290           *               volmode = 2，表示耳机模式
+  291           *
+  292           * Returns     : void
+  293           *
+  294           * Notes       :
+  295           *
+  296           ********************************************************************************************************
+             -*********
+  297           */
+  298          void CaraokeEnable(int8 volmode)
+  299          {
+  300   1          SpeechMute(volmode);
+  301   1          SetVol(1); //根据耳机或者喇叭选择默认mic音量，默认dec音量
+  302   1          SetCaraokeEqMode(0); //设定卡拉OK EQ
+  303   1      }
+  304          
+  305          /*
+  306           ********************************************************************************************************
+C251 COMPILER V4.55,  sub_caraoke                                                          23/05/16  10:41:54  PAGE 6   
+
+             -*********
+  307           *             void CaraokeDisable()
+  308           *
+  309           * Description :退出卡拉OK模式
+  310           *
+  311           * Arguments   : void
+  312           *
+  313           * Returns     : void
+  314           *
+  315           * Notes       :
+  316           *
+  317           ********************************************************************************************************
+             -*********
+  318           */
+  319          void CaraokeDisable(void)
+  320          {
+  321   1          SetVol(0);
+  322   1          SpeechMute(0);
+  323   1      }
+  324          void deal_caraok_msg(void)
+  325          {
+  326   1          if (g_music_vars.karaoke_flag == 1)
+  327   1          {
+  328   2              /* 获取当前歌曲采样率 */
+  329   2              musicpSendCommand(MC_GETSAPLE, (void *) (&g_Openparam.current_samplerate));
+  330   2              sCaraokeEnable(g_Openparam.current_samplerate, 1);
+  331   2          }
+  332   1          else
+  333   1          {
+  334   2              sCaraokeDisable();
+  335   2          }
+  336   1      }
+  337          /********************************************************************************
+  338           * Description :处理mic开关功能
+  339           *
+  340           * Arguments  :
+  341           *
+  342           * Returns     :
+  343           *            无
+  344           * Notes       :
+  345          
+  346           *
+  347           ********************************************************************************/
+  348          void deal_mic_msg(void)
+  349          {
+  350   1          micin_status = 0;
+  351   1          check_plug_device_msg(&micin_status, MIC_IN);
+  352   1          if(micin_status == 0)
+  353   1          {
+  354   2              return;
+  355   2          }
+  356   1          if (mic_on_flag == 1)
+  357   1          {
+  358   2              OpenMicRoute(MIC_GAIN_VAL);
+  359   2          }
+  360   1          else
+  361   1          {
+  362   2              CloseMicRoute();
+  363   2          }
+  364   1      }
+  365          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       446     ------
+C251 COMPILER V4.55,  sub_caraoke                                                          23/05/16  10:41:54  PAGE 7   
+
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =         2     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =        72     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

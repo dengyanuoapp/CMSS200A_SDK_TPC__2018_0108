@@ -1,0 +1,431 @@
+C251 COMPILER V4.55,  AutoSearchHandle                                                     23/05/16  10:42:06  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE AutoSearchHandle
+OBJECT MODULE PLACED IN .\obj\AutoSearchHandle.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE AutoSearchHandle.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED
+                    -) BROWSE ORDER INCDIR(..\..\..\psp_rel\inc;..\..\inc;.\\FM_QN8035) I4 DEFINE(CHECKALARM) DEBUG PRINT(.\lst\AutoSearchHan
+                    -dle.lst) OBJECT(.\obj\AutoSearchHandle.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        main ap of sdk 3.0
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *        History Record:
+    9           1.去掉刷新背景显示，消除搜台时的界面闪烁感, by Mars,2008-04-15
+   10           *******************************************************************************
+   11           */
+   12          
+   13          #include "ap_radio.h"
+   14          
+   15          #pragma name(AP_AUTOSEARCH)
+   16          
+   17          void SequenceFreqlist(uint16 *buf, uint16 curfreq, uint8 totalnum);
+   18          void SaveStation(void);
+   19          
+   20          /*
+   21           ********************************************************************************
+   22           *             void ShowStationCount(uint16 count)
+   23           *
+   24           * Description : 显示电台号.
+   25           *
+   26           * Arguments   :
+   27           *
+   28           * Returns     :
+   29           *
+   30           * Notes       :
+   31           *
+   32           ********************************************************************************
+   33           */
+   34          void ShowStationCount(uint8 count)
+   35          {
+   36   1          char buf[3];
+   37   1          uint8 i;
+   38   1      
+   39   1          LEDClearScreen();
+   40   1      
+   41   1          LEDDisplay(NUMBER1, NUM_C, 1);
+   42   1          LEDDisplay(NUMBER2, NUM_H, 1);
+   43   1          itoa2(count, buf);
+   44   1          for (i = 0; i < 2; i++)
+   45   1          {
+   46   2              buf[i] -= '0';
+   47   2          }
+   48   1          LEDDisplay(NUMBER3, buf[0], 1);
+   49   1          LEDDisplay(NUMBER4, buf[1], 1);
+   50   1      }
+   51          
+   52          /*
+   53           ********************************************************************************
+   54           *             void ShowFreqInFM2()
+   55           *
+   56           * Description : 显示全自动搜台界面---显示频点
+   57           *
+C251 COMPILER V4.55,  AutoSearchHandle                                                     23/05/16  10:42:06  PAGE 2   
+
+   58           * Arguments   :
+   59           *
+   60           * Returns     :
+   61           *
+   62           * Notes       :
+   63           *
+   64           ********************************************************************************
+   65           */
+   66          void ShowFreqInFM2(void)
+   67          {
+   68   1          char buf[5];
+   69   1          uint8 i;
+   70   1      
+   71   1          LEDClearScreen();
+   72   1      
+   73   1          LEDDisplay(LED_FM, 0xff, 1);
+   74   1          itoa4(g_FMStatus.freq, buf);
+   75   1          for (i = 0; i < 4; i++)
+   76   1          {
+   77   2              buf[i] -= '0';
+   78   2          }
+   79   1      
+   80   1          if (g_FMStatus.freq > 1000)
+   81   1          {
+   82   2              LEDDisplay(NUMBER1, buf[0], 1);
+   83   2          }
+   84   1          LEDDisplay(NUMBER2, buf[1], 1);
+   85   1          LEDDisplay(NUMBER3, buf[2], 1);
+   86   1          LEDDisplay(NUMBER4, buf[3], 1);
+   87   1      }
+   88          
+   89          /*
+   90           ********************************************************************************
+   91           *             bool Search_Show2(FM_direct_e Direct)
+   92           *
+   93           * Description : 搜索下一个在电台表中没有的新电台.
+   94           *
+   95           * Arguments   : Direct,Next或Last搜索.
+   96           *
+   97           * Returns     : TRUE:搜到下一个新电台,FALSE:没有搜到.
+   98           *
+   99           * Notes       :
+  100           *
+  101           ********************************************************************************
+  102           */
+  103          bool Search_Show2(FM_direct_e Direct)
+  104          {
+  105   1          bool Search_Flag;
+  106   1          int i;
+  107   1          g_FMStatus.stereo_status = Stereo;
+  108   1          g_FMStatus.station = 0;
+  109   1          fmSendCommand(FM_MUTE, SetMUTE, NULL);
+  110   1          fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
+  111   1      
+  112   1          Search_Flag = fmSendCommand(FM_SEARCH, (void *) &g_FMStatus, (void *) Direct);
+  113   1          if (Search_Flag) //搜台成功后，MUTE释放
+  114   1          {
+  115   2              AutoTabNum++;
+  116   2              ShowStationCount(AutoTabNum);
+  117   2              //fmSendCommand(FM_MUTE, releaseMUTE,NULL);
+  118   2              fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
+  119   2              if (fmSendCommand(FM_MID_SAVESTATION, NULL, NULL) != FALSE)
+  120   2              {
+  121   3                  fmSendCommand(FM_MID_SAVE, &radio_param, NULL);
+  122   3              }
+  123   2              //        for (i = 0; i < 0x7000; i++)
+C251 COMPILER V4.55,  AutoSearchHandle                                                     23/05/16  10:42:06  PAGE 3   
+
+  124   2              //        {
+  125   2              //        }
+  126   2          }
+  127   1          else
+  128   1          {
+  129   2              ShowFreqInFM2();
+  130   2          }
+  131   1          for (i = 0; i < 0x3999; i++)
+  132   1          {
+  133   2          }
+  134   1          if (flag_r == 0)
+  135   1          {
+  136   2              return 0;
+  137   2          }
+  138   1          else
+  139   1          {
+  140   2              return Search_Flag;
+  141   2          }
+  142   1      }
+  143          
+  144          /*
+  145           ********************************************************************************
+  146           *             bool RestartSearch(uint8 level)
+  147           *
+  148           * Description : 设置门限值,重新开始搜索.
+  149           *
+  150           * Arguments   : 门限值
+  151           *
+  152           * Returns     : TRUE:继续搜索,FALSE:中断搜索,正常结束.
+  153           *
+  154           * Notes       :
+  155           *
+  156           ********************************************************************************
+  157           */
+  158          #if 0
+               bool RestartSearch(uint8 level)
+               {
+                   if (level <= 2)
+                   {
+                       return FALSE;
+                   }
+                   fmSendCommand(FM_OPEN, level, NULL); //重新设置搜索门限值，开始重新搜索
+               
+               #ifndef HARDWARE_SEEK
+                   fmSendCommand(FM_MID_RESTORE, & radio_param, NULL);
+               #endif
+                   return TRUE;
+               }
+               #endif
+  173          
+  174          /*
+  175           ********************************************************************************
+  176           *             uint16 AutoSearchHandle(uint8 Direct)
+  177           *
+  178           * Description : 全自动搜索
+  179           *
+  180           * Arguments   : Direct,Next或Last搜索.
+  181           *
+  182           * Returns     : 如果有可识别的热键消息,  返回结果消息
+  183           如果没有可识别的热键消息,  返回0
+  184           *
+  185           * Notes       :
+  186           *
+  187           ********************************************************************************
+  188           */
+  189          uint16 AutoSearchHandle(uint8 Direct)
+C251 COMPILER V4.55,  AutoSearchHandle                                                     23/05/16  10:42:06  PAGE 4   
+
+  190          {
+  191   1          int key = 0;
+  192   1          bool need_draw = TRUE, need_restart = TRUE;
+  193   1          BYTE Searchflag = 1;
+  194   1          uint16 backup_freq, end_freq;
+  195   1          uint8 result = 0;
+  196   1          bool loop = TRUE;
+  197   1      
+  198   1          flag_r = 0;
+  199   1          AutoTabNum = 0;
+  200   1          memset(m_FMStationTab, 0, sizeof(uint16) * MAX_STATION_COUNT); //初始化AutoSearch所用数组
+  201   1      
+  202   1          g_FMStatus.station = 0;
+  203   1          g_FMStatus.station_count = 0;
+  204   1          backup_freq = g_FMStatus.freq; //备份当前频点
+  205   1          // US频段
+  206   1          if (g_radio_config.band_mode == Bank_US_Europe)
+  207   1          {
+  208   2              if (Direct == SEARCH_NEXT)
+  209   2              {
+  210   3                  g_FMStatus.freq = USFREQ_MIN - 5; //870
+  211   3                  end_freq = USFREQ_MAX;
+  212   3              }
+  213   2              else
+  214   2              {
+  215   3                  g_FMStatus.freq = USFREQ_MAX;
+  216   3                  end_freq = USFREQ_MIN;
+  217   3              }
+  218   2          }
+  219   1          // JP频段
+  220   1          else
+  221   1          {
+  222   2              if (Direct == SEARCH_NEXT)
+  223   2              {
+  224   3                  g_FMStatus.freq = JPFREQ_MIN;
+  225   3                  end_freq = JPFREQ_MAX;
+  226   3              }
+  227   2              else
+  228   2              {
+  229   3                  g_FMStatus.freq = JPFREQ_MAX;
+  230   3                  end_freq = JPFREQ_MIN;
+  231   3              }
+  232   2          }
+  233   1      
+  234   1          fmSendCommand(FM_MID_SAVE, &radio_param, NULL); //清空g_radio_config中的数据
+  235   1          charge_pump_onoff(0);
+  236   1          while (loop)//while(1)
+  237   1          {
+  238   2              if (Direct != SEARCH_NULL)
+  239   2              {
+  240   3                  if (Direct == SEARCH_NEXT) //NEXT搜索处理
+  241   3                  {
+  242   4                      g_FMStatus.freq += 1;
+  243   4                      if ((g_FMStatus.freq >= USFREQ_MAX) && (g_radio_config.band_mode == Bank_US_Europe))
+  244   4                      {
+  245   5                          loop = FALSE;
+  246   5                      }
+  247   4                      else if ((g_FMStatus.freq >= JPFREQ_MAX) && (g_radio_config.band_mode == Bank_Japan))
+  248   4                      {
+  249   5                          loop = FALSE;
+  250   5                      }
+  251   4                      if (Search_Show2(UP))
+  252   4                      {
+  253   5                          // return 0;
+  254   5                          break;
+  255   5                      }
+C251 COMPILER V4.55,  AutoSearchHandle                                                     23/05/16  10:42:06  PAGE 5   
+
+  256   4                  }
+  257   3                  else if (Direct == SEARCH_LAST) //LAST搜索处理
+  258   3                  {
+  259   4                      g_FMStatus.freq -= 1;
+  260   4                      if ((g_FMStatus.freq <= USFREQ_MIN) && (g_radio_config.band_mode == Bank_US_Europe))
+  261   4                      {
+  262   5                          loop = FALSE;
+  263   5                      }
+  264   4      
+  265   4                      else if ((g_FMStatus.freq <= JPFREQ_MIN) && (g_radio_config.band_mode == Bank_Japan))
+  266   4                      {
+  267   5                          loop = FALSE;
+  268   5                      }
+  269   4                      if (Search_Show2(DOWN))
+  270   4                      {
+  271   5                          //return 0;
+  272   5                          break;
+  273   5                      }
+  274   4                  }
+  275   3                  else if (Direct == SEARCH_STOP)
+  276   3                  {
+  277   4                      Direct = SEARCH_NULL;
+  278   4                      break;
+  279   4                      //  return 0;
+  280   4                  }
+  281   3              }
+  282   2              if (AutoTabNum >= MAX_STATION_COUNT) //已搜到MAX_STATION_COUNT个电台,正常退出.
+  283   2              {
+  284   3                  loop = FALSE;
+  285   3              }
+  286   2              if (loop)
+  287   2              {
+  288   3                  key = ap_get_message();
+  289   3                  switch (key)
+  290   3                  {
+  291   4                  case AP_KEY_NEXT | AP_KEY_UP: //NEXT搜索时按NEXT键，停止搜索
+  292   4                      break;
+  293   4      
+  294   4                  case AP_KEY_PREV | AP_KEY_UP: //LAST搜索时按LAST键，停止搜索
+  295   4                      break;
+  296   4      
+  297   4                  case AP_KEY_PLAY | AP_KEY_UP:
+  298   4                  case AP_KEY_MODE | AP_KEY_UP:
+  299   4                      Direct = SEARCH_STOP;
+  300   4                      break;
+  301   4      
+  302   4                  case AP_MSG_LINEIN_IN:
+  303   4                      result = RESULT_LINEIN;
+  304   4                      break;
+  305   4      
+  306   4                  case AP_MSG_ALARM:
+  307   4                      result = RESULT_ALARM;
+  308   4                      break;
+  309   4      
+  310   4                  case AP_MSG_WAIT_TIMEOUT:
+  311   4                  case AP_MSG_UH_IN:
+  312   4                  case AP_MSG_SD_IN:
+  313   4                  case AP_MSG_USB_PLUGIN:
+  314   4                      break;
+  315   4      
+  316   4                  default: //热键处理
+  317   4                      result = ap_handle_hotkey(key);
+  318   4                      break;
+  319   4                  }
+  320   3                  if (result)
+  321   3                  {
+C251 COMPILER V4.55,  AutoSearchHandle                                                     23/05/16  10:42:06  PAGE 6   
+
+  322   4                      break;
+  323   4                  }
+  324   3              }
+  325   2          }
+  326   1          charge_pump_onoff(1);
+  327   1          if (g_FMStatus.station_count > 0x00) // 判断是否搜索到电台
+  328   1          {
+  329   2              /* 跳转到第一个电台 */
+  330   2              g_FMStatus.freq = m_FMStationTab[0];
+  331   2              fmSendCommand(FM_SETFREQ, (void *) g_FMStatus.freq, NULL);
+  332   2              fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
+  333   2      
+  334   2              fmSendCommand(FM_MID_SAVE, &radio_param, NULL);
+  335   2          }
+  336   1          else
+  337   1          {
+  338   2              g_FMStatus.freq = backup_freq;
+  339   2              fmSendCommand(FM_SETFREQ, (void *) g_FMStatus.freq, NULL);
+  340   2              fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
+  341   2              fmSendCommand(FM_MID_SAVE, &radio_param, NULL);
+  342   2          }
+  343   1          while (ap_get_message() != AP_KEY_NULL) //清除自动搜台过程中的消息
+  344   1          {
+  345   2              ClearWatchDog(); //清空消息池
+  346   2          }
+  347   1          return result;
+  348   1      }
+  349          
+  350          /*
+  351           ********************************************************************************
+  352           *             void SaveStation(void)
+  353           *
+  354           * Description : 保存搜索到的电台
+  355           *
+  356           * Arguments   :
+  357           *
+  358           * Returns     :
+  359           *
+  360           * Notes       :
+  361           *
+  362           ********************************************************************************
+  363           */
+  364          #if 0
+               void SaveStation(void)
+               {
+                   uint8 i;
+                   uint16 k;
+                   fmSendCommand(MC_GETFREQ, (uint16) & k); // 保存电台
+                   //FMAutoTab[AutoTabNum] = k;
+                   AutoTabNum++;
+                   SequenceFreqlist(FMAutoTab, k, AutoTabNum);
+                   for (i = AutoTabNum; i < 30; i++)
+                   {
+                       if (radio_param.param1[i] == k) // 删除重复的电台.
+               
+                       {
+                           radio_param.param1[i] = 0;
+                       }
+                   }
+               
+               }
+               #endif
+  384          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+C251 COMPILER V4.55,  AutoSearchHandle                                                     23/05/16  10:42:06  PAGE 7   
+
+  code size            =    ------     ------
+  ecode size           =       932     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

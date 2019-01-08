@@ -1,0 +1,361 @@
+C251 COMPILER V4.55,  UsbBulkTFun                                                          15/07/16  16:03:53  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE UsbBulkTFun
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usb\UsbBulkTFun.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usb\UsbBulkTFun.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) I
+                    -NCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usb\UsbBulkTFun.lst) OBJECT(..\..\..\obj\lib\usb\UsbBulkTFun.o
+                    -bj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************************************
+             -*
+    3           *                                       ACTOS GL3976
+    4           *
+    5           *
+    6           *                           (c) Copyright 2002-2007, Actions Co,Ld.
+    7           *                                   All Right Reserved
+    8           *
+    9           * File   : UsbBulkFun.msa
+   10           * By     : zhouxl
+   11           * Version: v1.02     first version     2004-12-14 9:09
+   12           ********************************************************************************************************
+             -*
+   13           */
+   14          
+   15          #include "udisklib.h"
+   16          
+   17          #pragma name(BULkFUN_C)
+   18          
+   19          #pragma renamecode(?PR?BULkFUN_C)
+   20          #pragma ROM(HUGE)
+   21          /*
+   22           ********************************************************************************************************
+             -*
+   23           *                                           DMA_Data_Transfer
+   24           *
+   25           * Description: 使用通用DMA在USB FIFO与RAM之间传输数据, USB normal模式
+   26           *
+   27           * Arguments  : DMA_DT_Trnsfr_t
+   28           *
+   29           * Returns    : None.
+   30           *
+   31           * Note(s)    :
+   32           ********************************************************************************************************
+             -*
+   33           */
+   34          void DMA_Data_Transfer(DMA_DT_Trnsfr_t *dma_struct)
+   35          {
+   36   1          if (fifo_trans_mode == 0x01)
+   37   1          {
+   38   2              SFR_BANK = BANK_DMA_CARD;
+   39   2          }
+   40   1          else
+   41   1          {
+   42   2              SFR_BANK = BANK_DMA0;
+   43   2          }
+   44   1          DMAnCTL1 = dma_struct->pagenum;
+   45   1      
+   46   1          if ((dma_struct->pagenum & 0x0f) == 0x0a)
+   47   1          {
+   48   2              DMAnSADDR0H = 0xff;
+   49   2          }
+   50   1          else
+   51   1          {
+   52   2              DMAnSADDR0H = 0x00;
+   53   2          }
+C251 COMPILER V4.55,  UsbBulkTFun                                                          15/07/16  16:03:53  PAGE 2   
+
+   54   1          DMAnSADDR0L = (uint8) dma_struct->source_addr;
+   55   1          DMAnSADDR0M = (uint8) (dma_struct->source_addr >> 8);
+   56   1      
+   57   1          if ((dma_struct->pagenum & 0xf0) == 0xa0)
+   58   1          {
+   59   2              DMAnDADDR0H = 0xff;
+   60   2          }
+   61   1          else
+   62   1          {
+   63   2              DMAnDADDR0H = 0x00;
+   64   2          }    
+   65   1              
+   66   1              DMAnDADDR0L = (uint8) dma_struct->dst_addr;
+   67   1          DMAnDADDR0M = (uint8) (dma_struct->dst_addr >> 8);
+   68   1      
+   69   1          DMAnFrameLenL = (uint8) dma_struct->length;
+   70   1          DMAnFrameLenH = (uint8) (dma_struct->length >> 8);
+   71   1      
+   72   1          SFR_BANK = BANK_USB;
+   73   1          if ((dma_struct->pagenum & 0x0f) == 0x04) //源地址为usbfifo
+   74   1          {
+   75   2              EP2DMALENL = (uint8) dma_struct->length;
+   76   2              EP2DMALENH = (uint8) (dma_struct->length >> 8);               
+   77   2                      UDMAM = UDMAM | 0x02; //DMAEPSEL = OUT2
+   78   2      
+   79   2          }
+   80   1          else
+   81   1          {
+   82   2                      EP1DMALENL = (uint8) dma_struct->length;
+   83   2              EP1DMALENH = (uint8) (dma_struct->length >> 8);         
+   84   2                      UDMAM = UDMAM | 0x01; //DMAST = DMA
+   85   2          }
+   86   1      
+   87   1          if (fifo_trans_mode != 0x01)
+   88   1          {
+   89   2              SFR_BANK = BANK_DMA0;
+   90   2                      DMAnCTL0 = DMAnCTL0 | 0x01; //Nomal 模式
+   91   2          }   
+   92   1      
+   93   1          SFR_BANK = BANK_USB;
+   94   1      
+   95   1      }
+   96          
+   97          /*
+   98           ********************************************************************************************************
+             -*
+   99           *                                           Wait_PrevDMA_TransEnd
+  100           *
+  101           * Description: 等待上一次DMA传输完成.
+  102           *
+  103           * Arguments  : None
+  104           *
+  105           * Returns    : None.
+  106           *
+  107           * Note(s)    : 对于短包要特殊处理.
+  108           ********************************************************************************************************
+             -*
+  109           */
+  110          void Wait_PrevDMA_TransEnd(void)
+  111          {
+  112   1          if (fifo_trans_mode == 0x01)
+  113   1          {
+  114   2              /*
+  115   2                由于flash fifo直通由flash主导，且flash
+  116   2                内部数据传输分成很多小块；那很有可能拔线后
+  117   2                dma已经结束，导致无法退出U盘。
+C251 COMPILER V4.55,  UsbBulkTFun                                                          15/07/16  16:03:53  PAGE 3   
+
+  118   2              */
+  119   2              SFR_BANK = BANK_USB;
+  120   2      #ifndef _FPGA_VERTION_
+  121   2             if (((DPDMCTRL & 0x40) == 0x00) || ((Usbirq_hcusbirq & 0x10) != 0x00))
+  122   2             {
+  123   3                ifIsConnect();
+  124   3             }
+  125   2      #endif
+  126   2              SFR_BANK = BANK_DMA_CARD;
+  127   2          }
+  128   1          else
+  129   1          {
+  130   2              SFR_BANK = BANK_DMA0;
+  131   2          }
+  132   1      
+  133   1          //wait DMA0 complete
+  134   1          while ((DMAnCTL0 & 0x01) != 0x00)
+  135   1          {
+  136   2              //拔线处理
+  137   2              ifIsConnect();
+  138   2          }
+  139   1      
+  140   1          //wait usb fifo empty
+  141   1          if (((DMAnCTL1 >> 4) & 0x0f) == 0x04) //目的地址为usbfifo
+  142   1          {
+  143   2              SFR_BANK = BANK_USB;
+  144   2              while ((UDMAM & 0x01) != 0x00)
+  145   2              {
+  146   3                  //拔线处理
+  147   3                  ifIsConnect();
+  148   3              }
+  149   2              while ((In1cs_hcout1cs & 0x0E) != 0x0C) //FIFO Empty?
+  150   2              {
+  151   3                  //拔线处理
+  152   3                  ifIsConnect();
+  153   3              }
+  154   2          }
+  155   1      
+  156   1          if (fifo_trans_mode == 0x01)
+  157   1          {
+  158   2              SFR_BANK = BANK_DMA_CARD;
+  159   2          }
+  160   1          else
+  161   1          {
+  162   2              SFR_BANK = BANK_DMA0;
+  163   2          }
+  164   1          //FIFO直通模式结束后关闭直通配置，避免DMA的配置处于fifo直通模式,导致后续存储介质处理异常
+  165   1          DMAnCTL1 = 0x00;
+  166   1      
+  167   1          SFR_BANK = BANK_USB;
+  168   1      }
+  169          
+  170          /*
+  171           ********************************************************************************************************
+             -*
+  172           *                                           Send_CSW
+  173           *
+  174           * Description: Send Command Status Wrapper(CSW).
+  175           *
+  176           * Arguments  : None.
+  177           *
+  178           * Returns    : None.
+  179           *
+  180           * Note(s)    : None.
+  181           ********************************************************************************************************
+             -*
+C251 COMPILER V4.55,  UsbBulkTFun                                                          15/07/16  16:03:53  PAGE 4   
+
+  182           */
+  183          void Send_CSW(void)
+  184          {
+  185   1          Send_Data_To_PC((uint8 *) &CSWBuffer, 13);
+  186   1          //CWW阶段已完成，清fifo为下一个IN准备
+  187   1          EPB_OutRdy_ShortPacketNAK();
+  188   1      }
+  189          
+  190          /*
+  191           ********************************************************************************************************
+             -*
+  192           *                                           Send_Data_To_PC
+  193           *
+  194           * Description: Upload request length data to PC through endpointA.
+  195           *
+  196           * Arguments  : de: Addr of Data for Sending;
+  197           *            : bc: Data Length(The length MUST less than FIFO Buffer length);
+  198           *
+  199           * Returns    : None.
+  200           *
+  201           * Note(s)    : The shared fifo will be switched to in endpoint.
+  202           ********************************************************************************************************
+             -*
+  203           */
+  204          void Send_Data_To_PC(uint8 *data_p, uint16 length)
+  205          {
+  206   1          char *dataAddr;
+  207   1          int16 i, sendLength, count;
+  208   1      
+  209   1          dataAddr = data_p;
+  210   1          sendLength = length;
+  211   1      
+  212   1          while (sendLength != 0)
+  213   1          {
+  214   2              count = (sendLength >= max_pkt_size) ? max_pkt_size : sendLength;
+  215   2      
+  216   2              for (i = 0; i < count; i++)
+  217   2              {
+  218   3                  Fifo1dat = (char *) dataAddr[i]; //fill epa fifo
+  219   3              }
+  220   2      
+  221   2              if (count != max_pkt_size)
+  222   2              {
+  223   3                  In1cs_hcout1cs = In1cs_hcout1cs | 0x02; //短包,需要手动设置Busy位
+  224   3              }
+  225   2      
+  226   2              while ((In1cs_hcout1cs & 0x0E) != 0x0C) //FIFO Empty?
+  227   2              {
+  228   3                  //拔线处理
+  229   3                  ifIsConnect();
+  230   3              }
+  231   2              sendLength = sendLength - count;
+  232   2              dataAddr = dataAddr + count;
+  233   2          }
+  234   1      }
+  235          
+  236          /*
+  237           ********************************************************************************************************
+             -*
+  238           *                                           EPB_OutRdy_ShortPacketNAK
+  239           *
+  240           * Description: NAK the endpointB if a short packet had been received.
+  241           *
+  242           * Arguments  : None.
+  243           *
+  244           * Returns    : None.
+C251 COMPILER V4.55,  UsbBulkTFun                                                          15/07/16  16:03:53  PAGE 5   
+
+  245           *
+  246           * Note(s)    : Memory必须切给EPB.
+  247           ********************************************************************************************************
+             -*
+  248           */
+  249          void EPB_OutRdy_ShortPacketNAK(void)
+  250          {
+  251   1          //reset all endpoint fifo
+  252   1          EPRST = 0x42;
+  253   1          //switch 2kbyte fifo to endpointB
+  254   1      
+  255   1          //disable out packet counter
+  256   1          OUTPCKCNTL = 0x00;
+  257   1          OUTPCKCNTH = 0x00;
+  258   1          USBEIRQ = USBEIRQ | (uint8) 0x80;
+  259   1          //clear epB interrupt to rx next out packet
+  260   1          SHORTPCKIRQ = SHORTPCKIRQ | 0x20;
+  261   1      }
+  262          
+  263          /*
+  264           ********************************************************************************************************
+             -*
+  265           *                                           EPB_OutRdy_FIFOFullNAK
+  266           *
+  267           * Description: NAK if the useful space size of index endpoint FIFO is smaller than the maxpacket size.
+  268           *
+  269           * Arguments  : None.
+  270           *
+  271           * Returns    : None.
+  272           *
+  273           * Note(s)    : Memory mest convert to EPB.
+  274           ********************************************************************************************************
+             -*
+  275           */
+  276          void EPB_OutRdy_FIFOFullNAK(void)
+  277          {
+  278   1          //switch 2kbyte fifo to endpointB
+  279   1          //clear epB interrupt to rx next out packet
+  280   1          SHORTPCKIRQ = SHORTPCKIRQ | 0x20;
+  281   1      }
+  282          
+  283          /*
+  284           ********************************************************************************************************
+             -*
+  285           *                                           EPA_In_Rdy
+  286           *
+  287           * Description: Set the index in enpoint ready for upload data to host.
+  288           *
+  289           * Arguments  : None.
+  290           *
+  291           * Returns    : None.
+  292           *
+  293           * Note(s)    : Memory必须切给EPA.
+  294           ********************************************************************************************************
+             -*
+  295           */
+  296          void EPA_In_Rdy(void)
+  297          {
+  298   1      
+  299   1      }
+  300          #pragma ROM(HUGE)
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       423     ------
+C251 COMPILER V4.55,  UsbBulkTFun                                                          15/07/16  16:03:53  PAGE 6   
+
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

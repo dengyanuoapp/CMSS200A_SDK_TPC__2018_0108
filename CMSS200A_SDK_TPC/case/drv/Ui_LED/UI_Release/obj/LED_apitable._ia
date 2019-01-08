@@ -1,0 +1,1 @@
+"LED_apitable.A51" MODSRC INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 SET (XSMALL,ROMHUGE) DEBUG PRINT(.\UI_Release\list\LED_apitable.lst) OBJECT(.\UI_Release\obj\LED_apitable.obj) EP

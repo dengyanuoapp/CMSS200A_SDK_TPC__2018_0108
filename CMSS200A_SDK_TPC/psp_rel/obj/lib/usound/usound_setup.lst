@@ -1,0 +1,1063 @@
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE usound_setup
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usound\usound_setup.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usbsound\usound_setup.c XSMALL FUNCTIONS(REENTRANT) ROM(H
+                    -UGE) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\usound_setup.lst) OBJECT(..\..\..\obj\lib\usound\
+                    -usound_setup.obj) 
+
+stmt  level    source
+
+    1          /********************************************************************************
+    2           *                              AS260A
+    3           *                            Module: USB Sound
+    4           *                 Copyright(c) 2001-2012 Actions Semiconductor,
+    5           *                            All Rights Reserved.
+    6           *
+    7           * History:
+    8           *      <author>    <time>            <version >             <desc>
+    9           *      dengtaiping 2012-10-23 16:40     1.0                build this file
+   10           ********************************************************************************/
+   11          /*!
+   12           * \file     usound_setup.c
+   13           * \brief    .
+   14           * \author   dengtaiping
+   15           * \par      GENERAL DESCRIPTION:
+   16           *               枚举代码
+   17           * \par      EXTERNALIZED FUNCTIONS:
+   18           *               这里描述调用到外面的模块
+   19           *
+   20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
+   21           *
+   22           * \version 1.0
+   23           * \date  2012/10/23
+   24           *******************************************************************************/
+   25          #include "actos.h"
+   26          #include "usound_setup.h"
+   27          #include "usound_intern.h"
+   28          #include "usound_extern.h"
+   29          
+   30          #pragma name(USC_SETUP)
+   31          #pragma renamecode(?PR?USC_SETUP)
+   32          
+   33          /******************************************************************************/
+   34          /*!
+   35           * \par  Description:
+   36           *     count string lenth.
+   37           * \param[in]    pstraddr:point to string、strlgth:max lenth.
+   38           * \param[out]   none.
+   39           * \return       actual lenth
+   40          
+   41           * \ingroup      module name
+   42           * \par          exmaple code
+   43           * \code
+   44           *               list example code in here
+   45           * \endcode
+   46           *******************************************************************************/
+   47          static uint8 count_string_charlngth(uint8 *pstraddr, uint8 strlgth)
+   48          {
+   49   1          unsigned char charcounter = 0x00;
+   50   1          unsigned char i;
+   51   1          for (i = 0; i < strlgth; i++)
+   52   1          {
+   53   2              if (*pstraddr == 0)
+   54   2              {
+   55   3                  break;
+   56   3              }
+   57   2              charcounter++;
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 2   
+
+   58   2              pstraddr++;
+   59   2          }
+   60   1          return charcounter;
+   61   1      }
+   62          
+   63          /******************************************************************************/
+   64          /*!
+   65           * \par  Description:
+   66           *     convert ascII code to unique code.
+   67           * \param[in]    pstraddr:point to string、strlgth:max lenth.
+   68           * \param[out]   none.
+   69           * \return       none
+   70          
+   71           * \ingroup      module name
+   72           * \par          exmaple code
+   73           * \code
+   74           *               list example code in here
+   75           * \endcode
+   76           *******************************************************************************/
+   77          static void cnvrt_ascii_to_uni16(uint8 *pstraddr, uint8 strlgth)
+   78          {
+   79   1          uint8 *data_p1;
+   80   1          uint8 *data_p2;
+   81   1      
+   82   1          //数组的下标从0开始
+   83   1          data_p1 = pstraddr + (strlgth - 1); //The last byte address
+   84   1          data_p2 = pstraddr + (strlgth - 1) * 2 + 1; //the data address to be load
+   85   1      
+   86   1          //当ASCII码长度为0或1时作下面的转换会覆盖地址指向memory之前的数据
+   87   1          while (strlgth != 0x00)
+   88   1          {
+   89   2              *data_p2 = 0x00;
+   90   2              data_p2--;
+   91   2              *data_p2 = *data_p1; //Original ASCII char
+   92   2      
+   93   2              data_p1--;
+   94   2              data_p2--;
+   95   2              strlgth--;
+   96   2          }
+   97   1      }
+   98          
+   99          /******************************************************************************/
+  100          /*!
+  101           * \par  Description:
+  102           *     data endian reverse.
+  103           * \param[in]    pstraddr:point to data、strlgth:max lenth.
+  104           * \param[out]   none.
+  105           * \return       none
+  106          
+  107           * \ingroup      module name
+  108           * \par          exmaple code
+  109           * \code
+  110           *               list example code in here
+  111           * \endcode
+  112           *******************************************************************************/
+  113          void endian_reverse(uint8 *data_p, uint16 data_length)
+  114          {
+  115   1          char tmp;
+  116   1          char *head_p, *end_p;
+  117   1          head_p = data_p;
+  118   1          end_p = data_p + data_length - 1;
+  119   1      
+  120   1          for (; head_p < end_p; ++head_p, --end_p)
+  121   1          {
+  122   2              tmp = *end_p;
+  123   2              *end_p = *head_p;
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 3   
+
+  124   2              *head_p = tmp;
+  125   2          }
+  126   1      }
+  127          
+  128          /******************************************************************************/
+  129          /*!
+  130           * \par  Description:
+  131           *     iso out token process.
+  132           * \param[in]    pstraddr:point to string、strlgth:max lenth.
+  133           * \param[out]   none.
+  134           * \return       actual lenth
+  135          
+  136           * \ingroup      module name
+  137           * \par          exmaple code
+  138           * \code
+  139           *               list example code in here
+  140           * \endcode
+  141           *******************************************************************************/
+  142          void descriptor_init(usound_param *pud_param)
+  143          {
+  144   1          uint8 string_len;
+  145   1      
+  146   1          string_len = count_string_charlngth((uint8 *) &manufacure_string.wManufacturerName, sizeof(manufacure
+             -_string.wManufacturerName)/2);
+  147   1          manufacure_string.bLength = 0x02 + string_len * 2;
+  148   1          manufacure_string.bDescriptorType = 0x03;
+  149   1          cnvrt_ascii_to_uni16((uint8 *) &manufacure_string.wManufacturerName, string_len);
+  150   1      
+  151   1          string_len = count_string_charlngth((uint8 *) &device_name_string.wProductName, sizeof(device_name_st
+             -ring.wProductName)/2);
+  152   1          device_name_string.bLength = 0x02 + string_len * 2;
+  153   1          device_name_string.bDescriptorType = 0x03;
+  154   1          cnvrt_ascii_to_uni16((uint8 *) &device_name_string.wProductName, string_len);
+  155   1      
+  156   1          string_len = count_string_charlngth((uint8 *) &SerialNumber.wManufacturerName, sizeof(SerialNumber.wM
+             -anufacturerName)/2);
+  157   1          SerialNumber.bLength = 0x02 + string_len * 2;
+  158   1          SerialNumber.bDescriptorType = 0x03;
+  159   1          cnvrt_ascii_to_uni16((uint8 *) &SerialNumber.wManufacturerName, string_len);
+  160   1          
+  161   1          //memcpy(All_Descriptors_of_Configuration.Audio_Class_Format_Setting1.tSamFreq, sample_rate_arr[pud_p
+             -aram->record_sample_rate], 3);
+  162   1          memcpy(All_Descriptors_of_Configuration.Audio_Class_Format_Setting1.tSamFreq, sample_rate_arr[pud_par
+             -am->play_sample_rate], 3);
+  163   1          memcpy(All_Descriptors_of_Configuration.Audio_Class_Format_Setting2.tSamFreq, sample_rate_arr[pud_par
+             -am->record_sample_rate], 3);
+  164   1      
+  165   1         if (DOWNLOAD_BIT_DEPTH_24== pud_param->bit_depth)
+  166   1          {  
+  167   2              All_Descriptors_of_Configuration.Endpoint_Descriptor_Setting1.wMaxPacketSize = 0x4002;//0x2001; /
+             -/0x320;
+  168   2              All_Descriptors_of_Configuration.Audio_Class_Format_Setting1.bSubFrameSize = 0x03;//0x04;//0x03;
+  169   2              All_Descriptors_of_Configuration.Audio_Class_Format_Setting1.bBitResolution = 0x18;
+  170   2          }  
+  171   1         else
+  172   1          {
+  173   2              //All_Descriptors_of_Configuration.Endpoint_Descriptor_Setting1.wMaxPacketSize = 0x8001;//0x2001;
+             - //0x320;;
+  174   2                      ;
+  175   2          }
+  176   1      }
+  177          
+  178          /******************************************************************************/
+  179          /*!
+  180           * \par  Description:
+  181           *     set endp0 ACK bit.
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 4   
+
+  182           * \param[in]    none.
+  183           * \param[out]   none.
+  184           * \return       actual lenth
+  185          
+  186           * \ingroup      module name
+  187           * \par          exmaple code
+  188           * \code
+  189           *               list example code in here
+  190           * \endcode
+  191           *******************************************************************************/
+  192          void no_data_control(void)
+  193          {
+  194   1          uint8 sfr_temp = SFR_BANK;
+  195   1          SFR_BANK = BANK_USB;
+  196   1          Ep0cs_hcep0cs |= 0x02;
+  197   1          SFR_BANK = sfr_temp;
+  198   1      }
+  199          
+  200          /******************************************************************************/
+  201          /*!
+  202           * \par  Description:
+  203           *     read endp0 data.
+  204           * \param[in]    data_address:point to string、data_length:actual lenth、request_length：request length.
+  205           * \param[out]   none.
+  206           * \return       none
+  207          
+  208           * \ingroup      module name
+  209           * \par          exmaple code
+  210           * \code
+  211           *               list example code in here
+  212           * \endcode
+  213           *******************************************************************************/
+  214          void control_write(uint8 *data_address, uint8 data_length, uint8 request_length)
+  215          {
+  216   1          uint8 sfr_temp;
+  217   1          uint8 transfer_length, temp_count, ret_var;
+  218   1          uint8 *p_temp;
+  219   1      
+  220   1          sfr_temp = SFR_BANK;
+  221   1          SFR_BANK = BANK_USB;
+  222   1          /* if length of data to be received is more than PC sent, only send data length that pc sent.  */
+  223   1          if (data_length <= request_length)
+  224   1          {
+  225   2              transfer_length = data_length;
+  226   2          }
+  227   1          else
+  228   1          {
+  229   2              transfer_length = request_length;
+  230   2          }
+  231   1          p_temp = data_address;
+  232   1      
+  233   1          Out0bc_hcin0bc = 0x00;
+  234   1          /* wait transfer complete. */
+  235   1          while (1)
+  236   1          {
+  237   2              /* check if line is pulled out.  */
+  238   2              ret_var = is_usb_connect();
+  239   2              if (USB_IS_CONNECT != ret_var)
+  240   2              {
+  241   3                  break;
+  242   3              }
+  243   2      
+  244   2              /* check if busy.   */
+  245   2              if (0x00 == (Ep0cs_hcep0cs & 0x08))
+  246   2              {
+  247   3                  break;
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 5   
+
+  248   3              }
+  249   2          }/* while(1) */
+  250   1      
+  251   1          if (ret_var == USB_IS_CONNECT)
+  252   1          {
+  253   2              for (temp_count = 0; temp_count < transfer_length; temp_count++)
+  254   2              {
+  255   3                  *p_temp++ = Ep0outdata;
+  256   3              }
+  257   2          }
+  258   1          SFR_BANK = sfr_temp;
+  259   1      }
+  260          
+  261          /******************************************************************************/
+  262          /*!
+  263           * \par  Description:
+  264           *     write endp0 data.
+  265           * \param[in]    data_address:point to string、actul_dlen:actual lenth、rqst_dlen：request length.
+  266           * \param[out]   none.
+  267           * \return       none
+  268          
+  269           * \ingroup      module name
+  270           * \par          exmaple code
+  271           * \code
+  272           *               list example code in here
+  273           * \endcode
+  274           *******************************************************************************/
+  275          static void control_read(uint8 *d_addr, uint8 actul_dlen, uint8 rqst_dlen)
+  276          {
+  277   1          uint8 translen_sum;
+  278   1          uint8 translen_once;
+  279   1          uint8 i;
+  280   1          uint8 sfr_temp;
+  281   1          //calucate data length of this control read
+  282   1          sfr_temp = SFR_BANK;
+  283   1          SFR_BANK = BANK_USB;
+  284   1          if (rqst_dlen == 0x00)
+  285   1          {
+  286   2              translen_sum = actul_dlen;
+  287   2          }
+  288   1          else if (rqst_dlen > actul_dlen)
+  289   1          {
+  290   2              translen_sum = actul_dlen;
+  291   2          }
+  292   1          else
+  293   1          {
+  294   2              translen_sum = rqst_dlen;
+  295   2          }
+  296   1      
+  297   1          //transferring
+  298   1          while (translen_sum != 0)
+  299   1          {
+  300   2              if (translen_sum > EP0_MAX_PACKET_SIZE)
+  301   2              {
+  302   3                  translen_once = EP0_MAX_PACKET_SIZE;
+  303   3                  translen_sum = translen_sum - EP0_MAX_PACKET_SIZE;
+  304   3              }
+  305   2              else
+  306   2              {
+  307   3                  translen_once = translen_sum;
+  308   3                  translen_sum = 0x00;
+  309   3              }
+  310   2              for (i = 0; i < translen_once; i++)
+  311   2              {
+  312   3                  Ep0indata = *d_addr++;
+  313   3              }
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 6   
+
+  314   2              //wtite in0 conter,it will start packet transfer and set in0busy
+  315   2              In0bc_hcout0bc = translen_once;
+  316   2              //wait transfer end,Inbsy_hcoutbsy = b'0'
+  317   2              while ((Ep0cs_hcep0cs & 0x04) != 0x00)
+  318   2              {
+  319   3                  if (USB_IS_CONNECT != is_usb_connect())
+  320   3                  {
+  321   4                      break;
+  322   4                  }
+  323   3              }
+  324   2          }
+  325   1          //hsnak clear; when stall bit is 0,it will ack in status stage
+  326   1          no_data_control();
+  327   1          SFR_BANK = sfr_temp;
+  328   1      }
+  329          
+  330          /******************************************************************************/
+  331          /*!
+  332           * \par  Description:
+  333           *     write endp0 data.
+  334           * \param[in]    ep_num:endp NO..
+  335           * \param[out]   none.
+  336           * \return       none
+  337          
+  338           * \ingroup      module name
+  339           * \par          exmaple code
+  340           * \code
+  341           *               list example code in here
+  342           * \endcode
+  343           *******************************************************************************/
+  344          void stall_endpoint(uint8 ep_num)
+  345          {
+  346   1          uint8 sfr_temp;
+  347   1          sfr_temp = SFR_BANK;
+  348   1          SFR_BANK = BANK_USB;
+  349   1          switch (ep_num)
+  350   1          {
+  351   2          case EP0:
+  352   2              Ep0cs_hcep0cs |= 0x01;
+  353   2              break;
+  354   2          case EP1:
+  355   2              In1ctrl_hcout1ctrl |= 0x40;
+  356   2              break;
+  357   2          case EP2:
+  358   2              Out2ctrl_hcin2ctrl |= 0x40;
+  359   2              break;
+  360   2          case EP3:
+  361   2              In3ctrl_hcout3ctrl |= 0x40;
+  362   2              break;
+  363   2          default:
+  364   2              break;
+  365   2          }
+  366   1          SFR_BANK = sfr_temp;
+  367   1          return;
+  368   1      }
+  369          
+  370          /******************************************************************************/
+  371          /*!
+  372           * \par  Description:
+  373           *     recover stall endpoint.
+  374           * \param[in]    ep_num:endp NO..
+  375           * \param[out]   none.
+  376           * \return       none
+  377          
+  378           * \ingroup      module name
+  379           * \par          exmaple code
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 7   
+
+  380           * \code
+  381           *               list example code in here
+  382           * \endcode
+  383           *******************************************************************************/
+  384          void recover_stall_endpoint(uint8 ep_num)
+  385          {
+  386   1          uint8 sfr_temp;
+  387   1          sfr_temp = SFR_BANK;
+  388   1          SFR_BANK = BANK_USB;
+  389   1          switch (ep_num)
+  390   1          {
+  391   2          case EP0:
+  392   2              Ep0cs_hcep0cs &= ~0x01;
+  393   2              break;
+  394   2          case EP1:
+  395   2              In1ctrl_hcout1ctrl &= ~0x40;
+  396   2              break;
+  397   2          case EP2:
+  398   2              Out2ctrl_hcin2ctrl &= ~0x40;
+  399   2              break;
+  400   2          case EP3:
+  401   2              In3ctrl_hcout3ctrl &= ~0x40;
+  402   2              break;
+  403   2          default:
+  404   2              break;
+  405   2          }
+  406   1          SFR_BANK = sfr_temp;
+  407   1      }
+  408          
+  409          /******************************************************************************/
+  410          /*!
+  411           * \par  Description:
+  412           *     init out endpoint.
+  413           * \param[in]    none.
+  414           * \param[out]   none.
+  415           * \return       none
+  416          
+  417           * \ingroup      module name
+  418           * \par          exmaple code
+  419           * \code
+  420           *               list example code in here
+  421           * \endcode
+  422           *******************************************************************************/
+  423          static void set_out_iso_ep(void)
+  424          {
+  425   1          uint8 sfr_temp;
+  426   1          sfr_temp = SFR_BANK;
+  427   1          SFR_BANK = BANK_USB;
+  428   1          if (DOWNLOAD_BIT_DEPTH_24== gud_param.bit_depth)
+  429   1          {       
+  430   2              Hcin2maxpckl = 0x40;//0x20;
+  431   2              Hcin2maxpckh = 0x02; //0x01;
+  432   2              //EP2STADDRH = 0x03;//0x03;  //uram+fir_rds +pcm
+  433   2              //EP2STADDRL = 0x80;//0x80;
+  434   2          }
+  435   1          else
+  436   1          {
+  437   2              Hcin2maxpckl = 0xc0; //0x80;
+  438   2              Hcin2maxpckh = 0x00; //0x01;
+  439   2              //EP2STADDRH = 0x03;//0x03;   //uram+fir_rds +pcm
+  440   2              //EP2STADDRL = 0x80;//0x80;
+  441   2          }
+  442   1          EP2STADDRH = 0x03;//uram+fir_rds +pcm = 0x200 + 0xc0*2 + 0x1000
+  443   1          EP2STADDRL = 0x80;
+  444   1          Out2ctrl_hcin2ctrl = 0x84; //single buff、iso ep 192*1
+  445   1      
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 8   
+
+  446   1          EPRST = 0x02;
+  447   1          EPRST = 0x22;
+  448   1          EPRST = 0x42;
+  449   1      
+  450   1          Fifoctrl |= 0x22;
+  451   1          SFR_BANK = sfr_temp;
+  452   1      }
+  453          /******************************************************************************/
+  454          /*!
+  455           * \par  Description:
+  456           *     init in endpoint.
+  457           * \param[in]    none.
+  458           * \param[out]   none.
+  459           * \return       none
+  460          
+  461           * \ingroup      module name
+  462           * \par          exmaple code
+  463           * \code
+  464           *               list example code in here
+  465           * \endcode
+  466           *******************************************************************************/
+  467          static void set_in_iso_ep(void)
+  468          {
+  469   1          uint8 sfr_temp;
+  470   1          sfr_temp = SFR_BANK;
+  471   1          SFR_BANK = BANK_USB;
+  472   1          Hcout1maxpckh = 0x00;
+  473   1          Hcout1maxpckl = 0x64; //100 byte
+  474   1      
+  475   1          //不能从0x0000地址开始，因为那个地址被配置成了EP0,EP3 fifo
+  476   1          EP1STADDRH = 0x00;
+  477   1          EP1STADDRL = 0xc0;
+  478   1          In1ctrl_hcout1ctrl = 0x86; //triple buff、iso ep 320
+  479   1      
+  480   1          EPRST = 0x01;
+  481   1          EPRST = 0x21;
+  482   1          EPRST = 0x41;
+  483   1      
+  484   1          Fifoctrl |= 0x21;
+  485   1          SFR_BANK = sfr_temp;
+  486   1      
+  487   1      }
+  488          
+  489          /******************************************************************************/
+  490          /*!
+  491           * \par  Description:
+  492           *     init interrupt in endpoint.
+  493           * \param[in]    none.
+  494           * \param[out]   none.
+  495           * \return       none
+  496          
+  497           * \ingroup      module name
+  498           * \par          exmaple code
+  499           * \code
+  500           *               list example code in here
+  501           * \endcode
+  502           *******************************************************************************/
+  503          static void set_in_int_ep(void)
+  504          {
+  505   1          uint8 sfr_temp;
+  506   1          sfr_temp = SFR_BANK;
+  507   1          SFR_BANK = BANK_USB;
+  508   1          Hcout3maxpck = 0x04; //4 byte
+  509   1          In3ctrl_hcout3ctrl = 0x8c; // int ep
+  510   1      
+  511   1          EPRST = 0x03;
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 9   
+
+  512   1          EPRST = 0x23;
+  513   1          EPRST = 0x43;
+  514   1      
+  515   1          Fifoctrl |= 0x23;
+  516   1          SFR_BANK = sfr_temp;
+  517   1      }
+  518          
+  519          /******************************************************************************/
+  520          /*!
+  521           * \par  Description:
+  522           *     设置PA音量.
+  523           * \param[in]    vol_val.
+  524           * \param[out]   none.
+  525           * \return       none
+  526          
+  527           * \ingroup      module name
+  528           * \par          exmaple code
+  529           * \code
+  530           *               list example code in here
+  531           * \endcode
+  532           *******************************************************************************/
+  533          void set_pa_vol(uint8 vol_val)
+  534          {
+  535   1          uint8 sfr_temp = SFR_BANK;
+  536   1          SFR_BANK = BANK_AUIP;
+  537   1          if (vol_val == 0)
+  538   1          {
+  539   2              DAC_ANALOG0 &= 0xfe;
+  540   2          }
+  541   1          else
+  542   1          {
+  543   2              DAC_ANALOG0 |= 0x01;
+  544   2          }
+  545   1          PA_VOLUME = (PA_VOLUME & 0xf8) | (vol_val & 0x07);
+  546   1          SFR_BANK = sfr_temp;
+  547   1      }
+  548          
+  549          /******************************************************************************/
+  550          /*!
+  551           * \par  Description:
+  552           *     设置ADC op1 增益.
+  553           * \param[in]    vol_gain.
+  554           * \param[out]   none.
+  555           * \return       none
+  556          
+  557           * \ingroup      module name
+  558           * \par          exmaple code
+  559           * \code
+  560           *               list example code in here
+  561           * \endcode
+  562           *******************************************************************************/
+  563          #if 0
+               void set_adc_gain(uint8 vol_gain)
+               {
+                   uint8 sfr_temp = SFR_BANK;
+                   SFR_BANK = BANK_AUIP;
+                  // ADC_GAIN1 = (ADC_GAIN1 & 0xf8) | (vol_gain & 0x07);
+                   SFR_BANK = sfr_temp;
+               }
+               #endif
+  572          /******************************************************************************/
+  573          /*!
+  574           * \par  Description:
+  575           *     setup process.
+  576           * \param[in]    none.
+  577           * \param[out]   none.
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 10  
+
+  578           * \return       none
+  579          
+  580           * \ingroup      module name
+  581           * \par          exmaple code
+  582           * \code
+  583           *               list example code in here
+  584           * \endcode
+  585           *******************************************************************************/
+  586          void deal_setup(void)
+  587          {
+  588   1          uint8 sfr_temp = SFR_BANK;
+  589   1          uint8 temp_count;
+  590   1          uint8 *p_temp;
+  591   1          uint32 new_sample;
+  592   1              uint8 test_temp[4] = {0x00, 0x00, 0x00, 0x00};
+  593   1              
+  594   1          SFR_BANK = BANK_USB;
+  595   1          p_temp = &setup_data.bmRequestType;
+  596   1      
+  597   1          ((uint8 *) &setup_data)[0] = Setupdat0; //get setup data.
+  598   1          ((uint8 *) &setup_data)[1] = Setupdat1;
+  599   1          ((uint8 *) &setup_data)[2] = Setupdat3;
+  600   1          ((uint8 *) &setup_data)[3] = Setupdat2;
+  601   1          ((uint8 *) &setup_data)[4] = Setupdat5;
+  602   1          ((uint8 *) &setup_data)[5] = Setupdat4;
+  603   1          ((uint8 *) &setup_data)[6] = Setupdat7;
+  604   1          ((uint8 *) &setup_data)[7] = Setupdat6;
+  605   1      
+  606   1          switch (setup_data.bmRequestType)
+  607   1              //judge type of device request.
+  608   1          {
+  609   2          case RD_STD_DEV:
+  610   2              if (setup_data.bRequest == GET_DESCRIPTOR)
+  611   2              {
+  612   3                  if (setup_data.wValue == VALUE_DEVICE) //get device descriptor.
+  613   3                  {
+  614   4                      control_read(&Device_Descriptor.bLength, Device_Descriptor.bLength, (uint8) setup_data.wL
+             -ength);
+  615   4                  }
+  616   3                  else if (setup_data.wValue == VALUE_CONFIG) //get device configuration.
+  617   3                  {
+  618   4                      control_read(&All_Descriptors_of_Configuration.Configuration_Descriptor.bLength,
+  619   4                                   (uint8) (All_Descriptors_of_Configuration.Configuration_Descriptor.wTotalLen
+             -gth >> 8),
+  620   4                                   (uint8) setup_data.wLength);
+  621   4                  }
+  622   3                  else if (setup_data.wValue == VALUE_STRING_LANGID) // get string of language ID.
+  623   3                  {
+  624   4                      control_read(&language_string.bLength, language_string.bLength, (uint8) setup_data.wLengt
+             -h);
+  625   4                  }
+  626   3                  else if (setup_data.wValue == VALUE_STRING_MANUFACTURER) // get string of manufaturer.
+  627   3                  {
+  628   4                      control_read(&manufacure_string.bLength, manufacure_string.bLength, (uint8) setup_data.wL
+             -ength);
+  629   4                  }
+  630   3                  else if (setup_data.wValue == VALUE_STRING_PRODUCT) //get string of product.
+  631   3                  {
+  632   4                      control_read(&device_name_string.bLength, device_name_string.bLength, (uint8) setup_data.
+             -wLength);
+  633   4                  }
+  634   3                  else if (setup_data.wValue == VALUE_STRING_SERIAL_NUMBER) //get string of serial number.
+  635   3                  {
+  636   4                      control_read(&SerialNumber.bLength, SerialNumber.bLength, (uint8) setup_data.wLength);
+  637   4                  }
+  638   3                  else //others error.
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 11  
+
+  639   3                  {
+  640   4                      no_data_control();
+  641   4                  }
+  642   3              }
+  643   2              else
+  644   2              {
+  645   3                  stall_endpoint(EP0);
+  646   3              }
+  647   2      
+  648   2              break;
+  649   2      
+  650   2          case RD_STD_IF: //get Descriptor.
+  651   2              if (setup_data.bRequest == GET_DESCRIPTOR)
+  652   2              {
+  653   3                  if (setup_data.wIndex == INDEX_INTERFACE3)
+  654   3                  {
+  655   4                      control_read(ReportDescriptor, sizeof(ReportDescriptor), (uint8) setup_data.wLength);
+  656   4                  }
+  657   3              }
+  658   2              break;
+  659   2      
+  660   2          case WR_STD_DEV: //set address.
+  661   2              if (setup_data.bRequest == SET_ADDRESS)
+  662   2              {
+  663   3                  no_data_control();
+  664   3              }
+  665   2              else if (setup_data.bRequest == SET_CONFIGURATION) //set configuration.
+  666   2              {
+  667   3      //#ifdef _USB_RECORD_
+  668   3                  set_in_iso_ep();
+  669   3      //#endif
+  670   3                  set_out_iso_ep();
+  671   3                  set_in_int_ep();
+  672   3                  no_data_control();
+  673   3              }
+  674   2              else
+  675   2              {
+  676   3                  stall_endpoint(EP0);
+  677   3              }
+  678   2              break;
+  679   2      
+  680   2          case WR_STD_IF: //set interface.
+  681   2              if (setup_data.bRequest == SET_INTERFACE)
+  682   2              {
+  683   3                  if (setup_data.wIndex == INDEX_INTERFACE1)
+  684   3                  {
+  685   4                      if (setup_data.wValue == VALUE_ALTERNATE_SETTING0) //setting 0 means that zero-bandwidth.
+  686   4                      {
+  687   5                          usb_state &= (~PLAY_RUNNING);
+  688   5                          SFR_BANK = BANK_DMA_USB1;
+  689   5                          DMAnCTL0 &= 0xfe; //stop dma
+  690   5                          SFR_BANK = BANK_USB;
+  691   5                          start_play_flag = 0;
+  692   5                      }
+  693   4                      else if (setup_data.wValue == VALUE_ALTERNATE_SETTING1)
+  694   4                      {
+  695   5                          //usb_state |= PLAY_RUNNING;
+  696   5                          wr_play_buff_ptr = 0;
+  697   5                          play_data_count = 0;
+  698   5                      }
+  699   4                  }
+  700   3                  else if (setup_data.wIndex == INDEX_INTERFACE2)
+  701   3                  {
+  702   4                      if (setup_data.wValue == VALUE_ALTERNATE_SETTING0)
+  703   4                      {
+  704   5                          usb_state &= (~RECORD_RUNNING);
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 12  
+
+  705   5                          SFR_BANK = BANK_DMA_USB2;
+  706   5                          DMAnCTL0 &= 0xfe; //stop dma
+  707   5                          SFR_BANK = BANK_USB;
+  708   5                          start_record_flag = 0;
+  709   5                      }
+  710   4                      else if (setup_data.wValue == VALUE_ALTERNATE_SETTING1)
+  711   4                      {
+  712   5                          usb_state |= RECORD_RUNNING;
+  713   5                          rd_record_buff_ptr = 0;
+  714   5                          record_data_count = 0;
+  715   5                          start_record_flag = 0;
+  716   5                      }
+  717   4                  }
+  718   3      
+  719   3                  no_data_control();
+  720   3              }
+  721   2              else
+  722   2              {
+  723   3                  stall_endpoint(EP0);
+  724   3              }
+  725   2              break;
+  726   2      
+  727   2          case SET_UNIT_CONTROL: //set unit
+  728   2              if (setup_data.wIndex == FEATURE_UNIT_INDEX1)
+  729   2              {
+  730   3                  if (setup_data.bRequest == SET_CUR)
+  731   3                  {
+  732   4                      temp_count = VOLUME_LENGTH;
+  733   4                      if (setup_data.wValue == ((MUTE_CONTROL << 8) | MAIN_CHANNEL_NUMBER0))
+  734   4                      {
+  735   5                          p_temp = &play_mute_ch0;
+  736   5                          temp_count = MUTE_LENGTH;
+  737   5                      }
+  738   4                      else if (setup_data.wValue == ((VOLUME_CONTROL << 8) | MAIN_CHANNEL_NUMBER0))
+  739   4                      {
+  740   5                          p_temp = (uint8 *) &play_vol_ch0;
+  741   5                      }
+  742   4                      else
+  743   4                      {
+  744   5                          ;
+  745   5                      }
+  746   4      
+  747   4                      control_write(p_temp, temp_count, (uint8) setup_data.wLength);
+  748   4                      endian_reverse(p_temp, temp_count);
+  749   4                      no_data_control();
+  750   4      
+  751   4                      if (play_mute_ch0 == 0x01)
+  752   4                      {
+  753   5                          //set_pa_vol(0);
+  754   5                      }
+  755   4                      else
+  756   4                      {
+  757   5                       //   set_pa_vol((uint8)(play_vol_ch0 >> 12));
+  758   5                                              cur_vol_index = (uint8)(play_vol_ch0/PLAY_RESOTION_VOLUME);
+  759   5                                              vol_change_flag = 1;
+  760   5                      }
+  761   4                      break;
+  762   4                  }
+  763   3                              else if (setup_data.bRequest == SET_RES)
+  764   3                  {
+  765   4                                      temp_count = (uint8) setup_data.wLength;
+  766   4                                      control_write(test_temp, temp_count, (uint8) setup_data.wLength);
+  767   4                      stall_endpoint(EP0);
+  768   4                                      break;
+  769   4                      //no_data_control();
+  770   4                              }
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 13  
+
+  771   3              }
+  772   2              else if (setup_data.wIndex == FEATURE_UNIT_INDEX2)
+  773   2              {
+  774   3                  if (setup_data.bRequest == SET_CUR)
+  775   3                  {
+  776   4                      temp_count = VOLUME_LENGTH;
+  777   4                      if (setup_data.wValue == ((MUTE_CONTROL << 8) | MAIN_CHANNEL_NUMBER0))
+  778   4                      {
+  779   5                          p_temp = &record_mute_ch0;
+  780   5                          temp_count = MUTE_LENGTH;
+  781   5                      }
+  782   4                      else if (setup_data.wValue == ((VOLUME_CONTROL << 8) | MAIN_CHANNEL_NUMBER0))
+  783   4                      {
+  784   5                          p_temp = (uint8 *) &record_vol_ch0;
+  785   5                      }
+  786   4                      else
+  787   4                      {
+  788   5                          ;
+  789   5                      }
+  790   4      
+  791   4                      control_write(p_temp, temp_count, (uint8) setup_data.wLength);
+  792   4                      endian_reverse(p_temp, temp_count);
+  793   4                      no_data_control();
+  794   4      #if 0
+                               if (record_mute_ch0 == 0x01)
+                               {
+                                   set_adc_gain(0);
+                               }
+                               else
+                               {
+                                   set_adc_gain((uint8)(record_vol_ch0 >> 12));
+                               }
+               #endif
+  804   4                                      break;
+  805   4                  }
+  806   3                              else if (setup_data.bRequest == SET_RES)
+  807   3                  {
+  808   4                      temp_count = (uint8) setup_data.wLength;
+  809   4                                      control_write(test_temp, temp_count, (uint8) setup_data.wLength);
+  810   4                      stall_endpoint(EP0);
+  811   4                      break;
+  812   4                                      //no_data_control();
+  813   4                              }
+  814   3              }
+  815   2              else if (setup_data.wIndex == SELECTOR_UNIT_INDEX)
+  816   2              {
+  817   3                  if (setup_data.bRequest == SET_CUR)
+  818   3                  {
+  819   4                      temp_count = 0x01;
+  820   4                      p_temp = (uint8 *) &cur_selector;
+  821   4                      control_write(p_temp, temp_count, (uint8) setup_data.wLength);
+  822   4                  }
+  823   3              }
+  824   2              no_data_control();
+  825   2              break;
+  826   2      
+  827   2          case GET_UNIT_CONTROL: //get unit
+  828   2              temp_count = VOLUME_LENGTH;
+  829   2              p_temp = (uint8 *) &volume_value;
+  830   2              if (setup_data.wIndex == FEATURE_UNIT_INDEX1)
+  831   2              {
+  832   3                  if (setup_data.bRequest == GET_CUR)
+  833   3                  {
+  834   4                      if (setup_data.wValue == ((MUTE_CONTROL << 8) | MAIN_CHANNEL_NUMBER0))
+  835   4                      {
+  836   5                          p_temp = &play_mute_ch0;
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 14  
+
+  837   5                          temp_count = MUTE_LENGTH;
+  838   5                      }
+  839   4                      else if (setup_data.wValue == ((VOLUME_CONTROL << 8) | MAIN_CHANNEL_NUMBER0))
+  840   4                      {
+  841   5                          p_temp = (uint8 *) &play_vol_ch0;
+  842   5                      }
+  843   4                      else
+  844   4                      {
+  845   5                          ;
+  846   5                      }
+  847   4                  }
+  848   3                  else if (setup_data.bRequest == GET_MIN)
+  849   3                  {
+  850   4                      volume_value = PLAY_MINIMUM_VOLUME;
+  851   4                  }
+  852   3                  else if (setup_data.bRequest == GET_MAX)
+  853   3                  {
+  854   4                      volume_value = PLAY_MAXIMUM_VOLUME;
+  855   4                  }
+  856   3                  else if (setup_data.bRequest == GET_RES)
+  857   3                  {
+  858   4                      volume_value = PLAY_RESOTION_VOLUME;
+  859   4                  }
+  860   3                  else
+  861   3                  {
+  862   4                      ;
+  863   4                  }
+  864   3      
+  865   3                  endian_reverse(p_temp, temp_count);
+  866   3                  control_read(p_temp, temp_count, (uint8) setup_data.wLength);
+  867   3                  endian_reverse(p_temp, temp_count);
+  868   3              }
+  869   2              else if (setup_data.wIndex == FEATURE_UNIT_INDEX2)
+  870   2              {
+  871   3                  if (setup_data.bRequest == GET_CUR)
+  872   3                  {
+  873   4                      if (setup_data.wValue == ((MUTE_CONTROL << 8) | MAIN_CHANNEL_NUMBER0))
+  874   4                      {
+  875   5                          p_temp = &record_mute_ch0;
+  876   5                          temp_count = MUTE_LENGTH;
+  877   5                      }
+  878   4                      else if (setup_data.wValue == ((VOLUME_CONTROL << 8) | MAIN_CHANNEL_NUMBER0))
+  879   4                      {
+  880   5                          p_temp = (uint8 *) &record_vol_ch0;
+  881   5                      }
+  882   4                      else
+  883   4                      {
+  884   5                          ;
+  885   5                      }
+  886   4                  }
+  887   3                  else if (setup_data.bRequest == GET_MIN) //get minimum volume of main channel 0,1,2.
+  888   3                  {
+  889   4                      volume_value = RECORD_MINIMUM_VOLUME;
+  890   4                  }
+  891   3                  else if (setup_data.bRequest == GET_MAX) //get maximum volume of main channel 0,1,2.
+  892   3                  {
+  893   4                      volume_value = RECORD_MAXIMUM_VOLUME;
+  894   4                  }
+  895   3                  else if (setup_data.bRequest == GET_RES) //get resolution volume of main channel 0,1,2.
+  896   3                  {
+  897   4                      volume_value = RECORD_RESOTION_VOLUME;
+  898   4                  }
+  899   3                  else
+  900   3                  {
+  901   4                      ;
+  902   4                  }
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 15  
+
+  903   3      
+  904   3                  endian_reverse(p_temp, temp_count);
+  905   3                  control_read(p_temp, temp_count, (uint8) setup_data.wLength);
+  906   3                  endian_reverse(p_temp, temp_count);
+  907   3              }
+  908   2              else if (setup_data.wIndex == SELECTOR_UNIT_INDEX)
+  909   2              {
+  910   3                  if (setup_data.bRequest == GET_CUR)
+  911   3                  {
+  912   4                      temp_count = 0x01;
+  913   4                      p_temp = (uint8 *) &cur_selector;
+  914   4                      control_read(p_temp, temp_count, (uint8) setup_data.wLength);
+  915   4                  }
+  916   3              }
+  917   2                      else if (setup_data.wIndex == 0x0003)
+  918   2                      {
+  919   3                              if (setup_data.bRequest == SET_CUR)
+  920   3                              {
+  921   4                                      temp_count = (uint8) setup_data.wLength;
+  922   4                      control_read(test_temp, temp_count, (uint8) setup_data.wLength);         
+  923   4                              }
+  924   3                      }
+  925   2              else
+  926   2                      {
+  927   3                      }               
+  928   2              break;
+  929   2      
+  930   2          case SET_ENDPOINT_CONTROL: //set endpoint
+  931   2              if (setup_data.wValue == SAMPLING_FREQ_CONTROL)
+  932   2              {
+  933   3                  if (setup_data.bRequest == SET_CUR)
+  934   3                  {
+  935   4                      new_sample = 0x00000000;
+  936   4                      temp_count = SAMPLE_FREQUENCY_LENGTH;
+  937   4                      p_temp = (uint8 *) &new_sample;
+  938   4      
+  939   4                      control_write(p_temp, temp_count, (uint8) setup_data.wLength);
+  940   4                      no_data_control();
+  941   4                      endian_reverse(p_temp, temp_count);
+  942   4      
+  943   4                      if (new_sample != current_sample)
+  944   4                      {
+  945   5                          current_sample = new_sample;
+  946   5                      }
+  947   4      
+  948   4                      //if(pa_mute == 0x00)
+  949   4                      //{
+  950   4                      //    SFR_BANK = BANK_AUIP;
+  951   4                      //    PA_CTL = PA_CTL | 0x10;
+  952   4                      //    SFR_BANK = BANK_USB;
+  953   4                      //
+  954   4                      //    pa_mute = 0x01;
+  955   4                      //}
+  956   4                  }
+  957   3                  else
+  958   3                  {
+  959   4                      ;
+  960   4                  }
+  961   3              }
+  962   2              break;
+  963   2                      
+  964   2              case GET_ENDPOINT_CONTROL: 
+  965   2                      if (setup_data.wValue == SAMPLING_FREQ_CONTROL)
+  966   2              {
+  967   3                      if (setup_data.bRequest == GET_CUR)
+  968   3                              {
+C251 COMPILER V4.55,  usound_setup                                                         13/12/18  14:07:01  PAGE 16  
+
+  969   4                                      temp_count = (uint8) setup_data.wLength;
+  970   4                                      p_temp = (uint8 *) &current_sample;
+  971   4                                      endian_reverse(p_temp, temp_count);
+  972   4                          control_read(p_temp, temp_count, (uint8) setup_data.wLength);
+  973   4                          endian_reverse(p_temp, temp_count);
+  974   4                              }
+  975   3                      }
+  976   2                      no_data_control();//可能会发set clearfeature到ep3in
+  977   2                      break;
+  978   2              
+  979   2          default:
+  980   2              no_data_control();//可能会发set clearfeature到ep3in
+  981   2              break;
+  982   2          }
+  983   1          SFR_BANK = sfr_temp;
+  984   1      }
+  985          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      2240     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =         4     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

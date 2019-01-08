@@ -1,0 +1,132 @@
+C251 COMPILER V4.55,  show_pause                                                           13/12/18  16:28:56  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE show_pause
+OBJECT MODULE PLACED IN .\obj\show_pause.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE show_pause.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) BROW
+                    -SE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 ORDER DEFINE(USOUND_AP) DEBUG PRINT(.\list\show_pause.lst) OBJECT(.\obj\sho
+                    -w_pause.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           *******************************************************************************
+    3           *                ACTOS AP
+    4           *        voice recorder main program.
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: show_pause.c,v 1.2 2009/10/09 09:53:51 dengyulin Exp $
+   10           *******************************************************************************
+   11           */
+   12          #include "ap_record.h"
+   13          
+   14          //#pragma renamecode(AP_PAUSE)
+   15          #pragma name(AP_PAUSE)
+   16          
+   17          /*
+   18           ********************************************************************************
+   19           * Description : 暂停界面
+   20           *
+   21           * Arguments   :
+   22           *
+   23           * Returns     : 结果消息或0
+   24           RESULT_USER_STOP    //用户按键结束
+   25           RESULT_LOW_POWER_STOP    //低电压结束
+   26           *
+   27           * Notes       :
+   28           *
+   29           ********************************************************************************
+   30           */
+   31          int16 do_pause(void)
+   32          {
+   33   1      #if 0
+                   //uint16 result;
+               
+                   //uint8 isUsbVoltage;
+                   uint8 key;
+               
+                   BOOL need_draw_ui = TRUE;
+               
+                   BOOL flash_state = TRUE; //闪烁的状态
+                   BYTE low_power_count = 0; //获得低电压的次数
+                   //BYTE batt;
+               
+                   while (1)
+                   {
+                           #if 0
+                       if (FALSE != need_draw_ui)
+                       {
+                           //暂停USOUND录音状态
+                           LEDDisplay(LED_PLAY, 0xff, 0);
+                           LEDDisplay(LED_PAUSE, 0xff, 1);
+                           need_draw_ui = FALSE;
+                       }
+                          #endif
+                       //handle msg
+                       key = ap_get_message();
+C251 COMPILER V4.55,  show_pause                                                           13/12/18  16:28:56  PAGE 2   
+
+                       switch (key)
+                       {
+               
+                       case AP_KEY_PLAY | AP_KEY_UP:
+                           //继续usound录音
+                           //LEDDisplay(LED_PAUSE, 0xff, 0);
+                           //LEDDisplay(LED_PLAY, 0xff, 1);
+                           mp3rSendCommand(MC_RECORD, 0);
+                           return 0;
+               
+                       case AP_MSG_SD_OUT:
+                           if (g_record_vars.location.disk == 'H')
+                           {
+                               mp3rSendCommand(MC_STOP, 0);
+                               return RESULT_CARD_OUT;
+                           }
+                           break;
+               
+                       case AP_KEY_MODE | AP_KEY_UP:
+                           /* 保存录音文件 */
+                           mp3rSendCommand(MC_STOP, 0);
+                           return RESULT_SAVE_FILE;
+                           break;
+               
+                       case AP_MSG_RTC:
+                           //show batt
+                           //batt = GetBattery();
+                           //ui_show_batt(batt);
+                           break;
+               
+                       default:
+                           break;
+                       }//switch()
+                   }//while(1)
+               #endif
+   93   1          return 0; //避免编译器warning
+   94   1      }
+   95          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =         3     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

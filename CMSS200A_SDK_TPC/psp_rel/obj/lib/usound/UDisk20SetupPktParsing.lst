@@ -1,0 +1,601 @@
+C251 COMPILER V4.55,  UDisk20SetupPktParsing                                               15/07/16  15:45:43  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE UDisk20SetupPktParsing
+OBJECT MODULE PLACED IN ..\..\..\obj\lib\usb\UDisk20SetupPktParsing.obj
+COMPILER INVOKED BY: E:\Keil\C251\BIN\C251.EXE ..\..\..\libsrc\usb\UDisk20SetupPktParsing.c XSMALL FUNCTIONS(REENTRANT) 
+                    -ROM(HUGE) INCDIR(..\..\..\inc) I4 ORDER DEBUG PRINT(..\..\..\obj\lib\usound\UDisk20SetupPktParsing.lst) OBJECT(..\..\..\
+                    -obj\lib\usb\UDisk20SetupPktParsing.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************************************************************
+             -*
+    3           *                                       ACTOS GL3976
+    4           *
+    5           *
+    6           *                           (c) Copyright 2002-2007, Actions Co,Ld.
+    7           *                                   All Right Reserved
+    8           *
+    9           * File   : UDisk20SetupPktParsing.msa
+   10           * By     : zhouxl
+   11           * Version: v1.02     first version     2004-12-10 13:11
+   12           ********************************************************************************************************
+             -*
+   13           */
+   14          
+   15          #include "udisklib.h"
+   16          
+   17          #pragma name(SETUPPKT_C)
+   18          
+   19          #pragma ROM(HUGE)
+   20          void Set_Endpoint_PacketSize(void);
+   21          void SetSerialNumber(void);
+   22          void Cnvrt_ASCII_To_UNI16(uint8 *addr, uint8 length);
+   23          uint8 Count_String_CharLngth(uint8 *addr, uint8 length);
+   24          void Cnvrt_Hex_To_ASCII(uint8 *addr, uint8 length);
+   25          uint8 Hex_to_ASCII(uint8 hex_value);
+   26          #pragma ROM(HUGE)
+   27          
+   28          #pragma renamecode(?PR?SETUPPKT_C)
+   29          #pragma ROM(HUGE)
+   30          /*
+   31           ********************************************************************************************************
+             -*
+   32           *                                           Setup_Packet_Handle
+   33           *
+   34           * Description: SetupPacket Main Function Entry.
+   35           *
+   36           * Arguments  : None.
+   37           *
+   38           * Returns    : None.
+   39           *
+   40           * Note(s)    : None.
+   41           ********************************************************************************************************
+             -*
+   42           */
+   43          void Setup_Packet_Handle(void)
+   44          {
+   45   1          uint8 Request_Type, Request_Command;
+   46   1          int Request_Value, Request_Index, Request_Length;
+   47   1      
+   48   1          ((uint8 *) &setup_paket_data)[0] = Setupdat0;
+   49   1          ((uint8 *) &setup_paket_data)[1] = Setupdat1;
+   50   1          ((uint8 *) &setup_paket_data)[2] = Setupdat3;
+   51   1          ((uint8 *) &setup_paket_data)[3] = Setupdat2;
+   52   1          ((uint8 *) &setup_paket_data)[4] = Setupdat5;
+   53   1          ((uint8 *) &setup_paket_data)[5] = Setupdat4;
+C251 COMPILER V4.55,  UDisk20SetupPktParsing                                               15/07/16  15:45:43  PAGE 2   
+
+   54   1          ((uint8 *) &setup_paket_data)[6] = Setupdat7;
+   55   1          ((uint8 *) &setup_paket_data)[7] = Setupdat6;
+   56   1      
+   57   1          //clear EP0 SETUP interrupt
+   58   1          USBEIRQ = USBEIRQ | (uint8) 0x80;
+   59   1          Usbirq_hcusbirq = Usbirq_hcusbirq | 0x01;
+   60   1      
+   61   1          Request_Type = (uint8) setup_paket_data.bmRequestType;
+   62   1          Request_Command = (uint8) setup_paket_data.bRequest;
+   63   1          Request_Value = setup_paket_data.wValue;
+   64   1          Request_Index = setup_paket_data.wIndex;
+   65   1          Request_Length = setup_paket_data.wLength;
+   66   1      
+   67   1          switch (Request_Command)
+   68   1          {
+   69   2          case USB_REQ_GET_STATUS:
+   70   2              switch (Request_Type)
+   71   2              {
+   72   3              case USB_RECIP_DEVICE | USB_DIR_IN:
+   73   3                  Control_Read((char *) &DeviceStatus, sizeof(DeviceStatus), Request_Length);
+   74   3                  break;
+   75   3      
+   76   3              case USB_RECIP_INTERFACE | USB_DIR_IN:
+   77   3                  Control_Read((char *) &InterfaceStatus, sizeof(InterfaceStatus), Request_Length);
+   78   3                  break;
+   79   3      
+   80   3              case USB_RECIP_ENDPOINT | USB_DIR_IN:
+   81   3                  if (Request_Index == 0x81)
+   82   3                  {
+   83   4                      Control_Read((char *) &EndPoint1Status, sizeof(EndPoint1Status), Request_Length);
+   84   4                  }
+   85   3                  else if (Request_Index == 0x02)
+   86   3                  {
+   87   4                      Control_Read((char *) &EndPoint2Status, sizeof(EndPoint2Status), Request_Length);
+   88   4                  }
+   89   3                  //else if( Request_Index == 0x83 )
+   90   3                  //    Control_Read( (char *)&EndpointC_Status, sizeof(EndpointC_Status), Request_Length );
+   91   3                  else
+   92   3                  {
+   93   4                      Stall_Endpoint(ENDPOINT_0);
+   94   4                  }
+   95   3                  break;
+   96   3      
+   97   3              default:
+   98   3                  Stall_Endpoint(ENDPOINT_0);
+   99   3                  break;
+  100   3              }
+  101   2              break;
+  102   2      
+  103   2          case USB_REQ_CLEAR_FEATURE:
+  104   2              if ((Request_Type == (USB_RECIP_ENDPOINT | USB_DIR_OUT)) && (Request_Value == USB_ENDPOINT_HALT))
+  105   2              {
+  106   3                  if (Request_Index == 0x81)
+  107   3                  {
+  108   4                      EndPoint1Status = 0;
+  109   4                      //Flush FIFO,Clear STALL
+  110   4                      Recover_Stall_Endpoint(ENDPOINT_A);
+  111   4                      NoData_PhaseReturn();
+  112   4                  }
+  113   3                  else if (Request_Index == 0x02)
+  114   3                  {
+  115   4                      EndPoint2Status = 0;
+  116   4                      //Flush FIFO,Clear STALL
+  117   4                      Recover_Stall_Endpoint(ENDPOINT_B);
+  118   4                      NoData_PhaseReturn();
+  119   4                  }
+C251 COMPILER V4.55,  UDisk20SetupPktParsing                                               15/07/16  15:45:43  PAGE 3   
+
+  120   3                  else
+  121   3                  {
+  122   4                      Stall_Endpoint(ENDPOINT_0);
+  123   4                  }
+  124   3              }
+  125   2              else
+  126   2              {
+  127   3                  Stall_Endpoint(ENDPOINT_0);
+  128   3              }
+  129   2              break;
+  130   2      
+  131   2          case USB_REQ_SET_FEATURE:
+  132   2              if ((Request_Type == (USB_RECIP_DEVICE | USB_DIR_OUT)) && (Request_Value == USB_DEVICE_TEST_MODE)
+  133   2                      && ((Request_Index & 0xFF) == 0))
+  134   2              {
+  135   3                  NoData_PhaseReturn();
+  136   3                  //High byte of wIndex is the test mode descriptor
+  137   3                  TestModeTest((char) * (((char *) & (Request_Index)) + 1));
+  138   3              }
+  139   2              else if ((Request_Type == (USB_RECIP_ENDPOINT | USB_DIR_OUT)) && (Request_Value == USB_ENDPOINT_H
+             -ALT))
+  140   2              {
+  141   3                  if (Request_Index == 0x81)
+  142   3                  {
+  143   4                      EndPoint1Status = 1;
+  144   4                      //Flush FIFO,STALL EndpointA
+  145   4                      Stall_Endpoint(ENDPOINT_A);
+  146   4                      NoData_PhaseReturn();
+  147   4                  }
+  148   3                  else if (Request_Index == 0x02)
+  149   3                  {
+  150   4                      EndPoint2Status = 1;
+  151   4                      //Flush FIFO,STALL EndpointB,NAK OUT Mode
+  152   4                      Stall_Endpoint(ENDPOINT_B);
+  153   4                      NoData_PhaseReturn();
+  154   4                  }
+  155   3                  else
+  156   3                  {
+  157   4                      Stall_Endpoint(ENDPOINT_0);
+  158   4                  }
+  159   3              }
+  160   2              else
+  161   2              {
+  162   3                  Stall_Endpoint(ENDPOINT_0);
+  163   3              }
+  164   2              break;
+  165   2      
+  166   2          case USB_REQ_SET_ADDRESS:
+  167   2              NoData_PhaseReturn();
+  168   2              break;
+  169   2      
+  170   2              //USB_REQ_GET_DESCRIPTOR:0x06
+  171   2          case USB_REQ_GET_DESCRIPTOR:
+  172   2              if (Request_Type != (USB_RECIP_DEVICE | USB_DIR_IN))
+  173   2              {
+  174   3                  Stall_Endpoint(ENDPOINT_0);
+  175   3                  break;
+  176   3              }
+  177   2      
+  178   2              //High byte of wValue is the descriptor num
+  179   2              switch ((char) (Request_Value >> 8))
+  180   2              {
+  181   3              case USB_DT_DEVICE:
+  182   3                  Control_Read((char *) &HS_Device_Dscrptr, 0x12, Request_Length);
+  183   3                  break;
+  184   3      
+C251 COMPILER V4.55,  UDisk20SetupPktParsing                                               15/07/16  15:45:43  PAGE 4   
+
+  185   3              case USB_DT_CONFIG:
+  186   3                  Set_Endpoint_PacketSize();
+  187   3                  Control_Read((char *) &HS_Config_Dscrptr, 0x20, Request_Length);
+  188   3                  Request_Length++;
+  189   3                  break;
+  190   3      
+  191   3              case USB_DT_STRING:
+  192   3                  if ((char) (Request_Value) == 0)
+  193   3                  {
+  194   4                      Control_Read((char *) &language_string, *((uint8 *) &language_string), Request_Length);
+  195   4                  }
+  196   3                  else if ((char) (Request_Value) == 1)
+  197   3                  {
+  198   4                      Control_Read((char *) &manufacure_string, *((uint8 *) &manufacure_string), Request_Length
+             -);
+  199   4                  }
+  200   3                  else if ((char) (Request_Value) == 2)
+  201   3                  {
+  202   4                      Control_Read((char *) &device_name_string, *((uint8 *) &device_name_string), Request_Leng
+             -th);
+  203   4                  }
+  204   3                  else if ((char) (Request_Value) == 3)
+  205   3                  {
+  206   4                      Control_Read((char *) &SerialNumber, *((uint8 *) &SerialNumber), Request_Length);
+  207   4                  }
+  208   3                  else
+  209   3                  {
+  210   4                      Stall_Endpoint(ENDPOINT_0);
+  211   4                  }
+  212   3                  break;
+  213   3      
+  214   3              case USB_DT_DEVICE_QUALIFIER:
+  215   3                  Control_Read((char *) &HS_Device_Qualifier_Dscrptr, 0x0a, Request_Length);
+  216   3                  break;
+  217   3      
+  218   3              case USB_DT_OTHER_SPEED_CONFIG:
+  219   3                  Control_Read((char *) &HS_OtherSpeed_Config_Dscrptr, 0x20, Request_Length);
+  220   3                  break;
+  221   3      
+  222   3              default:
+  223   3                  Stall_Endpoint(ENDPOINT_0);
+  224   3                  break;
+  225   3              }
+  226   2              break;
+  227   2      
+  228   2          case USB_REQ_GET_CONFIGURATION:
+  229   2              if (Request_Type != (USB_RECIP_DEVICE | USB_DIR_IN))
+  230   2              {
+  231   3                  Stall_Endpoint(ENDPOINT_0);
+  232   3                  break;
+  233   3              }
+  234   2              Control_Read((char *) &ConfigValue, sizeof(ConfigValue), Request_Length);
+  235   2              break;
+  236   2      
+  237   2          case USB_REQ_SET_CONFIGURATION:
+  238   2              usb_pwr_suspnd_fnsh++;
+  239   2              //bit[7]:1 need process suspend,0 don't process suspend; bit[1:0]:0 no suspend; 1 recieve suspend
+             -; 2 has handle suspend
+  240   2              Suspend_Flag = Suspend_Flag | 0x80;
+  241   2              if ((Request_Type != (USB_RECIP_DEVICE | USB_DIR_OUT)) || (Request_Value > 1))
+  242   2              {
+  243   3                  Stall_Endpoint(ENDPOINT_0);
+  244   3                  break;
+  245   3              }
+  246   2              NoData_PhaseReturn();
+  247   2              ConfigValue = (char) Request_Value;
+C251 COMPILER V4.55,  UDisk20SetupPktParsing                                               15/07/16  15:45:43  PAGE 5   
+
+  248   2              Set_EPA_BulkInMode();
+  249   2              Set_EPB_BulkOutMode();
+  250   2              //set config后恢复高速模式,在HS传输中出错转FS会是导致传输中断
+  251   2              Set_HighSpeed_Mode();
+  252   2              break;
+  253   2      
+  254   2          case USB_REQ_GET_INTERFACE:
+  255   2              if ((Request_Type != (USB_RECIP_INTERFACE | USB_DIR_IN)) || (Request_Index != 0))
+  256   2              {
+  257   3                  Stall_Endpoint(ENDPOINT_0);
+  258   3                  break;
+  259   3              }
+  260   2              Control_Read((char *) &AlternateSetting, sizeof(AlternateSetting), Request_Length);
+  261   2              break;
+  262   2      
+  263   2          case USB_REQ_SET_INTERFACE:
+  264   2              if ((Request_Type != (USB_RECIP_INTERFACE | USB_DIR_OUT)) || (Request_Index != 0) || (Request_Val
+             -ue != 0))
+  265   2              {
+  266   3                  Stall_Endpoint(ENDPOINT_0);
+  267   3                  break;
+  268   3              }
+  269   2              NoData_PhaseReturn();
+  270   2              break;
+  271   2          case BULK_ONLY_MASS_STORAGE_RESET:
+  272   2              if ((Request_Type == 0x21) || (Request_Index == 0) || (Request_Value == 0) || (Request_Length == 
+             -0))
+  273   2              {
+  274   3                  Rest_Endp_Toggle();
+  275   3                  NoData_PhaseReturn();
+  276   3              }
+  277   2              else
+  278   2              {
+  279   3                  Stall_Endpoint(ENDPOINT_0);
+  280   3              }
+  281   2              break;
+  282   2          case GET_MAX_LUN:
+  283   2              if ((Request_Type == 0xa1) || (Request_Index == 0) || (Request_Value == 0) || (Request_Length == 
+             -1))
+  284   2              {
+  285   3                  Control_Read((char *) &MaxLUN, sizeof(MaxLUN), Request_Length);
+  286   3              }
+  287   2              else
+  288   2              {
+  289   3                  Stall_Endpoint(ENDPOINT_0);
+  290   3              }
+  291   2              break;
+  292   2          default:
+  293   2              //Not Support USB_REQ_SET_DESCRIPTOR, USB_REQ_SYNCH_FRAME.
+  294   2              Stall_Endpoint(ENDPOINT_0);
+  295   2              break;
+  296   2          }
+  297   1      }
+  298          
+  299          /*
+  300           ********************************************************************************************************
+             -*
+  301           *                                           Set_Endpoint_PacketSize
+  302           *
+  303           * Description: This function set the maxpacket size for endpoint a & b.
+  304           *
+  305           * Arguments  : None.
+  306           *
+  307           * Returns    : None.
+  308           *
+  309           * Note(s)    :
+C251 COMPILER V4.55,  UDisk20SetupPktParsing                                               15/07/16  15:45:43  PAGE 6   
+
+  310           ********************************************************************************************************
+             -*
+  311           */
+  312          void Set_Endpoint_PacketSize(void)
+  313          {
+  314   1          int max_pkt_len, max_pkt_len_alter;
+  315   1      
+  316   1          ClearWatchdog();
+  317   1      
+  318   1          if ((BKDOOR & 0x40) != 0x00)
+  319   1          {
+  320   2              max_pkt_len = 0x0002; //0x200转为小端模式,High Speed
+  321   2              max_pkt_len_alter = 0x4000; //0x40转为小端模式
+  322   2          }
+  323   1          else
+  324   1          {
+  325   2              max_pkt_len = 0x4000; //0x40转为小端模式,Full Speed
+  326   2              max_pkt_len_alter = 0x0002; //0x200转为小端模式
+  327   2          }
+  328   1      
+  329   1          HS_EndpointA_Dscrptr.wMaxPacketSize = max_pkt_len;
+  330   1          HS_EndpointB_Dscrptr.wMaxPacketSize = max_pkt_len;
+  331   1          HS_OtherSpeed_EndpointA_Dscrptr.wMaxPacketSize = max_pkt_len_alter;
+  332   1          HS_OtherSpeed_EndpointB_Dscrptr.wMaxPacketSize = max_pkt_len_alter;
+  333   1      
+  334   1          if (has_set_usb_dscrptr == 0)
+  335   1          {
+  336   2              has_set_usb_dscrptr++;
+  337   2              SetSerialNumber();
+  338   2          }
+  339   1      }
+  340          
+  341          /*
+  342           ********************************************************************************************************
+             -*
+  343           *                                           SetSerialNumber
+  344           *
+  345           * Description: This function set the maxpacket size for endpoint a & b.
+  346           *
+  347           * Arguments  : None.
+  348           *
+  349           * Returns    : None.
+  350           *
+  351           * Note(s)    :
+  352           ********************************************************************************************************
+             -*
+  353           */
+  354          
+  355          void SetSerialNumber(void)
+  356          {
+  357   1          uint8 length;
+  358   1          if ((HS_Device_Dscrptr.iSerialNumber != 0x00) && ((udisk_setting & 0x03) != 0x01))
+  359   1          {
+  360   2              GetUsbSetupInfo((int8 *) SerialNumber.wString);
+  361   2              length = Count_String_CharLngth((int8 *) SerialNumber.wString, 0x30);
+  362   2              if (length == 0x00)
+  363   2              {
+  364   3                  HS_Device_Dscrptr.iSerialNumber = 0x00;
+  365   3              }
+  366   2              else
+  367   2              {
+  368   3                  //serial number total length, including the head;
+  369   3                  SerialNumber.bLength = length * 4 + 2;
+  370   3                  // 1个hex数转换为2个ASCII,高4bit在前,低4bit在后;
+  371   3                  Cnvrt_Hex_To_ASCII((int8 *) SerialNumber.wString, length);
+  372   3                  //1个ASCII转换为2byte Unicode16
+C251 COMPILER V4.55,  UDisk20SetupPktParsing                                               15/07/16  15:45:43  PAGE 7   
+
+  373   3                  Cnvrt_ASCII_To_UNI16((uint8 *) SerialNumber.wString, length * 2);
+  374   3      
+  375   3                  SerialNumber.bDescriptorType = 0x03;
+  376   3              }
+  377   2          }
+  378   1      
+  379   1          ClearWatchdog();
+  380   1      
+  381   1          //Just for temp buffer,careful not cover sn
+  382   1          GetUsbAttribute((usbattri_t *) device_name_string.wString);
+  383   1          memcpy(manufacure_string.bSring, device_name_string.wString, 8);
+  384   1          memcpy(device_name_string.wString, device_name_string.wString + 8, 16);
+  385   1      
+  386   1          length = Count_String_CharLngth((int8 *) manufacure_string.bSring, 8);
+  387   1          Cnvrt_ASCII_To_UNI16((uint8 *) manufacure_string.bSring, length);
+  388   1          manufacure_string.bLength = length * 2 + 2;
+  389   1          manufacure_string.bDescriptorType = 0x03;
+  390   1      
+  391   1          length = Count_String_CharLngth((int8 *) device_name_string.wString, 16);
+  392   1          Cnvrt_ASCII_To_UNI16((uint8 *) device_name_string.wString, length);
+  393   1          device_name_string.bLength = length * 2 + 2;
+  394   1          device_name_string.bDescriptorType = 0x03;
+  395   1      }
+  396          
+  397          /*
+  398           ********************************************************************************************************
+             -*
+  399           *                                           Cnvrt_ASCII_To_UNI16
+  400           *
+  401           * Description: Convert the string to unicode 16, one byte ASCII to two byte unicode, fill high byte with
+             - 0.
+  402           *
+  403           * Arguments  : addr: string address; length: maximun char length(should be not more than 255byte).
+  404           *
+  405           * Returns    : None.
+  406           *
+  407           * Note(s)    : None.
+  408           ********************************************************************************************************
+             -*
+  409           */
+  410          void Cnvrt_ASCII_To_UNI16(uint8 *addr, uint8 length)
+  411          {
+  412   1          uint8 *data_p1;
+  413   1          uint8 *data_p2;
+  414   1      
+  415   1          //数组的下标从0开始
+  416   1          data_p1 = addr + (length - 1); //The last byte address
+  417   1          data_p2 = addr + (length - 1) * 2 + 1; //the data address to be load
+  418   1      
+  419   1          //当ASCII码长度为0或1时作下面的转换会覆盖地址指向memory之前的数据
+  420   1          while (length != 0x00)
+  421   1          {
+  422   2              *data_p2 = 0x00;
+  423   2              data_p2--;
+  424   2              *data_p2 = *data_p1; //Original ASCII char
+  425   2      
+  426   2              data_p1--;
+  427   2              data_p2--;
+  428   2              length--;
+  429   2          }
+  430   1      }
+  431          
+  432          /*
+  433           ********************************************************************************************************
+             -*
+  434           *                                           Count_String_CharLngth
+C251 COMPILER V4.55,  UDisk20SetupPktParsing                                               15/07/16  15:45:43  PAGE 8   
+
+  435           *
+  436           * Description: Calculate the string char length.
+  437           *
+  438           * Arguments  : Addr: string address; length: maximun char length.
+  439           *
+  440           * Returns    : string length(byte unit, maximun 255byte long).
+  441           *
+  442           * Note(s)    : None.
+  443           ********************************************************************************************************
+             -*
+  444           */
+  445          uint8 Count_String_CharLngth(uint8 *addr, uint8 length)
+  446          {
+  447   1          uint8 count = 0x00;
+  448   1          //为0表示字符串已经到最后
+  449   1          while (length != 0x00)
+  450   1          {
+  451   2              if (*addr == 0x00)
+  452   2              {
+  453   3                  break;
+  454   3              }
+  455   2              count++;
+  456   2              addr++;
+  457   2              length--;
+  458   2          }
+  459   1      
+  460   1          return count;
+  461   1      }
+  462          
+  463          /*
+  464           ********************************************************************************************************
+             -*
+  465           *                                           Cnvrt_Hex_To_ASCII
+  466           *
+  467           * Description: Convert Hex value to Ascii code.
+  468           *
+  469           * Arguments  : addr: hex value address; length: byte length.
+  470           *
+  471           * Returns    : ascii length(byte unit, maximun 255byte long).
+  472           *
+  473           * Note(s)    : None.
+  474           ********************************************************************************************************
+             -*
+  475           */
+  476          void Cnvrt_Hex_To_ASCII(uint8 *addr, uint8 length)
+  477          {
+  478   1          uint8 *data_p1;
+  479   1          uint8 *data_p2;
+  480   1      
+  481   1          //数组的下标从0开始
+  482   1          data_p1 = addr + (length - 1); //The last byte address
+  483   1          data_p2 = addr + (length - 1) * 2 + 1; //the data address to be load
+  484   1      
+  485   1          while (length != 0x00)
+  486   1          {
+  487   2              //Original ASCII char
+  488   2              *data_p2 = Hex_to_ASCII(*data_p1);
+  489   2              data_p2--;
+  490   2              *data_p2 = Hex_to_ASCII((*data_p1) >> 4);
+  491   2      
+  492   2              data_p1--;
+  493   2              data_p2--;
+  494   2              length--;
+  495   2          }
+  496   1      }
+  497          
+C251 COMPILER V4.55,  UDisk20SetupPktParsing                                               15/07/16  15:45:43  PAGE 9   
+
+  498          /*
+  499           ********************************************************************************************************
+             -*
+  500           *                                           Hex_to_ASCII
+  501           *
+  502           * Description: Convert 1byte Hex value to Ascii code.
+  503           *
+  504           * Arguments  : hex_value: hex value;
+  505           *
+  506           * Returns    : ascii code.
+  507           *
+  508           * Note(s)    : hex value is 4 bit, high 4 bits will be discard.
+  509           ********************************************************************************************************
+             -*
+  510           */
+  511          uint8 Hex_to_ASCII(uint8 hex_value)
+  512          {
+  513   1          uint8 assii_value;
+  514   1          hex_value = hex_value & 0x0f;
+  515   1          if (hex_value < 0x0a)
+  516   1          {
+  517   2              assii_value = hex_value + '0';
+  518   2          }
+  519   1          else
+  520   1          {
+  521   2              assii_value = hex_value + 'A' - 0x0a;
+  522   2          }
+  523   1          return assii_value;
+  524   1      }
+  525          #pragma ROM(HUGE)
+  526          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1463     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

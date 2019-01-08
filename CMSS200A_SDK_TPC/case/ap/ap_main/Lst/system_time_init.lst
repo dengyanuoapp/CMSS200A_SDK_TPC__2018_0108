@@ -1,0 +1,136 @@
+C251 COMPILER V4.55,  system_time_init                                                     13/12/18  16:28:43  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE system_time_init
+OBJECT MODULE PLACED IN .\Obj\system_time_init.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE system_time_init.c XSMALL FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED
+                    -) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\system_time_init.lst) OBJECT(.\Obj\system_time_init
+                    -.obj) 
+
+stmt  level    source
+
+    1          #include "ap_common.h"
+    2          
+    3          #define VERIFY_IsNotPowerDown
+    4          
+    5          #define RTCFlushAP() {if(RTCRUPD != 0xA5) RTCRUPD = 0xA5;while(RTCRUPD != 0x5A);}
+    6          
+    7          #pragma name(KCFG_M)
+    8          extern uint32 systemtime;
+    9          extern time_t time;
+   10          
+   11          extern date_t date;//系统日期
+   12          //time_t time;//系统时间
+   13          kval_t kval;
+   14          
+   15          int8 near IsNotPowerDown(void);//判断此次开机之前是否掉电关机
+   16          
+   17          int16 InitSystemtime(void)
+   18          {
+   19   1          uint8 sfr_bak;
+   20   1          uint8 InitDateTime;//是否需要初始化系统时间1:需要初始化0:不需要初始化
+   21   1      
+   22   1          //调试日期, 时间设置
+   23   1      #ifdef VERIFY_IsNotPowerDown
+   24   1      
+   25   1          VMRead(&kval, VM_KERNEL, sizeof(kval_t));
+   26   1      
+   27   1          if (kval.magic == MAGIC_KVAL)
+   28   1          {
+   29   2              //判断此次开机之前是否掉电关机
+   30   2              if (IsNotPowerDown() == 0) //返回  0：掉电   非0：没掉电
+   31   2              {
+   32   3                  InitDateTime = 1; //需要初始化
+   33   3              }
+   34   2              else
+   35   2              {
+   36   3                  InitDateTime = 0; //不需要初始化
+   37   3              }
+   38   2          }
+   39   1          else //升级完第一次开机
+   40   1          {
+   41   2              InitDateTime = 1; //需要初始化
+   42   2          }
+   43   1      
+   44   1          if (InitDateTime == 1)
+   45   1          {
+   46   2              kval.rtcresetflag = 0x55; //设置掉电标志
+   47   2              date.year = 2010;
+   48   2              date.month = 01;
+   49   2              date.day = 01;
+   50   2              time.hour = 0;
+   51   2              time.minute = 0;
+   52   2              time.second = 1;
+   53   2      
+   54   2              TM_SetDate(&date); //会修改systemtime   systemtime采用系统初始值
+   55   2              TM_SetTime(&time); //会修改systemtime   systemtime采用系统初始值
+   56   2              //将systemtime写回到VRAM中
+   57   2              kval.magic = MAGIC_KVAL;
+C251 COMPILER V4.55,  system_time_init                                                     13/12/18  16:28:43  PAGE 2   
+
+   58   2              kval.systemtime = systemtime; //在TM_SetDate被修改
+   59   2      
+   60   2              VMWrite(&kval, VM_KERNEL, sizeof(kval_t));
+   61   2              sfr_bak = SFR_BANK;
+   62   2              SFR_BANK = BANK_RTC;
+   63   2              //RTC_CTL0|=0x85;
+   64   2              //fpga,  select cal_clk_division
+   65   2              RTC_CTL0 |= 0x81;
+   66   2              RTCFlushAP();
+   67   2              SFR_BANK = sfr_bak;
+   68   2          }
+   69   1          else
+   70   1          {
+   71   2      
+   72   2          }
+   73   1          ClearWatchDog();
+   74   1      
+   75   1          //从VRAM中取出systemtime
+   76   1          systemtime = kval.systemtime;
+   77   1      #endif
+   78   1          return 0xffff;
+   79   1      
+   80   1      }
+   81          
+   82          int8 near IsNotPowerDown(void)
+   83          {
+   84   1          uint8 sfr_bak;
+   85   1      
+   86   1          sfr_bak = SFR_BANK;
+   87   1          SFR_BANK = BANK_RTC;
+   88   1          if(RTC_CTL0 & 0x80)
+   89   1          {
+   90   2              SFR_BANK = sfr_bak;
+   91   2              return 1;
+   92   2          }
+   93   1          else
+   94   1          {
+   95   2              SFR_BANK = sfr_bak;
+   96   2              return 0;
+   97   2          }
+   98   1      }
+   99          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       217     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =        11     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =    ------     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,855 @@
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE show_stop
+OBJECT MODULE PLACED IN .\Obj\show_stop.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE show_stop.c XSMALL NOALIAS FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEE
+                    -D) BROWSE INCDIR(..\..\..\psp_rel\inc;..\..\inc) I4 DEBUG PRINT(.\Lst\show_stop.lst) OBJECT(.\Obj\show_stop.obj) 
+
+stmt  level    source
+
+    1          /*
+    2           ********************************************************
+    3           *                ACTOS AP
+    4           *        voice recorder main program.
+    5           *
+    6           *        (c) Copyright, Actions Co,Ld.
+    7           *             All Right Reserved
+    8           *
+    9           *  $Id: show_stop.c,v 1.13 2009/10/09 09:53:51 dengyulin Exp $
+   10           *  History Record：
+   11           *  2008-03-22  15:47
+   12           *
+   13           *********************************************************
+   14           */
+   15          #include "actos.h"
+   16          #include "basal.h"
+   17          #include "enhanced.h"
+   18          #include "ap_common.h"
+   19          #include "ap_record.h"
+   20          
+   21          #define MURAM1H_OFFSET 0x12c0
+   22          #define MURAM1H_ADDR (0x8000 + MURAM1H_OFFSET)
+   23          
+   24          #pragma name(AP_STOP)
+   25          
+   26          /*******************外部函数声明*********************/
+   27          /* 各比特率对应的每秒所录的扇区数32kbps, 64kbps, 128kbps, 192kbps, 256kbps, 384kbps */
+   28          //const uint8 rec_bitrate_sector_ratio[] =
+   29          //{ 8, 16, 32, 48, 64, 96 };
+   30          const uint8 voice_ext[][4] =
+   31          { "WAV", "MP3" };
+   32          const uint8 FilenameHead[] =
+   33          { "REC" };
+   34          const uint8 g_dir_ext[] = "*  ";
+   35          const uint8 g_dir_record[] = "RECORD     ";
+   36          /* 各比特率对应的采样率配置, 需和codec 配合
+   37           ** 目前各索引对应的采样率为
+   38           ** 8000,11025,12000,16000,22050,24000,32000,44100,48000
+   39           ** 暂定32kbps,  64kbps, 128kbps, 192kbps, 256kbps 对应采样率
+   40           ** 分别8kHz,  8kHz,  32kHz, 32kHz, 32kHz
+   41           */
+   42          /*
+   43          
+   44          typedef enum
+   45          
+   46          {
+   47          
+   48             _FS_8K = 0, //8k sample rate
+   49          
+   50             _FS_11K025, //11.025k sample rate
+   51          
+   52             _FS_12K, //12k sample rate
+   53          
+   54             _FS_16K, //16k sample rate
+   55          
+   56             _FS_22K05, //22.05k  sample rate
+   57          
+   58             _FS_24K, //24k sample rate
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 2   
+
+   59          
+   60             _FS_32K, //32k sample rate
+   61          
+   62             _FS_44K1, //44.1k sample rate
+   63          
+   64             _FS_48K, //48k sample rate
+   65          
+   66             _FS_96K //96k sample rate
+   67          
+   68          } samplerate_t;
+   69          
+   70          */
+   71          
+   72          //目前录音的采样率都是统一为48k,
+   73          
+   74          //如果需要其他的采样率，只需要修改Fsrate_ap_codec中的值就OK,
+   75          
+   76          //目前最高只支持到48K.
+   77          
+   78          const uint8 Fsrate_ap_codec[] =
+   79          
+   80          { 8, 8, 8, 8, 8, 8 }; //其中的8对应到samplerate_t中的_FS_48K
+   81          
+   82          const int8 log_table[64] =
+   83          {
+   84              96, 94, 92, 90, 88, 86, 84, 82, 80, 78, 76, 74, 72, 70, 68, 66, 64, 62, 60, 58, 56, 54, 52, 50, 48, 4
+             -6, 44, 42, 40,
+   85              38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             - 0, 0, 0,
+   86              0, 0, 0
+   87          };
+   88          const uint8 err_str[4] =
+   89          { "ERR" };
+   90          /* ADPCM 三种模式下比特率配置*/
+   91          const ap_bitrate_e bitrate_ap_adpcm[3] =
+   92              //{ AP_BT_64K, AP_BT_128K, AP_BT_256K};
+   93          { AP_BT_384K, AP_BT_192K, AP_BT_384K }; /* FPGA */
+   94          
+   95          /* PCM 三种模式下比特率配置*/
+   96          const ap_bitrate_e bitrate_ap_pcm[3] =
+   97              //{ AP_BT_64K, AP_BT_128K, AP_BT_256K};
+   98          { AP_BT_256K, AP_BT_128K, AP_BT_256K }; /* FPGA */
+   99          
+  100          /* MP2 三种模式下比特率配置*/
+  101          const ap_bitrate_e bitrate_ap_mp2[3] =
+  102          { AP_BT_64K, AP_BT_128K, AP_BT_256K };
+  103          
+  104          //const uint8 root_dirname[] = "ROOT";
+  105          
+  106          
+  107          const uint8 rec_bitrate_sector_ratio[] =
+  108          { 8, 16, 32, 48, 64, 96 };
+  109          
+  110          /*
+  111           ********************************************************************************
+  112           * Description : 确定录音的比特率及通道数
+  113           *
+  114           * Arguments   :  NULL
+  115           *
+  116           * Returns     :  NULL
+  117           *
+  118           * Notes       :  根据菜单选择的录音模式( 长时, 普通, 优质)  以及
+  119           *                   具体的录音格式( ADPCM,  PCM,  MP2) ,  决定录音参数
+  120           *
+  121           * 后续根据IC  支持及方案具体需求进行调整
+  122           ********************************************************************************
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 3   
+
+  123           */
+  124          void confirm_rec_param(void)
+  125          {
+  126   1          if (g_record_vars.rec_type == RECORD_FILE_TYPE_WAV)
+  127   1          {
+  128   2              if (g_record_vars.rec_encode == ENCODE_WAV_ADPCM)
+  129   2              {
+  130   3                  //wav, ADPCM
+  131   3                  rec_bitrate = bitrate_ap_adpcm[g_record_vars.rec_mode];
+  132   3              }
+  133   2              else
+  134   2              {
+  135   3                  //wav, PCM
+  136   3                  rec_bitrate = bitrate_ap_pcm[g_record_vars.rec_mode];
+  137   3              }
+  138   2          }
+  139   1          else
+  140   1          {
+  141   2              //mp2
+  142   2              rec_bitrate = bitrate_ap_mp2[g_record_vars.rec_mode];
+  143   2          }
+  144   1          if (rec_bitrate == AP_BT_128K)
+  145   1          {
+  146   2              rec_channel = DUAL_CH;
+  147   2          }
+  148   1          else
+  149   1          {
+  150   2              rec_channel = SINGLE_CH;
+  151   2          }
+  152   1      #if 0
+                   //channel number
+                   if ((rec_bitrate == AP_BT_32K) || (rec_bitrate == AP_BT_128K) || (rec_bitrate == AP_BT_192K))
+                   {
+                       rec_channel = SINGLE_CH;
+                   }
+                   else
+                   {
+                       rec_channel = DUAL_CH;
+                       if ((rec_bitrate == AP_BT_64K) && (g_record_vars.rec_type == RECORD_FILE_TYPE_MP2))
+                       {
+                           //MP2 64Kbps 录音 单声道
+                           rec_channel = SINGLE_CH;
+                       }
+                   }
+               #endif
+  168   1      }
+  169          
+  170          /***************************************************/
+  171          //#pragma renamecode(AP_STOP)
+  172          
+  173          /*
+  174           ********************************************************************************
+  175           * Description : 格式化文件名
+  176           *
+  177           * Arguments   : NULL
+  178           *
+  179           * Returns     : NULL
+  180           *
+  181           * Notes       : RECxxx.WAV or RECxxx.MP3
+  182           *
+  183           ********************************************************************************
+  184           */
+  185          void near format_filename(void)
+  186          {
+  187   1          memset(g_record_vars.location.filename, 0, 12);
+  188   1          strcpy(g_record_vars.location.filename, FilenameHead); //REC000.WAV
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 4   
+
+  189   1      
+  190   1          if(g_record_vars.rec_type == RECORD_FILE_TYPE_MP2)
+  191   1          {
+  192   2              itoa3(g_record_vars.mp2_num, &g_record_vars.location.filename[3]);
+  193   2          }
+  194   1          else
+  195   1          {
+  196   2              itoa3(g_record_vars.wav_num, &g_record_vars.location.filename[3]);
+  197   2          }
+  198   1          strcat(g_record_vars.location.filename, "  ");
+  199   1          strcat(g_record_vars.location.filename, voice_ext[(uint8)g_record_vars.rec_type]);
+  200   1      }
+  201          #if 0
+               /*
+                ********************************************************************************
+                * Description : 使能DAC
+                *
+                * Arguments   : NULL
+                *
+                * Returns     : NULL
+                *
+                * Notes       :
+                *
+                ********************************************************************************
+                */
+               void near openDAC(void)
+               {
+                   dac_t dacattr;
+                   dacattr.dacselect = 0;
+                   dacattr.rate = FS_44K1;//默认
+                   EnableDAC(&dacattr);
+               }
+               #endif
+  222          /*
+  223           ********************************************************************************
+  224           * Description : 生成新的录音文件名
+  225           *
+  226           * Arguments   : NULL
+  227           *
+  228           * Returns     : TRUE, 成功
+  229           FALSE, 编号01~99 文件都存在
+  230           全局变量
+  231           g_record_vars.location
+  232           g_record_vars.wav_num
+  233           g_file_name_time[], 文件名,文件时间字符串
+  234           *
+  235           * Notes       :
+  236           *
+  237           ********************************************************************************
+  238           */
+  239          BOOL gen_filename(void)
+  240          {
+  241   1          date_t date;
+  242   1          uint16 num = (uint16) GenNewName(&g_record_vars.location);
+  243   1      
+  244   1          if (num == 0)
+  245   1          {
+  246   2              return FALSE;
+  247   2          }
+  248   1      
+  249   1          memset(g_file_name_time, 0, sizeof(g_file_name_time));
+  250   1      
+  251   1          if (g_record_vars.rec_type == RECORD_FILE_TYPE_MP2)
+  252   1          {
+  253   2              g_record_vars.mp2_num = num;
+  254   2          }
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 5   
+
+  255   1          else
+  256   1          {
+  257   2              g_record_vars.wav_num = num;
+  258   2          }
+  259   1          TM_GetDate(&date);
+  260   1          itoa4(date.year, &g_file_name_time[5]); // "----2004"
+  261   1          memcpy(g_file_name_time, g_record_vars.location.filename, 6);
+  262   1      
+  263   1          g_file_name_time[6] = ' '; //"WAVxxx 04"
+  264   1          g_file_name_time[9] = '/'; //"WAVxxx 04/"
+  265   1          itoa2(date.month, &g_file_name_time[10]);
+  266   1          g_file_name_time[12] = '/'; //"WAVxxx 04/01/"
+  267   1          itoa2(date.day, &g_file_name_time[13]); //"WAVxxx 04/01/01"
+  268   1      
+  269   1          return TRUE;
+  270   1      }
+  271          
+  272          /*
+  273           ********************************************************************************
+  274           * Description : 分析剩余空间,计算可录音时间
+  275           *
+  276           * Arguments   :  NULL
+  277           *
+  278           * Returns     :  NULL
+  279           *
+  280           * Notes       :  根据剩余空间g_free_space  ( 以扇区为单位) , 计算可录
+  281           *                时间
+  282           ********************************************************************************
+  283           */
+  284          void parse_total_time(void)
+  285          {
+  286   1          uint32 total_sec_temp;
+  287   1      
+  288   1          if (need_fetch_space)
+  289   1          {
+  290   2              g_free_space = (ulong) FS_GetSpace(FS_GET_SPACE_FREE);
+  291   2          }
+  292   1      
+  293   1          if (g_free_space > SPACE_LOW)
+  294   1          {
+  295   2              g_free_space -= SPACE_LOW;
+  296   2          }
+  297   1          else
+  298   1          {
+  299   2              g_free_space = 0;
+  300   2              total_sec = 0;
+  301   2              return;
+  302   2          }
+  303   1      
+  304   1          if (RecSpare != 0xffffffff)
+  305   1          {
+  306   2              /* 用配置的容量 */
+  307   2              g_free_space = total_space_setting - total_space_used;
+  308   2              if (g_free_space <= SPACE_LOW)
+  309   2              {
+  310   3                  g_free_space = 0;
+  311   3                  total_sec = 0;
+  312   3                  return;
+  313   3              }
+  314   2          }
+  315   1          total_sec = g_free_space / (rec_bitrate_sector_ratio[(uint8) rec_bitrate]);
+  316   1          total_sec_temp = total_sec;
+  317   1      
+  318   1          g_total_time.hour = total_sec_temp / 3600;
+  319   1          total_sec_temp %= 3600;
+  320   1          g_total_time.minute = (uint8) (total_sec_temp / 60);
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 6   
+
+  321   1          g_total_time.second = (uint8) (total_sec_temp % 60);
+  322   1      }
+  323          
+  324          /*
+  325           ********************************************************************************
+  326           * Description : 计算当前目录下的总录音文件个数
+  327           *
+  328           * Arguments   :  NULL
+  329           *
+  330           * Returns     :    g_file_num, 总录音文件个数
+  331           *
+  332           * Notes       :
+  333           *
+  334           ********************************************************************************
+  335           */
+  336          void parse_total_num(void)
+  337          {
+  338   1          uint8 name[12];
+  339   1          g_file_num = 0;
+  340   1      
+  341   1          if (0 != FS_Dir(name, voice_ext[(uint8) g_record_vars.rec_type], FS_DIR_FILE, 1))
+  342   1          {
+  343   2              g_file_num++;
+  344   2              while (0 != FS_Dir(name, voice_ext[(uint8) g_record_vars.rec_type], FS_DIR_FILE_CONT, 1))
+  345   2              {
+  346   3                  g_file_num++;
+  347   3                  if(g_file_num >= 200)
+  348   3                  {
+  349   4                      break;
+  350   4                  }
+  351   3              }
+  352   2          }
+  353   1      }
+  354          uint8 change_device(uint8 first_init)
+  355          {
+  356   1          if (first_init == FALSE)
+  357   1          {
+  358   2              return 0;
+  359   2          }
+  360   1          if (g_record_vars.location.disk == g_disk_char[0])
+  361   1          {
+  362   2              if (DRV_DetectUD(1) == 0x20)
+  363   2              {
+  364   3                  g_record_vars.location.disk = g_disk_char[1];
+  365   3                  return NULL;
+  366   3              }
+  367   2          }
+  368   1          else
+  369   1          {
+  370   2              if (USBH_Check_Udisk())
+  371   2              {
+  372   3                  g_record_vars.location.disk = g_disk_char[0];
+  373   3                  return NULL;
+  374   3              }
+  375   2          }
+  376   1          return RESULT_MAIN;
+  377   1      }
+  378          uint8 init_rec_param(void)
+  379          {
+  380   1          /* 录音准备过程*/
+  381   1          uint8 result;
+  382   1          confirm_rec_param();
+  383   1          if (g_record_vars.rec_type == RECORD_FILE_TYPE_MP2)
+  384   1          {
+  385   2              result = StartMP2Record();
+  386   2          }
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 7   
+
+  387   1          else
+  388   1          {
+  389   2              result = StartWAVRecord();
+  390   2          }
+  391   1      
+  392   1          if (!result)
+  393   1          {
+  394   2              g_rec_event = AP_EVENT_CODEC_ERR;
+  395   2              return show_err_msg();
+  396   2          }
+  397   1          recSendCommand(MC_RECORD, 0);
+  398   1          return 0;
+  399   1      }
+  400          uint8 show_err_msg(void)
+  401          {
+  402   1          LEDClearScreen();
+  403   1          LEDPuts(NUMBER2, err_str, 1);
+  404   1          ap_sleep(4);
+  405   1          return RESULT_MAIN;
+  406   1      }
+  407          uint8 rec_init(void)
+  408          {
+  409   1          uint8 first_init = TRUE;
+  410   1          uint8 retval;
+  411   1      continue_init:
+  412   1          if (review_disk != 0)
+  413   1          {
+  414   2              retval = CheckStoreOK();
+  415   2              if (retval == FALSE)
+  416   2              {
+  417   3                  retval = change_device(first_init);
+  418   3                  if (retval == 0)
+  419   3                  {
+  420   4                      return show_err_msg();
+  421   4                  }
+  422   3                  else
+  423   3                  {
+  424   4                      first_init = 0;
+  425   4                      goto continue_init;
+  426   4                  }
+  427   3              }
+  428   2          }
+  429   1          parse_total_time();
+  430   1          if (g_free_space == 0)
+  431   1          {
+  432   2              retval = change_device(first_init);
+  433   2              if (retval == 0)
+  434   2              {
+  435   3                  return show_err_msg();
+  436   3              }
+  437   2              else
+  438   2              {
+  439   3                  first_init = 0;
+  440   3                  review_disk = 1;
+  441   3                  goto continue_init;
+  442   3              }
+  443   2          }
+  444   1          parse_total_num();
+  445   1          if (g_file_num >= 200) //大于200个录音文件
+  446   1          {
+  447   2              retval = change_device(first_init);
+  448   2              if (retval == 0)
+  449   2              {
+  450   3                  return show_err_msg();
+  451   3              }
+  452   2              else
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 8   
+
+  453   2              {
+  454   3                  first_init = 0;
+  455   3                  review_disk = 1;
+  456   3                  goto continue_init;
+  457   3              }
+  458   2          }
+  459   1          format_filename(); //格式化录音文件名
+  460   1          if (!gen_filename()) //产生录音文件序号名
+  461   1          {
+  462   2              //已达到该目录录音文件数限制
+  463   2              return show_err_msg();
+  464   2          }
+  465   1          return init_rec_param();
+  466   1      }
+  467          /*
+  468           ********************************************************************************
+  469           * Description : 获取当前的录音源,并记录在g_resource.input中.
+  470           *
+  471           * Arguments   :
+  472           *
+  473           * Returns     :
+  474           *
+  475           * Notes       :在调用MC_SETRESOURCE之前,调用此函数!
+  476           *
+  477           ********************************************************************************
+  478           */
+  479          void get_rec_source(void)
+  480          {
+  481   1      #if 0
+                   //    inputSelect.input = 0;
+               
+                   //fpga test
+                   //    g_record_vars.rec_source = AP_MICIN;
+                   inputSelSave = g_record_vars.rec_source;
+                   switch (g_record_vars.rec_source)
+                   {
+                   case AP_LINEIN://AP_FMIN
+                       inputSelect.input = ENC_LINEIN;
+                       break;
+               
+                   case AP_FMIN:
+                       inputSelect.input = ENC_FM;
+                       break;
+               
+                   case AP_MICIN:
+                       inputSelect.input = ENC_MIC;
+                       break;
+               
+                   default:
+                       inputSelect.input = ENC_MIC;
+                       break;
+                   }
+               #endif
+  506   1      }
+  507          
+  508          /*
+  509           ********************************************************************************
+  510           * Description :    准备开始WAV格式录音
+  511           *
+  512           * Arguments   :  NULL
+  513           *
+  514           * Returns     :   success/fail
+  515           *
+  516           * Notes       :   主要是调用basal接口函数发命令
+  517           *
+  518           ********************************************************************************
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 9   
+
+  519           */
+  520          uint8 StartWAVRecord(void)
+  521          {
+  522   1          uint8 result;
+  523   1      
+  524   1          //初始化codec 变量,  传参2   标识录音格式, 需和codec  定义匹配
+  525   1          result = recSendCommand(MC_OPEN, 2);
+  526   1          recSendCommand(MC_RECODEMODE, (void *) g_record_vars.rec_encode);
+  527   1          recSendCommand(MC_SET_RECORD_DELAY, (void *) g_record_vars.rec_DelayTime);
+  528   1          recSendCommand(MC_SETGAIN, (void *) g_record_vars.rec_InputGain);
+  529   1          recSendCommand(MC_SETGAIN_ADC, (void *) g_record_vars.rec_ADCGain);
+  530   1          recSendCommand(MC_SETGAIN_DSP, (void *) g_record_vars.rec_DSPGain);
+  531   1      
+  532   1          //MUST TO BE SET
+  533   1          // get_rec_source();
+  534   1          //    recSendCommand(MC_SETSOURCE, (void*) &inputSelect);
+  535   1          Rec_format.sample_rate = (uint8) (Fsrate_ap_codec[(uint8) rec_bitrate]);
+  536   1      
+  537   1          Rec_format.channel = (uint8) rec_channel;
+  538   1      
+  539   1          Rec_format.bit_rate[0] = (currentBitrate[0]);
+  540   1          Rec_format.bit_rate[1] = (currentBitrate[1]);
+  541   1          Rec_format.bit_rate[2] = (currentBitrate[2]);
+  542   1          recSendCommand(MC_SETAUDIOFMT, (void *) &Rec_format);
+  543   1      
+  544   1          /* 创建录音文件*/
+  545   1          result = recSendCommand(MC_LOAD, (void *) g_record_vars.location.filename);
+  546   1          return result;
+  547   1      }
+  548          
+  549          /*
+  550           ********************************************************************************
+  551           * Description :    准备开始MP2   格式录音
+  552           *
+  553           * Arguments   :  NULL
+  554           *
+  555           * Returns     :   success/fail
+  556           *
+  557           * Notes       :   主要是调用basal接口函数发命令
+  558           *
+  559           ********************************************************************************
+  560           */
+  561          uint8 StartMP2Record(void)
+  562          {
+  563   1          uint8 result;
+  564   1          char *mp2_buff_addr = (char *) MURAM1H_ADDR;
+  565   1          char *mp2_array_addr = log_table;
+  566   1          memcpy(mp2_buff_addr, mp2_array_addr, sizeof(log_table));
+  567   1          result = recSendCommand(MC_OPEN, 0);
+  568   1      
+  569   1          recSendCommand(MC_SET_RECORD_DELAY, (void *) g_record_vars.rec_DelayTime);
+  570   1          //    recSendCommand(MC_SETGAIN, (void*) g_record_vars.rec_InputGain);
+  571   1          //    recSendCommand(MC_SETGAIN_ADC, (void*) g_record_vars.rec_ADCGain);
+  572   1          recSendCommand(MC_SETGAIN_DSP, (void *) g_record_vars.rec_DSPGain);
+  573   1      
+  574   1          //set record source
+  575   1          get_rec_source();
+  576   1          //    recSendCommand(MC_SETSOURCE, (void*) &inputSelect);
+  577   1      
+  578   1          //Rec_format.bits = 18;
+  579   1      
+  580   1          Rec_format.sample_rate = (uint8) (Fsrate_ap_codec[(uint8) rec_bitrate]);
+  581   1      
+  582   1          Rec_format.channel = (uint8) rec_channel;
+  583   1      #if 0
+                   Rec_format.bit_rate[0] = '0';
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 10  
+
+                   Rec_format.bit_rate[1] = (currentBitrate[0]);
+                   Rec_format.bit_rate[2] = (currentBitrate[1]);
+                   Rec_format.bit_rate[3] = (currentBitrate[2]);
+               #endif
+  589   1          Rec_format.bit_rate[0] = (currentBitrate[0]);
+  590   1          Rec_format.bit_rate[1] = (currentBitrate[1]);
+  591   1          Rec_format.bit_rate[2] = (currentBitrate[2]);
+  592   1          recSendCommand(MC_SETAUDIOFMT, (void *) &Rec_format);
+  593   1      
+  594   1          /* 创建录音文件*/
+  595   1          result = recSendCommand(MC_LOAD, (void *) g_record_vars.location.filename);
+  596   1      
+  597   1          return result;
+  598   1      }
+  599          /*
+  600           ********************************************************************************
+  601           * Description : 设置录音缺省目录
+  602           *
+  603           * Arguments   :
+  604           *
+  605           * Returns     : 成功or 失败
+  606           *
+  607           * Notes       :  根据录音格式, 设置缺省目录为RECORD/VOICE
+  608           *                   或RECORD/MUSIC
+  609           ********************************************************************************
+  610           */
+  611          BOOL reset_record_dir(bool need_init)
+  612          {
+  613   1          uint8 i;
+  614   1          BOOL status;
+  615   1          uint8 file[12];
+  616   1          uint8 short_name[12];
+  617   1      
+  618   1          if (need_init)
+  619   1          {
+  620   2              fselInit(DIRECTORY_ALL, FSEL_DIR_END, FSEL_TYPE_COMMONDIR, &g_record_vars.location, 0);
+  621   2          }
+  622   1          g_record_vars.location.filename[0] = 0;
+  623   1      
+  624   1          //    type = (uint8) g_record_vars.rec_type;
+  625   1          //    g_dir_voice = g_dir_rec_voice[type];
+  626   1          g_dir_voice = g_dir_record;
+  627   1          strcpy(g_record_vars.location.path, g_dir_voice);
+  628   1      
+  629   1          g_record_vars.location.path[11] = 0x00;
+  630   1          g_record_vars.location.filename[0] = 0;
+  631   1      
+  632   1          FS_CD(FS_CD_ROOT);
+  633   1      #if 0
+                   status = FS_CD(g_dir_record);
+                   if (!status)
+                   {
+                       status = FS_MakeDir(g_dir_record);
+                       if (!status)
+                           return FALSE; // 创建目录失败//create directory fail
+                   }
+                   else
+                       FS_CD("\\");
+               
+                   /* 为exFAT添加, 获取短名 */
+                   memset(short_name, 0x0, 12);
+                   status = FS_JustBeing(g_dir_record, short_name, 0x11);
+                   if (!status)
+                   {
+                       return FALSE;
+                   }
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 11  
+
+                   if (short_name[0] == 0x0)
+                   {
+                       memcpy(short_name, g_dir_record, 12);
+                   }
+                   i = 1;
+                   status = FS_Dir(file, g_dir_ext, FS_DIR_DIR, 0);
+                   do
+                   {
+                       //if(0 == memcmp(file, g_dir_record, 8))
+                       if (0 == memcmp(file, short_name, 8))
+                       {
+                           break;
+                       }
+                       i++;
+                   }
+                   while ((status = FS_Dir(file, g_dir_ext, FS_DIR_DIR_CONT, 0)));
+                   if (!status)
+                       return FALSE;
+               
+                   g_record_vars.location.DirNo[0] = i;
+               
+                   FS_CD(g_dir_record);
+               #endif
+  674   1          status = FS_CD(g_dir_voice);
+  675   1          if (!status)
+  676   1          {
+  677   2              status = FS_MakeDir(g_dir_voice);
+  678   2              if (!status)
+  679   2                  return FALSE; // 创建目录失败
+  680   2          }
+  681   1          else
+  682   1              FS_CD("\\");
+  683   1      
+  684   1          /* 为exFAT添加, 获取短名 */
+  685   1          memset(short_name, 0x0, 12);
+  686   1          status = FS_JustBeing(g_dir_voice, short_name, 0x11);
+  687   1          if (!status)
+  688   1          {
+  689   2              return FALSE;
+  690   2          }
+  691   1          if (short_name[0] == 0x0)
+  692   1          {
+  693   2              memcpy(short_name, g_dir_voice, 12);
+  694   2          }
+  695   1          i = 1;
+  696   1          status = FS_Dir(file, g_dir_ext, FS_DIR_DIR, 0);
+  697   1          do
+  698   1          {
+  699   2              //if(0 == memcmp(file, g_dir_voice, 8))
+  700   2              if (0 == memcmp(file, short_name, 8))
+  701   2              {
+  702   3                  break;
+  703   3              }
+  704   2              i++;
+  705   2          }
+  706   1          while ((status = FS_Dir(file, g_dir_ext, FS_DIR_DIR_CONT, 0)));
+  707   1          if (!status)
+  708   1              return FALSE;
+  709   1      
+  710   1          g_record_vars.location.DirNo[1] = i;
+  711   1          g_record_vars.location.dirLayer = 1;
+  712   1          g_record_vars.location.ID3buffer = NULL;
+  713   1          status = FS_CD(g_dir_voice);
+  714   1      
+  715   1          g_record_vars.location.dirLayer++;
+  716   1          g_record_vars.location.ClusterNo = FS_GetCurDir();
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 12  
+
+  717   1          g_record_vars.location.DirEntry = FS_GetCurDirEntry();
+  718   1      
+  719   1          return TRUE;
+  720   1      }
+  721          
+  722          /*
+  723           ********************************************************************************
+  724           * Description : 根据所配置的录音方式，为Get_Space做准备
+  725           *
+  726           * Arguments   : NULL
+  727           *
+  728           * Returns     : NULL
+  729           *
+  730           * Notes       : 如配置最长录音时间为0， 则表示使用实际磁盘容量录音
+  731           *               否则，表示最长录音时间为所设置的小时数
+  732           *               设置好系统变量， 文件系统FS_GetSpace接口返回如下
+  733           * 如果磁盘实际容量大于所设置容量，则返回设置的容量
+  734           * 如果磁盘实际容量小于所设置容量，则返回磁盘实际容量
+  735           ********************************************************************************
+  736           */
+  737          void near prepare_GetSpace(void)
+  738          {
+  739   1          uint32 total_sec_setting = 0;
+  740   1      
+  741   1          if(g_comval.RecordTime_max == 0)
+  742   1          {
+  743   2              //用实际容量
+  744   2              RecSpare = 0xffffffff;
+  745   2          }
+  746   1          else
+  747   1          {
+  748   2              //用设置容量
+  749   2              total_sec_setting = (uint32)g_comval.RecordTime_max * 3600;
+  750   2              RecSpare = (rec_bitrate_sector_ratio[(uint8)rec_bitrate]) * total_sec_setting;
+  751   2              total_space_setting = RecSpare;
+  752   2          }
+  753   1          total_space_used = 0;
+  754   1      }
+  755          /*
+  756           ********************************************************************************
+  757           * Description : 设置录音缺省目录并检查剩余容量
+  758           *
+  759           * Arguments   : NULL
+  760           *
+  761           * Returns     : true -- 录音缺省目录设置成功, 剩余容量足够
+  762           *                   false -- 录音缺省目录设置失败或容量已满
+  763           * Notes       :
+  764           *
+  765           ********************************************************************************
+  766           */
+  767          BOOL CheckStoreOK(void)
+  768          {
+  769   1          BOOL status;
+  770   1          prepare_GetSpace();
+  771   1          if (0 == fselSetLocation(&g_record_vars.location))
+  772   1          {
+  773   2              status = reset_record_dir(TRUE);
+  774   2          }
+  775   1      
+  776   1          g_free_space = (uint32) FS_GetSpace(FS_GET_SPACE_FREE);
+  777   1      
+  778   1          need_fetch_space = FALSE;
+  779   1          if (g_free_space <= SPACE_LOW)
+  780   1          {
+  781   2              overflag = TRUE;
+  782   2              status = FALSE;
+C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 13  
+
+  783   2          }
+  784   1          else
+  785   1          {
+  786   2              status = TRUE;
+  787   2          }
+  788   1          if ((RecSpare != 0xffffffff) && (g_free_space < total_space_setting))
+  789   1          {
+  790   2              /* 用配置的容量,但磁盘实际容量小于配置容量 */
+  791   2              total_space_setting = g_free_space;
+  792   2          }
+  793   1          return status;
+  794   1      }
+  795          
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =      1814     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =    ------     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =       133     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,18 @@
+"..\..\..\psp_rel\lib\actos30api.LIB",
+"..\..\..\psp_rel\lib\LIBC.LIB",
+"..\..\..\psp_rel\lib\DrvDftSeg.LIB"(?C_START??),
+".\output\Drv_header.obj",
+".\output\LED_apitable.obj",
+".\output\uart_msg.obj",
+".\output\uart.obj",
+".\output\uart_rcode.obj" 
+TO ".\output\uart"
+NOOVERLAY 
+NOJMPTAB
+NODEFAULTLIBRARY
+CLASSES(ECODE(0x800000-0xFFFFFF))
+CLASSES(HCONST(0x800000-0xFFFFFF))
+SEGMENTS(UART_APITABLE(0xFF1200),?PR?UART_RCODE,C_RESERVE0(^0xFF15FF))
+SEGMENTS(?PR?UART(0xED5600),?PR?UART_MSG            ,C_RESERVE1(^0xED5DFF))
+SEGMENTS(?ED?UART(0xA80),D_RESERVE0(^0xB2F))
+SEGMENTS(UI_INFO(0xFF0000))

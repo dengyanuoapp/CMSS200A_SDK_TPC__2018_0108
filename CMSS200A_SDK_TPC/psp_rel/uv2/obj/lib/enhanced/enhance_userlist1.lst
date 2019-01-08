@@ -1,0 +1,109 @@
+C251 COMPILER V4.55,  enhance_userlist1                                                    13/12/18  16:27:40  PAGE 1   
+
+
+C251 COMPILER V4.55, COMPILATION OF MODULE enhance_userlist1
+OBJECT MODULE PLACED IN ..\..\..\..\obj\lib\enhanced\enhance_userlist1.obj
+COMPILER INVOKED BY: C:\Keil\C251\BIN\C251.EXE ..\..\..\..\..\libsrc\midware\enhanced\fsel\enhance_userlist1.c XSMALL IN
+                    -TR2 FUNCTIONS(REENTRANT) ROM(HUGE) OPTIMIZE(9,SPEED) ORDER INCDIR(..\..\..\..\..\inc) DEFINE(_ACTIVE_USERPL,_ACTIVE_SHUF
+                    -FLE,_ACTIVE_DIRL) DEBUG PRINT(..\..\..\..\obj\lib\enhanced\enhance_userlist1.lst) OBJECT(..\..\..\..\obj\lib\enhanced\en
+                    -hance_userlist1.obj) 
+
+stmt  level    source
+
+    1          
+    2          #include "actos.h"
+    3          #include "enhanced.h"
+    4          #include "string.h"
+    5          
+    6          #pragma name(MO_EH_USERPL1)
+    7          extern uint8 User_ItemTotal;
+    8          extern uint8 User_ItemCur;
+    9          extern uint8 User_FirstOffset;
+   10          extern uint8 User_LastOffset;
+   11          extern uint8 User_fileoffset;
+   12          extern uint8 fselError;    // store error id;
+   13          extern uint16 vm1_addr;
+   14          
+   15          
+   16          extern uint8  fselError;    // store error id;
+   17          extern uint8  fselMode;    //Mode of select, Sequence, repeat one ...
+   18          extern uint16 fselRandCount;
+   19          extern uint16 Random1(void);
+   20          extern bool fselGetLocationPL(file_location_t  *location);
+   21          extern uint8 fselSetLocationPL(file_location_t  *location);
+   22          extern bool GetFilebyItem(uint8 *filename, uint16 ItemNum);
+   23          extern bool init_shuffle(uint16 num_total);
+   24          
+   25          char MW_User_buffer[512];
+   26          const uint8 far vfilename1[7] = "USERPL";
+   27          
+   28          #pragma renamecode(MO_EH_USERPL1)
+   29          
+   30          
+   31          BOOL fselUserPLEnt(file_location_t  *location)
+   32          {
+   33   1          favi_head_t  head;
+   34   1      
+   35   1          VMRead(MW_User_buffer, VM_FAVI_HEAD, 0x80);
+   36   1          if(location->disk == 'H')
+   37   1          {
+   38   2              memcpy(&head, MW_User_buffer + 0x40, sizeof(favi_head_t));
+   39   2          }
+   40   1          else
+   41   1          {
+   42   2              memcpy(&head, MW_User_buffer, sizeof(favi_head_t));
+   43   2          }
+   44   1      
+   45   1          if(memcmp(head.magic, vfilename1, 6) == 0)
+   46   1          {
+   47   2              //magic ÕýÈ·
+   48   2              User_fileoffset = head.first_offset;
+   49   2              User_LastOffset = head.last_offset;
+   50   2              User_ItemTotal = head.total_item;
+   51   2              User_ItemCur = 0;
+   52   2              User_FirstOffset = User_fileoffset;
+   53   2              if(User_ItemTotal == 0)
+   54   2              {
+   55   3                  return FALSE;
+   56   3              }
+C251 COMPILER V4.55,  enhance_userlist1                                                    13/12/18  16:27:40  PAGE 2   
+
+   57   2      #ifdef _ACTIVE_SHUFFLE
+   58   2              init_shuffle(User_ItemTotal);
+   59   2      #endif
+   60   2              if(location->disk == 'H')
+   61   2              {
+   62   3                  vm1_addr = VM_FAVI_CARD;
+   63   3              }
+   64   2              else
+   65   2              {
+   66   3                  vm1_addr = VM_FAVI_HOST;
+   67   3              }
+   68   2              return TRUE;
+   69   2          }
+   70   1          return FALSE;
+   71   1      }
+
+
+Module Information          Static   Overlayable
+------------------------------------------------
+  code size            =    ------     ------
+  ecode size           =       175     ------
+  data size            =    ------     ------
+  idata size           =    ------     ------
+  pdata size           =    ------     ------
+  xdata size           =    ------     ------
+  xdata-const size     =    ------     ------
+  edata size           =       512     ------
+  bit size             =    ------     ------
+  ebit size            =    ------     ------
+  bitaddressable size  =    ------     ------
+  ebitaddressable size =    ------     ------
+  far data size        =    ------     ------
+  huge data size       =    ------     ------
+  const size           =    ------     ------
+  hconst size          =         7     ------
+End of Module Information.
+
+
+C251 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

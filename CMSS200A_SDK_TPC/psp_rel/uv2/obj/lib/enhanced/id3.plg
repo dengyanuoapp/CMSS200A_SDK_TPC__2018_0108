@@ -1,0 +1,24 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+D:\projekt\CMSS200A_SDK_170718_TMP_48kbps_24bit\CMSS200A_SDK_170718_TMP_48kbps_24bit\psp_rel\uv2\prj\lib\midware\enhanced\ID3.uv2
+Project File Date:  03/03/2014
+
+<h2>Output:</h2>
+Build target 'id3'
+compiling enhanced_tag.c...
+compiling enhanced_tag1.c...
+compiling enhanced_tag3.c...
+creating library ..\..\..\..\obj\lib\enhanced\id3.LIB...
+TRANSFER
+"..\..\..\..\obj\lib\enhanced\enhanced_tag.obj",
+"..\..\..\..\obj\lib\enhanced\enhanced_tag1.obj",
+"..\..\..\..\obj\lib\enhanced\enhanced_tag3.obj" 
+TO "..\..\..\..\obj\lib\enhanced\id3.LIB"
+LIB251 LIBRARY MANAGER V4.24
+COPYRIGHT KEIL ELEKTRONIK GmbH 1987 - 2002
+User command #1: id3.bat
+已复制         1 个文件。
+"..\..\..\..\obj\lib\enhanced\id3.LIB" - 0 Error(s), 0 Warning(s).
