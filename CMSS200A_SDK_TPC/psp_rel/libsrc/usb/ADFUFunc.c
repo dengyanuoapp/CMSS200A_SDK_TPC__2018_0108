@@ -28,7 +28,7 @@ static uint16 Caculate_CheckSum(uint16 *addr, uint16 length);
  */
 void Access_Internal_RAM_Command(void)
 {
-    //¶ÁÈ¡»¹ÊÇĞ´Èë 0:Ğ´Èë  01:¶ÁÈ¡
+    //è¯»å–è¿˜æ˜¯å†™å…¥ 0:å†™å…¥  01:è¯»å–
     if ((CBW_data_buffer._CBWCB[1] & 0x80) == 0)
     {
         Write_Internal_RAM();
@@ -59,12 +59,12 @@ void Access_Nand_Flash_Command(void)
     uint8 tmp;
     LogicOrPhy = CBW_data_buffer._CBWCB[0];
 
-    //ÅĞ¶ÏÊÇ·ñÊÇSPINor
+    //åˆ¤æ–­æ˜¯å¦æ˜¯SPINor
     if (flash_type != 0x02)
     {
-        //ÒòÁ¿²ú¹¤¾ß¶ÔÍ¬Ò»Éè±¸µÄ²»Í¬LUN¾ù·¢ËÍ¶ÁĞ´ÃüÁî,¶øADFUÏÂÓÖÃ»ÓĞÈ¥Çø·ÖLUNºÅ
-        //¹¤¾ß¶ÔÓÚÃ¿¸öLUNµÄ¶ÁĞ´¾ùÊÇ²Ù×÷Flash,µ¼ÖÂ¶ÔFlash½øĞĞ¶à´ÎÍ¬Ò»sectorºÅµÄ¶ÁĞ´
-        //ADFUÏÂÖ»ÈÏÎª¶ÔLUN=1(FlashÅÌ)µÄ¶ÁĞ´ºÏ·¨,¶ÔÆäËûLUN·ÇÁãµÄ¶ÁĞ´×÷²»×÷·´Ó¦;
+        //å› é‡äº§å·¥å…·å¯¹åŒä¸€è®¾å¤‡çš„ä¸åŒLUNå‡å‘é€è¯»å†™å‘½ä»¤,è€ŒADFUä¸‹åˆæ²¡æœ‰å»åŒºåˆ†LUNå·
+        //å·¥å…·å¯¹äºæ¯ä¸ªLUNçš„è¯»å†™å‡æ˜¯æ“ä½œFlash,å¯¼è‡´å¯¹Flashè¿›è¡Œå¤šæ¬¡åŒä¸€sectorå·çš„è¯»å†™
+        //ADFUä¸‹åªè®¤ä¸ºå¯¹LUN=1(Flashç›˜)çš„è¯»å†™åˆæ³•,å¯¹å…¶ä»–LUNéé›¶çš„è¯»å†™ä½œä¸ä½œååº”;
         illegalLBAFlag = CBW_data_buffer._bCBWLUN - 1;
     }
 
@@ -157,7 +157,7 @@ void Detach_Device_Command(void)
  */
 void Polling_Ready_Command(void)
 {
-    //°Ñ±êÖ¾ÉÏ´«
+    //æŠŠæ ‡å¿—ä¸Šä¼ 
     CBW_data_buffer._dCBWDataTransferLength = 2;
     Send_Data_To_PC((uint8 *) &StatusLength, CBW_data_buffer._dCBWDataTransferLength);
 
@@ -179,7 +179,7 @@ void Polling_Ready_Command(void)
  */
 void Get_Status_Command(void)
 {
-    //°Ñ×´Ì¬ÉÏ´«,Òª´«ÊäµÄÊı¾İ³¤¶È
+    //æŠŠçŠ¶æ€ä¸Šä¼ ,è¦ä¼ è¾“çš„æ•°æ®é•¿åº¦
     CBW_data_buffer._dCBWDataTransferLength = *((uint16 *) &CBW_data_buffer._CBWCB[7]);
     EndianReverse((uint8 *) (&CBW_data_buffer._dCBWDataTransferLength), 4);
 
@@ -203,7 +203,7 @@ void Calling_Entry_Command(void)
 {
     uint8 tmp;
 
-    //CallingTaskÆğÊ¼µØÖ·
+    //CallingTaskèµ·å§‹åœ°å€
     tmp = *((uint8 *) &CBW_data_buffer._CBWCB[2]);
 
     if (tmp < 0x90)
@@ -211,34 +211,34 @@ void Calling_Entry_Command(void)
         CallingTaskFlag = 1;
 
         EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[1]), 2);
-        CallingTaskAdd = (uint32) (*((uint16 *) &CBW_data_buffer._CBWCB[1])) + 0xff0000; //×ªÎª³ÌĞòµØÖ·
+        CallingTaskAdd = (uint32) (*((uint16 *) &CBW_data_buffer._CBWCB[1])) + 0xff0000; //è½¬ä¸ºç¨‹åºåœ°å€
     }
     else if (tmp == 0x90) //9000h
     {
-        TransferFlag = 0x21; //ÏÔÊ¾DownLoad
+        TransferFlag = 0x21; //æ˜¾ç¤ºDownLoad
     }
     else if (tmp == 0x91) //9100h
     {
         //prints("callentry exit-");
-        detach_cmd_rcv = 1; //Íê³ÉÉı¼¶²¢ÊÕµ½detachÃüÁî
-        TransferFlag = 0x41; //ÏÔÊ¾Succ
+        detach_cmd_rcv = 1; //å®Œæˆå‡çº§å¹¶æ”¶åˆ°detachå‘½ä»¤
+        TransferFlag = 0x41; //æ˜¾ç¤ºSucc
     }
     else if (tmp == 0x92) //9200h
     {
-        TransferFlag = 0x31; //ÏÔÊ¾UpLoad
+        TransferFlag = 0x31; //æ˜¾ç¤ºUpLoad
     }
     else if (tmp == 0x93) //9300h
     {
         FWOpStatus = 2;
-        TransferFlag = 0x41; //ÏÔÊ¾Succ
+        TransferFlag = 0x41; //æ˜¾ç¤ºSucc
     }
     else if (tmp == 0x95) //9500h
     {
-        TransferFlag = 0x11; //ÏÔÊ¾Commu
+        TransferFlag = 0x11; //æ˜¾ç¤ºCommu
     }
     else //9600h
     {
-        TransferFlag = 0x51; //ÏÔÊ¾Ready
+        TransferFlag = 0x51; //æ˜¾ç¤ºReady
     }
 
     ReportCSW(0);
@@ -265,7 +265,7 @@ void Write_Internal_RAM(void)
 
     EPB_OutRdy_FIFOFullNAK();
 
-    //Òª´«ÊäµÄÊı¾İ³¤¶È
+    //è¦ä¼ è¾“çš„æ•°æ®é•¿åº¦
     EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[7]), 2);
     sendLength = *((uint16 *) &CBW_data_buffer._CBWCB[7]);
 
@@ -294,7 +294,7 @@ void Write_Internal_RAM(void)
  *
  * Returns    : None.
  *
- * Note(s)    : ÃüÁîÖĞ¶ÁÊı¾İ¸öÊı²»ÄÜ³¬¹ı0xC0.
+ * Note(s)    : å‘½ä»¤ä¸­è¯»æ•°æ®ä¸ªæ•°ä¸èƒ½è¶…è¿‡0xC0.
  *********************************************************************************************************
  */
 static void Read_Internal_RAM(void)
@@ -308,20 +308,20 @@ static void Read_Internal_RAM(void)
     EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[7]), 2);
 
     adfuSysInfo = (ADFU_SysInfo_t *) URAMYADDR;
-    //Òª´«ÊäµÄÊı¾İ³¤¶ÈÖ»ÄÜ´ÓRamÖĞ×î¶à¶Á512×Ö½Ú¸öÕæÊı¾İ,·ñÔòÎªÎ±Êı¾İ,Òª´«ÊäµÄÊı¾İÆğÊ¼µØÖ·Ö»ÄÜÊÇdata¿Õ¼äµÄ0x800µÄÎ»ÖÃ
+    //è¦ä¼ è¾“çš„æ•°æ®é•¿åº¦åªèƒ½ä»Ramä¸­æœ€å¤šè¯»512å­—èŠ‚ä¸ªçœŸæ•°æ®,å¦åˆ™ä¸ºä¼ªæ•°æ®,è¦ä¼ è¾“çš„æ•°æ®èµ·å§‹åœ°å€åªèƒ½æ˜¯dataç©ºé—´çš„0x800çš„ä½ç½®
     if ((*((uint16 *) &CBW_data_buffer._CBWCB[7]) <= 0x200) && (*((uint16 *) &CBW_data_buffer._CBWCB[2]) == 0x800))
     {
         //don't use URAMXADDR for buffer,because when calling SD_READ,need use it
         GetSysInfo((ADFU_SysInfo_t *) URAMYADDR);
 
         adfu_flag = 1;
-        phy_block_addr = BREC_START_BLOCK; //BRECµÚÒ»·İÔÚFlash ÎïÀíblock 4
+        phy_block_addr = BREC_START_BLOCK; //BRECç¬¬ä¸€ä»½åœ¨Flash ç‰©ç†block 4
         sectors_trans_once = 1;
 
-        //×Ü¹²4·İBREC,ÕÒµ½Ğ£ÑéºÍÕıÈ·µÄÄÇÒ»·İ,¶Á³öÆäID±íºÍDowngradeĞÅÏ¢
+        //æ€»å…±4ä»½BREC,æ‰¾åˆ°æ ¡éªŒå’Œæ­£ç¡®çš„é‚£ä¸€ä»½,è¯»å‡ºå…¶IDè¡¨å’ŒDowngradeä¿¡æ¯
         for (i = 1; i <= 1; i++)
         {
-            //Return: BRECĞ£ÑéºÍ,»áÓÃµ½DATABUFFER×÷Êı¾İbufferÀ´¼ÆËãĞ£ÑéºÍ
+            //Return: BRECæ ¡éªŒå’Œ,ä¼šç”¨åˆ°DATABUFFERä½œæ•°æ®bufferæ¥è®¡ç®—æ ¡éªŒå’Œ
             if (Calculate_BREC_Checksum() == 0)
             {
                 break;
@@ -329,7 +329,7 @@ static void Read_Internal_RAM(void)
             phy_block_addr++;
         }
 
-        //ÅĞ¶ÏÊÇ·ñÊÇSPINor,¶ÔÓÚNor Base·½°¸Ã¿´Î¾ù¸üĞÂMBREC,BREC
+        //åˆ¤æ–­æ˜¯å¦æ˜¯SPINor,å¯¹äºNor Baseæ–¹æ¡ˆæ¯æ¬¡å‡æ›´æ–°MBREC,BREC
         if (flash_type == 0x02)
         {
             adfuSysInfo->adfu_fwscaninfo.BrecCheckSum[1] = 0;
@@ -353,12 +353,12 @@ static void Read_Internal_RAM(void)
             adfuSysInfo->adfu_hwscaninfo.BootDiskType[6] = 0xf6;
             adfuSysInfo->adfu_hwscaninfo.BootDiskType[7] = 0x48;
         }
-        //BREC×îºóÒ»¸öÉÈÇøµÄÍ·64byteÊÇFlash ID±íĞÅÏ¢,Ö®ºó32byteÊÇDowngradeĞÅÏ¢
+        //BRECæœ€åä¸€ä¸ªæ‰‡åŒºçš„å¤´64byteæ˜¯Flash IDè¡¨ä¿¡æ¯,ä¹‹å32byteæ˜¯Downgradeä¿¡æ¯
         //memcpy(URAMYADDR+160, DATABUFFER, 64);
         //memcpy(URAMYADDR+160+64, DATABUFFER+64, 32);
 
-        //uÅÌÏÂĞ¡·É»úÉı¼¶Ê±,¹¤¾ß·ÖÎö¹Ì¼şĞÅÏ¢»ú²úÆ·¼°Éè±¸ĞÅÏ¢Ê±°´z80Æ½Ì¨µÄÊı¾İ½á¹¹»ñÈ¡
-        //¹ÊĞ¡»ú¶ËÅĞ¶Ïµ½ÊÇ¹¤¾ßÔÚ¶ÁÈ¡ĞÅÏ¢Ê±,ÌîĞ´ÏàÓ¦Î»ÖÃËÍ¸ø¹¤¾ß.
+        //uç›˜ä¸‹å°é£æœºå‡çº§æ—¶,å·¥å…·åˆ†æå›ºä»¶ä¿¡æ¯æœºäº§å“åŠè®¾å¤‡ä¿¡æ¯æ—¶æŒ‰z80å¹³å°çš„æ•°æ®ç»“æ„è·å–
+        //æ•…å°æœºç«¯åˆ¤æ–­åˆ°æ˜¯å·¥å…·åœ¨è¯»å–ä¿¡æ¯æ—¶,å¡«å†™ç›¸åº”ä½ç½®é€ç»™å·¥å…·.
         if (CBW_data_buffer._dCBWDataTransferLength == 0xc0)
         {
             memcpy(&adfuSysInfo->SysinfoFlag[0] + 8 + 64 + 6, &adfuSysInfo->adfu_fwscaninfo.FirmwareVersion,
@@ -419,7 +419,7 @@ static uint8 MBREC_Write_AndCheck(void)
         if (memcmp(DATABUFFER, URAMYADDR, udisk_rw_sctr_num * 512) != 0)
         {
             //prints("mrec err-");
-            //Ğ´MBREC·İÊı
+            //å†™MBRECä»½æ•°
             count = 4;
         }
         else
@@ -431,8 +431,8 @@ static uint8 MBREC_Write_AndCheck(void)
     }
     else if (flash_type == 2)//spi nor base
     {
-        //ÊÇ·ñSnor,Nor·½°¸Ã¿´Î¾ù¸üĞÂMBREC,ÓÃÓÚ²Á³ıÕûÆ¬Nor,SPI NorFlashÖ»Ğ´Ò»·İMBRECºÍBREC
-        //ÇÒÒòSPI NorÕûÆ¬²Á³ı,ËùÒÔ×ÜĞèĞ´MBRECºÍBREC
+        //æ˜¯å¦Snor,Noræ–¹æ¡ˆæ¯æ¬¡å‡æ›´æ–°MBREC,ç”¨äºæ“¦é™¤æ•´ç‰‡Nor,SPI NorFlashåªå†™ä¸€ä»½MBRECå’ŒBREC
+        //ä¸”å› SPI Noræ•´ç‰‡æ“¦é™¤,æ‰€ä»¥æ€»éœ€å†™MBRECå’ŒBREC
         count = 1;
     }
     else
@@ -451,7 +451,7 @@ static uint8 MBREC_Write_AndCheck(void)
         if ((memcmp(DATABUFFER, URAMYADDR, 0x1e0) != 0) || (memcmp(DATABUFFER + 0x200, URAMYADDR + 0x200, 0x200) != 0))
         {
             //prints("flash mrec err-");
-            //Ğ´MBREC·İÊı
+            //å†™MBRECä»½æ•°
             count = 4;
         }
         else
@@ -473,7 +473,7 @@ static uint8 MBREC_Write_AndCheck(void)
             phy_block_addr++;
         }
 
-        //Ğ´ÍêºóÔÙÖØĞ£Ñéblock0ÖĞ MBRECĞ´ÈëÊÇ·ñÕıÈ·
+        //å†™å®Œåå†é‡æ ¡éªŒblock0ä¸­ MBRECå†™å…¥æ˜¯å¦æ­£ç¡®
         phy_block_addr = 0;
         sFlash_Phy_Read(DATABUFFER);
 
@@ -541,7 +541,7 @@ static uint8 BREC_Write_AndCheck(void)
         udisk_rw_sctr_num--;
     }
 
-    //Return: BRECĞ£ÑéºÍ,²¢¶ÔÆä×÷Ğ£Ñé: 0:Ò»ÖÂ; 1:²»Ò»ÖÂ.
+    //Return: BRECæ ¡éªŒå’Œ,å¹¶å¯¹å…¶ä½œæ ¡éªŒ: 0:ä¸€è‡´; 1:ä¸ä¸€è‡´.
     ret = Calculate_BREC_Checksum();
 
     return ret;
@@ -557,7 +557,7 @@ static uint8 BREC_Write_AndCheck(void)
  *
  * Returns    : a: if BREC verify success: 0: yes; 1:no; hl: Brec checksum;
  *
- * Note(s)    : ×¢Òâphy_block_addr²ÎÊıÖµ,±íÊ¾FlashÎïÀíblockµØÖ·.
+ * Note(s)    : æ³¨æ„phy_block_addrå‚æ•°å€¼,è¡¨ç¤ºFlashç‰©ç†blockåœ°å€.
  *********************************************************************************************************
  */
 static uint8 Calculate_BREC_Checksum(void)
@@ -579,7 +579,7 @@ static uint8 Calculate_BREC_Checksum(void)
         brecCount--;
     }
 
-    //Ğ£ÑéºÍ¶à¼ÓÁË×îºóÁ½¸öbyte(×îºóÁ½¸öbyteÊÇÔ­ÓĞµÄĞ£ÑéºÍ)
+    //æ ¡éªŒå’Œå¤šåŠ äº†æœ€åä¸¤ä¸ªbyte(æœ€åä¸¤ä¸ªbyteæ˜¯åŸæœ‰çš„æ ¡éªŒå’Œ)
     if (*((uint16 *) ((uint8 *) DATABUFFER + 0x1fc)) == 0xaa55)
     {
         if (brec_check_sum == (*((uint16 *) ((uint8 *) DATABUFFER + 0x1fe)) * 2))
@@ -598,7 +598,7 @@ static uint8 Calculate_BREC_Checksum(void)
  *********************************************************************************************************
  *                                           sFlash_Phy_Write
  *
- * Description: ½«BufferÖĞÒ»¸öÉÈÇøÊı¾İĞ´ÈëFlashÎïÀí¿Õ¼ä.
+ * Description: å°†Bufferä¸­ä¸€ä¸ªæ‰‡åŒºæ•°æ®å†™å…¥Flashç‰©ç†ç©ºé—´.
  *
  * Arguments  : ix: Uram Address.
  *
@@ -621,7 +621,7 @@ static void sFlash_Phy_Write(uint8 *dst_buffer)
  *********************************************************************************************************
  *                                           sFlash_Phy_Read
  *
- * Description: °ÑÒ»¸öÉÈÇøÊı¾İ´ÓFlashÎïÀíÇø¶Áµ½BufferÈ¥.
+ * Description: æŠŠä¸€ä¸ªæ‰‡åŒºæ•°æ®ä»Flashç‰©ç†åŒºè¯»åˆ°Bufferå».
  *
  * Arguments  : ix: Uram Address.
  *
@@ -644,7 +644,7 @@ void sFlash_Phy_Read(uint8 *dst_buffer)
  *********************************************************************************************************
  *             Caculate_CheckSum
  *
- * Description : ¼ÆËãzramÄÚÖ¸¶¨µØÖ·¿ªÊ¼´¦Ö¸¶¨³¤¶ÈÊı¾İµÄĞ£ÑéºÍ(2byte add)
+ * Description : è®¡ç®—zramå†…æŒ‡å®šåœ°å€å¼€å§‹å¤„æŒ‡å®šé•¿åº¦æ•°æ®çš„æ ¡éªŒå’Œ(2byte add)
  *
  * Arguments   : de: data start address; bc: data length
  *
@@ -654,7 +654,7 @@ void sFlash_Phy_Read(uint8 *dst_buffer)
  *
  *********************************************************************************************************
  */
-static uint16 Caculate_CheckSum(uint16 *addr, uint16 length)//length°´Á½×Ö½ÚÎªÒ»µ¥Î»
+static uint16 Caculate_CheckSum(uint16 *addr, uint16 length)//lengthæŒ‰ä¸¤å­—èŠ‚ä¸ºä¸€å•ä½
 {
     uint16 tmp, checksum = 0;
 

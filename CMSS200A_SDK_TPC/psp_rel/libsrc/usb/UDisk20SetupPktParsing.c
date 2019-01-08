@@ -247,7 +247,7 @@ void Setup_Packet_Handle(void)
         ConfigValue = (char) Request_Value;
         Set_EPA_BulkInMode();
         Set_EPB_BulkOutMode();
-        //set configºó»Ö¸´¸ßËÙÄ£Ê½,ÔÚHS´«ÊäÖĞ³ö´í×ªFS»áÊÇµ¼ÖÂ´«ÊäÖĞ¶Ï
+        //set configåæ¢å¤é«˜é€Ÿæ¨¡å¼,åœ¨HSä¼ è¾“ä¸­å‡ºé”™è½¬FSä¼šæ˜¯å¯¼è‡´ä¼ è¾“ä¸­æ–­
         Set_HighSpeed_Mode();
         break;
 
@@ -317,13 +317,13 @@ void Set_Endpoint_PacketSize(void)
 
     if ((BKDOOR & 0x40) != 0x00)
     {
-        max_pkt_len = 0x0002; //0x200×ªÎªĞ¡¶ËÄ£Ê½,High Speed
-        max_pkt_len_alter = 0x4000; //0x40×ªÎªĞ¡¶ËÄ£Ê½
+        max_pkt_len = 0x0002; //0x200è½¬ä¸ºå°ç«¯æ¨¡å¼,High Speed
+        max_pkt_len_alter = 0x4000; //0x40è½¬ä¸ºå°ç«¯æ¨¡å¼
     }
     else
     {
-        max_pkt_len = 0x4000; //0x40×ªÎªĞ¡¶ËÄ£Ê½,Full Speed
-        max_pkt_len_alter = 0x0002; //0x200×ªÎªĞ¡¶ËÄ£Ê½
+        max_pkt_len = 0x4000; //0x40è½¬ä¸ºå°ç«¯æ¨¡å¼,Full Speed
+        max_pkt_len_alter = 0x0002; //0x200è½¬ä¸ºå°ç«¯æ¨¡å¼
     }
 
     HS_EndpointA_Dscrptr.wMaxPacketSize = max_pkt_len;
@@ -367,9 +367,9 @@ void SetSerialNumber(void)
         {
             //serial number total length, including the head;
             SerialNumber.bLength = length * 4 + 2;
-            // 1¸öhexÊı×ª»»Îª2¸öASCII,¸ß4bitÔÚÇ°,µÍ4bitÔÚºó;
+            // 1ä¸ªhexæ•°è½¬æ¢ä¸º2ä¸ªASCII,é«˜4bitåœ¨å‰,ä½4bitåœ¨å;
             Cnvrt_Hex_To_ASCII((int8 *) SerialNumber.wString, length);
-            //1¸öASCII×ª»»Îª2byte Unicode16
+            //1ä¸ªASCIIè½¬æ¢ä¸º2byte Unicode16
             Cnvrt_ASCII_To_UNI16((uint8 *) SerialNumber.wString, length * 2);
 
             SerialNumber.bDescriptorType = 0x03;
@@ -412,11 +412,11 @@ void Cnvrt_ASCII_To_UNI16(uint8 *addr, uint8 length)
     uint8 *data_p1;
     uint8 *data_p2;
 
-    //Êı×éµÄÏÂ±ê´Ó0¿ªÊ¼
+    //æ•°ç»„çš„ä¸‹æ ‡ä»0å¼€å§‹
     data_p1 = addr + (length - 1); //The last byte address
     data_p2 = addr + (length - 1) * 2 + 1; //the data address to be load
 
-    //µ±ASCIIÂë³¤¶ÈÎª0»ò1Ê±×÷ÏÂÃæµÄ×ª»»»á¸²¸ÇµØÖ·Ö¸ÏòmemoryÖ®Ç°µÄÊı¾İ
+    //å½“ASCIIç é•¿åº¦ä¸º0æˆ–1æ—¶ä½œä¸‹é¢çš„è½¬æ¢ä¼šè¦†ç›–åœ°å€æŒ‡å‘memoryä¹‹å‰çš„æ•°æ®
     while (length != 0x00)
     {
         *data_p2 = 0x00;
@@ -445,7 +445,7 @@ void Cnvrt_ASCII_To_UNI16(uint8 *addr, uint8 length)
 uint8 Count_String_CharLngth(uint8 *addr, uint8 length)
 {
     uint8 count = 0x00;
-    //Îª0±íÊ¾×Ö·û´®ÒÑ¾­µ½×îºó
+    //ä¸º0è¡¨ç¤ºå­—ç¬¦ä¸²å·²ç»åˆ°æœ€å
     while (length != 0x00)
     {
         if (*addr == 0x00)
@@ -478,7 +478,7 @@ void Cnvrt_Hex_To_ASCII(uint8 *addr, uint8 length)
     uint8 *data_p1;
     uint8 *data_p2;
 
-    //Êı×éµÄÏÂ±ê´Ó0¿ªÊ¼
+    //æ•°ç»„çš„ä¸‹æ ‡ä»0å¼€å§‹
     data_p1 = addr + (length - 1); //The last byte address
     data_p2 = addr + (length - 1) * 2 + 1; //the data address to be load
 

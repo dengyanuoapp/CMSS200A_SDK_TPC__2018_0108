@@ -25,7 +25,7 @@
 #pragma name(MW_BS_AD_CMD2)
 
 extern HANDLE m_deFileHandle;
-extern Open_param_t *m_deOpenparam; //²ÎÊı±íµØÖ·
+extern Open_param_t *m_deOpenparam; //å‚æ•°è¡¨åœ°å€
 
 extern uint32 deApointerSave;
 extern uint32 deBpointerSave;
@@ -47,11 +47,11 @@ bool BackupCommand(void)
     m_deOpenparam->BreakPTSave->ApointSave = deApointerSave;
     m_deOpenparam->BreakPTSave->BpointSave = deBpointerSave;
     m_deOpenparam->BreakPTSave->breakPT = deBreakPointSave;
-    if (m_backupmode == 0)//¶ÏµãĞø²¥±¸·İ
+    if (m_backupmode == 0)//æ–­ç‚¹ç»­æ’­å¤‡ä»½
     {
         memcpy(&(m_deOpenparam->BreakPTSave->breakPointInfor), &g_decBreakPointInfor, sizeof(decBreakPointInfor_t));
     }
-    else//AB ¸´¶Á¹ı³ÌÖĞµÄ¶Ïµã²»±£´æ£¬Ö»ÊÇ±£´æAµã£¬ÒÔºó¶ÏµãĞø²¥´ÓAµã¿ªÊ¼
+    else//AB å¤è¯»è¿‡ç¨‹ä¸­çš„æ–­ç‚¹ä¸ä¿å­˜ï¼Œåªæ˜¯ä¿å­˜Aç‚¹ï¼Œä»¥åæ–­ç‚¹ç»­æ’­ä»Aç‚¹å¼€å§‹
     {
         memcpy(&(m_deOpenparam->BreakPTSave->breakPointInfor), &m_breakPointInfo, sizeof(decBreakPointInfor_t));
     }
@@ -71,7 +71,7 @@ bool RestoreCommand(void *param)
     else if((uint8) param == Hard_Break_open)
     {
         get_bpt_from_rdm();
-        deBreakPointSave	 = m_breakPointInfo.BreakPointAddr / 0x200;       //×Ö½ÚÆ«ÒÆ×ªÉÈÇøÆ«ÒÆ
+        deBreakPointSave	 = m_breakPointInfo.BreakPointAddr / 0x200;       //å­—èŠ‚åç§»è½¬æ‰‡åŒºåç§»
     }
     return TRUE;
 }
@@ -81,7 +81,7 @@ bool APointPlayCommand(void)
     g_decControlInfor.PlayMode = PLAY_MODE_BREAK;
     memcpy(&g_decBreakPointInfor, &m_breakPointInfo, sizeof(decBreakPointInfor_t));
     FS_FSeek(0, FS_SEEK_FFROMSTART, m_deFileHandle);
-    decInit();//¼ÆËãÊ±¼ä²»µ­Èë
+    decInit();//è®¡ç®—æ—¶é—´ä¸æ·¡å…¥
     decstart();
     return TRUE;
 }

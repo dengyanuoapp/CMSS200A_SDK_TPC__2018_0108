@@ -33,7 +33,7 @@ stmt  level    source
    22   1      branch_reflash:
    23   1          switch (CurUI_Type)
    24   1          {
-   25   2          case FMFreq_UI: //œ‘ æ∆µµ„
+   25   2          case FMFreq_UI: //ÊòæÁ§∫È¢ëÁÇπ
    26   2              /* stop or play icon */
    27   2              LEDDisplay(LED_PLAY, 0xff, !mute_flag);
    28   2              LEDDisplay(LED_PAUSE, 0xff, mute_flag);
@@ -54,7 +54,7 @@ stmt  level    source
    43   2              LEDDisplay(NUMBER4, buf[3], 1);
    44   2              break;
    45   2      
-   46   2          case FMChannel_UI://œ‘ æµÁÃ®∫≈
+   46   2          case FMChannel_UI://ÊòæÁ§∫ÁîµÂè∞Âè∑
    47   2              if (!g_FMStatus.station)
    48   2              {
    49   3                  CurUI_Type = FMFreq_UI;

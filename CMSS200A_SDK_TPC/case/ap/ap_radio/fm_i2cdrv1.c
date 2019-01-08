@@ -57,11 +57,11 @@ void OpenPA(void);
  ********************************************************************************
  *             uint8 FM_Init(uint8 band,uint8 slevel)
  *
- * Description : FM³õÊ¼»¯,ÉèÖÃËÑË÷ÃÅÏŞ,²¨¶Î,²½½øµÈ
+ * Description : FMåˆå§‹åŒ–,è®¾ç½®æœç´¢é—¨é™,æ³¢æ®µ,æ­¥è¿›ç­‰
  *
- * Arguments   :	  	 ²¨¶ÎÑ¡ÔñÖµ,ÃÅÏŞ
+ * Arguments   :	  	 æ³¢æ®µé€‰æ‹©å€¼,é—¨é™
  *
- * Returns     :		 Èô³õÊ¼»¯³É¹¦,Ôò·µ»Ø1,·ñÔò,·µ»Ø0
+ * Returns     :		 è‹¥åˆå§‹åŒ–æˆåŠŸ,åˆ™è¿”å›1,å¦åˆ™,è¿”å›0
  *
  * Notes       :
  *
@@ -80,22 +80,22 @@ uint8 FM_Init(uint8 band, uint8 slevel)
     {
         Set_Band = 0x04;
     }
-    WriteBuffer[0] &= (uint8) 0xfe; //³õÊ¼»¯,disable SEEK
+    WriteBuffer[0] &= (uint8) 0xfe; //åˆå§‹åŒ–,disable SEEK
 
     WriteBuffer[3] &= (uint8) 0xf0;
     WriteBuffer[3] |= Set_Band;
 
-    Set_SeekLevel = slevel; //±äÁ¿³õÊ¼»¯
+    Set_SeekLevel = slevel; //å˜é‡åˆå§‹åŒ–
     WriteBuffer[6] = 0x80;
     WriteBuffer[6] |= Set_SeekLevel;
 
     //Set_Standby = 1;
     //Set_SearchMode = 0;
 
-    I2C_Init(); //I2C³õÊ¼»¯
+    I2C_Init(); //I2Cåˆå§‹åŒ–
     result = FM_Standby_Drv(1);
     FM_Wait50ms();
-    SetMfpToNand(); //½«GPIOÇĞµ½NAND FLASH
+    SetMfpToNand(); //å°†GPIOåˆ‡åˆ°NAND FLASH
 
     SetAINGain(0x02, 0x05);
     Analogtempbuf[0] = 0x01;
@@ -110,7 +110,7 @@ uint8 FM_Init(uint8 band, uint8 slevel)
  ********************************************************************************
  *             void FM_Exit(void)
  *
- * Description : ÍË³öFM
+ * Description : é€€å‡ºFM
  *
  * Arguments   :
  *
@@ -137,12 +137,12 @@ void FM_Exit(void)
  ********************************************************************************
  *             uint8 FM_SetFreq(uint16 Freq)
  *
- * Description : ÉèÖÃÆµµã,½øĞĞtune²Ù×÷
+ * Description : è®¾ç½®é¢‘ç‚¹,è¿›è¡Œtuneæ“ä½œ
  *
- * Arguments   :	  ĞèÉèÖÃµÄÆµµãÖµ
+ * Arguments   :	  éœ€è®¾ç½®çš„é¢‘ç‚¹å€¼
  *
- * Returns     :		//ÉèÖÃÆµµãÊÇ·ñ³É¹¦,ÈôÎªÕæÌ¨,·µ»Ø1
- *					       ·ñÔò,·µ»Ø0
+ * Returns     :		//è®¾ç½®é¢‘ç‚¹æ˜¯å¦æˆåŠŸ,è‹¥ä¸ºçœŸå°,è¿”å›1
+ *					       å¦åˆ™,è¿”å›0
  * Notes       :
  *
  ********************************************************************************
@@ -150,7 +150,7 @@ void FM_Exit(void)
 uint8 FM_SetFreq(uint16 Freq)
 {
     uint8 result;
-    I2C_Init(); //½«GPIOÇĞµ½I2C
+    I2C_Init(); //å°†GPIOåˆ‡åˆ°I2C
     result = FM_SetFrequency(Freq);
     result = CheckStation();
     if (result != 0)
@@ -161,19 +161,19 @@ uint8 FM_SetFreq(uint16 Freq)
     {
         Is_Stere0 = 0;
     }
-    //SetMfpToNand(); //½«GPIOÇĞµ½NAND FLASH
+    //SetMfpToNand(); //å°†GPIOåˆ‡åˆ°NAND FLASH
     return result;
 }
 /*
  ********************************************************************************
  *             uint8 FM_GetStatus(FMStatus_Tab_t * Buf)
  *
- * Description : »ñÈ¡ËÑË÷µ½µÄÕæÌ¨µÄÆµµãºÍÁ¢ÌåÉùĞÅÏ¢
+ * Description : è·å–æœç´¢åˆ°çš„çœŸå°çš„é¢‘ç‚¹å’Œç«‹ä½“å£°ä¿¡æ¯
  *
- * Arguments   :	  ±£´æµçÌ¨ĞÅÏ¢µÄ½á¹¹ÌåÖ¸Õë
+ * Arguments   :	  ä¿å­˜ç”µå°ä¿¡æ¯çš„ç»“æ„ä½“æŒ‡é’ˆ
  *
- * Returns     :		//ÊÇ·ñ¶ÁÈ¡×´Ì¬³É¹¦,Èç¹û¶ÁÈ¡³É¹¦,Ôò·µ»ØÖµÎª1
- *					       ·ñÔò,·µ»Ø0
+ * Returns     :		//æ˜¯å¦è¯»å–çŠ¶æ€æˆåŠŸ,å¦‚æœè¯»å–æˆåŠŸ,åˆ™è¿”å›å€¼ä¸º1
+ *					       å¦åˆ™,è¿”å›0
  * Notes       :
  *
  ********************************************************************************
@@ -182,7 +182,7 @@ uint8 FM_GetStatus(FMStatus_Tab_t *Buf)
 {
     uint8 result;
     uint8 i;
-    I2C_Init(); //½«GPIOÇĞµ½I2C
+    I2C_Init(); //å°†GPIOåˆ‡åˆ°I2C
     for (i = 0; i < 2; i++)
     {
         result = ReadStatus();
@@ -194,7 +194,7 @@ uint8 FM_GetStatus(FMStatus_Tab_t *Buf)
     if (result != 0)
     {
         DisAssemble_WriteBuffer();
-        if (Is_Stere0 == 1) //»ñÈ¡ËÑË÷µ½µÄÕæÌ¨µÄÆµµãºÍÁ¢ÌåÉùĞÅÏ¢
+        if (Is_Stere0 == 1) //è·å–æœç´¢åˆ°çš„çœŸå°çš„é¢‘ç‚¹å’Œç«‹ä½“å£°ä¿¡æ¯
         {
             Buf->FM_Stereo_Status = 0;
         }
@@ -218,7 +218,7 @@ uint8 FM_GetStatus(FMStatus_Tab_t *Buf)
  *
  * Arguments   :
  *
- * Returns     :		 ÈôÉèÖÃstandby³É¹¦,Ôò·µ»Ø1,·ñÔò,·µ»Ø0
+ * Returns     :		 è‹¥è®¾ç½®standbyæˆåŠŸ,åˆ™è¿”å›1,å¦åˆ™,è¿”å›0
  *
  * Notes       :
  *
@@ -227,20 +227,20 @@ uint8 FM_GetStatus(FMStatus_Tab_t *Buf)
 uint8 FM_Standby(void)
 {
     uint8 result;
-    I2C_Init(); //½«GPIOÇĞµ½I2C
+    I2C_Init(); //å°†GPIOåˆ‡åˆ°I2C
     result = FM_Standby_Drv(0);
-    SetMfpToNand(); //½«GPIOÇĞµ½NAND FLASH
+    SetMfpToNand(); //å°†GPIOåˆ‡åˆ°NAND FLASH
     return result;
 }
 /*
  ********************************************************************************
  *             uint8 FM_Mute(FM_MUTE_t mode)
  *
- * Description : FM¾²ÒôÉèÖÃ
+ * Description : FMé™éŸ³è®¾ç½®
  *
- * Arguments   :	  ÊÇ·ñ¾²Òô,0ÎªÈ¡Ïû¾²Òô,1Îª¾²Òô
+ * Arguments   :	  æ˜¯å¦é™éŸ³,0ä¸ºå–æ¶ˆé™éŸ³,1ä¸ºé™éŸ³
  *
- * Returns     :		 ÈôÉèÖÃ¾²Òô¿ØÖÆ³É¹¦,Ôò·µ»Ø1,·ñÔò,·µ»Ø0
+ * Returns     :		 è‹¥è®¾ç½®é™éŸ³æ§åˆ¶æˆåŠŸ,åˆ™è¿”å›1,å¦åˆ™,è¿”å›0
  *
  * Notes       :
  *
@@ -251,8 +251,8 @@ uint8 FM_Mute(FM_MUTE_t mode)
     uint8 result;
     uint8 sfr_bak;
     uint8 i;
-    I2C_Init(); //½«GPIOÇĞµ½I2C
-    WriteBuffer[0] &= (uint8) 0xfe; //disable seek ,×¢ÒâÓ²¼şSEEK·½Ê½,ÔÚÉèÖÃÆµµã\¾²ÒôÊ±,±ØĞëdisable seek!!!!
+    I2C_Init(); //å°†GPIOåˆ‡åˆ°I2C
+    WriteBuffer[0] &= (uint8) 0xfe; //disable seek ,æ³¨æ„ç¡¬ä»¶SEEKæ–¹å¼,åœ¨è®¾ç½®é¢‘ç‚¹\é™éŸ³æ—¶,å¿…é¡»disable seek!!!!
     if (mode == 0)
     {
         WriteBuffer[0] |= (0x01 << 6);
@@ -277,20 +277,20 @@ uint8 FM_Mute(FM_MUTE_t mode)
             break;
         }
     }
-    SetMfpToNand(); //½«GPIOÇĞµ½NAND FLASH
+    SetMfpToNand(); //å°†GPIOåˆ‡åˆ°NAND FLASH
     return result;
 }
 /*
  ********************************************************************************
  *             uint8 FM_Search(fm_play_status_t * Buf,uint16 Freq,uint8 SeekDirect)
  *
- * Description : FMËÑÌ¨
+ * Description : FMæœå°
  *
  * Arguments   :
- param1:  ±£´æµçÌ¨ĞÅÏ¢µÄ½á¹¹ÌåÖ¸Õë
- param2:  Èí¼şËÑÌ¨·½Ê½,ĞèÉèÖÃµÄÆµÂÊÖµ
- param3:  ËÑË÷·½Ïò
- * Returns     :		Èç¹ûËÑµ½µÄµçÌ¨ÎªÕæÌ¨,Ôò·µ»Ø1;·ñÔò,·µ»Ø0
+ param1:  ä¿å­˜ç”µå°ä¿¡æ¯çš„ç»“æ„ä½“æŒ‡é’ˆ
+ param2:  è½¯ä»¶æœå°æ–¹å¼,éœ€è®¾ç½®çš„é¢‘ç‡å€¼
+ param3:  æœç´¢æ–¹å‘
+ * Returns     :		å¦‚æœæœåˆ°çš„ç”µå°ä¸ºçœŸå°,åˆ™è¿”å›1;å¦åˆ™,è¿”å›0
  *
  * Notes       :
  *
@@ -300,10 +300,10 @@ uint8 FM_Search(fm_play_status_t *Buf, uint16 Freq, uint8 SeekDirect)
 {
     uint8 result, i;
 #ifdef  HARDWARE_SEEK
-    Set_SeekDirect = SeekDirect << 1; //Ó²¼şSEEK·½Ê½,ĞèÉèÖÃSEEK·½Ïò
+    Set_SeekDirect = SeekDirect << 1; //ç¡¬ä»¶SEEKæ–¹å¼,éœ€è®¾ç½®SEEKæ–¹å‘
     Freq = Freq; //avoid keil warning
 #else
-    Freq_RF = Freq; //Èí¼şËÑÌ¨,ÉèÖÃtuneÆµµã
+    Freq_RF = Freq; //è½¯ä»¶æœå°,è®¾ç½®tuneé¢‘ç‚¹
     SeekDirect = SeekDirect; //avoid keil warning
 #endif
     I2C_Init();
@@ -311,7 +311,7 @@ uint8 FM_Search(fm_play_status_t *Buf, uint16 Freq, uint8 SeekDirect)
     for (i = 0; i < 2; i++)
     {
 #ifdef  HARDWARE_SEEK
-        result = WriteOneFrame(2); //Ó²¼şSEEK·½Ê½,Ö»ĞèĞ´02¼Ä´æÆ÷,enable seek
+        result = WriteOneFrame(2); //ç¡¬ä»¶SEEKæ–¹å¼,åªéœ€å†™02å¯„å­˜å™¨,enable seek
 #else
         result = WriteOneFrame(8);
         // result=WriteOneFrame(4);
@@ -354,9 +354,9 @@ uint8 FM_Search(fm_play_status_t *Buf, uint16 Freq, uint8 SeekDirect)
  ********************************************************************************
  *             void FM_VolumeSet(uint8 Vol)
  *
- * Description : ÉèÖÃPAÒôÁ¿
+ * Description : è®¾ç½®PAéŸ³é‡
  *
- * Arguments   :	  ĞèÉèÖÃµÄÒôÁ¿Öµ
+ * Arguments   :	  éœ€è®¾ç½®çš„éŸ³é‡å€¼
  *
  * Returns     :
  *
@@ -372,11 +372,11 @@ void FM_VolumeSet(uint8 Vol)
  ********************************************************************************
  *             uint8 CheckStation(void)
  *
- * Description : ÕæÌ¨ÅĞ¶Ï
+ * Description : çœŸå°åˆ¤æ–­
  *
  * Arguments   :
  *
- * Returns     :	 ÈôËÑµ½µÄµçÌ¨ÎªÕæÌ¨,·µ»Ø1;·ñÔò,·µ»Ø0
+ * Returns     :	 è‹¥æœåˆ°çš„ç”µå°ä¸ºçœŸå°,è¿”å›1;å¦åˆ™,è¿”å›0
  *
  * Notes       :
  *
@@ -387,17 +387,17 @@ uint8 CheckStation(void)
     uint8 i = 2;
     uint8 result = 0;
     uint8 temp;
-    FM_Wait50ms(); //ÑÓÊ±20ms£¬µÈ´ıFM Tune»òSEEKÍê³É
+    FM_Wait50ms(); //å»¶æ—¶20msï¼Œç­‰å¾…FM Tuneæˆ–SEEKå®Œæˆ
     do
     {
-        i--; //¶ÁÈ¡Á½´Î
+        i--; //è¯»å–ä¸¤æ¬¡
         result = ReadStatus();
     }
     while ((result == 0) && (i > 0));
     if (result != 0)
     {
 #ifdef HARDWARE_SEEK
-        temp = ReadBuffer[0] | 0xdf; //Ó²¼şSEEK·½Ê½£¬ÕæÌ¨ÅĞ¶Ï´¦Àí
+        temp = ReadBuffer[0] | 0xdf; //ç¡¬ä»¶SEEKæ–¹å¼ï¼ŒçœŸå°åˆ¤æ–­å¤„ç†
         if(temp != 0xff)
         {
             DisAssemble_WriteBuffer();
@@ -408,7 +408,7 @@ uint8 CheckStation(void)
             return 0;
         }
 #else
-        temp = ReadBuffer[2] & 0x01; //Èí¼şËÑÌ¨·½Ê½£¬ÕæÌ¨ÅĞ¶Ï´¦Àí
+        temp = ReadBuffer[2] & 0x01; //è½¯ä»¶æœå°æ–¹å¼ï¼ŒçœŸå°åˆ¤æ–­å¤„ç†
         if (temp == 0x01)
         {
             DisAssemble_WriteBuffer();
@@ -427,11 +427,11 @@ uint8 CheckStation(void)
  ********************************************************************************
  *             uint8 FM_SetFrequency(uint16 Freq)
  *
- * Description : ÆµµãÉèÖÃ
+ * Description : é¢‘ç‚¹è®¾ç½®
  *
- * Arguments   :	ĞèÉèÖÃµÄÆµÂÊÖµ
+ * Arguments   :	éœ€è®¾ç½®çš„é¢‘ç‡å€¼
  *
- * Returns     :	 ÈôÆµµãÉèÖÃ³É¹¦£¬·µ»Ø1;·ñÔò,·µ»Ø0
+ * Returns     :	 è‹¥é¢‘ç‚¹è®¾ç½®æˆåŠŸï¼Œè¿”å›1;å¦åˆ™,è¿”å›0
  *
  * Notes       :
  *
@@ -440,7 +440,7 @@ uint8 CheckStation(void)
 uint8 FM_SetFrequency(uint16 Freq)
 {
     uint8 i, result;
-    WriteBuffer[0] &= (uint8) 0xfe; //½ûÖ¹SEEK ,×¢ÒâÓ²¼şSEEK·½Ê½,ÔÚÉèÖÃÆµµã\¾²ÒôÊ±,±ØĞëdisable seek!!!!
+    WriteBuffer[0] &= (uint8) 0xfe; //ç¦æ­¢SEEK ,æ³¨æ„ç¡¬ä»¶SEEKæ–¹å¼,åœ¨è®¾ç½®é¢‘ç‚¹\é™éŸ³æ—¶,å¿…é¡»disable seek!!!!
     WriteBuffer[1] |= (0x01 << 0); //Enable FM
     WriteBuffer[2] = (uint8) (Freq >> 8);
     WriteBuffer[3] &= 0x3f;
@@ -450,7 +450,7 @@ uint8 FM_SetFrequency(uint16 Freq)
     WriteBuffer[6] |= Set_SeekLevel;
     for (i = 0; i < 2; i++)
     {
-        result = WriteOneFrame(8); //ÉèÖÃÆµµã,Ğ´Ïà¹Ø¼Ä´æÆ÷
+        result = WriteOneFrame(8); //è®¾ç½®é¢‘ç‚¹,å†™ç›¸å…³å¯„å­˜å™¨
         if (result != 0)
         {
             return 1;
@@ -463,11 +463,11 @@ uint8 FM_SetFrequency(uint16 Freq)
  ********************************************************************************
  *            uint8 FM_Standby_Drv(uint8 StandbyFlag)
  *
- * Description : FM standby»òwake up
+ * Description : FM standbyæˆ–wake up
  *
- * Arguments   :	 standby±êÖ¾,1±íÊ¾wake up,0±íÊ¾standby
+ * Arguments   :	 standbyæ ‡å¿—,1è¡¨ç¤ºwake up,0è¡¨ç¤ºstandby
  *
- * Returns     :	 Èô standby»òwake up³É¹¦£¬·µ»Ø1;·ñÔò,·µ»Ø0
+ * Returns     :	 è‹¥ standbyæˆ–wake upæˆåŠŸï¼Œè¿”å›1;å¦åˆ™,è¿”å›0
  *
  * Notes       :
  *
@@ -493,7 +493,7 @@ uint8 FM_Standby_Drv(uint8 StandbyFlag)
  ********************************************************************************
  *           void Assemble_WriteBuffer(void)
  *
- * Description : ÉèÖÃFMµÄĞ´¼Ä´æÆ÷,¿ØÖÆËÑÌ¨
+ * Description : è®¾ç½®FMçš„å†™å¯„å­˜å™¨,æ§åˆ¶æœå°
  *
  * Arguments   :
  *
@@ -505,17 +505,17 @@ uint8 FM_Standby_Drv(uint8 StandbyFlag)
  */
 void Assemble_WriteBuffer(void)
 {
-#ifdef HARDWARE_SEEK				//Ó²¼şSEEK·½Ê½
+#ifdef HARDWARE_SEEK				//ç¡¬ä»¶SEEKæ–¹å¼
     WriteBuffer[0] |= 0x01; //seek enable
-    WriteBuffer[0] &= (uint8)0xfd; //Çå³ıÉÏ´ÎµÄseek direct
-    WriteBuffer[0] |= Set_SeekDirect; //ÉèÖÃ SEEK Direct
+    WriteBuffer[0] &= (uint8)0xfd; //æ¸…é™¤ä¸Šæ¬¡çš„seek direct
+    WriteBuffer[0] |= Set_SeekDirect; //è®¾ç½® SEEK Direct
     WriteBuffer[1] |= (0x01 << 0); //FM Enable
     WriteBuffer[1] &= 0x7f; //Seekmode=0
 
-#else							   //Èí¼şËÑÌ¨·½Ê½
-    WriteBuffer[0] &= (uint8) 0xfe; //½ûÖ¹SEEK
+#else							   //è½¯ä»¶æœå°æ–¹å¼
+    WriteBuffer[0] &= (uint8) 0xfe; //ç¦æ­¢SEEK
     WriteBuffer[1] |= (0x01 << 0); //Enable FM
-    WriteBuffer[2] = (uint8) (Freq_RF >> 8); //ÉèÖÃËÑË÷Æµµã
+    WriteBuffer[2] = (uint8) (Freq_RF >> 8); //è®¾ç½®æœç´¢é¢‘ç‚¹
     WriteBuffer[3] &= 0x3f;
     WriteBuffer[3] |= (uint8) (Freq_RF % 256);
     WriteBuffer[3] |= (0x01 << 4); //enable tune
@@ -527,7 +527,7 @@ void Assemble_WriteBuffer(void)
  ********************************************************************************
  *           void DisAssemble_WriteBuffer(void)
  *
- * Description : ¶ÁFMµÄ¼Ä´æÆ÷,¶ÁÈ¡µçÌ¨ĞÅÏ¢
+ * Description : è¯»FMçš„å¯„å­˜å™¨,è¯»å–ç”µå°ä¿¡æ¯
  *
  * Arguments   :
  *
@@ -539,7 +539,7 @@ void Assemble_WriteBuffer(void)
  */
 void DisAssemble_WriteBuffer(void)
 {
-    if ((ReadBuffer[0] & (0x01 << 2)) != 0) //stereoÁ¢ÌåÉù ÅĞ¶Ï
+    if ((ReadBuffer[0] & (0x01 << 2)) != 0) //stereoç«‹ä½“å£° åˆ¤æ–­
     {
         StereoFlag = 1;
     }
@@ -547,7 +547,7 @@ void DisAssemble_WriteBuffer(void)
     {
         StereoFlag = 0;
     }
-    Freq_RF = (uint16) (ReadBuffer[0] & 0x03); //¶ÁÈ¡ËÑË÷µ½µÄµçÌ¨Æµµã
+    Freq_RF = (uint16) (ReadBuffer[0] & 0x03); //è¯»å–æœç´¢åˆ°çš„ç”µå°é¢‘ç‚¹
     Freq_RF <<= 8;
     Freq_RF += ReadBuffer[1];
 }
@@ -558,11 +558,11 @@ void OpenPA(void)
     uint8 sfr_bak;
     sfr_bak = SFR_BANK;
     paattr.pa_in.dacin = 0;
-    paattr.pa_in.fmin = 1; //Ñ¡ÔñPAµÄÊäÈëÎªFMIN
+    paattr.pa_in.fmin = 1; //é€‰æ‹©PAçš„è¾“å…¥ä¸ºFMIN
     paattr.pa_in.linein = 0;
     paattr.pa_in.micin = 0;
 
-    SFR_BANK = 0x01; //Ê¹ÄÜFMINµ½PAµÄÍ¨Â·
+    SFR_BANK = 0x01; //ä½¿èƒ½FMINåˆ°PAçš„é€šè·¯
     MRCR2 |= 0x30;
     SFR_BANK = BANK_AUIP;
     FMOP_CTL &= (uint8) 0xf8;

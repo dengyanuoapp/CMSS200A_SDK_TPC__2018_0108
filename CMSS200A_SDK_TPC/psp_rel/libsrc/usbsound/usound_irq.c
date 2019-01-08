@@ -13,9 +13,9 @@
  * \brief    .
  * \author   dengtaiping
  * \par      GENERAL DESCRIPTION:
- *               usbÖĞ¶Ï·şÎñ³ÌĞò
+ *               usbä¸­æ–­æœåŠ¡ç¨‹åº
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
  *
@@ -151,7 +151,7 @@ void dma_adc_half_isr(void)
             ADC_SRFT_CTL0 = (ADC_SRFT_CTL0 & 0xf9) | 0x04; //adjust faster
         }
 #else
-        if (start_play_flag == 0) //Èç¹ûÃ»²¥·Å£¬¾Íµ÷£¬ÓÅÏÈ±£Ö¤²¥·Å²»¶ÏÒô
+        if (start_play_flag == 0) //å¦‚æœæ²¡æ’­æ”¾ï¼Œå°±è°ƒï¼Œä¼˜å…ˆä¿è¯æ’­æ”¾ä¸æ–­éŸ³
         {
             
             //adjust_audio_pll(record_data_count, RECORD_HIGH_THRESHOLD, RECORD_LOW_THRESHOLD);
@@ -455,7 +455,7 @@ void usound_isr(void)
         hid_in_token_isr();
         break;
     case DISCONNECT_INT:
-        USBEIRQ = 0x80; //¹ØÖĞ¶Ï£¬ap½«ÍË³ö
+        USBEIRQ = 0x80; //å…³ä¸­æ–­ï¼Œapå°†é€€å‡º
         usb_state |= USOUND_PLUG_OUT;
         break;
     default:

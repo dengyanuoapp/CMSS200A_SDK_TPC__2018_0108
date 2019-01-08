@@ -35,7 +35,7 @@ void show_lowpower_msg(void)
     }
 }
 
-//´ò¿ª°´¼üÒô
+//æ‰“å¼€æŒ‰é”®éŸ³
 void Open_KeyTone(uint8 keytone)
 {
 #if 0
@@ -47,7 +47,7 @@ void Open_KeyTone(uint8 keytone)
     keytone = keytone;
 #endif
 }
-//¶Ô³¤°´Êı×Ö¼ü½øĞĞ¸´ÓÃ´¦Àí
+//å¯¹é•¿æŒ‰æ•°å­—é”®è¿›è¡Œå¤ç”¨å¤„ç†
 uint8 switch_key_func(uint8 key)
 {
     if ((key >= START_KEY_NUM) && (key <= END_KEY_NUM ))
@@ -59,15 +59,15 @@ uint8 switch_key_func(uint8 key)
 
 /*
  ********************************************************************************
- * Description : ´¦ÀíÏµÍ³ÏûÏ¢, ·µ»Ø°´¼üÏûÏ¢, Í¬Ê±¸ºÔğ¿ª/¹Ø±³¹â
+ * Description : å¤„ç†ç³»ç»Ÿæ¶ˆæ¯, è¿”å›æŒ‰é”®æ¶ˆæ¯, åŒæ—¶è´Ÿè´£å¼€/å…³èƒŒå…‰
  *
- * Arguments   : key, ÏµÍ³ÏûÏ¢
+ * Arguments   : key, ç³»ç»Ÿæ¶ˆæ¯
  *
- * Returns     : ·µ»ØapÄÜ¹»Ê¶±ğµÄÏûÏ¢, Èç¹ûÃ»ÓĞÏµÍ³ÏûÏ¢, ·µ»Ø AP_KEY_NULL
+ * Returns     : è¿”å›apèƒ½å¤Ÿè¯†åˆ«çš„æ¶ˆæ¯, å¦‚æœæ²¡æœ‰ç³»ç»Ÿæ¶ˆæ¯, è¿”å› AP_KEY_NULL
  *
  * Notes       :
 
- * °´¼üÊ±Ğò:
+ * æŒ‰é”®æ—¶åº:
  *  0.....1.2....1.5........... (s)
  *  key    long   hold    up    (>1.2s)
  *  key  up            (<1.2s)
@@ -79,28 +79,28 @@ uint8 switch_key_func(uint8 key)
 uint8 ap_get_message_core(uint8 key)
 {
     uint8 tmp_key;
-    /*°´¼üÏûÏ¢ºÍÉÏ´ÎµÄÒ»ÑùÊ±µÄ´¦Àí*/
+    /*æŒ‰é”®æ¶ˆæ¯å’Œä¸Šæ¬¡çš„ä¸€æ ·æ—¶çš„å¤„ç†*/
     if (key == key_value)
     {
-        /*±³¹âÃ»¿ªÊ±£¬µÈÌ§Æğ¼ü¿ª±³¹â£¬ºöÂÔ°´¼ü*/
+        /*èƒŒå…‰æ²¡å¼€æ—¶ï¼Œç­‰æŠ¬èµ·é”®å¼€èƒŒå…‰ï¼Œå¿½ç•¥æŒ‰é”®*/
         g_rtc_counter = 0;
         g_standby_time = 0;
         key_count++;
 
-        /*°´×¡°´¼üÊ±£¬320ms·¢ËÍÒ»´ÎÏàÍ¬°´¼üÏûÏ¢*/
+        /*æŒ‰ä½æŒ‰é”®æ—¶ï¼Œ320mså‘é€ä¸€æ¬¡ç›¸åŒæŒ‰é”®æ¶ˆæ¯*/
         if (key_count >= 4)
         {
             key_value = key;
-            //´¦ÀíÊı×Ö¼ü³¤°´¸´ÓÃ¹¦ÄÜ
+            //å¤„ç†æ•°å­—é”®é•¿æŒ‰å¤ç”¨åŠŸèƒ½
             tmp_key = switch_key_func(key);
             if(tmp_key == NULL)
             {
-                key = (uint8) (key | AP_KEY_LONG); //=1.2s,·¢³¤°´¼üÏûÏ¢
+                key = (uint8) (key | AP_KEY_LONG); //=1.2s,å‘é•¿æŒ‰é”®æ¶ˆæ¯
             }
             else
             {
                 key = tmp_key;
-                //±ÜÃâ¸´ÓÃ³¤°´¼ü¶à´Î´¦Àí
+                //é¿å…å¤ç”¨é•¿æŒ‰é”®å¤šæ¬¡å¤„ç†
                 if(holdkey_flag == TRUE)
                 {
                     longkey_flag = 1;
@@ -117,7 +117,7 @@ uint8 ap_get_message_core(uint8 key)
         key_count = 0;
         g_rtc_counter = 0;
         g_standby_time = 0;
-        //Èç¹ûµ±Ç°µÄ°´¼üÎªplay¼ü£¬Ôò¼ì²âµ½onoff²¢Ã»ÓĞËÉ¿ª£¬Ôò¶ªÆú·¢³öupÏûÏ¢
+        //å¦‚æœå½“å‰çš„æŒ‰é”®ä¸ºplayé”®ï¼Œåˆ™æ£€æµ‹åˆ°onoffå¹¶æ²¡æœ‰æ¾å¼€ï¼Œåˆ™ä¸¢å¼ƒå‘å‡ºupæ¶ˆæ¯
         if((key_value == Msg_KeyPlayPause) && (get_onoff_key_status() != 0))
         {
             break;
@@ -130,14 +130,14 @@ uint8 ap_get_message_core(uint8 key)
         }
         else
         {
-            /*key_valueµÄÖÃĞè¸Ä±ä*/
+            /*key_valueçš„ç½®éœ€æ”¹å˜*/
             key = key_value | AP_KEY_UP;
         }
         key_value = key;
 
         break;
     case MSG_LOW_POWER:
-        /*ÏµÍ³µÍµçÏûÏ¢´¦ÀíÎªÇ¿ÖÆ¹Ø»ú*/
+        /*ç³»ç»Ÿä½ç”µæ¶ˆæ¯å¤„ç†ä¸ºå¼ºåˆ¶å…³æœº*/
         lowpower_count++;
         if (lowpower_count > 6)
         {
@@ -156,7 +156,7 @@ uint8 ap_get_message_core(uint8 key)
     case MSG_USB_UNSTICK:
         key = AP_KEY_NULL;
         break;
-    default: /*ĞÂ°´¼ü´¦Àí*/
+    default: /*æ–°æŒ‰é”®å¤„ç†*/
         g_rtc_counter = 0;
         key_value = key;
         key_count = 1;
@@ -168,12 +168,12 @@ uint8 ap_get_message_core(uint8 key)
 
 /*
  ********************************************************************************
- * Description : ´¦ÀíÈÈ¼üÏûÏ¢, ·µ»Ø½á¹ûÏûÏ¢
+ * Description : å¤„ç†çƒ­é”®æ¶ˆæ¯, è¿”å›ç»“æœæ¶ˆæ¯
  *
- * Arguments   : key, °´¼üÏûÏ¢
+ * Arguments   : key, æŒ‰é”®æ¶ˆæ¯
  *
- * Returns     : Èç¹ûÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø½á¹ûÏûÏ¢
- Èç¹ûÃ»ÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø0
+ * Returns     : å¦‚æœæœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›ç»“æœæ¶ˆæ¯
+ å¦‚æœæ²¡æœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›0
  *
  * Notes       :
  *
@@ -183,13 +183,13 @@ uint8 ap_handle_hotkey_core(uint8 key)
 {
     switch (key)
     {
-    case AP_KEY_PLAY | AP_KEY_LONG: //³¤°´play·¢standby
+    case AP_KEY_PLAY | AP_KEY_LONG: //é•¿æŒ‰playå‘standby
     case AP_KEY_FUNCTION | AP_KEY_LONG:
         longkey_flag = 1;
-    case AP_MSG_STANDBY: //×Ô¶¯¹Ø»ú
+    case AP_MSG_STANDBY: //è‡ªåŠ¨å…³æœº
         return RESULT_STANDBY;
     case AP_KEY_USBTEST | AP_KEY_UP:
-        //Èç¹ûÃ»ÓĞÁ¬½ÓUSBÏß£¬Ôò²»½øÈëutest¹¦ÄÜ
+        //å¦‚æœæ²¡æœ‰è¿æ¥USBçº¿ï¼Œåˆ™ä¸è¿›å…¥uteståŠŸèƒ½
         if(usb_on_flag == 0)
         {
             return NULL;
@@ -200,9 +200,9 @@ uint8 ap_handle_hotkey_core(uint8 key)
         return RESULT_PITCH;
 
         break;
-    case AP_KEY_REC | AP_KEY_UP: //½øÈëÂ¼Òô
-        //ÕâÀïµÄÌõ¼şÅĞ¶ÏÖ÷ÒªÊÇÎªÁË´¦ÀíÊı×Ö³¤°´¼ü¸´ÓÃ³ÉÂ¼Òô¼üÊ±£¬
-        //·ÀÖ¹ÍË³öµ±Ç°apºóÔÙ´Î´¦Àí¸Ã°´¼ü
+    case AP_KEY_REC | AP_KEY_UP: //è¿›å…¥å½•éŸ³
+        //è¿™é‡Œçš„æ¡ä»¶åˆ¤æ–­ä¸»è¦æ˜¯ä¸ºäº†å¤„ç†æ•°å­—é•¿æŒ‰é”®å¤ç”¨æˆå½•éŸ³é”®æ—¶ï¼Œ
+        //é˜²æ­¢é€€å‡ºå½“å‰apåå†æ¬¡å¤„ç†è¯¥æŒ‰é”®
         if(holdkey_flag == TRUE)
         {
             longkey_flag = 1;
@@ -229,11 +229,11 @@ uint8 ap_handle_hotkey_core(uint8 key)
     }
 }
 /********************************************************************************
- * Description : »ñÈ¡onoff¼üµÄ×´Ì¬
+ * Description : è·å–onoffé”®çš„çŠ¶æ€
  *
  * Arguments   :
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -244,21 +244,21 @@ uint8 get_onoff_key_status(void)
     uint8 sfr_bak, onoff_staus;
     sfr_bak = SFR_BANK;
     SFR_BANK = BANK_PMU;
-    onoff_staus = SYSTEM_ONOFF & 0x08;  //»ñÈ¡onoff¼üµÄ×´Ì¬
+    onoff_staus = SYSTEM_ONOFF & 0x08;  //è·å–onoffé”®çš„çŠ¶æ€
     SFR_BANK = sfr_bak;
     return onoff_staus;
 }
 
 /********************************************************************************
- * Description :´¦Àí³¤°´PLAY¼ü¹Ø»ú£¬»ò³¤°´Play¼ü¹Ø»úµÄÏûÏ¢
+ * Description :å¤„ç†é•¿æŒ‰PLAYé”®å…³æœºï¼Œæˆ–é•¿æŒ‰Playé”®å…³æœºçš„æ¶ˆæ¯
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
- Èç¹û¶ÔÏàÓ¦µÄ³¤°´¼üÒª½øĞĞ´¦ÀíÊ±£¬±ØĞëÏÈ½«longkey_flagÖÃÎª1.·ñÔò²»½øĞĞÌØ±ğ´¦Àí¡£
- *			ÓÉÓÚRTCÖĞ¶Ï»á²»¶Ï·¢³öÀ´£¬ËùÒÔÔÚ¼ì²â³¤°´ÏûÏ¢Ê±£¬Òª¹ıÂËµôRTCÏûÏ¢¡£
+ å¦‚æœå¯¹ç›¸åº”çš„é•¿æŒ‰é”®è¦è¿›è¡Œå¤„ç†æ—¶ï¼Œå¿…é¡»å…ˆå°†longkey_flagç½®ä¸º1.å¦åˆ™ä¸è¿›è¡Œç‰¹åˆ«å¤„ç†ã€‚
+ *			ç”±äºRTCä¸­æ–­ä¼šä¸æ–­å‘å‡ºæ¥ï¼Œæ‰€ä»¥åœ¨æ£€æµ‹é•¿æŒ‰æ¶ˆæ¯æ—¶ï¼Œè¦è¿‡æ»¤æ‰RTCæ¶ˆæ¯ã€‚
  ********************************************************************************/
 
 uint8 check_longkey_msg(uint8 key)
@@ -270,7 +270,7 @@ uint8 check_longkey_msg(uint8 key)
     }
     else if ((key & AP_KEY_UP) != 0)
     {
-        //Èç¹û¼ì²âµ½onoff¼ü»¹ÊÇ°´×¡µÄ£¬Ôò¿ÉÄÜÊÇÎó·¢³öÁËupÏûÏ¢£¬Ôò²»×÷´¦Àí¡£
+        //å¦‚æœæ£€æµ‹åˆ°onoffé”®è¿˜æ˜¯æŒ‰ä½çš„ï¼Œåˆ™å¯èƒ½æ˜¯è¯¯å‘å‡ºäº†upæ¶ˆæ¯ï¼Œåˆ™ä¸ä½œå¤„ç†ã€‚
         if(get_onoff_key_status() != 0)
         {
             return 1;
@@ -289,9 +289,9 @@ uint8 check_longkey_msg(uint8 key)
 }
 /*
  ********************************************************************************
- * Description : int FW_Updata(void) Í¨¹ı¿¨»òUÅÌ½øĞĞĞ¡»ú¹Ì¼şÉı¼¶£¬µ±Ç°½öÖ§³Ö¿¨Éı¼¶
+ * Description : int FW_Updata(void) é€šè¿‡å¡æˆ–Uç›˜è¿›è¡Œå°æœºå›ºä»¶å‡çº§ï¼Œå½“å‰ä»…æ”¯æŒå¡å‡çº§
  *
- * Arguments   : µ±Ç°Ö»Ö§³Ö¿¨Éı¼¶
+ * Arguments   : å½“å‰åªæ”¯æŒå¡å‡çº§
  *
  * Returns     : 1 = updata ok,0 = updata fail
  *

@@ -40,20 +40,20 @@
 #define FIFO_TRANS_MODE
 //#define _FPGA_VERTION_
 
-/* ��ȡ����bank��*/
+/* 获取函数bank号*/
 #define BYTE2_OF(x) ((unsigned char)((((unsigned long)((void far*)x))&0xff0000) >>16))
 
-/* bank֮�亯������,ʹ��LCALL */
+/* bank之间函数调用,使用LCALL */
 #define     LCALL(x)						(*((void (*)()) ((uint16)&x)))
 
-#define     USB_IC_A_BUG               		//A��ICbug��ܣ�1kflash��umode�£�udma�쳣��ֹ;��̨��ͬʱ��������.
+#define     USB_IC_A_BUG               		//A版ICbug规避，1kflash，umode下，udma异常中止;两台机同时操作问题.
 //#define     SDDISKCAP                       SD_CAP/0x200
 #define     VM_FS_FLAG       				0xF000
-//#define     USERSPACESTARTADDR              SDDISKCAP + DrvOffset           //�û��ռ����ʼ������,8sector����
+//#define     USERSPACESTARTADDR              SDDISKCAP + DrvOffset           //用户空间的起始扇区号,8sector对齐
 //#define     ENCRYPTINFOSECTOR               USERSPACESTARTADDR-1
-//DRMInfo����С��ַ(sector,3Mbyte),�˵�ַ֮��ű���Ϊ������DRMINFO,�������ζ�SD���Ķ�
+//DRMInfo的最小地址(sector,3Mbyte),此地址之后才被认为可能是DRMINFO,用于屏蔽对SD区的读
 #define     DRMINFOADDR                     0x1800
-#define     SYSINFORAMADDR                  0x800       //SYSINFO��ZRAM1�еĵ�ַ
+#define     SYSINFORAMADDR                  0x800       //SYSINFO在ZRAM1中的地址
 #define     ClearWatchdog 		            ClearWatchDog
 /*
  *********************************************************************************************************
@@ -64,14 +64,14 @@
 #define     URAMXADDR                       0x4000
 #define     URAMYADDR                       (URAMXADDR+URAM_BUFFER_LENGTH)
 #define     DATABUFFER                      0x4000
-#define     DATABUFFERLENGTH                0x08        //8K,��512bytesΪ��λ
+#define     DATABUFFERLENGTH                0x08        //8K,以512bytes为单位
 #define     URAMSTARTADDR                   0x0000
-#define     ENCRYPTINFOURAMADD              DATABUFFER                  //EncryptInfoSector����Uram B2�е���ʼ��ַ
-#define     UDISKSTARTADDRURAMADD           DATABUFFER                  //UdiskStartAddr����Uram B2�е���ʼ��ַ
+#define     ENCRYPTINFOURAMADD              DATABUFFER                  //EncryptInfoSector读到Uram B2中的起始地址
+#define     UDISKSTARTADDRURAMADD           DATABUFFER                  //UdiskStartAddr读到Uram B2中的起始地址
 #define     MAX_NORMAL_RW_SETCORS           0x08
-#define     MAX_FIFO_RW_SETCORS             0x80                        //MAX_FIFO_RW_SETCORS ����<=0x80,��DMA������СΪ0x10000��byte
-#define     USBFIFO_TO_DRAM                 0x04                        //[bit7:4]=0,Ŀ���ַΪdram space; [bit3:0]=4,Դ��ַΪusbfifo
-#define     DRAM_TO_USBFIFO                 0x40                        //[bit7:4]=4,Ŀ���ַusbfifo; [bit3:0]=0,Դ��ַ��dram space,sequential access
+#define     MAX_FIFO_RW_SETCORS             0x80                        //MAX_FIFO_RW_SETCORS 必须<=0x80,因DMA最大传输大小为0x10000个byte
+#define     USBFIFO_TO_DRAM                 0x04                        //[bit7:4]=0,目标地址为dram space; [bit3:0]=4,源地址为usbfifo
+#define     DRAM_TO_USBFIFO                 0x40                        //[bit7:4]=4,目标地址usbfifo; [bit3:0]=0,源地址在dram space,sequential access
 #define     USBFIFO_TO_CARDFIFO             0x64
 #define     CARDFIFO_TO_USBFIFO             0x46
 #define     USBFIFO_TO_FLASHFIFO            0x24      	// spi Nor flash
@@ -86,12 +86,12 @@
 #define     ENDPOINT_B                      2
 #define     ENDPOINT_C                      3
 
-//BREC��Flash����ʼBlock��,Ĭ��Ϊһ��byte,�������һ��byte�������޸���Ӧ����
+//BREC在Flash中起始Block号,默认为一个byte,如果大于一个byte长度需修改相应函数
 #define     BREC_START_BLOCK                2
 
-#define     USBIDLECOUNTERVALUE             2           //2��
-#define     USBEJECTCTRVALUE                3           //3��
-#define     COUNTERVALUE_30S                6           //6��
+#define     USBIDLECOUNTERVALUE             2           //2秒
+#define     USBEJECTCTRVALUE                3           //3秒
+#define     COUNTERVALUE_30S                6           //6秒
 /*
  *********************************************************************************************************
  *                                       USB Protocol requeset value
@@ -179,7 +179,7 @@
  *  structure  declare
  *********************************************************************************************************
  */
-//������Ϣ����Э��
+//加密信息交流协议
 typedef struct
 {
     uint8 CMDSignature[7]; //0x00
@@ -292,11 +292,11 @@ typedef struct
     uint8 DataAreaOffset; //DBR  start address
     uint32 DBRStartAddress; //data offset, to align 8Kbyte
     uint8 rw_dbr_flag; //if DBR is operated, set flag.
-    uint16 BPB_RootEntCnt; //FAT16�и�Ŀ¼����,FAT32Ϊ0
+    uint16 BPB_RootEntCnt; //FAT16中根目录项数,FAT32为0
     uint32 FATSize;
     uint8 SectorPerCluster;
     uint16 ReservedSecotr;
-    uint8 mbr_exit_flag; //MBR���ڱ��
+    uint8 mbr_exit_flag; //MBR存在标记
 } udisk_fs_info_t;
 
 /*
@@ -396,7 +396,7 @@ extern uint8 pic_data_buff[2048];
 
 #endif
 
-//��״̬��־,ȫ�ֱ���,��Timer�ж���ɨ�迨��ѹ�õ�(��֧�ֿ�ʱ�˱��λ����Ϊ0)
+//卡状态标志,全局变量,在Timer中断中扫描卡电压得到(不支持卡时此标记位总是为0)
 extern uint8 CardDetectState;
 
 //for const

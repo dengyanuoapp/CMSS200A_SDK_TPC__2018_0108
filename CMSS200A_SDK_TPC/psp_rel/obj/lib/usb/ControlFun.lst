@@ -72,7 +72,7 @@ stmt  level    source
    57   2              //FIFO Empty?
    58   2              while ((Ep0cs_hcep0cs & 0x04) != 0)
    59   2              {
-   60   3                  //∞Œœﬂ¥¶¿Ì
+   60   3                  //ÊãîÁ∫øÂ§ÑÁêÜ
    61   3                  ifIsConnect();
    62   3              }
    63   2              sendLength = sendLength - count;

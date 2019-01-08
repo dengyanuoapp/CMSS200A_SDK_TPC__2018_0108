@@ -26,7 +26,7 @@ stmt  level    source
                 ********************************************************************************
                 *             void deal_device_msg(void)
                 *
-                * Description : ´¦ÀíÉè±¸°Î²åÏûÏ¢
+                * Description : å¤„ç†è®¾å¤‡æ‹”æ’æ¶ˆæ¯
                 *
                 *
                 * Arguments   :
@@ -44,50 +44,50 @@ stmt  level    source
                {
                    uint8 retval;
                    no_device_flag = FALSE;
-                   if (key == AP_MSG_SD_OUT)//¿¨°Î³ö
+                   if (key == AP_MSG_SD_OUT)//å¡æ‹”å‡º
                
                    {
-                       if (CurUselocation.disk == disk_char[0])//Èç¹û²¥·ÅµÄÊÇuÅÌ£¬Ôò²»´¦Àí¿¨°Î³öÏûÏ¢
+                       if (CurUselocation.disk == disk_char[0])//å¦‚æœæ’­æ”¾çš„æ˜¯uç›˜ï¼Œåˆ™ä¸å¤„ç†å¡æ‹”å‡ºæ¶ˆæ¯
                
                        {
                            return NULL;
                        }
-                       else if (USBH_Check_Udisk())//Èç¹û²¥·ÅµÄÊÇ¿¨£¬²¢ÇÒ´æÔÚuÅÌ£¬ÔòÇĞ»»µ½uÅÌ²¥·Å
+                       else if (USBH_Check_Udisk())//å¦‚æœæ’­æ”¾çš„æ˜¯å¡ï¼Œå¹¶ä¸”å­˜åœ¨uç›˜ï¼Œåˆ™åˆ‡æ¢åˆ°uç›˜æ’­æ”¾
                
                        {
                            CurUselocation.disk = disk_char[0];
                        }
-                       else//Èç¹ûÃ»ÓĞuÅÌ£¬Ôò½«no_device_flagÖÃÆğÀ´
+                       else//å¦‚æœæ²¡æœ‰uç›˜ï¼Œåˆ™å°†no_device_flagç½®èµ·æ¥
                
                        {
                            no_device_flag = TRUE;
                        }
                    }
-                   else if (key == AP_MSG_UH_OUT)//uhost °Î³ö
+                   else if (key == AP_MSG_UH_OUT)//uhost æ‹”å‡º
                
                    {
 C251 COMPILER V4.55,  ap_report_sub                                                        23/05/16  10:41:56  PAGE 2   
 
-                       if (CurUselocation.disk == disk_char[1])//Èç¹û²¥·ÅµÄÊÇ¿¨ÅÌ£¬Ôò²»´¦Àíuhost°Î³öÏûÏ¢
+                       if (CurUselocation.disk == disk_char[1])//å¦‚æœæ’­æ”¾çš„æ˜¯å¡ç›˜ï¼Œåˆ™ä¸å¤„ç†uhostæ‹”å‡ºæ¶ˆæ¯
                
                        {
                            return NULL;
                        }
-                       else if (DRV_DetectUD(1) == 0x20)//Èç¹û²¥·ÅµÄÊÇuhost£¬²¢ÇÒ´æÔÚ¿¨£¬ÔòÇĞ»»µ½¿¨ÅÌ²¥·Å
+                       else if (DRV_DetectUD(1) == 0x20)//å¦‚æœæ’­æ”¾çš„æ˜¯uhostï¼Œå¹¶ä¸”å­˜åœ¨å¡ï¼Œåˆ™åˆ‡æ¢åˆ°å¡ç›˜æ’­æ”¾
                
                        {
                            CurUselocation.disk = disk_char[1];
                        }
-                       else//Èç¹ûÃ»ÓĞ¿¨ÅÌ£¬Ôò½«no_device_flagÖÃÆğÀ´
+                       else//å¦‚æœæ²¡æœ‰å¡ç›˜ï¼Œåˆ™å°†no_device_flagç½®èµ·æ¥
                
                        {
                            no_device_flag = TRUE;
                        }
                    }
-                   else if (key == AP_MSG_SD_IN)//¿¨²åÈë
+                   else if (key == AP_MSG_SD_IN)//å¡æ’å…¥
                
                    {
-                       //ÎªÁË·ÀÖ¹¼ì²âµ½²åÈëÏûÏ¢ÒÔºó£¬ÓÖÂíÉÏ¸ø°Îµô£¬Ôò³öÏÖÂ©¼ìµÄÇé¿ö
+                       //ä¸ºäº†é˜²æ­¢æ£€æµ‹åˆ°æ’å…¥æ¶ˆæ¯ä»¥åï¼Œåˆé©¬ä¸Šç»™æ‹”æ‰ï¼Œåˆ™å‡ºç°æ¼æ£€çš„æƒ…å†µ
                        if (DRV_DetectUD(1) == 0x20)
                        {
                            CurUselocation.disk = disk_char[1];
@@ -103,7 +103,7 @@ stmt  level    source
                    }
                    else
                    {
-                       //ÎªÁË·ÀÖ¹¼ì²âµ½²åÈëÏûÏ¢ÒÔºó£¬ÓÖÂíÉÏ¸ø°Îµô£¬Ôò³öÏÖÂ©¼ìµÄÇé¿ö
+                       //ä¸ºäº†é˜²æ­¢æ£€æµ‹åˆ°æ’å…¥æ¶ˆæ¯ä»¥åï¼Œåˆé©¬ä¸Šç»™æ‹”æ‰ï¼Œåˆ™å‡ºç°æ¼æ£€çš„æƒ…å†µ
                        if (USBH_Check_Udisk() != 0x0)
                        {
                            CurUselocation.disk = disk_char[0];
@@ -121,7 +121,7 @@ stmt  level    source
                    {
                        return RESULT_MAIN;
                    }
-                   //ÇĞ»»´ÅÅÌÊ±£¬ÏÈ±£´æ¶ÏµãĞÅÏ¢
+                   //åˆ‡æ¢ç£ç›˜æ—¶ï¼Œå…ˆä¿å­˜æ–­ç‚¹ä¿¡æ¯
                
                    stop_music_play(TRUE);
                
@@ -177,10 +177,10 @@ stmt  level    source
                        if (g_Openparam.typeerror == 1)
                        {
                            result = get_next_prev_music(Music_Next, Auto_Sel);
-                           //¼ÓÇ¿¿ìËÙ°Î²å¿¨µÄ³ö´í´¦Àí£¬ÒÔÃâ³öÏÖËÀ»ú»ò²¥·ÅÒì³£µÄÎÊÌâ
+                           //åŠ å¼ºå¿«é€Ÿæ‹”æ’å¡çš„å‡ºé”™å¤„ç†ï¼Œä»¥å…å‡ºç°æ­»æœºæˆ–æ’­æ”¾å¼‚å¸¸çš„é—®é¢˜
                            if (result == RESULT_UI_STOP)
                            {
-                               //¿ìËÙ°Î²å¿¨»òuÅÌºó£¬Èç¹ûÃ»ÓĞÀ´µÃ¼°ÇĞ»»´ÅÅÌ£¬ĞèÒªÖØĞÂ³õÊ¼»¯´ÅÅÌ
+                               //å¿«é€Ÿæ‹”æ’å¡æˆ–uç›˜åï¼Œå¦‚æœæ²¡æœ‰æ¥å¾—åŠåˆ‡æ¢ç£ç›˜ï¼Œéœ€è¦é‡æ–°åˆå§‹åŒ–ç£ç›˜
                                if (CurUselocation.disk == disk_char[1] && (DRV_DetectUD(1) == 0x20))
                                {
                                }
@@ -190,8 +190,8 @@ stmt  level    source
                                else
                                {
                
-                                   //ÕâÀïÖ÷ÒªÊÇÎªÁË·ÀÖ¹¿¨»òuÅÌ°Î³öÒÔºó£¬Ã»ÓĞ¼°Ê±¼ì²âµ½
-                                   //¿¨»òuÅÌ°Î³öÏûÏ¢£¬´Ó¶ø¼ÌĞø¶ÁÈ¡´ÅÅÌ¶ø³öÏÖ´íÎóµÄÎÊÌâ
+                                   //è¿™é‡Œä¸»è¦æ˜¯ä¸ºäº†é˜²æ­¢å¡æˆ–uç›˜æ‹”å‡ºä»¥åï¼Œæ²¡æœ‰åŠæ—¶æ£€æµ‹åˆ°
+                                   //å¡æˆ–uç›˜æ‹”å‡ºæ¶ˆæ¯ï¼Œä»è€Œç»§ç»­è¯»å–ç£ç›˜è€Œå‡ºç°é”™è¯¯çš„é—®é¢˜
                                    //                first_check = FALSE;
                                    //                goto check_disk;
                                    no_device_flag = TRUE;
@@ -224,11 +224,11 @@ stmt  level    source
                }
                /**
                 **************************************************************
-                * Description :²¥±¨ID3ºÍ¸èÃû£¬ÎªÁË½ÚÔ¼¿Õ¼äĞ´³Éº¯Êı
+                * Description :æ’­æŠ¥ID3å’Œæ­Œåï¼Œä¸ºäº†èŠ‚çº¦ç©ºé—´å†™æˆå‡½æ•°
                 *
                 * input : NULL
                 *
-                * output: param ·µ»ØÏûÏ¢Öµ
+                * output: param è¿”å›æ¶ˆæ¯å€¼
                 *
                 * Notes :
                

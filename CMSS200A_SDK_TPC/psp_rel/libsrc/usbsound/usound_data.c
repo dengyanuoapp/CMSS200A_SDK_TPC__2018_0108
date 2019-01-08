@@ -13,9 +13,9 @@
  * \brief    .
  * \author   dengtaiping
  * \par      GENERAL DESCRIPTION:
- *               ¶¨ÒåÈ«¾Ö±äÁ¿
+ *               å®šä¹‰å…¨å±€å˜é‡
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
  *
@@ -52,7 +52,7 @@ uint8 cpuclkctl_bak = 0;
 uint8 pa_volume_bak = 0;
 uint8 cur_vol_index;
 uint8 vol_change_flag;
-uint8 g_record_packet_size = 32; //Ä¬ÈÏÊÇ16K ²ÉÑùÂÊÉÏ´«µÄ:16x2
+uint8 g_record_packet_size = 32; //é»˜è®¤æ˜¯16K é‡‡æ ·ç‡ä¸Šä¼ çš„:16x2
 usound_param gud_param = {0};
 
 uint8 sample_rate_arr[4][3] = 
@@ -79,7 +79,7 @@ uint8 ReportDescriptor[0x21] =
     0x09, 0xb3, //USAGE (Fast Forward)
     0x09, 0xb4, //USAGE (Rewind)
     0x75, 0x01, //Report Size (0x01)
-    0x95, 0x08, //Report Count (0x08),±¨¸æµÄ¸öÊıÎª8£¬¼´×Ü¹²ÓĞ8¸öbits
+    0x95, 0x08, //Report Count (0x08),æŠ¥å‘Šçš„ä¸ªæ•°ä¸º8ï¼Œå³æ€»å…±æœ‰8ä¸ªbits
     0x81, 0x42, //Input (Data,Variable,Absolute,No Wrap,Linear,Preferred State,Null state)
     0xc0, //END_COLLECTION
 };

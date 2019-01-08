@@ -7,7 +7,7 @@
  *             All Right Reserved
  *
  *  $Id: show_stop.c,v 1.13 2009/10/09 09:53:51 dengyulin Exp $
- *  History Record£º
+ *  History Recordï¼š
  *  2008-03-22  15:47
  *
  *********************************************************

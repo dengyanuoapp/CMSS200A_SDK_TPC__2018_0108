@@ -57,7 +57,7 @@ void Control_Read(char *data_p, int data_length, int request_length)
         //FIFO Empty?
         while ((Ep0cs_hcep0cs & 0x04) != 0)
         {
-            //°ÎÏß´¦Àí
+            //æ‹”çº¿å¤„ç†
             ifIsConnect();
         }
         sendLength = sendLength - count;

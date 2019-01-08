@@ -13,9 +13,9 @@
  * \brief    .
  * \author   dengtaiping
  * \par      GENERAL DESCRIPTION:
- *               lib°ü³öµÄº¯Êý½Ó¿Ú¡¢ºê¼°±äÁ¿ÉùÃ÷
+ *               libåŒ…å‡ºçš„å‡½æ•°æŽ¥å£ã€å®åŠå˜é‡å£°æ˜Ž
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
  *

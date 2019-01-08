@@ -26,7 +26,7 @@ stmt  level    source
    15          #include "ap_common.h"
    16          
    17          #pragma name(AP_CLOCK_1)
-   18          const uint8 month_days[] = //Ò»Äê12¸öÔÂÃ¿¸öÔÂ¶ÔÓ¦µÄ»ù±¾ÌìÊı
+   18          const uint8 month_days[] = //ä¸€å¹´12ä¸ªæœˆæ¯ä¸ªæœˆå¯¹åº”çš„åŸºæœ¬å¤©æ•°
    19          { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
    20          
    21          void init_alarm_setting(void)
@@ -34,20 +34,20 @@ stmt  level    source
    23   1          SetCurUI_Type(AlarmSet_UI);
    24   1          //    VMRead(&g_alarm, VM_ALARM, sizeof(alarm_vars_t));
    25   1          memcpy(&time, &g_comval.g_alarm.alarmTime, sizeof(time_t));
-   26   1          //ÄÖÖÓÉèÖÃÊ±£¬´ÓµÚ2Ïî¿ªÊ¼ÉèÖÃÒÔ±ãºÍÊ±¼äÉèÖÃÍ³Ò»
+   26   1          //é—¹é’Ÿè®¾ç½®æ—¶ï¼Œä»ç¬¬2é¡¹å¼€å§‹è®¾ç½®ä»¥ä¾¿å’Œæ—¶é—´è®¾ç½®ç»Ÿä¸€
    27   1          set_what = 2;
    28   1          longkey_flag = TRUE;
    29   1      }
    30          
    31          /********************************************************************************
-   32           * Description : ½«BUFÖĞµÄÊıÖµ×ª»»³ÉÏÖÊµ¿ÉÓÃµÄÊı×Ö¡£
+   32           * Description : å°†BUFä¸­çš„æ•°å€¼è½¬æ¢æˆç°å®å¯ç”¨çš„æ•°å­—ã€‚
    33           *
    34           * Arguments  :
    35           *
    36           * Returns     :
-   37           *            ÎŞ
+   37           *            æ— 
    38           * Notes       :
-   39           ÀıÈç:DigitalCount=3,DigitalBuf[]={3,7,8},×ª»»³ÉÊµÏÖ¿ÉÄÜµÄÊı×Ö¾ÍÊÇDigitalNum=378£»
+   39           ä¾‹å¦‚:DigitalCount=3,DigitalBuf[]={3,7,8},è½¬æ¢æˆå®ç°å¯èƒ½çš„æ•°å­—å°±æ˜¯DigitalNum=378ï¼›
    40           *
    41           ********************************************************************************/
    42          uint16 DigitalSwitchToRealNum(void)
@@ -70,12 +70,12 @@ stmt  level    source
 
    58          
    59          /********************************************************************************
-   60           * Description : ÊµÏÖÍ¨¹ıÊı×ÖÖµµ÷ÕûÈÕÆÚ£¬Ê±¼äµÄ¹¦ÄÜ
+   60           * Description : å®ç°é€šè¿‡æ•°å­—å€¼è°ƒæ•´æ—¥æœŸï¼Œæ—¶é—´çš„åŠŸèƒ½
    61           *
    62           * Arguments  :
    63           *
    64           * Returns     :
-   65           *            ÎŞ
+   65           *            æ— 
    66           * Notes       :
    67          
    68           *
@@ -100,10 +100,10 @@ stmt  level    source
    87   3              }
    88   2              break;
    89   2          case 2: //day
-   90   2              days = month_days[date.month - 1]; //±¾ÔÂÌìÊı
+   90   2              days = month_days[date.month - 1]; //æœ¬æœˆå¤©æ•°
    91   2              if (((date.year % 4) == 0) && (date.month == 2))
    92   2              {
-   93   3                  days++; //ÈòÄê+1
+   93   3                  days++; //é—°å¹´+1
    94   3              }
    95   2              if ((realNum <= days) && (realNum > 0))
    96   2              {
@@ -150,16 +150,16 @@ stmt  level    source
   135   1          {
   136   2              g_comval.g_alarm.AlarmEnable = !g_comval.g_alarm.AlarmEnable;
   137   2          }
-  138   1          //ÉÏÏÂµ÷½ÚÄê·İ£¬ÈÕÆÚ£¬Ê±¼ä
+  138   1          //ä¸Šä¸‹è°ƒèŠ‚å¹´ä»½ï¼Œæ—¥æœŸï¼Œæ—¶é—´
   139   1          KeyAdjustTime(key);
   140   1      }
   141          /********************************************************************************
-  142           * Description :¸ù¾İ°´¼üÖµÉÏÏÂµ÷Õûµ±Ç°µÄÈÕÆÚ»òÊ±¼ä
+  142           * Description :æ ¹æ®æŒ‰é”®å€¼ä¸Šä¸‹è°ƒæ•´å½“å‰çš„æ—¥æœŸæˆ–æ—¶é—´
   143           *
   144           * Arguments  :
-  145           *           key£ºÏàÓ¦°´¼üÖµ
+  145           *           keyï¼šç›¸åº”æŒ‰é”®å€¼
   146           * Returns     :
-  147           *            ÎŞ
+  147           *            æ— 
   148           * Notes       :
   149           *
   150           ********************************************************************************/
@@ -191,10 +191,10 @@ stmt  level    source
   176   4                  }
   177   3                  break;
   178   3              case 2: //day
-  179   3                  days = month_days[date.month - 1]; //±¾ÔÂÌìÊı
+  179   3                  days = month_days[date.month - 1]; //æœ¬æœˆå¤©æ•°
   180   3                  if (((date.year % 4) == 0) && (date.month == 2))
   181   3                  {
-  182   4                      days++; //ÈòÄê+1
+  182   4                      days++; //é—°å¹´+1
   183   4                  }
   184   3                  if (date.day < days)
   185   3                  {
@@ -256,10 +256,10 @@ stmt  level    source
   239   4                  }
   240   3                  break;
   241   3              case 2: //day
-  242   3                  days = month_days[date.month - 1]; //±¾ÔÂÌìÊı
+  242   3                  days = month_days[date.month - 1]; //æœ¬æœˆå¤©æ•°
   243   3                  if (((date.year % 4) == 0) && (date.month == 2))
   244   3                  {
-  245   4                      days++; //ÈòÄê+1
+  245   4                      days++; //é—°å¹´+1
   246   4                  }
   247   3                  if (date.day > 1)
   248   3                  {
@@ -302,7 +302,7 @@ stmt  level    source
   283          {
   284   1          uint8 key_val;
   285   1          uint8 maxcount;
-  286   1          //¹â±êÍ£ÁôÔÚÄÖÖÓ¿ª¹ØÑ¡ÏîÊ±£¬°´Êı×Ö¼üÎŞĞ§
+  286   1          //å…‰æ ‡åœç•™åœ¨é—¹é’Ÿå¼€å…³é€‰é¡¹æ—¶ï¼ŒæŒ‰æ•°å­—é”®æ— æ•ˆ
   287   1          if (CurUI_Type == Clock_UI)
   288   1          {
   289   2              return NULL;
@@ -313,11 +313,11 @@ stmt  level    source
   294   2              return NULL;
   295   2          }
   296   1      
-  297   1          if (set_what == 0) //Äê·İÕ¼ËÄÎ»ÏÔÊ¾
+  297   1          if (set_what == 0) //å¹´ä»½å å››ä½æ˜¾ç¤º
   298   1          {
   299   2              maxcount = 4;
   300   2          }
-  301   1          else //ÔÂ£¬ÈÕ£¬Ê±£¬·Ö£¬ÃëÕ¼Á½Î»ÏÔÊ¾
+  301   1          else //æœˆï¼Œæ—¥ï¼Œæ—¶ï¼Œåˆ†ï¼Œç§’å ä¸¤ä½æ˜¾ç¤º
   302   1          {
   303   2              maxcount = 2;
   304   2          }
@@ -325,7 +325,7 @@ stmt  level    source
   306   1          {
   307   2              SetCurUI_Type(CurUI_Type);
   308   2          }
-  309   1          key_val = (key & ~AP_KEY_UP) - AP_KEY_NUM0;//½«Êı×Ö°´¼üÏûÏ¢×ª»»³ÉÊı×Ö
+  309   1          key_val = (key & ~AP_KEY_UP) - AP_KEY_NUM0;//å°†æ•°å­—æŒ‰é”®æ¶ˆæ¯è½¬æ¢æˆæ•°å­—
   310   1          DigitalBuf[DigitalCount] = key_val;
   311   1          DigitalCount++;
   312   1          need_draw = TRUE;
@@ -349,7 +349,7 @@ stmt  level    source
   328   3                  DigitalCount = 0;
   329   3                  memset(DigitalBuf, 0, 4);
   330   3              }
-  331   2              //µ±ÇĞ»»µ½×îºóÒ»ÏîÊ±£¬±£´æµ±Ç°µÄÉèÖÃ
+  331   2              //å½“åˆ‡æ¢åˆ°æœ€åä¸€é¡¹æ—¶ï¼Œä¿å­˜å½“å‰çš„è®¾ç½®
   332   2              if (set_what >= 4)
   333   2              {
   334   3                  set_what = 3;
@@ -381,14 +381,14 @@ stmt  level    source
   360   3              }
   361   2          }
   362   1      }
-  363          //Ê¹ÓÃÉèÖÃÏîÉÁË¸Ğ§¹û
+  363          //ä½¿ç”¨è®¾ç½®é¡¹é—ªçƒæ•ˆæœ
   364          void enable_flicker(void)
   365          {
   366   1          show_ui_flag = 1;
   367   1          show_count = 0;
   368   1          need_draw = TRUE;
   369   1      }
-  370          //È¡ÏûÉèÖÃÏîÉÁË¸Ğ§¹û
+  370          //å–æ¶ˆè®¾ç½®é¡¹é—ªçƒæ•ˆæœ
   371          void disable_flicker(void)
   372          {
   373   1          show_ui_flag = 0;
@@ -396,7 +396,7 @@ stmt  level    source
   375   1          show_what = 1;
   376   1          need_draw = TRUE;
   377   1      }
-  378          //È¡ÏûÏµÍ³ÄÖÖÓ
+  378          //å–æ¶ˆç³»ç»Ÿé—¹é’Ÿ
   379          void disable_alarm(void)
   380          {
   381   1          uint8 sfr_bak;

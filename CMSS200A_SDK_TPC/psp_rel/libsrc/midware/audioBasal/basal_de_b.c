@@ -30,13 +30,13 @@ extern void decTimerIntSub(void);
 
 #pragma name(MW_BS_AD_CMD1)
 
-//#define DECODE_BUFFER_ADDRESS_NORMAL 0xD80	//‘≠0x600∏ƒŒ™ π”√code ram
+//#define DECODE_BUFFER_ADDRESS_NORMAL 0xD80	//Âéü0x600Êîπ‰∏∫‰ΩøÁî®code ram
 #define WRONG_DECODE_FILE_TYPE 0xf0
 
 #define CAN_NOT_CALL_RESERVE_INTERFACE() while(1){;}
 
 extern HANDLE m_deFileHandle;
-extern Open_param_t *m_deOpenparam; //≤Œ ˝±Ìµÿ÷∑
+extern Open_param_t *m_deOpenparam; //ÂèÇÊï∞Ë°®Âú∞ÂùÄ
 
 extern uint32 deBpointerSave;
 extern uint32 deBreakPointSave;
@@ -70,8 +70,8 @@ extern uint8 m_deRead_Data(uchar readFileDirection, DWORD position);
 
 
 /*************************************************************************
- * CaltimeCommand Õ®π˝AUDIO IP¿¥º∆À„∏Ë«˙µƒ ±º‰
- *œ÷‘⁄WMA WAV MP3æ˘ø…“‘Õ®π˝»Ìº˛¿¥º∆À„◊‹ ±º‰
+ * CaltimeCommand ÈÄöËøáAUDIO IPÊù•ËÆ°ÁÆóÊ≠åÊõ≤ÁöÑÊó∂Èó¥
+ *Áé∞Âú®WMA WAV MP3ÂùáÂèØ‰ª•ÈÄöËøáËΩØ‰ª∂Êù•ËÆ°ÁÆóÊÄªÊó∂Èó¥
  ****************************************************************************/
 
 bool CaltimeCommand(void *param)
@@ -82,7 +82,7 @@ bool CaltimeCommand(void *param)
     {
         return FALSE;
     }
-    g_decControlInfor.PlayMode = PLAY_MODE_CALTIME; //  codec ª·∏˘æ›’‚∏ˆΩ¯––≈‰÷√
+    g_decControlInfor.PlayMode = PLAY_MODE_CALTIME; //  codec ‰ºöÊ†πÊçÆËøô‰∏™ËøõË°åÈÖçÁΩÆ
     decInit();
 
     m_deOldDspIntAddrSav = IRQ_Intercept((uint32)(decAudioIntSub), IRQ_DSP);
@@ -152,7 +152,7 @@ BOOL apSendCommand_bank(BYTE cmd, void *param)
     case MC_SETA_B:
         switch((uint8)param)
         {
-        case ClrABPoint://±æ√¸¡Ó≤ª‘Ÿ π”√£¨AP‘⁄signal = reach_B ±ºÏ≤‚µΩ∏¥∂¡¥Œ ˝-1æÕ∑¢AB_FINISHED√¸¡Ó
+        case ClrABPoint://Êú¨ÂëΩ‰ª§‰∏çÂÜç‰ΩøÁî®ÔºåAPÂú®signal = reach_BÊó∂Ê£ÄÊµãÂà∞Â§çËØªÊ¨°Êï∞-1Â∞±ÂèëAB_FINISHEDÂëΩ‰ª§
             if (play_status.status == PLAYING_WAIT_A)
             {
                 APointPlayCommand();
@@ -160,7 +160,7 @@ BOOL apSendCommand_bank(BYTE cmd, void *param)
             play_status.status = PLAYING_PLAYING;
             g_decControlInfor.ABSetFlag = AB_CLEAR;
             play_status.signal = 0;
-            m_deABok_sav = FALSE;//ÕÀ≥ˆAB ±“™«Â¥À±Í÷æ,∑Ò‘Úœ¬¥ŒAB÷ªƒ‹“ª¥Œ
+            m_deABok_sav = FALSE;//ÈÄÄÂá∫ABÊó∂Ë¶ÅÊ∏ÖÊ≠§Ê†áÂøó,Âê¶Âàô‰∏ãÊ¨°ABÂè™ËÉΩ‰∏ÄÊ¨°
             break;
 
         case SetAPoint://SET A
@@ -171,7 +171,7 @@ BOOL apSendCommand_bank(BYTE cmd, void *param)
             g_decControlInfor.ABSetFlag = AB_SET_B;
             break;
 
-        case ReturnApoint://∑µªÿAµ„≤•∑≈
+        case ReturnApoint://ËøîÂõûAÁÇπÊí≠Êîæ
             if(play_status.status == PLAYING_WAIT_A)
             {
                 play_status.status = PLAYING_AB;
@@ -198,12 +198,12 @@ BOOL apSendCommand_bank(BYTE cmd, void *param)
         //				}
         if (((uint8)param & 0xf0) == FADEIN_DEF)
         {
-            g_decControlInfor.FadeInTime = (uint8)param & 0x0f;//…Ë÷√µ≠»Î±Í÷æ
+            g_decControlInfor.FadeInTime = (uint8)param & 0x0f;//ËÆæÁΩÆÊ∑°ÂÖ•Ê†áÂøó
             return TRUE;
         }
         else if (((uint8)param & 0xf0) == FADEOUT_DEF)
         {
-            g_decControlInfor.FadeOutTime = (uint8)param & 0x0f;//…Ë÷√µ≠≥ˆ±Í÷æ
+            g_decControlInfor.FadeOutTime = (uint8)param & 0x0f;//ËÆæÁΩÆÊ∑°Âá∫Ê†áÂøó
             return TRUE;
         }
         else
@@ -248,11 +248,11 @@ BOOL apSendCommand_bank(BYTE cmd, void *param)
  m_deOpenparam->BreakPTSave->ApointSave = deApointerSave;
  m_deOpenparam->BreakPTSave->BpointSave = deBpointerSave;
  m_deOpenparam->BreakPTSave->breakPT = deBreakPointSave;
- if(m_backupmode == 0)//∂œµ„–¯≤•±∏∑›
+ if(m_backupmode == 0)//Êñ≠ÁÇπÁª≠Êí≠Â§á‰ªΩ
  {
  memcpy(&(m_deOpenparam->BreakPTSave->breakPointInfor), &g_decBreakPointInfor, sizeof(decBreakPointInfor_t));
  }
- else//AB ∏¥∂¡π˝≥Ã÷–µƒ∂œµ„≤ª±£¥Ê£¨÷ª «±£¥ÊAµ„£¨“‘∫Û∂œµ„–¯≤•¥”Aµ„ø™ º
+ else//AB Â§çËØªËøáÁ®ã‰∏≠ÁöÑÊñ≠ÁÇπ‰∏ç‰øùÂ≠òÔºåÂè™ÊòØ‰øùÂ≠òAÁÇπÔºå‰ª•ÂêéÊñ≠ÁÇπÁª≠Êí≠‰ªéAÁÇπÂºÄÂßã
  {
  memcpy(&(m_deOpenparam->BreakPTSave->breakPointInfor), &m_breakPointInfo, sizeof(decBreakPointInfor_t));
  }
@@ -273,7 +273,7 @@ BOOL apSendCommand_bank(BYTE cmd, void *param)
  g_decControlInfor.PlayMode = PLAY_MODE_BREAK;
  memcpy(&g_decBreakPointInfor, &m_breakPointInfo, sizeof(decBreakPointInfor_t));
  FS_FSeek(0, FS_SEEK_FFROMSTART, m_deFileHandle);
- decInit();//º∆À„ ±º‰≤ªµ≠»Î
+ decInit();//ËÆ°ÁÆóÊó∂Èó¥‰∏çÊ∑°ÂÖ•
  decstart();
  return TRUE;
  }

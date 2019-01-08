@@ -17,7 +17,7 @@
 
 #pragma name(MW_EH_FSEL_API)
 
-/*Íâ²¿±äÁ¿ºÍº¯Êı*/
+/*å¤–éƒ¨å˜é‡å’Œå‡½æ•°*/
 extern bool fselGetNext(uint8 *strFile);
 extern bool fselGetPrev(uint8 *strFile);
 extern bool GetFilebyItem(uint8 *filename, uint16 ItemNum);
@@ -43,12 +43,12 @@ uint8 fselType; //Type of select,  Music or voice.
 uint8 fselError; // store error id;
 int8 fselDiskLetter;
 int8 fselDirLayer; //dir  layer
-uint16 fselFileNoInDisk;// ÎÄ¼şÔÚÈ«ÅÌµÄĞòºÅ
-uint16 fselTotalInDisk;// È«ÅÌÎÄ¼ş×ÜÊı
+uint16 fselFileNoInDisk;// æ–‡ä»¶åœ¨å…¨ç›˜çš„åºå·
+uint16 fselTotalInDisk;// å…¨ç›˜æ–‡ä»¶æ€»æ•°
 bool select_file_begin_flag;
-uint16 CurDirFileNum; //µ±Ç°Ä¿Â¼ÓĞĞ§¸èÇúÊıÁ¿
-uint32 CurDirClusNo; //µ±Ç°Ä¿Â¼ÆğÊ¼´ØºÅ£¬ÓÃÓÚµ±Ç°Ä¿Â¼Ñ­»·Ä£Ê½
-uint16 fselDirNoInDisk; //µ±Ç°ËùÔÚÄ¿Â¼µÄĞòºÅ
+uint16 CurDirFileNum; //å½“å‰ç›®å½•æœ‰æ•ˆæ­Œæ›²æ•°é‡
+uint32 CurDirClusNo; //å½“å‰ç›®å½•èµ·å§‹ç°‡å·ï¼Œç”¨äºå½“å‰ç›®å½•å¾ªç¯æ¨¡å¼
+uint16 fselDirNoInDisk; //å½“å‰æ‰€åœ¨ç›®å½•çš„åºå·
 uint16 fselTotalDir;
 uint8 dir_list_flag;
 
@@ -93,7 +93,7 @@ static uint8 GetExtSize(void)
 /********************************************************************************
  * Description : Get name buffer of current extend
  *
- * Arguments  :  »ñµÃ¸èÇúÀ©Õ¹Ãû
+ * Arguments  :  è·å¾—æ­Œæ›²æ‰©å±•å
  * Returns     :  the buffer of current file extend name
  * Notes       :     None
  *
@@ -159,8 +159,8 @@ void fsel_init_val(uint8 type, uint8 mode)
     fselDirLayer = 0;
     fselFileNoInDisk = 0;
     fselDirNoInDisk = 0;
-    CurDirClusNo = 0xfffffff0; //³õÊ¼»¯ÎÄ¼ş²»¿ÉÄÜÊ¹ÓÃµÄ´ØºÅ
-    CurDirFileNum = 0; //µ±Ç°Ä¿Â¼Ñ­»·²¥·ÅÊ±Ê¹ÓÃ
+    CurDirClusNo = 0xfffffff0; //åˆå§‹åŒ–æ–‡ä»¶ä¸å¯èƒ½ä½¿ç”¨çš„ç°‡å·
+    CurDirFileNum = 0; //å½“å‰ç›®å½•å¾ªç¯æ’­æ”¾æ—¶ä½¿ç”¨
     select_file_begin_flag = TRUE;
 }
 //uint8 fselScanDiskInfo(file_location_t *location)
@@ -248,7 +248,7 @@ bool fselInit(uint8 type, uint8 mode, uint8 PlayListOrCommonDir, file_location_t
     }
     if (FS_Dir(fileNameTmp, GetExtBuf(), FS_DIR_FILE, GetExtSize()))
     {
-        fselDirNoInDisk = 1; //¸ùÄ¿Â¼ÓĞÎÄ¼ş£¬Ä¿Â¼ĞòºÅÏÈ¼Ó1
+        fselDirNoInDisk = 1; //æ ¹ç›®å½•æœ‰æ–‡ä»¶ï¼Œç›®å½•åºå·å…ˆåŠ 1
     }
     else
     {
@@ -260,7 +260,7 @@ bool fselInit(uint8 type, uint8 mode, uint8 PlayListOrCommonDir, file_location_t
         fselTotalInDisk = 0;
         fselTotalDir = 0;
         fselDirNoInDisk_bak = fselDirNoInDisk;
-        if (FALSE == fselScanDiskInfo(location, PlayListOrCommonDir)) //±éÀúÈ«ÅÌ
+        if (FALSE == fselScanDiskInfo(location, PlayListOrCommonDir)) //éå†å…¨ç›˜
         {
             return FALSE;
         }
@@ -417,7 +417,7 @@ uint8 fselSetLocation(file_location_t *location)
             return FALSE;
         }
         GetFilebyItem(location->filename, location->PL_Cur);
-        fp_list = FS_FOpen(location->filename, FS_OPEN_NORMAL); //¼ì²éµ±Ç°ÁĞ±íÎÄ¼şÊÇ·ñ´æÔÚ
+        fp_list = FS_FOpen(location->filename, FS_OPEN_NORMAL); //æ£€æŸ¥å½“å‰åˆ—è¡¨æ–‡ä»¶æ˜¯å¦å­˜åœ¨
         if(fp_list == NULL)
         {
             return FALSE;
@@ -570,7 +570,7 @@ int8 fselGetErrID(void)
 }
 
 /********************************************************************************
- * Description : Êı×Öµã¸è
+ * Description : æ•°å­—ç‚¹æ­Œ
  *
  * Arguments  : None
  * Returns     : Number of current selected file.
@@ -588,7 +588,7 @@ bool fselGetFileByNoInDisk(uint8 *strFile, const uint16 Num)
     if (fselPLOrCommonDir == FSEL_TYPE_COMMONDIR)
     {
         mode_bak = fselMode;
-        fselMode = FSEL_ALL_REPEATALL; //µ÷ÓÃfselGetNext»á¸ù¾İ²¥·ÅÄ£Ê½£¬±ØĞëÏÈÇĞ»»Ä£Ê½
+        fselMode = FSEL_ALL_REPEATALL; //è°ƒç”¨fselGetNextä¼šæ ¹æ®æ’­æ”¾æ¨¡å¼ï¼Œå¿…é¡»å…ˆåˆ‡æ¢æ¨¡å¼
         result = fselGetFileByNoInDiskC(strFile, Num);
         fselMode = mode_bak;
     }
@@ -606,7 +606,7 @@ bool fselGetFileByNoInDisk(uint8 *strFile, const uint16 Num)
 }
 
 /********************************************************************************
- * Description : Ñ¡ÔñÏÂÒ»¸öÎÄ¼şµÄµÚÒ»Ê×¸è
+ * Description : é€‰æ‹©ä¸‹ä¸€ä¸ªæ–‡ä»¶çš„ç¬¬ä¸€é¦–æ­Œ
  *
  * Arguments  : None
  * Returns     : Number of current selected file.
@@ -627,7 +627,7 @@ bool fselGetNextFolderFile(uint8 *filename)
 }
 
 /********************************************************************************
- * Description : Ñ¡ÔñÉÏÒ»¸öÎÄ¼şµÄµÚÒ»Ê×¸è
+ * Description : é€‰æ‹©ä¸Šä¸€ä¸ªæ–‡ä»¶çš„ç¬¬ä¸€é¦–æ­Œ
  *
  * Arguments  : None
  * Returns     : Number of current selected file.
@@ -648,9 +648,9 @@ bool fselGetPrevFolderFile(uint8 *filename)
 }
 
 /**************************************************
- ·µ»ØÖµ£º»ñÈ¡µ±Ç°Ñ¡¶¨µÄ¸èÇúËùÔÚÄ¿Â¼µÄĞòºÅ£¬´Ó1¿ªÊ¼
- Êä³ö²ÎÊı strLName£º»ñÈ¡µ±Ç°ËùÔÚÄ¿Â¼Ãû£¬strLNameµÄµÚÒ»¸ö×Ö½Ú 0£ºÄ¿Â¼ÃûÎªasciiÂë  1£ºÄ¿Â¼ÃûÎªunicodeÂë
- ÊäÈë²ÎÊı LNanmeSize£ºÒª»ñÈ¡µÄ³¤ÃûUnicode×Ö·ûÊıÄ¿
+ è¿”å›å€¼ï¼šè·å–å½“å‰é€‰å®šçš„æ­Œæ›²æ‰€åœ¨ç›®å½•çš„åºå·ï¼Œä»1å¼€å§‹
+ è¾“å‡ºå‚æ•° strLNameï¼šè·å–å½“å‰æ‰€åœ¨ç›®å½•åï¼ŒstrLNameçš„ç¬¬ä¸€ä¸ªå­—èŠ‚ 0ï¼šç›®å½•åä¸ºasciiç   1ï¼šç›®å½•åä¸ºunicodeç 
+ è¾“å…¥å‚æ•° LNanmeSizeï¼šè¦è·å–çš„é•¿åUnicodeå­—ç¬¦æ•°ç›®
  ***************************************************/
 uint16 fselGetDirNo(uint8 *strLName, uint8 LNameSize)
 {
@@ -660,27 +660,27 @@ uint16 fselGetDirNo(uint8 *strLName, uint8 LNameSize)
     {
         if (fselDirLayer == 0)
         {
-            *strLName = 0; //µÚÒ»¸ö×Ö½Ú0±íÊ¾·µ»ØµÄÄ¿Â¼ÃûÊÇASCII±àÂë
+            *strLName = 0; //ç¬¬ä¸€ä¸ªå­—èŠ‚0è¡¨ç¤ºè¿”å›çš„ç›®å½•åæ˜¯ASCIIç¼–ç 
             memcpy(strLName + 1, "ROOT", 5);
         }
         else
         {
             FS_GetCurDir_layer(dir_buf);
-            CurClusNo = FS_GetCurDir();//µ±Ç°Ä¿Â¼ÏîÔÚÎÄ¼şÏµÍ³ÖĞµÄÆ«ÒÆ
-            DirEntry = FS_GetCurDirEntry();//ÎÄ¼şÏîÔÚµ±Ç°Ä¿Â¼ÏîÖĞµÄÆ«ÒÆ
+            CurClusNo = FS_GetCurDir();//å½“å‰ç›®å½•é¡¹åœ¨æ–‡ä»¶ç³»ç»Ÿä¸­çš„åç§»
+            DirEntry = FS_GetCurDirEntry();//æ–‡ä»¶é¡¹åœ¨å½“å‰ç›®å½•é¡¹ä¸­çš„åç§»
 
             FS_DirParNext();
-            *(strLName + 1) = 0x20; //»ñÈ¡µ±Ç°ÎÄ¼şÏµÍ³Ö¸ÕëÖ¸ÏòµÄÄ¿Â¼Ãû
+            *(strLName + 1) = 0x20; //è·å–å½“å‰æ–‡ä»¶ç³»ç»ŸæŒ‡é’ˆæŒ‡å‘çš„ç›®å½•å
             if (!FS_GetName(strLName + 1, (LNameSize - 3) / 2))
             {
-                FS_GetName(strLName + 1, 0); //²»´æÔÚ³¤ÃûÔò»ñÈ¡¶ÌÃû
-                *strLName = 0; //Ö»ÓĞ¶ÌÃû£¬ascii±àÂë
+                FS_GetName(strLName + 1, 0); //ä¸å­˜åœ¨é•¿ååˆ™è·å–çŸ­å
+                *strLName = 0; //åªæœ‰çŸ­åï¼Œasciiç¼–ç 
             }
             else
             {
-                *strLName = 1; //´æÔÚ³¤Ãû£¬unicode±àÂë
+                *strLName = 1; //å­˜åœ¨é•¿åï¼Œunicodeç¼–ç 
             }
-            if (FALSE == FS_CD(":")) //±ÜÃâ´¦ÓÚ×îºóµÄÄ¿Â¼ÏîÊ±µ÷ÓÃFS_SetCurDir³ö´í
+            if (FALSE == FS_CD(":")) //é¿å…å¤„äºæœ€åçš„ç›®å½•é¡¹æ—¶è°ƒç”¨FS_SetCurDirå‡ºé”™
             {
                 return FALSE;
             }

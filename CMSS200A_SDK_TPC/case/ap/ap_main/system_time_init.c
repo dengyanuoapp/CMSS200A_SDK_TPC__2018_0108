@@ -8,42 +8,42 @@
 extern uint32 systemtime;
 extern time_t time;
 
-extern date_t date;//ÏµÍ³ÈÕÆÚ
-//time_t time;//ÏµÍ³Ê±¼ä
+extern date_t date;//ç³»ç»Ÿæ—¥æœŸ
+//time_t time;//ç³»ç»Ÿæ—¶é—´
 kval_t kval;
 
-int8 near IsNotPowerDown(void);//ÅĞ¶Ï´Ë´Î¿ª»úÖ®Ç°ÊÇ·ñµôµç¹Ø»ú
+int8 near IsNotPowerDown(void);//åˆ¤æ–­æ­¤æ¬¡å¼€æœºä¹‹å‰æ˜¯å¦æ‰ç”µå…³æœº
 
 int16 InitSystemtime(void)
 {
     uint8 sfr_bak;
-    uint8 InitDateTime;//ÊÇ·ñĞèÒª³õÊ¼»¯ÏµÍ³Ê±¼ä1:ĞèÒª³õÊ¼»¯0:²»ĞèÒª³õÊ¼»¯
+    uint8 InitDateTime;//æ˜¯å¦éœ€è¦åˆå§‹åŒ–ç³»ç»Ÿæ—¶é—´1:éœ€è¦åˆå§‹åŒ–0:ä¸éœ€è¦åˆå§‹åŒ–
 
-    //µ÷ÊÔÈÕÆÚ, Ê±¼äÉèÖÃ
+    //è°ƒè¯•æ—¥æœŸ, æ—¶é—´è®¾ç½®
 #ifdef VERIFY_IsNotPowerDown
 
     VMRead(&kval, VM_KERNEL, sizeof(kval_t));
 
     if (kval.magic == MAGIC_KVAL)
     {
-        //ÅĞ¶Ï´Ë´Î¿ª»úÖ®Ç°ÊÇ·ñµôµç¹Ø»ú
-        if (IsNotPowerDown() == 0) //·µ»Ø  0£ºµôµç   ·Ç0£ºÃ»µôµç
+        //åˆ¤æ–­æ­¤æ¬¡å¼€æœºä¹‹å‰æ˜¯å¦æ‰ç”µå…³æœº
+        if (IsNotPowerDown() == 0) //è¿”å›  0ï¼šæ‰ç”µ   é0ï¼šæ²¡æ‰ç”µ
         {
-            InitDateTime = 1; //ĞèÒª³õÊ¼»¯
+            InitDateTime = 1; //éœ€è¦åˆå§‹åŒ–
         }
         else
         {
-            InitDateTime = 0; //²»ĞèÒª³õÊ¼»¯
+            InitDateTime = 0; //ä¸éœ€è¦åˆå§‹åŒ–
         }
     }
-    else //Éı¼¶ÍêµÚÒ»´Î¿ª»ú
+    else //å‡çº§å®Œç¬¬ä¸€æ¬¡å¼€æœº
     {
-        InitDateTime = 1; //ĞèÒª³õÊ¼»¯
+        InitDateTime = 1; //éœ€è¦åˆå§‹åŒ–
     }
 
     if (InitDateTime == 1)
     {
-        kval.rtcresetflag = 0x55; //ÉèÖÃµôµç±êÖ¾
+        kval.rtcresetflag = 0x55; //è®¾ç½®æ‰ç”µæ ‡å¿—
         date.year = 2010;
         date.month = 01;
         date.day = 01;
@@ -51,11 +51,11 @@ int16 InitSystemtime(void)
         time.minute = 0;
         time.second = 1;
 
-        TM_SetDate(&date); //»áĞŞ¸Äsystemtime   systemtime²ÉÓÃÏµÍ³³õÊ¼Öµ
-        TM_SetTime(&time); //»áĞŞ¸Äsystemtime   systemtime²ÉÓÃÏµÍ³³õÊ¼Öµ
-        //½«systemtimeĞ´»Øµ½VRAMÖĞ
+        TM_SetDate(&date); //ä¼šä¿®æ”¹systemtime   systemtimeé‡‡ç”¨ç³»ç»Ÿåˆå§‹å€¼
+        TM_SetTime(&time); //ä¼šä¿®æ”¹systemtime   systemtimeé‡‡ç”¨ç³»ç»Ÿåˆå§‹å€¼
+        //å°†systemtimeå†™å›åˆ°VRAMä¸­
         kval.magic = MAGIC_KVAL;
-        kval.systemtime = systemtime; //ÔÚTM_SetDate±»ĞŞ¸Ä
+        kval.systemtime = systemtime; //åœ¨TM_SetDateè¢«ä¿®æ”¹
 
         VMWrite(&kval, VM_KERNEL, sizeof(kval_t));
         sfr_bak = SFR_BANK;
@@ -72,7 +72,7 @@ int16 InitSystemtime(void)
     }
     ClearWatchDog();
 
-    //´ÓVRAMÖĞÈ¡³ösystemtime
+    //ä»VRAMä¸­å–å‡ºsystemtime
     systemtime = kval.systemtime;
 #endif
     return 0xffff;

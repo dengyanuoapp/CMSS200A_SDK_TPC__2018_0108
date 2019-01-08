@@ -17,7 +17,7 @@ stmt  level    source
     6           *        (c) Copyright, Actions Co,Ld.
     7           *             All Right Reserved
     8           *        History Record:
-    9           1.È¥µôË¢ĞÂ±³¾°ÏÔÊ¾£¬Ïû³ıËÑÌ¨Ê±µÄ½çÃæÉÁË¸¸Ğ, by Mars,2008-04-15
+    9           1.å»æ‰åˆ·æ–°èƒŒæ™¯æ˜¾ç¤ºï¼Œæ¶ˆé™¤æœå°æ—¶çš„ç•Œé¢é—ªçƒæ„Ÿ, by Mars,2008-04-15
    10           *******************************************************************************
    11           */
    12          
@@ -32,7 +32,7 @@ stmt  level    source
    21           ********************************************************************************
    22           *             void ShowStationCount(uint16 count)
    23           *
-   24           * Description : ÏÔÊ¾µçÌ¨ºÅ.
+   24           * Description : æ˜¾ç¤ºç”µå°å·.
    25           *
    26           * Arguments   :
    27           *
@@ -64,7 +64,7 @@ stmt  level    source
    53           ********************************************************************************
    54           *             void ShowFreqInFM2()
    55           *
-   56           * Description : ÏÔÊ¾È«×Ô¶¯ËÑÌ¨½çÃæ---ÏÔÊ¾Æµµã
+   56           * Description : æ˜¾ç¤ºå…¨è‡ªåŠ¨æœå°ç•Œé¢---æ˜¾ç¤ºé¢‘ç‚¹
    57           *
 C251 COMPILER V4.55,  AutoSearchHandle                                                     23/05/16  10:42:06  PAGE 2   
 
@@ -103,11 +103,11 @@ stmt  level    source
    90           ********************************************************************************
    91           *             bool Search_Show2(FM_direct_e Direct)
    92           *
-   93           * Description : ËÑË÷ÏÂÒ»¸öÔÚµçÌ¨±íÖĞÃ»ÓĞµÄĞÂµçÌ¨.
+   93           * Description : æœç´¢ä¸‹ä¸€ä¸ªåœ¨ç”µå°è¡¨ä¸­æ²¡æœ‰çš„æ–°ç”µå°.
    94           *
-   95           * Arguments   : Direct,Next»òLastËÑË÷.
+   95           * Arguments   : Direct,Nextæˆ–Lastæœç´¢.
    96           *
-   97           * Returns     : TRUE:ËÑµ½ÏÂÒ»¸öĞÂµçÌ¨,FALSE:Ã»ÓĞËÑµ½.
+   97           * Returns     : TRUE:æœåˆ°ä¸‹ä¸€ä¸ªæ–°ç”µå°,FALSE:æ²¡æœ‰æœåˆ°.
    98           *
    99           * Notes       :
   100           *
@@ -123,7 +123,7 @@ stmt  level    source
   110   1          fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
   111   1      
   112   1          Search_Flag = fmSendCommand(FM_SEARCH, (void *) &g_FMStatus, (void *) Direct);
-  113   1          if (Search_Flag) //ËÑÌ¨³É¹¦ºó£¬MUTEÊÍ·Å
+  113   1          if (Search_Flag) //æœå°æˆåŠŸåï¼ŒMUTEé‡Šæ”¾
   114   1          {
   115   2              AutoTabNum++;
   116   2              ShowStationCount(AutoTabNum);
@@ -160,11 +160,11 @@ stmt  level    source
   145           ********************************************************************************
   146           *             bool RestartSearch(uint8 level)
   147           *
-  148           * Description : ÉèÖÃÃÅÏŞÖµ,ÖØĞÂ¿ªÊ¼ËÑË÷.
+  148           * Description : è®¾ç½®é—¨é™å€¼,é‡æ–°å¼€å§‹æœç´¢.
   149           *
-  150           * Arguments   : ÃÅÏŞÖµ
+  150           * Arguments   : é—¨é™å€¼
   151           *
-  152           * Returns     : TRUE:¼ÌĞøËÑË÷,FALSE:ÖĞ¶ÏËÑË÷,Õı³£½áÊø.
+  152           * Returns     : TRUE:ç»§ç»­æœç´¢,FALSE:ä¸­æ–­æœç´¢,æ­£å¸¸ç»“æŸ.
   153           *
   154           * Notes       :
   155           *
@@ -177,7 +177,7 @@ stmt  level    source
                    {
                        return FALSE;
                    }
-                   fmSendCommand(FM_OPEN, level, NULL); //ÖØĞÂÉèÖÃËÑË÷ÃÅÏŞÖµ£¬¿ªÊ¼ÖØĞÂËÑË÷
+                   fmSendCommand(FM_OPEN, level, NULL); //é‡æ–°è®¾ç½®æœç´¢é—¨é™å€¼ï¼Œå¼€å§‹é‡æ–°æœç´¢
                
                #ifndef HARDWARE_SEEK
                    fmSendCommand(FM_MID_RESTORE, & radio_param, NULL);
@@ -190,12 +190,12 @@ stmt  level    source
   175           ********************************************************************************
   176           *             uint16 AutoSearchHandle(uint8 Direct)
   177           *
-  178           * Description : È«×Ô¶¯ËÑË÷
+  178           * Description : å…¨è‡ªåŠ¨æœç´¢
   179           *
-  180           * Arguments   : Direct,Next»òLastËÑË÷.
+  180           * Arguments   : Direct,Nextæˆ–Lastæœç´¢.
   181           *
-  182           * Returns     : Èç¹ûÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø½á¹ûÏûÏ¢
-  183           Èç¹ûÃ»ÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø0
+  182           * Returns     : å¦‚æœæœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›ç»“æœæ¶ˆæ¯
+  183           å¦‚æœæ²¡æœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›0
   184           *
   185           * Notes       :
   186           *
@@ -214,12 +214,12 @@ stmt  level    source
   197   1      
   198   1          flag_r = 0;
   199   1          AutoTabNum = 0;
-  200   1          memset(m_FMStationTab, 0, sizeof(uint16) * MAX_STATION_COUNT); //³õÊ¼»¯AutoSearchËùÓÃÊı×é
+  200   1          memset(m_FMStationTab, 0, sizeof(uint16) * MAX_STATION_COUNT); //åˆå§‹åŒ–AutoSearchæ‰€ç”¨æ•°ç»„
   201   1      
   202   1          g_FMStatus.station = 0;
   203   1          g_FMStatus.station_count = 0;
-  204   1          backup_freq = g_FMStatus.freq; //±¸·İµ±Ç°Æµµã
-  205   1          // USÆµ¶Î
+  204   1          backup_freq = g_FMStatus.freq; //å¤‡ä»½å½“å‰é¢‘ç‚¹
+  205   1          // USé¢‘æ®µ
   206   1          if (g_radio_config.band_mode == Bank_US_Europe)
   207   1          {
   208   2              if (Direct == SEARCH_NEXT)
@@ -233,7 +233,7 @@ stmt  level    source
   216   3                  end_freq = USFREQ_MIN;
   217   3              }
   218   2          }
-  219   1          // JPÆµ¶Î
+  219   1          // JPé¢‘æ®µ
   220   1          else
   221   1          {
   222   2              if (Direct == SEARCH_NEXT)
@@ -248,13 +248,13 @@ stmt  level    source
   231   3              }
   232   2          }
   233   1      
-  234   1          fmSendCommand(FM_MID_SAVE, &radio_param, NULL); //Çå¿Õg_radio_configÖĞµÄÊı¾İ
+  234   1          fmSendCommand(FM_MID_SAVE, &radio_param, NULL); //æ¸…ç©ºg_radio_configä¸­çš„æ•°æ®
   235   1          charge_pump_onoff(0);
   236   1          while (loop)//while(1)
   237   1          {
   238   2              if (Direct != SEARCH_NULL)
   239   2              {
-  240   3                  if (Direct == SEARCH_NEXT) //NEXTËÑË÷´¦Àí
+  240   3                  if (Direct == SEARCH_NEXT) //NEXTæœç´¢å¤„ç†
   241   3                  {
   242   4                      g_FMStatus.freq += 1;
   243   4                      if ((g_FMStatus.freq >= USFREQ_MAX) && (g_radio_config.band_mode == Bank_US_Europe))
@@ -273,7 +273,7 @@ stmt  level    source
 C251 COMPILER V4.55,  AutoSearchHandle                                                     23/05/16  10:42:06  PAGE 5   
 
   256   4                  }
-  257   3                  else if (Direct == SEARCH_LAST) //LASTËÑË÷´¦Àí
+  257   3                  else if (Direct == SEARCH_LAST) //LASTæœç´¢å¤„ç†
   258   3                  {
   259   4                      g_FMStatus.freq -= 1;
   260   4                      if ((g_FMStatus.freq <= USFREQ_MIN) && (g_radio_config.band_mode == Bank_US_Europe))
@@ -298,7 +298,7 @@ stmt  level    source
   279   4                      //  return 0;
   280   4                  }
   281   3              }
-  282   2              if (AutoTabNum >= MAX_STATION_COUNT) //ÒÑËÑµ½MAX_STATION_COUNT¸öµçÌ¨,Õı³£ÍË³ö.
+  282   2              if (AutoTabNum >= MAX_STATION_COUNT) //å·²æœåˆ°MAX_STATION_COUNTä¸ªç”µå°,æ­£å¸¸é€€å‡º.
   283   2              {
   284   3                  loop = FALSE;
   285   3              }
@@ -307,10 +307,10 @@ stmt  level    source
   288   3                  key = ap_get_message();
   289   3                  switch (key)
   290   3                  {
-  291   4                  case AP_KEY_NEXT | AP_KEY_UP: //NEXTËÑË÷Ê±°´NEXT¼ü£¬Í£Ö¹ËÑË÷
+  291   4                  case AP_KEY_NEXT | AP_KEY_UP: //NEXTæœç´¢æ—¶æŒ‰NEXTé”®ï¼Œåœæ­¢æœç´¢
   292   4                      break;
   293   4      
-  294   4                  case AP_KEY_PREV | AP_KEY_UP: //LASTËÑË÷Ê±°´LAST¼ü£¬Í£Ö¹ËÑË÷
+  294   4                  case AP_KEY_PREV | AP_KEY_UP: //LASTæœç´¢æ—¶æŒ‰LASTé”®ï¼Œåœæ­¢æœç´¢
   295   4                      break;
   296   4      
   297   4                  case AP_KEY_PLAY | AP_KEY_UP:
@@ -332,7 +332,7 @@ stmt  level    source
   313   4                  case AP_MSG_USB_PLUGIN:
   314   4                      break;
   315   4      
-  316   4                  default: //ÈÈ¼ü´¦Àí
+  316   4                  default: //çƒ­é”®å¤„ç†
   317   4                      result = ap_handle_hotkey(key);
   318   4                      break;
   319   4                  }
@@ -345,9 +345,9 @@ stmt  level    source
   324   3              }
   325   2          }
   326   1          charge_pump_onoff(1);
-  327   1          if (g_FMStatus.station_count > 0x00) // ÅĞ¶ÏÊÇ·ñËÑË÷µ½µçÌ¨
+  327   1          if (g_FMStatus.station_count > 0x00) // åˆ¤æ–­æ˜¯å¦æœç´¢åˆ°ç”µå°
   328   1          {
-  329   2              /* Ìø×ªµ½µÚÒ»¸öµçÌ¨ */
+  329   2              /* è·³è½¬åˆ°ç¬¬ä¸€ä¸ªç”µå° */
   330   2              g_FMStatus.freq = m_FMStationTab[0];
   331   2              fmSendCommand(FM_SETFREQ, (void *) g_FMStatus.freq, NULL);
   332   2              fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
@@ -361,9 +361,9 @@ stmt  level    source
   340   2              fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
   341   2              fmSendCommand(FM_MID_SAVE, &radio_param, NULL);
   342   2          }
-  343   1          while (ap_get_message() != AP_KEY_NULL) //Çå³ı×Ô¶¯ËÑÌ¨¹ı³ÌÖĞµÄÏûÏ¢
+  343   1          while (ap_get_message() != AP_KEY_NULL) //æ¸…é™¤è‡ªåŠ¨æœå°è¿‡ç¨‹ä¸­çš„æ¶ˆæ¯
   344   1          {
-  345   2              ClearWatchDog(); //Çå¿ÕÏûÏ¢³Ø
+  345   2              ClearWatchDog(); //æ¸…ç©ºæ¶ˆæ¯æ± 
   346   2          }
   347   1          return result;
   348   1      }
@@ -372,7 +372,7 @@ stmt  level    source
   351           ********************************************************************************
   352           *             void SaveStation(void)
   353           *
-  354           * Description : ±£´æËÑË÷µ½µÄµçÌ¨
+  354           * Description : ä¿å­˜æœç´¢åˆ°çš„ç”µå°
   355           *
   356           * Arguments   :
   357           *
@@ -387,13 +387,13 @@ stmt  level    source
                {
                    uint8 i;
                    uint16 k;
-                   fmSendCommand(MC_GETFREQ, (uint16) & k); // ±£´æµçÌ¨
+                   fmSendCommand(MC_GETFREQ, (uint16) & k); // ä¿å­˜ç”µå°
                    //FMAutoTab[AutoTabNum] = k;
                    AutoTabNum++;
                    SequenceFreqlist(FMAutoTab, k, AutoTabNum);
                    for (i = AutoTabNum; i < 30; i++)
                    {
-                       if (radio_param.param1[i] == k) // É¾³ıÖØ¸´µÄµçÌ¨.
+                       if (radio_param.param1[i] == k) // åˆ é™¤é‡å¤çš„ç”µå°.
                
                        {
                            radio_param.param1[i] = 0;

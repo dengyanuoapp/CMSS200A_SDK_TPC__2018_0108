@@ -16,13 +16,13 @@
 
 /*
  ********************************************************************************
- * Description : ÔİÍ£½çÃæ
+ * Description : æš‚åœç•Œé¢
  *
  * Arguments   :
  *
- * Returns     : ½á¹ûÏûÏ¢»ò0
- RESULT_USER_STOP    //ÓÃ»§°´¼ü½áÊø
- RESULT_LOW_POWER_STOP    //µÍµçÑ¹½áÊø
+ * Returns     : ç»“æœæ¶ˆæ¯æˆ–0
+ RESULT_USER_STOP    //ç”¨æˆ·æŒ‰é”®ç»“æŸ
+ RESULT_LOW_POWER_STOP    //ä½ç”µå‹ç»“æŸ
  *
  * Notes       :
  *
@@ -38,8 +38,8 @@ int16 do_pause(void)
 
     BOOL need_draw_ui = TRUE;
 
-    BOOL flash_state = TRUE; //ÉÁË¸µÄ×´Ì¬
-    BYTE low_power_count = 0; //»ñµÃµÍµçÑ¹µÄ´ÎÊı
+    BOOL flash_state = TRUE; //é—ªçƒçš„çŠ¶æ€
+    BYTE low_power_count = 0; //è·å¾—ä½ç”µå‹çš„æ¬¡æ•°
     //BYTE batt;
 
     while (1)
@@ -47,7 +47,7 @@ int16 do_pause(void)
 	    #if 0
         if (FALSE != need_draw_ui)
         {
-            //ÔİÍ£USOUNDÂ¼Òô×´Ì¬
+            //æš‚åœUSOUNDå½•éŸ³çŠ¶æ€
             LEDDisplay(LED_PLAY, 0xff, 0);
             LEDDisplay(LED_PAUSE, 0xff, 1);
             need_draw_ui = FALSE;
@@ -59,7 +59,7 @@ int16 do_pause(void)
         {
 
         case AP_KEY_PLAY | AP_KEY_UP:
-            //¼ÌĞøusoundÂ¼Òô
+            //ç»§ç»­usoundå½•éŸ³
             //LEDDisplay(LED_PAUSE, 0xff, 0);
             //LEDDisplay(LED_PLAY, 0xff, 1);
             mp3rSendCommand(MC_RECORD, 0);
@@ -74,7 +74,7 @@ int16 do_pause(void)
             break;
 
         case AP_KEY_MODE | AP_KEY_UP:
-            /* ±£´æÂ¼ÒôÎÄ¼ş */
+            /* ä¿å­˜å½•éŸ³æ–‡ä»¶ */
             mp3rSendCommand(MC_STOP, 0);
             return RESULT_SAVE_FILE;
             break;
@@ -90,6 +90,6 @@ int16 do_pause(void)
         }//switch()
     }//while(1)
 #endif
-    return 0; //±ÜÃâ±àÒëÆ÷warning
+    return 0; //é¿å…ç¼–è¯‘å™¨warning
 }
 

@@ -17,7 +17,7 @@
 #include "ap_common.h"
 #include "enhanced.h"
 #include "basal.h"
-#include "mmcmd.h"//Ä£¿é²ãÃüÁîÃû¶¨Òå
+#include "mmcmd.h"//æ¨¡å—å±‚å‘½ä»¤åå®šä¹‰
 //#define	 TEST_HOST	1
 
 //message
@@ -30,51 +30,51 @@
 #define  USOUND_CREAT_FAIL       (RESULT_USER1+8)
 
 //event
-#define  AP_EVENT_CODEC_ERR    AP_EVENT_9    //codec ³ö´í
-//main(int param) ¶¨ÒåÈë¿Ú²ÎÊıµÄÖµ
-#define  NON_FMREC      0                     //·ÇFMÂ¼Òô,´ËÊ±Â¼ÒôÔ´ÓÉg_mrecord_vars.rec_source¾ö¶¨
-#define  MICREC_START   1                   //RESULT_RECORD         //·ÇFM½ø³ÌÏÂ,°´REC¼üÖ±½Ó½øÈëMICÂ¼Òô.
-#define  FMREC_START    RESULT_FMREC_START    //FMÂ¼Òô.FM½ø³ÌÊÕÌıµçÌ¨Ê±°´ÈÈ¼üREC½øĞĞµÄFMÂ¼Òô
-#define  FMREC_NOSTART  RESULT_FMREC_NOSTART  //FMÂ¼Òô.FM½ø³ÌÊÕÌıµçÌ¨Ê±Ñ¡Ôñ"µçÌ¨Â¼Òô"²Ëµ¥½øĞĞµÄFMÂ¼Òô
+#define  AP_EVENT_CODEC_ERR    AP_EVENT_9    //codec å‡ºé”™
+//main(int param) å®šä¹‰å…¥å£å‚æ•°çš„å€¼
+#define  NON_FMREC      0                     //éFMå½•éŸ³,æ­¤æ—¶å½•éŸ³æºç”±g_mrecord_vars.rec_sourceå†³å®š
+#define  MICREC_START   1                   //RESULT_RECORD         //éFMè¿›ç¨‹ä¸‹,æŒ‰RECé”®ç›´æ¥è¿›å…¥MICå½•éŸ³.
+#define  FMREC_START    RESULT_FMREC_START    //FMå½•éŸ³.FMè¿›ç¨‹æ”¶å¬ç”µå°æ—¶æŒ‰çƒ­é”®RECè¿›è¡Œçš„FMå½•éŸ³
+#define  FMREC_NOSTART  RESULT_FMREC_NOSTART  //FMå½•éŸ³.FMè¿›ç¨‹æ”¶å¬ç”µå°æ—¶é€‰æ‹©"ç”µå°å½•éŸ³"èœå•è¿›è¡Œçš„FMå½•éŸ³
 #define  FMREC_AUSTART  RESULT_AUTORECORD_START
 
-//Â¼ÒôÔ´³£Á¿¶¨Òå(È«¾Ö±äÁ¿:g_rec_from»áÓÃµ½!)
+//å½•éŸ³æºå¸¸é‡å®šä¹‰(å…¨å±€å˜é‡:g_rec_fromä¼šç”¨åˆ°!)
 #define  R_SPDIF          0x80
 #define  R_FM             0x40
 #define  R_LINEIN         0x20
 #define  R_MIC            0x10
 
 //defines
-#define SPACE_LOW           150L          // exFAT Support  //60L    //Ê£ÓàÉÈÇøÊı
-#define LOW_POWER_COUNT     4      //Í£Ö¹Â¼ÒôÊ±µÍµçÑ¹·¢ÉúµÄ´ÎÊı
+#define SPACE_LOW           150L          // exFAT Support  //60L    //å‰©ä½™æ‰‡åŒºæ•°
+#define LOW_POWER_COUNT     4      //åœæ­¢å½•éŸ³æ—¶ä½ç”µå‹å‘ç”Ÿçš„æ¬¡æ•°
 //#define FPGA_DEBUG_ADC
 
 
-/* Â¼Òô¸ñÊ½Ã¶¾Ù*/
+/* å½•éŸ³æ ¼å¼æšä¸¾*/
 typedef enum
 {
     RECORD_FILE_TYPE_WAV = 0, RECORD_FILE_TYPE_MP2
 } ap_rectype_e;
 
-/* Â¼Òô²ÉÑùÂÊÃ¶¾Ù*/
+/* å½•éŸ³é‡‡æ ·ç‡æšä¸¾*/
 typedef enum
 {
     AP_FS_8K = 0, AP_FS_12K, AP_FS_32K, AP_FS_48K
 } ap_samplerate_e;
 
-/* Â¼Òô±ÈÌØÂÊÃ¶¾Ù*/
+/* å½•éŸ³æ¯”ç‰¹ç‡æšä¸¾*/
 typedef enum
 {
     AP_BT_32K = 0, AP_BT_64K, AP_BT_128K, AP_BT_192K, AP_BT_256K
 } ap_bitrate_e;
 
-/* Â¼ÒôÔ´Ã¶¾Ù*/
+/* å½•éŸ³æºæšä¸¾*/
 typedef enum
 {
     AP_MICIN = 0, AP_LINEIN, AP_FMIN
 } ap_inputSelect_e;
 
-//µ±Ç°´ÅÅÌ,Ä¿Â¼,ÎÄ¼ş
+//å½“å‰ç£ç›˜,ç›®å½•,æ–‡ä»¶
 typedef struct
 {
     int8 disk; //'C','D','E','F'-internal, 'H','I','J','K'-externel
@@ -86,16 +86,16 @@ typedef struct
     uint8 filename[12]; //8.3+'\0'
 } file_location_urec_t;
 
-/* Â¼ÒôVRAM Êı¾İÇø±¸·İ½á¹¹*/
+/* å½•éŸ³VRAM æ•°æ®åŒºå¤‡ä»½ç»“æ„*/
 typedef struct
 {
-    uint16 maigc; //ÓÃÀ´ÅĞ¶ÏvmÀïµÄÊı¾İÊÇ·ñÓĞĞ§
+    uint16 maigc; //ç”¨æ¥åˆ¤æ–­vmé‡Œçš„æ•°æ®æ˜¯å¦æœ‰æ•ˆ
     file_location_urec_t location;
-    uint16 wav_num; //µ±Ç°Â¼ÒôÎÄ¼şµÄ±àºÅ
-    ap_inputSelect_e rec_source; //µ±Ç°ÉèÖÃµÄÂ¼ÒôÔ´
+    uint16 wav_num; //å½“å‰å½•éŸ³æ–‡ä»¶çš„ç¼–å·
+    ap_inputSelect_e rec_source; //å½“å‰è®¾ç½®çš„å½•éŸ³æº
     //uint8 channelnum;
-    //uint8 Rec_Fsrate; //²ÉÑùÂÊ
-    //uint8 rec_bitrate; //0/1/2/3/4/5:32/48/64/96/128/192bps.(Í¨¹ıBitRate_Tab[]×ª»»³Émodule²ãµÄ½Ó¿Ú²ÎÊı)
+    //uint8 Rec_Fsrate; //é‡‡æ ·ç‡
+    //uint8 rec_bitrate; //0/1/2/3/4/5:32/48/64/96/128/192bps.(é€šè¿‡BitRate_Tab[]è½¬æ¢æˆmoduleå±‚çš„æ¥å£å‚æ•°)
 
     uint8 rec_InputGain;//5
     uint8 rec_ADCGain;//3
@@ -126,10 +126,10 @@ extern record_vars_t g_record_vars;
 //extern fmrecord_vars_t fm_record_vars;
 extern audio_format_t Rec_format;
 extern function_menu_t menu;
-extern wav_rec_status_t rec_stat; //Â¼Òô×´Ì¬
+extern wav_rec_status_t rec_stat; //å½•éŸ³çŠ¶æ€
 extern uint32 total_sec;
 
-extern uint32 g_free_space; //Ê£Óà´ÅÅÌ¿Õ¼ä
+extern uint32 g_free_space; //å‰©ä½™ç£ç›˜ç©ºé—´
 
 extern resource_t inputSelect;
 

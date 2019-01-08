@@ -46,7 +46,7 @@ stmt  level    source
    35          
    36          
    37          extern SD_FILE *m_deSd_Fp;
-   38          extern Open_param_t *m_deSdOpenparam;//²ÎÊı±íµØÖ·
+   38          extern Open_param_t *m_deSdOpenparam;//å‚æ•°è¡¨åœ°å€
    39          
    40          //extern uint32 deSdBpointerSave;
    41          extern uint32 deSdBreakPointSave;
@@ -83,8 +83,8 @@ stmt  level    source
    70          #pragma renamecode(MW_BS_AD_CMD1_SD)
    71          
    72          /*************************************************************************
-   73           * SdLoadCommand ³õÊ¼»¯codecÓÃµÄÈ«¾Ö±äÁ¿g_decInitPara£¬
-   74           * °üÀ¨codecµÄbuffer¡¢dmaÖĞ¶ÏµÄhookº¯Êı¡¢¸èÇúÎÄ¼şµÄµÚÒ»Ö¡Êı¾İµØÖ·µÈµÈ
+   73           * SdLoadCommand åˆå§‹åŒ–codecç”¨çš„å…¨å±€å˜é‡g_decInitParaï¼Œ
+   74           * åŒ…æ‹¬codecçš„bufferã€dmaä¸­æ–­çš„hookå‡½æ•°ã€æ­Œæ›²æ–‡ä»¶çš„ç¬¬ä¸€å¸§æ•°æ®åœ°å€ç­‰ç­‰
    75           ****************************************************************************/
    76          bool SdLoadCommand(BYTE music_type, void *param)
    77          {
@@ -129,14 +129,14 @@ stmt  level    source
   116   2              return FALSE;
   117   2          }
   118   1          {
-  119   2              /* uint32 EndPageLen;//×îºóÒ»¸öPAGEµÄ×Ö½ÚÊı
-  120   2               EndPageLen = (uint32)FS_GetUnalignedLen(m_deSd_Fp);//È¡×îºóÒ»¸öPAGEµÄBYTEÊı
+  119   2              /* uint32 EndPageLen;//æœ€åä¸€ä¸ªPAGEçš„å­—èŠ‚æ•°
+  120   2               EndPageLen = (uint32)FS_GetUnalignedLen(m_deSd_Fp);//å–æœ€åä¸€ä¸ªPAGEçš„BYTEæ•°
   121   2               deSdFilepages = (uint32)FS_GetFileLen(m_deSd_Fp);
   122   2               g_decReadFilePara.FileLen = (((uint32)deSdFilepages)<<9); //* 512;
   123   2      
 C251 COMPILER V4.55,  basal_de_sd_b                                                        13/12/18  16:27:23  PAGE 3   
 
-  124   2               //´¦ÀíÎÄ¼şÎ²²»ÊÇÕûPAGEµÄÊı¾İ,Ò»Ò³Ò»Ò³´«ËÍ
+  124   2               //å¤„ç†æ–‡ä»¶å°¾ä¸æ˜¯æ•´PAGEçš„æ•°æ®,ä¸€é¡µä¸€é¡µä¼ é€
   125   2               if (EndPageLen != 0)
   126   2               {
   127   2                   g_decReadFilePara.FileLen = g_decReadFilePara.FileLen - 512 + EndPageLen;
@@ -154,8 +154,8 @@ stmt  level    source
   139   1      }
   140          
   141          /*************************************************************************
-  142           * SdStopCommand Í£Ö¹²¥·Å
-  143           *1 g_decReadFilePara.ReadFilePagesÔÚdma hookÖĞ±»¸³Öµ = deSdBreakPointSave
+  142           * SdStopCommand åœæ­¢æ’­æ”¾
+  143           *1 g_decReadFilePara.ReadFilePagesåœ¨dma hookä¸­è¢«èµ‹å€¼ = deSdBreakPointSave
   144           ****************************************************************************/
   145          
   146          bool SdStopCommand(void *param)
@@ -174,7 +174,7 @@ stmt  level    source
   159   1      }
   160          
   161          /*************************************************************************
-  162           * SdPlayCommand ²¥·Å
+  162           * SdPlayCommand æ’­æ”¾
   163           *
   164           ****************************************************************************/
   165          bool SdPlayCommand(void *param)
@@ -190,7 +190,7 @@ stmt  level    source
   175   2              return TRUE;
   176   2          }
   177   1      
-  178   1          Sdplay_status.status = PLAYING_PLAYING;//Ä¬ÈÏÎª²¥·Å×´Ì¬
+  178   1          Sdplay_status.status = PLAYING_PLAYING;//é»˜è®¤ä¸ºæ’­æ”¾çŠ¶æ€
   179   1          if ((uint8) param == Nor_Break_open)
   180   1          {
   181   2              SdRestoreCommand();
@@ -204,13 +204,13 @@ stmt  level    source
   189   1          {
 C251 COMPILER V4.55,  basal_de_sd_b                                                        13/12/18  16:27:23  PAGE 4   
 
-  190   2              //Òª´ÓÍ·¿ªÊ¼·Å
+  190   2              //è¦ä»å¤´å¼€å§‹æ”¾
   191   2              g_decControlInfor.PlayMode = PLAY_MODE_NORMAL;
   192   2              SD_FSeek(m_deSd_Fp, 0, 0);
   193   2          }
   194   1          if (m_deSdOpenparam == NULL)
   195   1          {
-  196   2              g_decControlInfor.PlayMode = PLAY_MODE_AB;//Èô²ÎÊı±íµØÖ·Îª¿ÕÔò±íÊ¾Îª¸ú¶Á¶Ô±È²¥·Å
+  196   2              g_decControlInfor.PlayMode = PLAY_MODE_AB;//è‹¥å‚æ•°è¡¨åœ°å€ä¸ºç©ºåˆ™è¡¨ç¤ºä¸ºè·Ÿè¯»å¯¹æ¯”æ’­æ”¾
   197   2          }
   198   1      
   199   1          decInit();

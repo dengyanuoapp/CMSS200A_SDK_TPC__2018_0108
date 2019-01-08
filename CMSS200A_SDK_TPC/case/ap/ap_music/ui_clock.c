@@ -48,7 +48,7 @@ void show_time_setting(void)
 {
     switch (set_what)
     {
-    case 0://ÉèÖÃÄê·İ
+    case 0://è®¾ç½®å¹´ä»½
         if (show_what == 0)
         {
             memset(temp_buffer, 0xff, 0x04);
@@ -64,7 +64,7 @@ void show_time_setting(void)
             itoa4(date.year, temp_buffer);
         }
         break;
-    case 1://ÉèÖÃÔÂ·İ
+    case 1://è®¾ç½®æœˆä»½
         if (show_what == 0)
         {
             memset(temp_buffer, 0xff, 0x02);
@@ -83,7 +83,7 @@ void show_time_setting(void)
         }
         itoa2(date.day, &temp_buffer[2]);
         break;
-    case 2://ÉèÖÃÈÕÆÚ(Ê±¼äÉèÖÃ)»òÉèÖÃÄÖÖÓ¿ª¹Ø(ÄÖÖÓÉèÖÃ)
+    case 2://è®¾ç½®æ—¥æœŸ(æ—¶é—´è®¾ç½®)æˆ–è®¾ç½®é—¹é’Ÿå¼€å…³(é—¹é’Ÿè®¾ç½®)
         if (CurUI_Type == TimeSet_UI)
         {
             itoa2(date.month, temp_buffer);
@@ -116,7 +116,7 @@ void show_time_setting(void)
             return;
         }
         break;
-    case 3://ÉèÖÃÊ±¼äÖĞµÄÊ±
+    case 3://è®¾ç½®æ—¶é—´ä¸­çš„æ—¶
         if (show_what == 0)
         {
             memset(temp_buffer, 0xff, 0x02);
@@ -137,7 +137,7 @@ void show_time_setting(void)
         }
         itoa2(time.minute, &temp_buffer[2]);
         break;
-    case 4://ÉèÖÃÊ±¼äÖĞµÄ·Ö
+    case 4://è®¾ç½®æ—¶é—´ä¸­çš„åˆ†
         itoa2(time.hour, temp_buffer);
         if (show_what == 0)
         {
@@ -166,12 +166,12 @@ void show_clock_ui(void)
     switch(CurUI_Type)
     {
     case Clock_UI:
-        //ÏÔÊ¾µ±Ç°µÄÏµÍ³Ê±¼ä
+        //æ˜¾ç¤ºå½“å‰çš„ç³»ç»Ÿæ—¶é—´
         ShowTimer();
         break;
     case TimeSet_UI:
     case AlarmSet_UI:
-        //ÏÔÊ¾Ê±¼äÉèÖÃ»òÄÖÖÓÉèÖÃ½çÃæ
+        //æ˜¾ç¤ºæ—¶é—´è®¾ç½®æˆ–é—¹é’Ÿè®¾ç½®ç•Œé¢
         show_time_setting();
         break;
     default:
@@ -189,7 +189,7 @@ uint8 set_clock_loop(void)
             show_clock_ui();
             need_draw = FALSE;
         }
-        key = ap_get_message(); //¶Á¼üÖµ
+        key = ap_get_message(); //è¯»é”®å€¼
         switch (key)
         {
         case AP_MSG_WAIT_TIMEOUT:

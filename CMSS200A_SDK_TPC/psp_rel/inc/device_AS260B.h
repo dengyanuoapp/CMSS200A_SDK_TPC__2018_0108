@@ -117,21 +117,21 @@
 */
 typedef struct
 {
-    uint16 VID;            //default£º0x10d6
-    uint16 PID;            //default£º0x1000
+    uint16 VID;            //defaultï¼š0x10d6
+    uint16 PID;            //defaultï¼š0x1000
 } vidpid_t;
 typedef struct
 {
-    int8 usbvendor[8];                //default£º"Generic"
-    int8 usbproductidentification[16];    //default£º"USB DISK"£¬²»×ã²¹0x20
-    int8 usbproductversion[4];        //default£º" 1.00"
+    int8 usbvendor[8];                //defaultï¼š"Generic"
+    int8 usbproductidentification[16];    //defaultï¼š"USB DISK"ï¼Œä¸è¶³è¡¥0x20
+    int8 usbproductversion[4];        //defaultï¼š" 1.00"
     int8 reserve[4];
 } usbattri_t;
 typedef struct
 {
-    int8 descriptorlen;             //=sizeof(usbsetupinfo_t);      //¸Ã½á¹¹³¤¶È
-    int8 descriptortype;            //default£º0x03
-    uint16 unicodestring[23];        //default£º"USB Mass Storage Class"¡£unicode¸ñÊ½£¬²»×ã²¹0x20,0x00
+    int8 descriptorlen;             //=sizeof(usbsetupinfo_t);      //è¯¥ç»“æ„é•¿åº¦
+    int8 descriptortype;            //defaultï¼š0x03
+    uint16 unicodestring[23];        //defaultï¼š"USB Mass Storage Class"ã€‚unicodeæ ¼å¼ï¼Œä¸è¶³è¡¥0x20,0x00
     int8 reserve[16];
 } usbsetupinfo_t;
 
@@ -144,23 +144,23 @@ typedef struct
 
 
 
-//»ñÈ¡UÅÌÊÇ·ñ²åÏß  bi7:DC5V×´Ì¬,1:DC5VÎª¸ß,0£ºDC5VÎªµÍ;bi6:¼ì²âUSBÊÇ·ñÁ¬½Ó,1:ÊÇ,0:·ñ.
+//è·å–Uç›˜æ˜¯å¦æ’çº¿  bi7:DC5VçŠ¶æ€,1:DC5Vä¸ºé«˜,0ï¼šDC5Vä¸ºä½;bi6:æ£€æµ‹USBæ˜¯å¦è¿æ¥,1:æ˜¯,0:å¦.
 #define GetUsbCableStatus() 				API_GetUsbCableStatus(APINO_GetUsbCableStatus)
 uint8 API_GetUsbCableStatus(uint8 cmd);
 
-//»ñÈ¡UÅÌÊôĞÔ£¬Èç³§ÉÌĞÅÏ¢£¬²ú¿ÚĞÅÏ¢£¬²ú¿Ú°æ±¾
+//è·å–Uç›˜å±æ€§ï¼Œå¦‚å‚å•†ä¿¡æ¯ï¼Œäº§å£ä¿¡æ¯ï¼Œäº§å£ç‰ˆæœ¬
 #define GetUsbAttribute(usbattri) 			API_GetUsbAttribute(APINO_GetUsbAttribute,usbattri)
 bool API_GetUsbAttribute(uint8 cmd, usbattri_t *usbattri);
 
-//»ñÈ¡UÅÌ°²×°ÏÔÊ¾ĞÅÏ¢
+//è·å–Uç›˜å®‰è£…æ˜¾ç¤ºä¿¡æ¯
 #define GetUsbSetupInfo(udisk_serial_num) 	API_GetUsbSetupInfo(APINO_GetUsbSetupInfo,udisk_serial_num)
 bool API_GetUsbSetupInfo(uint8 cmd, int8 *udisk_serial_num);
 
-//»ñÈ¡UÅÌVID&PID
+//è·å–Uç›˜VID&PID
 #define GetUsbVidPid(vidpid) 				API_GetUsbVidPid(APINO_GetUsbVidPid,vidpid)
 bool API_GetUsbVidPid(uint8 cmd, vidpid_t *vidpid);
 
-//»ñÈ¡ÈÍ¼ş°æ±¾ºÅ
+//è·å–éŸ§ä»¶ç‰ˆæœ¬å·
 #define GetFwVersion(fwver) 		API_GetFwVersion(APINO_GetFwVersion,fwver)
 bool API_GetFwVersion(uint8 cmd, fwversion_t *fwver);
 
@@ -168,7 +168,7 @@ bool API_GetFwVersion(uint8 cmd, fwversion_t *fwver);
 bool API_GetDefaultComval(uint8 cmd, comval_t *dcomval);
 bool GetFMTag(int8 *FmTagAddr);
 
-//»ñÈ¡UÅÌ¾í±ê
+//è·å–Uç›˜å·æ ‡
 bool GetMSCVolumeLabel(int8 *msc_volume_label);
 
 /*
@@ -179,7 +179,7 @@ bool GetMSCVolumeLabel(int8 *msc_volume_label);
 //--------------------------------------------------------------------
 typedef struct
 {
-    uint8    InfoUniCharNum;         //Unicode×Ö·ûÊı£¬×î´ó32
+    uint8    InfoUniCharNum;         //Unicodeå­—ç¬¦æ•°ï¼Œæœ€å¤§32
     uint16    InfoData[33];            //Unicode
 } mtpinfo_t;
 
@@ -224,7 +224,7 @@ void USB_Default_isr_Handle(void);
 uint8 API_USB_CON_ENABLE(uint8 cmd);
 void UH_Poweroff(void);
 #define USBH_Check_Udisk() 	API_USBH_Check_Udisk(APINO_USBH_CHECK_UDISK)
-bool API_USBH_Check_Udisk(uint8 cmd);     //·µ»Ø1±íÊ¾µ±Ç°ÓĞUÅÌ²åÈë£¬·µ»Ø0±íÊ¾µ±Ç°Ã»ÓĞUÅÌ²åÈë
+bool API_USBH_Check_Udisk(uint8 cmd);     //è¿”å›1è¡¨ç¤ºå½“å‰æœ‰Uç›˜æ’å…¥ï¼Œè¿”å›0è¡¨ç¤ºå½“å‰æ²¡æœ‰Uç›˜æ’å…¥
 
 #define GetSDCap() 			API_GetSDCap(APINO_GetSDCap)
 #define GetVMCap() 			API_GetVMCap(APINO_GetVMCap)
@@ -233,28 +233,28 @@ bool API_USBH_Check_Udisk(uint8 cmd);     //·µ»Ø1±íÊ¾µ±Ç°ÓĞUÅÌ²åÈë£¬·µ»Ø0±íÊ¾µ±Ç
 //#define GetLCDWidth() 		API_GetLCDWidth(APINO_GetLCDWidth)
 //#define GetLCDHeight() 		API_GetLCDHeight(APINO_GetLCDHeight)
 
-//»ñÈ¡ÏµÍ³ÇøµÄÈİÁ¿£¬ÒÔÉÈÇøÎªµ¥Î»
+//è·å–ç³»ç»ŸåŒºçš„å®¹é‡ï¼Œä»¥æ‰‡åŒºä¸ºå•ä½
 int32 API_GetSDCap(uint8 cmd);
-//»ñÈ¡VramÇøµÄÈİÁ¿£¬ÒÔÉÈÇøÎªµ¥Î»
+//è·å–VramåŒºçš„å®¹é‡ï¼Œä»¥æ‰‡åŒºä¸ºå•ä½
 int32 API_GetVMCap(uint8 cmd);
-//»ñÈ¡MtpÇøµÄÈİÁ¿£¬ÒÔÉÈÇøÎªµ¥Î»
+//è·å–MtpåŒºçš„å®¹é‡ï¼Œä»¥æ‰‡åŒºä¸ºå•ä½
 // int32 GetMICap(void);
-//»ñÈ¡USB ĞÅÏ¢ÇøµÄÈİÁ¿£¬ÒÔÉÈÇøÎªµ¥Î»
+//è·å–USB ä¿¡æ¯åŒºçš„å®¹é‡ï¼Œä»¥æ‰‡åŒºä¸ºå•ä½
 int32 API_GetUICap(uint8 cmd);
-//»ñÈ¡ÊÇ·ñÖ§³ÖÍâ²¿RTCµÄ±êÖ¾
+//è·å–æ˜¯å¦æ”¯æŒå¤–éƒ¨RTCçš„æ ‡å¿—
 int8 API_GetExtRtcFlag(uint8 cmd);
-//»ñÈ¡LCDµÄ¿í¶È
+//è·å–LCDçš„å®½åº¦
 // int16 API_GetLCDWidth(uint8 cmd);
-//»ñÈ¡LCDµÄ¸ß¶È
+//è·å–LCDçš„é«˜åº¦
 // int16 API_GetLCDHeight(uint8 cmd);
 
-//16½øÖÆÏÔÊ¾uartÕûÊı´òÓ¡º¯Êı num:´ı´òÓ¡ÕûÊı
+//16è¿›åˆ¶æ˜¾ç¤ºuartæ•´æ•°æ‰“å°å‡½æ•° num:å¾…æ‰“å°æ•´æ•°
 // void UartPutHexNum(uint16 num);
 
-//10½øÖÆÏÔÊ¾uartÕûÊı´òÓ¡º¯Êı num:´ı´òÓ¡ÕûÊı
+//10è¿›åˆ¶æ˜¾ç¤ºuartæ•´æ•°æ‰“å°å‡½æ•° num:å¾…æ‰“å°æ•´æ•°
 // void UartPutDecNum(uint16 num);
 
-//uart´®¿ÚÀàprintfº¯Êı
+//uartä¸²å£ç±»printfå‡½æ•°
 // void UartPrintf (const int8 *fmt, ...);
 //--------------------------------------------------------------------
 
@@ -265,9 +265,9 @@ int8 API_GetExtRtcFlag(uint8 cmd);
 * Description : battery
 ********************************************************************************
 */
-//»ñÈ¡µ±Ç°µÄµçÁ¿
+//è·å–å½“å‰çš„ç”µé‡
 //para: none
-//ret:0 ~ 15 µçÁ¿Öµ
+//ret:0 ~ 15 ç”µé‡å€¼
 #define GetBattery()	API_GetBattery(APINO_GetBattery)
 uint8 API_GetBattery(uint8 cmd);
 
@@ -276,15 +276,15 @@ uint8 API_GetBattery(uint8 cmd);
 * Description : dsp
 ********************************************************************************
 */
-//³õÊ¼»¯dsp´úÂë»òÊı¾İ
-//para: dspcodename ´úÂëÎÄ¼şÃû£¬
+//åˆå§‹åŒ–dspä»£ç æˆ–æ•°æ®
+//para: dspcodename ä»£ç æ–‡ä»¶åï¼Œ
 //      mode        =0 dsp code
 //                  =1 table
 //ret:  true/false
 bool DSP_InitCode(const int8 *dspcodename, int8 mode);
 
-//³õÊ¼»¯dsp´úÂë»òÊı¾İ
-//para: dspcodename ´úÂëÎÄ¼şÃû
+//åˆå§‹åŒ–dspä»£ç æˆ–æ•°æ®
+//para: dspcodename ä»£ç æ–‡ä»¶å
 //      mod
 //          x  x  x  x  x  x  x  x
 //          |_____|  |___________|
@@ -292,7 +292,7 @@ bool DSP_InitCode(const int8 *dspcodename, int8 mode);
 //                |__________________codec type
 //ret:  true/false
 bool DSP_InitCodeExp(int8 *DSPFileName, uint8 songtype, uint8 audiotype);
-//³õÊ¼»¯dsp
+//åˆå§‹åŒ–dsp
 //para: mips: 00010:24mips 00011:36mips 00100:48mips 00101:60mips 00110:72mips 00111:84mips
 //01000:98m......11111:372m
 //ret:  true/false
@@ -302,12 +302,12 @@ bool StartDsp(uint8 mips);
 //ret:  true/false
 bool StopDsp(void);
 bool StopDspInUSB(void);
-//ÉèÖÃdspËÙ¶È
+//è®¾ç½®dspé€Ÿåº¦
 //para: mips: 00:12mips 01:24mips 02:36mips 03:48mips 04:60mips 05:80mips
 //ret:  true/false
 bool SetDspMips(uint8 mips);
 
-//»ñÈ¡wmaµÄtable
+//è·å–wmaçš„table
 //para: uint8 table no
 //ret:  true/false
 bool SetDspMips(uint8 tableno);
@@ -339,20 +339,20 @@ typedef unsigned char ain_t;
 /*
 typedef struct
 {
-        int8 micin:1;    //´ËÎ»Îª1,ai mic select
-        int8 linein:1;   //´ËÎ»Îª1,fmÊäÈë±»Ñ¡Ôñ only support by 51
-        int8 fmin:1;     //´ËÎ»Îª1,lineinÊäÈë±»Ñ¡Ôñ only support by 51
+        int8 micin:1;    //æ­¤ä½ä¸º1,ai mic select
+        int8 linein:1;   //æ­¤ä½ä¸º1,fmè¾“å…¥è¢«é€‰æ‹© only support by 51
+        int8 fmin:1;     //æ­¤ä½ä¸º1,lineinè¾“å…¥è¢«é€‰æ‹© only support by 51
 		int8 micin20:1;  //reserve
 }ain_t;
 */
 
 typedef struct
 {
-    adin_t adin;    		//adc ÊäÈëÑ¡Ôñ
+    adin_t adin;    		//adc è¾“å…¥é€‰æ‹©
     uint8 channelmode;      //0ch: Stereo ; 08h: only left ; 04h: only Right
-    rate_t rate;    		//²ÉÑùÂÊÑ¡Ôñ ADC Frequency Sampling:8/16/24/32/48 etc
-    uint8 inputgain;        //mic: 0-7 for 20-40db, fm: 0-7 for -3.0 - +7.5db, input source gain£¬micÂ¼ÒôÍÆ¼öÖµ5¼´·Å´ó50±¶£¬fmÂ¼ÒôÍÆ¼öÖµ2¼´²»·Å´óÒ²²»ËõĞ¡
-    uint8 lfpgain;			//0: -6 db, 20h: -3db, 40h: 0db, 60h: +3db, adc analog gain£¬ÍÆ¼öÖµ40h¼´²»·Å´óÒ²²»ËõĞ¡
+    rate_t rate;    		//é‡‡æ ·ç‡é€‰æ‹© ADC Frequency Sampling:8/16/24/32/48 etc
+    uint8 inputgain;        //mic: 0-7 for 20-40db, fm: 0-7 for -3.0 - +7.5db, input source gainï¼Œmicå½•éŸ³æ¨èå€¼5å³æ”¾å¤§50å€ï¼Œfmå½•éŸ³æ¨èå€¼2å³ä¸æ”¾å¤§ä¹Ÿä¸ç¼©å°
+    uint8 lfpgain;			//0: -6 db, 20h: -3db, 40h: 0db, 60h: +3db, adc analog gainï¼Œæ¨èå€¼40hå³ä¸æ”¾å¤§ä¹Ÿä¸ç¼©å°
     uint8 fifoaccess;	   //  ; 0: MCU, 10h: DMA, 20h: AHC, 30h: AHC
     uint8 trimmingflag;	  //  ; 0: no trimming, 01h: trimming
     uint8 FSBit;		   // 0: need mix    , 80h: not mix
@@ -360,7 +360,7 @@ typedef struct
     uint8 digitalgain;	  //0: 0 db, 40h: +6db, 80h: +12db, c0h: reserve, adc digital gain
 } adc_t;
 
-//ÆÕÍ¨ÓÃ»§Ö»ĞèÒªÅäÖÃÇ°Ãæ5¸ö£¬¸ß¼¶ÓÃ»§¿ÉÅäÖÃºóÃæ5¸ö¡£Îª·½±ãÓÃ»§Ê¹ÓÃ£¬Çë²¹³äÆäËû²ÎÊıµÄºêÃèÊö
+//æ™®é€šç”¨æˆ·åªéœ€è¦é…ç½®å‰é¢5ä¸ªï¼Œé«˜çº§ç”¨æˆ·å¯é…ç½®åé¢5ä¸ªã€‚ä¸ºæ–¹ä¾¿ç”¨æˆ·ä½¿ç”¨ï¼Œè¯·è¡¥å……å…¶ä»–å‚æ•°çš„å®æè¿°
 
 
 
@@ -368,81 +368,81 @@ typedef struct
 typedef struct
 {
     int8 dacselect; //0: internal dac 1: external dac       //2003-12-5 10:50
-    rate_t rate;    //dac ²ÉÑùÂÊÑ¡Ôñ
-    int8 reserve[2];//±£Áô
+    rate_t rate;    //dac é‡‡æ ·ç‡é€‰æ‹©
+    int8 reserve[2];//ä¿ç•™
 } dac_t;
 
 //***********************************************************
-//      power amplifier input µÄÄ£Ê½
-//       ¶ÔÓÚgl3935  ÊäÖ»Ö§³Ödacin : Ò²¾ÍÊÇdacµÄÊäÈë
+//      power amplifier input çš„æ¨¡å¼
+//       å¯¹äºgl3935  è¾“åªæ”¯æŒdacin : ä¹Ÿå°±æ˜¯dacçš„è¾“å…¥
 typedef struct
 {
-    int8 micin: 1;  //´ËÎ»Îª1,micinÊäÈë±»Ñ¡Ôñ only support by 51
-    int8 fmin: 1;   //´ËÎ»Îª1,fmÊäÈë±»Ñ¡Ôñ only support by 51
-    int8 linein: 1; //´ËÎ»Îª1,lineinÊäÈë±»Ñ¡Ôñ only support by 51
-    int8 dacin: 1;  //´ËÎ»Îª1,dac in select
+    int8 micin: 1;  //æ­¤ä½ä¸º1,micinè¾“å…¥è¢«é€‰æ‹© only support by 51
+    int8 fmin: 1;   //æ­¤ä½ä¸º1,fmè¾“å…¥è¢«é€‰æ‹© only support by 51
+    int8 linein: 1; //æ­¤ä½ä¸º1,lineinè¾“å…¥è¢«é€‰æ‹© only support by 51
+    int8 dacin: 1;  //æ­¤ä½ä¸º1,dac in select
 } pain_t;
 
 
 typedef struct
 {
-    pain_t pa_in;  //ÊäÈëÑ¡Ôñ
-    int8 volumel;    //ÒôÁ¿Ñ¡Ôñ
-    int8 volumer;    //ÒôÁ¿Ñ¡Ôñ
-    int8 reserve;//±£Áô
+    pain_t pa_in;  //è¾“å…¥é€‰æ‹©
+    int8 volumel;    //éŸ³é‡é€‰æ‹©
+    int8 volumer;    //éŸ³é‡é€‰æ‹©
+    int8 reserve;//ä¿ç•™
 } pa_t;
 
-//¼¤»îAnalog analog
+//æ¿€æ´»Analog analog
 #define EnableAIN(ain) API_EnableAIN(APINO_AI_Enable,ain)
 bool API_EnableAIN(uint8 cmd, adin_t ain);
-//¹Ø±ÕAnalog analog
+//å…³é—­Analog analog
 #define DisableAIN() API_DisableAIN(APINO_AI_Disable)
 void API_DisableAIN(uint8 cmd);
-//ÉèÖÃAnalog analog
+//è®¾ç½®Analog analog
 #define SetAINGain(gain0,gain1) API_SetAINGain(APINO_AI_SetGain,gain0,gain1)
 bool API_SetAINGain(uint8 cmd, uint8 gain0, uint8 gain1);
-//ÉèÖÃAnalog analog
+//è®¾ç½®Analog analog
 #define GetAINGain(ain) API_GetAINGain(APINO_AI_GetGain,ain)
 uint8 API_GetAINGain(uint8 cmd, ain_t ain);
 
-//¼¤»îAudio ADC
+//æ¿€æ´»Audio ADC
 #define EnableADC(adcattr) API_EnableADC(APINO_ADC_Enable,adcattr)
 bool API_EnableADC(uint8 cmd, adc_t *adcattr);
-//¹Ø±ÕAudio ADC
+//å…³é—­Audio ADC
 #define DisableADC() API_DisableADC(APINO_ADC_Disable)
 void API_DisableADC(uint8 cmd);
 
 
 
-//¼¤»îÄÚ²¿/Íâ²¿DAC
+//æ¿€æ´»å†…éƒ¨/å¤–éƒ¨DAC
 #define EnableDAC(dacattr) API_EnableDAC(APINO_DAC_Enable,dacattr)
 bool API_EnableDAC(uint8 cmd, dac_t *dacattr);
-//¹Ø±ÕÄÚ²¿/Íâ²¿DAC
+//å…³é—­å†…éƒ¨/å¤–éƒ¨DAC
 #define DisableDAC() API_DisableDAC(APINO_DAC_Disable)
 void API_DisableDAC(uint8 cmd);
-//¹Ø±ÕÄÚ²¿/Íâ²¿DAC
+//å…³é—­å†…éƒ¨/å¤–éƒ¨DAC
 #define SetDACRate(rate) API_SetDACRate(APINO_DAC_SetRate,rate)
 bool API_SetDACRate(uint8 cmd, rate_t rate);
-//»ñÈ¡dac sample rate
+//è·å–dac sample rate
 #define GetDACRate() API_GetDACRate(APINO_DAC_GetRate)
 rate_t API_GetDACRate(uint8 cmd);
 
-//¼¤»îÄÚ²¿pa
+//æ¿€æ´»å†…éƒ¨pa
 #define EnablePA(paattr) API_EnablePA(APINO_PA_Enable,paattr)
 bool API_EnablePA(uint8 cmd, pa_t *paattr);
-//¹Ø±ÕÄÚ²¿pa
+//å…³é—­å†…éƒ¨pa
 #define DisablePA() API_DisablePA(APINO_PA_Disable)
 void API_DisablePA(uint8 cmd);
-//ÉèÖÃpaÒôÁ¿
+//è®¾ç½®paéŸ³é‡
 #define SetPAVolume(volumel,volumer) API_SetPAVolume(APINO_PA_SetVolume,volumel,volumer)
 bool API_SetPAVolume(uint8 cmd, uint8 volumel, uint8 volumer);
-//»ñÈ¡paÒôÁ¿
+//è·å–paéŸ³é‡
 #define GetPAVolume() API_GetPAVolume(APINO_PA_GetVolume)
 uint8 API_GetPAVolume(uint8 cmd);
-//¼¤»îÖ±Çıpa
+//æ¿€æ´»ç›´é©±pa
 #define EnablePADDV(paattr) API_EnablePADDV(APINO_PADDV_Enable,paattr)
 bool API_EnablePADDV(uint8 cmd, pa_t *paattr);
-//¹Ø±ÕÖ±Çıpa
+//å…³é—­ç›´é©±pa
 #define DisablePADDV() API_DisablePADDV(APINO_PADDV_Disable)
 void API_DisablePADDV(uint8 cmd);
 
@@ -452,10 +452,10 @@ void API_DisablePADDV(uint8 cmd);
 //#define DisableCLD() API_DisableCLD(APINO_CLD_Disable)
 // void API_DisableCLD(uint8 cmd);
 
-//ÉèÖÃ CLD gain
+//è®¾ç½® CLD gain
 //#define SetCLDGain(gain) API_SetCLDGain(APINO_CLD_SetGain,gain)
 // void API_SetCLDGain(uint8 cmd, uint8 gain);
-//»ñÈ¡ CLD gain
+//è·å– CLD gain
 //#define GetCLDGain() API_GetCLDGain(APINO_CLD_GetGain)
 // uint8 API_GetCLDGain(uint8 cmd);
 // SetPLL
@@ -489,19 +489,19 @@ void API_Card_Detect_Ctrl(uint8 cmd, uint8 clk_bus_width, uint8 timer, uint8 mod
 #endif /* __C251__ */
 
 #ifdef __A251__
-mGetUsbCableStatus   macro                      //»ñÈ¡UÅÌÊÇ·ñ²åÏß  0:Ã»²åÏß   ÆäËû:²åÏß
+mGetUsbCableStatus   macro                      //è·å–Uç›˜æ˜¯å¦æ’çº¿  0:æ²¡æ’çº¿   å…¶ä»–:æ’çº¿
 MOV  R11, #APINO_GetUsbCableStatus
 ECALL RSTSYSAPI
 endm
-mGetUsbAttribute   macro                        //»ñÈ¡UÅÌÊôĞÔ£¬Èç³§ÉÌĞÅÏ¢£¬²ú¿ÚĞÅÏ¢£¬²ú¿Ú°æ±¾
+mGetUsbAttribute   macro                        //è·å–Uç›˜å±æ€§ï¼Œå¦‚å‚å•†ä¿¡æ¯ï¼Œäº§å£ä¿¡æ¯ï¼Œäº§å£ç‰ˆæœ¬
 MOV  R11, #APINO_GetUsbAttribute
 ECALL RSTSYSAPI
 endm
-mGetUsbSetupInfo   macro                        //»ñÈ¡UÅÌ°²×°ÏÔÊ¾ĞÅÏ¢
+mGetUsbSetupInfo   macro                        //è·å–Uç›˜å®‰è£…æ˜¾ç¤ºä¿¡æ¯
 MOV  R11, #APINO_GetUsbSetupInfo
 ECALL RSTSYSAPI
 endm
-mGetUsbVidPid   macro                           //»ñÈ¡UÅÌVID&PID
+mGetUsbVidPid   macro                           //è·å–Uç›˜VID&PID
 MOV  R11, #APINO_GetUsbVidPid
 ECALL RSTSYSAPI
 endm
@@ -604,70 +604,70 @@ endm
 
 //mtp
 /*
-mGetMtpVidPid   macro                      //»ñÈ¡UÅÌÊÇ·ñ²åÏß  0:Ã»²åÏß   ÆäËû:²åÏß
+mGetMtpVidPid   macro                      //è·å–Uç›˜æ˜¯å¦æ’çº¿  0:æ²¡æ’çº¿   å…¶ä»–:æ’çº¿
         MOV  WR8, #API_GetMtpVidPid
         LCALL RSTBankAPI
         endm
-mGetMtpMfrInfo   macro                        //»ñÈ¡UÅÌÊôĞÔ£¬Èç³§ÉÌĞÅÏ¢£¬²ú¿ÚĞÅÏ¢£¬²ú¿Ú°æ±¾
+mGetMtpMfrInfo   macro                        //è·å–Uç›˜å±æ€§ï¼Œå¦‚å‚å•†ä¿¡æ¯ï¼Œäº§å£ä¿¡æ¯ï¼Œäº§å£ç‰ˆæœ¬
         MOV  WR8, #API_GetMtpMfrInfo
         LCALL RSTBankAPI
         endm
 
-mGetMtpProdInfo   macro                           //»ñÈ¡UÅÌVID&PID
+mGetMtpProdInfo   macro                           //è·å–Uç›˜VID&PID
         MOV  WR8, #API_GetMtpProdInfo
         LCALL RSTBankAPI
         endm
 
-mGetMtpProdVer   macro                        //»ñÈ¡UÅÌ°²×°ÏÔÊ¾ĞÅÏ¢
+mGetMtpProdVer   macro                        //è·å–Uç›˜å®‰è£…æ˜¾ç¤ºä¿¡æ¯
         MOV  WR8, #API_GetMtpProdVer
         LCALL RSTBankAPI
         endm
-mGetMtpProdSn  macro                           //»ñÈ¡UÅÌVID&PID
+mGetMtpProdSn  macro                           //è·å–Uç›˜VID&PID
         MOV  WR8, #API_GetMtpProdSn
         LCALL RSTBankAPI
         endm
 */
-mGetAudibleDeviceID  macro                      //»ñÈ¡Éè±¸ID
+mGetAudibleDeviceID  macro                      //è·å–è®¾å¤‡ID
 MOV  R11, #APINO_GetAudibleDeviceID
 ECALL RSTSYSAPI
 endm
 
-mGetHideDiskCap  macro                          //»ñÈ¡Òş²ØÅÌµÄÈİÁ¿
+mGetHideDiskCap  macro                          //è·å–éšè—ç›˜çš„å®¹é‡
 MOV  R11, #APINO_GetHideDiskCap
 ECALL RSTSYSAPI
 endm
 
-mGetAutoRunDiskCap  macro                       //»ñÈ¡AutoRun¹âÅÌµÄÈİÁ¿
+mGetAutoRunDiskCap  macro                       //è·å–AutoRunå…‰ç›˜çš„å®¹é‡
 MOV  R11, #APINO_GetAutoRunDiskCap
 ECALL RSTSYSAPI
 endm
 
-mGetSDCap       macro                          //»ñÈ¡ÏµÍ³ÇøµÄÈİÁ¿
+mGetSDCap       macro                          //è·å–ç³»ç»ŸåŒºçš„å®¹é‡
 MOV  R11, #APINO_GetSDCap
 ECALL RSTSYSAPI
 endm
-mGetVMCap       macro                          //»ñÈ¡VramÇøµÄÈİÁ¿
+mGetVMCap       macro                          //è·å–VramåŒºçš„å®¹é‡
 MOV  R11, #APINO_GetVMCap
 ECALL RSTSYSAPI
 endm
 /*
-mGetMICap       macro                          //»ñÈ¡MtpÇøµÄÈİÁ¿
+mGetMICap       macro                          //è·å–MtpåŒºçš„å®¹é‡
         MOV  WR8, #API_GetMICap
         LCALL RSTBankAPI
         endm	*/
-mGetUICap       macro                          //»ñÈ¡USB ĞÅÏ¢ÇøµÄÈİÁ¿
+mGetUICap       macro                          //è·å–USB ä¿¡æ¯åŒºçš„å®¹é‡
 MOV  R11, #APINO_GetUICap
 ECALL RSTSYSAPI
 endm
-mGetExtRtcFlag  macro                          //»ñÈ¡ÊÇ·ñÖ§³ÖÍâ²¿RTCµÄ±êÖ¾
+mGetExtRtcFlag  macro                          //è·å–æ˜¯å¦æ”¯æŒå¤–éƒ¨RTCçš„æ ‡å¿—
 MOV  R11, #APINO_GetExtRtcFlag
 ECALL RSTSYSAPI
 endm
-mGetLCDWidth  macro							  //»ñÈ¡LCDµÄ³¤¶È
+mGetLCDWidth  macro							  //è·å–LCDçš„é•¿åº¦
 MOV  R11, #APINO_GetLCDWidth
 ECALL RSTSYSAPI
 endm
-mGetLCDHeight  macro                          //»ñÈ¡LCDµÄ¸ß¶È
+mGetLCDHeight  macro                          //è·å–LCDçš„é«˜åº¦
 MOV  R11, #APINO_GetLCDHeight
 ECALL RSTSYSAPI
 endm
@@ -697,7 +697,7 @@ MOV  R11, #APINO_COM_ISR_DEFAULT
 ECALL RSTSYSAPI
 endm
 
-mGetMSCVolumeLabel  macro                       //»ñÈ¡UÅÌµÄ¾í±ê
+mGetMSCVolumeLabel  macro                       //è·å–Uç›˜çš„å·æ ‡
 MOV  R11, #APINO_GetMSCVolumeLabel
 ECALL RSTSYSAPI
 endm

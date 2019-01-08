@@ -25,7 +25,7 @@
 #pragma name(MW_BS_AD_CMD2_SD)
 
 extern HANDLE m_deSd_Fp;
-extern Open_param_t *m_deSdOpenparam; //≤Œ ˝±Ìµÿ÷∑
+extern Open_param_t *m_deSdOpenparam; //ÂèÇÊï∞Ë°®Âú∞ÂùÄ
 
 //extern uint32 deSdApointerSave;
 //extern uint32 deSdBpointerSave;
@@ -45,11 +45,11 @@ bool SdBackupCommand(void)
     //    m_deSdOpenparam->BreakPTSave->ApointSave = deSdApointerSave;
     //    m_deSdOpenparam->BreakPTSave->BpointSave = deSdBpointerSave;
     m_deSdOpenparam->BreakPTSave->breakPT = deSdBreakPointSave;
-    //    if (m_Sdbackupmode == 0)//∂œµ„–¯≤•±∏∑›
+    //    if (m_Sdbackupmode == 0)//Êñ≠ÁÇπÁª≠Êí≠Â§á‰ªΩ
     //    {
     //        memcpy(&(m_deSdOpenparam->BreakPTSave->breakPointInfor), &g_decBreakPointInfor, sizeof(decBreakPointInfor_t));
     //    }
-    //    else//AB ∏¥∂¡π˝≥Ã÷–µƒ∂œµ„≤ª±£¥Ê£¨÷ª «±£¥ÊAµ„£¨“‘∫Û∂œµ„–¯≤•¥”Aµ„ø™ º
+    //    else//AB Â§çËØªËøáÁ®ã‰∏≠ÁöÑÊñ≠ÁÇπ‰∏ç‰øùÂ≠òÔºåÂè™ÊòØ‰øùÂ≠òAÁÇπÔºå‰ª•ÂêéÊñ≠ÁÇπÁª≠Êí≠‰ªéAÁÇπÂºÄÂßã
     //    {
     //        memcpy(&(m_deSdOpenparam->BreakPTSave->breakPointInfor), &m_SdbreakPointInfo, sizeof(decBreakPointInfor_t));
     //    }
@@ -70,7 +70,7 @@ bool SdRestoreCommand(void)
 //    g_decControlInfor.PlayMode = PLAY_MODE_BREAK;
 //    memcpy(&g_decBreakPointInfor, &m_SdbreakPointInfo, sizeof(decBreakPointInfor_t));
 //    SD_FSeek(0, FS_SEEK_FFROMSTART, m_deSd_Fp);
-//    decInit();//º∆À„ ±º‰≤ªµ≠»Î
+//    decInit();//ËÆ°ÁÆóÊó∂Èó¥‰∏çÊ∑°ÂÖ•
 //    decstart();
 //    return TRUE;
 //}

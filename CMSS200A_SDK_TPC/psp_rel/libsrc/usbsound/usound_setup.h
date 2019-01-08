@@ -13,9 +13,9 @@
  * \brief    .
  * \author   dengtaiping
  * \par      GENERAL DESCRIPTION:
- *               Ã¶¾Ù´úÂëÓÃµ½µÄºê¼°±äÁ¿ÉùÃ÷
+ *               æšä¸¾ä»£ç ç”¨åˆ°çš„å®åŠå˜é‡å£°æ˜
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
  *
@@ -194,14 +194,14 @@ typedef struct
 
 typedef struct
 {
-    uint8 bLength; //ÃèÊö·û´óĞ¡
-    uint8 bDescriptorType; //IADÃèÊö·ûÀàĞÍ
-    uint8 bFirstInterface; //ÆğÊ¼½Ó¿Ú
-    uint8 bInterfaceCount; //½Ó¿ÚÊı
-    uint8 bFunctionClass; //ÀàĞÍ´úÂë
-    uint8 bFunctionSubClass; //×ÓÀàĞÍ´úÂë
-    uint8 bFunctionProtocol; //Ğ­Òé´úÂë
-    uint8 iFunction; //ÃèÊö×Ö·û´®Ë÷Òı
+    uint8 bLength; //æè¿°ç¬¦å¤§å°
+    uint8 bDescriptorType; //IADæè¿°ç¬¦ç±»å‹
+    uint8 bFirstInterface; //èµ·å§‹æ¥å£
+    uint8 bInterfaceCount; //æ¥å£æ•°
+    uint8 bFunctionClass; //ç±»å‹ä»£ç 
+    uint8 bFunctionSubClass; //å­ç±»å‹ä»£ç 
+    uint8 bFunctionProtocol; //åè®®ä»£ç 
+    uint8 iFunction; //æè¿°å­—ç¬¦ä¸²ç´¢å¼•
 } usb_IAD_descriptor_t;
 
 /* Interface descriptor */
@@ -250,7 +250,7 @@ typedef struct
     uint16 wTerminalType; //Constant characterizing the type of Terminal.See USB Audio Terminal Types.
     uint8 bAssocTerminal; //ID of the Output Terminal to which this Input Terminal is associated.
     uint8 bNrChannels; /*Number of logical output channels
-     in the Terminal¡¯s output audio channel cluster.*/
+     in the Terminalâ€™s output audio channel cluster.*/
     uint16 wChannelConfig; //Describes the spatial location of the logical channels.
     uint8 iChannelNames; //Index of a string descriptor, describing the name of the first logical channel.
     uint8 iTerminal; //Index of a string descriptor, describing the Input Terminal.

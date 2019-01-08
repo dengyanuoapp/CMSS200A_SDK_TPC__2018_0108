@@ -60,11 +60,11 @@
 
 typedef enum
 {
-    CharType_NUM,    //Êı×Ö£¨0-9£©
-    CharType_UPER,    //´óĞ´×ÖÄ¸£¨A-Z£©
-    CharType_DNER,    //Ğ¡Ğ´×ÖÄ¸£¨a-z£©
-    CharType_SPACE,    //¿Õ¸ñ (" ")
-    CharType_OTHER    //ÆäËûÖµ
+    CharType_NUM,    //æ•°å­—ï¼ˆ0-9ï¼‰
+    CharType_UPER,    //å¤§å†™å­—æ¯ï¼ˆA-Zï¼‰
+    CharType_DNER,    //å°å†™å­—æ¯ï¼ˆa-zï¼‰
+    CharType_SPACE,    //ç©ºæ ¼ (" ")
+    CharType_OTHER    //å…¶ä»–å€¼
 } CharType_e;
 
 

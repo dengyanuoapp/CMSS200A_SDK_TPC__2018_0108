@@ -14,7 +14,7 @@
 
 EQ_VM_t far g_eq_vrampara;
 
-//Ä¬ÈÏEQÒôĞ§±í
+//é»˜è®¤EQéŸ³æ•ˆè¡¨
 const uint8 defaultEQ[SUPPORT_EQ_CNT][ONE_EQPARA_BYTE] =
 {
     0, 0, 0, 0, 0, 0, 0, //none
@@ -38,14 +38,14 @@ uint8 deal_eqsave_check(uint8 *eqbuf)
     uint8 *ptr;
 
     ptr = (uint8 *) &eqinfo;
-    eqmode = *eqbuf; // 1:normal 2:Rock 3:Pop 4:Classic 5:Soft 6:Jazz 7:Dbb 8:×Ô¶¨Òå
+    eqmode = *eqbuf; // 1:normal 2:Rock 3:Pop 4:Classic 5:Soft 6:Jazz 7:Dbb 8:è‡ªå®šä¹‰
     eqbuf++;
     memcpy((void *) &eqinfo, eqbuf, sizeof(utest_eq_info_t)); //get 14 bytes eq para
 
     result = VMRead(&g_eq_vrampara, VM_PCSET_EQ, sizeof(g_eq_vrampara));
     if (g_eq_vrampara.magic != EQ_VRAM_MAGIC)
     {
-        //¸øVRAM¸³³õÊ¼Öµ
+        //ç»™VRAMèµ‹åˆå§‹å€¼
         g_eq_vrampara.magic = EQ_VRAM_MAGIC;
         memcpy(g_eq_vrampara.left_eq_para, defaultEQ[0], ONE_EQPARA_BYTE * SUPPORT_EQ_CNT);
         memcpy(g_eq_vrampara.right_eq_para, defaultEQ[0], ONE_EQPARA_BYTE * SUPPORT_EQ_CNT);
@@ -60,13 +60,13 @@ uint8 deal_eqsave_check(uint8 *eqbuf)
         //right
         ptr += ONE_EQPARA_BYTE;
         memcpy(&g_eq_vrampara.right_eq_para[ONE_EQPARA_BYTE * eqmode], ptr, ONE_EQPARA_BYTE);
-        //½«²ÎÊı±íĞ´ÈëVRAM
+        //å°†å‚æ•°è¡¨å†™å…¥VRAM
         VMWrite(&g_eq_vrampara, VM_PCSET_EQ, sizeof(g_eq_vrampara));
         ret = 0;
     }
     else
     {
-        //´«µİÏÂÀ´µÄEQ mode²»ÔÚ·¶Î§ÄÚ, ·µ»Østatus: fail
+        //ä¼ é€’ä¸‹æ¥çš„EQ modeä¸åœ¨èŒƒå›´å†…, è¿”å›status: fail
         ret = 2;
     }
 
@@ -75,7 +75,7 @@ uint8 deal_eqsave_check(uint8 *eqbuf)
         return ret;
     }
 
-    //ÖØĞÂ¶Á³ö£¬±È½Ï
+    //é‡æ–°è¯»å‡ºï¼Œæ¯”è¾ƒ
     result = VMRead(&g_eq_vrampara, VM_PCSET_EQ, sizeof(g_eq_vrampara));
     if (g_eq_vrampara.magic != EQ_VRAM_MAGIC)
     {
@@ -85,14 +85,14 @@ uint8 deal_eqsave_check(uint8 *eqbuf)
     ptr = (uint8 *) &eqinfo;
     if (memcmp(&g_eq_vrampara.left_eq_para[ONE_EQPARA_BYTE * eqmode], ptr, ONE_EQPARA_BYTE) != 0)
     {
-        //×óÉùµÀ²ÎÊı²»Æ¥Åä
+        //å·¦å£°é“å‚æ•°ä¸åŒ¹é…
         ret = 2;
         return ret;
     }
     ptr += ONE_EQPARA_BYTE;
     if (memcmp(&g_eq_vrampara.right_eq_para[ONE_EQPARA_BYTE * eqmode], ptr, ONE_EQPARA_BYTE) != 0)
     {
-        //ÓÒÉùµÀ²ÎÊı²»Æ¥Åä
+        //å³å£°é“å‚æ•°ä¸åŒ¹é…
         ret = 2;
         return ret;
     }

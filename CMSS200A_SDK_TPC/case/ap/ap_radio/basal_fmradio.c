@@ -11,7 +11,7 @@
 
 #pragma name(MOD_BS_FMRADIO)
 
-uint16 m_FMStationTab[MAX_STATION_COUNT]; //µçÌ¨ÆµÂÊ¶ÔÕÕ±í(×¢:ÆµÂÊ·¶Î§87M-108M ÒÔKÎª¾«¶È).
+uint16 m_FMStationTab[MAX_STATION_COUNT]; //ç”µå°é¢‘ç‡å¯¹ç…§è¡¨(æ³¨:é¢‘ç‡èŒƒå›´87M-108M ä»¥Kä¸ºç²¾åº¦).
 
 static uint8 cmd_fm_mid_findstation(void *param1, void *param2);
 
@@ -35,34 +35,34 @@ bool SequenceFreqlist(uint16 *buf, uint16 curfreq, uint8 totalnum)
 
     for (i = 0; i < MAX_STATION_COUNT; i++)
     {
-        //dealbuf µÄÊı¾İÊÇ´ÓĞ¡µ½´óÅÅĞò
+        //dealbuf çš„æ•°æ®æ˜¯ä»å°åˆ°å¤§æ’åº
 
-        if (curfreq < (*dealbuf)) //Ğ¡Óëµ±Ç°Ö¸ÏòµÄ£¬Ôò°Ñµ±Ç°ÒÔºóµÄÍùºóÒÆ£¬²¢²åÈëµ½µ±Ç°
+        if (curfreq < (*dealbuf)) //å°ä¸å½“å‰æŒ‡å‘çš„ï¼Œåˆ™æŠŠå½“å‰ä»¥åçš„å¾€åç§»ï¼Œå¹¶æ’å…¥åˆ°å½“å‰
         {
             cur_pos = i;
-            if (cur_pos == (MAX_STATION_COUNT - 1)) //Èç¹ûÊÇ×îºóÒ»Ïî£¬Ö±½ÓÌæ»»
+            if (cur_pos == (MAX_STATION_COUNT - 1)) //å¦‚æœæ˜¯æœ€åä¸€é¡¹ï¼Œç›´æ¥æ›¿æ¢
             {
                 *dealbuf = curfreq;
                 g_FMStatus.station = i + 1;
                 break;
             }
 
-            for (j = (MAX_STATION_COUNT - 2); j >= (int8) cur_pos; j--) //´ÓĞ¡µ½´óÅÅĞò£¬²åÈëÖĞ¼ä£¬ĞèÒª°ÑºóÃæµÄÊı¾İÍùºóÒÆÒ»Î»
+            for (j = (MAX_STATION_COUNT - 2); j >= (int8) cur_pos; j--) //ä»å°åˆ°å¤§æ’åºï¼Œæ’å…¥ä¸­é—´ï¼Œéœ€è¦æŠŠåé¢çš„æ•°æ®å¾€åç§»ä¸€ä½
             {
                 *(buf + j + 1) = *(buf + j);
             }
-            *dealbuf = curfreq; //²åÈëÔÚÖĞ¼ä
+            *dealbuf = curfreq; //æ’å…¥åœ¨ä¸­é—´
             g_FMStatus.station = i + 1;
 
             break;
         }
         else if (curfreq == (*dealbuf))
         {
-            return FALSE; //ÓĞÖØ¸´£¬²»¸üĞÂ±í
+            return FALSE; //æœ‰é‡å¤ï¼Œä¸æ›´æ–°è¡¨
         }
         else
         {
-            if ((*dealbuf == 0) && (i < totalnum)) //¼ì²âµ½×îºóÁË£¬Ö±½Ó²åÈëµ½½áÎ²
+            if ((*dealbuf == 0) && (i < totalnum)) //æ£€æµ‹åˆ°æœ€åäº†ï¼Œç›´æ¥æ’å…¥åˆ°ç»“å°¾
             {
                 *dealbuf = curfreq;
                 g_FMStatus.station = i + 1;
@@ -78,9 +78,9 @@ bool SequenceFreqlist(uint16 *buf, uint16 curfreq, uint8 totalnum)
  ********************************************************************************
  *             void FM_VolumeSet(uint8 Vol)
  *
- * Description : ÉèÖÃPAÒôÁ¿
+ * Description : è®¾ç½®PAéŸ³é‡
  *
- * Arguments   :	  ĞèÉèÖÃµÄÒôÁ¿Öµ
+ * Arguments   :	  éœ€è®¾ç½®çš„éŸ³é‡å€¼
  *
  * Returns     :
  *
@@ -93,44 +93,44 @@ void FM_VolumeSet(uint8 Vol)
     set_dac_volume(Vol);
 }
 
-//°²×°fmÇı¶¯, ½øĞĞÄ£×é³õÊ¼»¯
+//å®‰è£…fmé©±åŠ¨, è¿›è¡Œæ¨¡ç»„åˆå§‹åŒ–
 uint8 cmd_fm_open(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
-    //param1 ³£Êı£¬ÔİÊ±Ã»ÓÃµ½µÄ£¬½ö½ö´«µİ½øÈ¥
+    //å½¢å‚ç¡®è®¤OK
+    //param1 å¸¸æ•°ï¼Œæš‚æ—¶æ²¡ç”¨åˆ°çš„ï¼Œä»…ä»…ä¼ é€’è¿›å»
     uint8 mode = (uint8) param1;
     param2 = param2;
 
-    BankSwitch((uint32) FMdrv_mute); //½«³£×¤´úÂëÇĞ»»½øÀ´
+    BankSwitch((uint32) FMdrv_mute); //å°†å¸¸é©»ä»£ç åˆ‡æ¢è¿›æ¥
     return FMdrv_Init(mode);
 }
 
-//Ä£×é½øÈëstandby, ²¢Ğ¶ÔØfmÇı¶¯
+//æ¨¡ç»„è¿›å…¥standby, å¹¶å¸è½½fmé©±åŠ¨
 uint8 cmd_fm_close(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     param1 = param1;
     param2 = param2;
 
-    BankSwitch((uint32) FMdrv_mute); //½«³£×¤´úÂëÇĞ»»½øÀ´
+    BankSwitch((uint32) FMdrv_mute); //å°†å¸¸é©»ä»£ç åˆ‡æ¢è¿›æ¥
     return FMdrv_Standby();
 }
 
-//FM Ó²¼şÏà¹ØÉèÖÃ
+//FM ç¡¬ä»¶ç›¸å…³è®¾ç½®
 uint8 cmd_fm_hardware(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
-    uint8 onoff = (uint8) param1; //onoff:  1--´ò¿ªFMÊ±    0--¹Ø±ÕFMÊ±
-    uint8 PA_mode = (uint8) param2; //PA_mode:   1-- Òª²Ù×÷PA    0--²»²Ù×÷PA
+    //å½¢å‚ç¡®è®¤OK
+    uint8 onoff = (uint8) param1; //onoff:  1--æ‰“å¼€FMæ—¶    0--å…³é—­FMæ—¶
+    uint8 PA_mode = (uint8) param2; //PA_mode:   1-- è¦æ“ä½œPA    0--ä¸æ“ä½œPA
 
-    BankSwitch((uint32) FMdrv_mute); //½«³£×¤´úÂëÇĞ»»½øÀ´
+    BankSwitch((uint32) FMdrv_mute); //å°†å¸¸é©»ä»£ç åˆ‡æ¢è¿›æ¥
     return FMdrv_hardware(onoff, PA_mode);
 }
 
-//ÉèÖÃµ¥¸öÆµµã²¥·Å
+//è®¾ç½®å•ä¸ªé¢‘ç‚¹æ’­æ”¾
 uint8 cmd_fm_setfreq(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     uint8 result;
     uint16 Freq = (uint16) param1;
     param2 = param2;
@@ -140,118 +140,118 @@ uint8 cmd_fm_setfreq(void *param1, void *param2)
     return result;
 }
 
-//FM¾²Òô»ò½â³ı¾²Òô
+//FMé™éŸ³æˆ–è§£é™¤é™éŸ³
 uint8 cmd_fm_mute(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     FM_MUTE_e mode = (uint8) param1;
     param2 = param2;
     return FMdrv_mute(mode);
 }
 
-//ÉèÖÃ²¨¶Î
+//è®¾ç½®æ³¢æ®µ
 uint8 cmd_fm_setband(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     radio_band_e band = (uint8) param1;
     param2 = param2;
     return FMdrv_setband(band);
 }
 
-//ÉèÖÃËÑÌ¨ÃÅÏŞ
+//è®¾ç½®æœå°é—¨é™
 uint8 cmd_fm_setth(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     uint8 level = (uint8) param1;
     param2 = param2;
 
-    BankSwitch((uint32) FMdrv_mute); //½«³£×¤´úÂëÇĞ»»½øÀ´
+    BankSwitch((uint32) FMdrv_mute); //å°†å¸¸é©»ä»£ç åˆ‡æ¢è¿›æ¥
     return FMdrv_setthrod(level);
 }
 
-//ÉèÖÃÈí¼şËÑÌ¨
+//è®¾ç½®è½¯ä»¶æœå°
 uint8 cmd_fm_search(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     fm_status_t *sptr = (fm_status_t *) param1;
     uint8 SeekDirect = (*(uint8 *) param2);
 
     return FMdrv_search(sptr->freq, SeekDirect);
 }
 
-//Æô¶¯seek (Ó²¼şËÑÌ¨)
+//å¯åŠ¨seek (ç¡¬ä»¶æœå°)
 uint8 cmd_fm_seek(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     uint16 start = (uint16) param1;
     uint16 stop = (uint16) param2;
     uint8 step = 1;
     return FMdrv_seek(start, stop, step);
 }
 
-//»ñÈ¡seek×´Ì¬
+//è·å–seekçŠ¶æ€
 uint8 cmd_fm_getseekflag(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     uint8 *flag = param1;
     param2 = param2;
     return FMdrv_getseekflag(flag);
 }
 
-//ÍË³öseek
+//é€€å‡ºseek
 uint8 cmd_fm_breakseek(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     param1 = param1;
     param2 = param2;
-    return FMdrv_breakseek(); //ÍË³öÓ²¼şËÑÌ¨
+    return FMdrv_breakseek(); //é€€å‡ºç¡¬ä»¶æœå°
 }
 
-//»ñÈ¡µ±Ç°ÆµÂÊÖµ
+//è·å–å½“å‰é¢‘ç‡å€¼
 uint8 cmd_fm_getfreq(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     uint8 result;
     uint16 *pfreg = param1;
     param2 = param2;
     result = FMdrv_getfreq(pfreg);
-    //¸ù¾İµçÌ¨ÆµÂÊÕÒµ½µçÌ¨ºÅ
+    //æ ¹æ®ç”µå°é¢‘ç‡æ‰¾åˆ°ç”µå°å·
     cmd_fm_mid_findstation(NULL, NULL);
     return result;
 }
 
-//»ñÈ¡µ±Ç°µçÌ¨ĞÅºÅÇ¿¶È
+//è·å–å½“å‰ç”µå°ä¿¡å·å¼ºåº¦
 uint8 cmd_fm_getintensity(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     uint8 *pvalue = param1;
     param2 = param2;
     return FMdrv_getintensity(pvalue);
 }
 
-//»ñÈ¡µ±Ç°µçÌ¨×´Ì¬
+//è·å–å½“å‰ç”µå°çŠ¶æ€
 uint8 cmd_fm_getstatus(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     uint8 result;
-    fm_status_t *pBuf = param1; //FMStatus_Tab_t ½á¹¹ÌåÀàĞÍÒ²¿ÉÒÔ
+    fm_status_t *pBuf = param1; //FMStatus_Tab_t ç»“æ„ä½“ç±»å‹ä¹Ÿå¯ä»¥
     param2 = param2;
     result = FMdrv_getstatus(pBuf);
-    //¸ù¾İµçÌ¨ÆµÂÊÕÒµ½µçÌ¨ºÅ
+    //æ ¹æ®ç”µå°é¢‘ç‡æ‰¾åˆ°ç”µå°å·
     cmd_fm_mid_findstation(NULL, NULL);
     return result;
 }
 
-//²¥·ÅµçÌ¨
+//æ’­æ”¾ç”µå°
 uint8 cmd_fm_mid_play(void *param1, void *param2)
 {
-    //ĞÎ²ÎÈ·ÈÏOK
+    //å½¢å‚ç¡®è®¤OK
     uint16 Tempfreq;
 
     param1 = param1;
     param2 = param2;
 
-    //FMcmd(FM_MUTE, SetMUTE,NULL);   //¾²Òô
+    //FMcmd(FM_MUTE, SetMUTE,NULL);   //é™éŸ³
     fmSendCommand(FM_MUTE, SetMUTE, NULL);
 
     {
@@ -260,18 +260,18 @@ uint8 cmd_fm_mid_play(void *param1, void *param2)
 
     FMdrv_setfreq(Tempfreq);
 
-    //Ó¦¸ÃÑÓÊ±Ò»ÏÂ
+    //åº”è¯¥å»¶æ—¶ä¸€ä¸‹
     ap_sleep(1);
 
-    FMdrv_mute(releaseMUTE); //½â³ı¾²Òô
+    FMdrv_mute(releaseMUTE); //è§£é™¤é™éŸ³
 
     return 0;
 }
 
-//±£´æµ±Ç°µçÌ¨
+//ä¿å­˜å½“å‰ç”µå°
 uint8 cmd_fm_mid_save(void *param1, void *param2)
 {
-    //¼´¾É´úÂëÀïµÄ:MC_BACKUP ÃüÁî
+    //å³æ—§ä»£ç é‡Œçš„:MC_BACKUP å‘½ä»¤
 
     param2 = param2;
 
@@ -285,7 +285,7 @@ uint8 cmd_fm_mid_save(void *param1, void *param2)
     return 0;
 }
 
-//±£´æµ±Ç°µçÌ¨¶ÔÓ¦µÄµçÌ¨±íÏîºÅ¡£
+//ä¿å­˜å½“å‰ç”µå°å¯¹åº”çš„ç”µå°è¡¨é¡¹å·ã€‚
 uint8 cmd_fm_mid_savestation(void *param1, void *param2)
 {
     //uint8 i,k;
@@ -298,11 +298,11 @@ uint8 cmd_fm_mid_savestation(void *param1, void *param2)
         return FALSE;
     }
 
-    //°ÑµçÌ¨ÆµÂÊ±£´æµ½µçÌ¨±í£¬Èç¹ûÒÑ¾­´æÔÚ£¬»á·µ»ØÊ§°Ü
+    //æŠŠç”µå°é¢‘ç‡ä¿å­˜åˆ°ç”µå°è¡¨ï¼Œå¦‚æœå·²ç»å­˜åœ¨ï¼Œä¼šè¿”å›å¤±è´¥
     g_FMStatus.station_count++;
     if (SequenceFreqlist(m_FMStationTab, g_FMStatus.freq, g_FMStatus.station_count) == FALSE)
     {
-        g_FMStatus.station_count--; //Ìí¼ÓÊ§°Ü
+        g_FMStatus.station_count--; //æ·»åŠ å¤±è´¥
         return FALSE;
     }
 
@@ -310,8 +310,8 @@ uint8 cmd_fm_mid_savestation(void *param1, void *param2)
 
 }
 
-//²éÕÒµ±Ç°µçÌ¨¶ÔÓ¦µÄµçÌ¨±íÏîºÅ¡£
-//±£´æÔÚ g_FMStatus.station Àï
+//æŸ¥æ‰¾å½“å‰ç”µå°å¯¹åº”çš„ç”µå°è¡¨é¡¹å·ã€‚
+//ä¿å­˜åœ¨ g_FMStatus.station é‡Œ
 uint8 cmd_fm_mid_findstation(void *param1, void *param2)
 {
     uint8 i = g_FMStatus.station_count;
@@ -329,7 +329,7 @@ uint8 cmd_fm_mid_findstation(void *param1, void *param2)
     return 0;
 }
 
-//¸ù¾İµçÌ¨±íÏîºÅ¼ÓÔØÆµÂÊ¡£
+//æ ¹æ®ç”µå°è¡¨é¡¹å·åŠ è½½é¢‘ç‡ã€‚
 uint8 cmd_fm_mid_loadfreq(void *param1, void *param2)
 {
     uint8 i = g_FMStatus.station_count;
@@ -342,7 +342,7 @@ uint8 cmd_fm_mid_loadfreq(void *param1, void *param2)
     return 0;
 }
 
-//»¹Ô­µ±Ç°µçÌ¨
+//è¿˜åŸå½“å‰ç”µå°
 uint8 cmd_fm_mid_restore(void *param1, void *param2)
 {
     param2 = param2;
@@ -357,17 +357,17 @@ uint8 cmd_fm_mid_restore(void *param1, void *param2)
     return 0;
 }
 
-//ÇĞ»»ÏÂÒ»¸öµçÌ¨
+//åˆ‡æ¢ä¸‹ä¸€ä¸ªç”µå°
 uint8 cmd_fm_mid_turn(void *param1, void *param2)
 {
     uint8 i;
 
-    //param1 Îª UP »ò DOWN
+    //param1 ä¸º UP æˆ– DOWN
     param2 = param2;
 
-    if (g_FMStatus.station_count >= 1) //ÓĞµçÌ¨
+    if (g_FMStatus.station_count >= 1) //æœ‰ç”µå°
     {
-        if (g_FMStatus.station) //µçÌ¨ÒÑ¾­±£´æÁË
+        if (g_FMStatus.station) //ç”µå°å·²ç»ä¿å­˜äº†
         {
             if (param1 == UP)
             {
@@ -388,20 +388,20 @@ uint8 cmd_fm_mid_turn(void *param1, void *param2)
         }
         else
         {
-            //µçÌ¨»¹Ã»±£´æ£¬Ó¦¸ÃÏÈÇó³öµçÌ¨ÔÚÄÄ¸öÌ¨ÓëÌ¨Ö®¼ä
+            //ç”µå°è¿˜æ²¡ä¿å­˜ï¼Œåº”è¯¥å…ˆæ±‚å‡ºç”µå°åœ¨å“ªä¸ªå°ä¸å°ä¹‹é—´
             i = g_FMStatus.station_count;
             while (i)
             {
-                //µçÌ¨´ÓĞ¡µ½´óÅÅĞòµÄ£¬ÏÈÕÒµ½Ğ¡ÓÚ´ËÆµµÀµÄµçÌ¨
+                //ç”µå°ä»å°åˆ°å¤§æ’åºçš„ï¼Œå…ˆæ‰¾åˆ°å°äºæ­¤é¢‘é“çš„ç”µå°
                 if (g_FMStatus.freq > m_FMStationTab[--i])
                 {
                     i++;
                     break;
                 }
             }
-            //i == 0 Ê±£¬ÆµÂÊ±ÈÈÎºÎÒ»¸öµçÌ¨»¹µÍ
-            //i == g_FMStatus.station_count ,Ôò±ÈÈÎºÎÒ»¸öµçÌ¨»¹¸ß
-            //·ñÔòµçÌ¨ÔÚ i Óë i+ 1 Ö®¼ä
+            //i == 0 æ—¶ï¼Œé¢‘ç‡æ¯”ä»»ä½•ä¸€ä¸ªç”µå°è¿˜ä½
+            //i == g_FMStatus.station_count ,åˆ™æ¯”ä»»ä½•ä¸€ä¸ªç”µå°è¿˜é«˜
+            //å¦åˆ™ç”µå°åœ¨ i ä¸ i+ 1 ä¹‹é—´
             if (param1 == UP)
             {
                 if (i == g_FMStatus.station_count)
@@ -436,12 +436,12 @@ uint8 cmd_fm_mid_turn(void *param1, void *param2)
     return FALSE;
 }
 
-//É¾³ıµ±Ç°µçÌ¨
-//ÒÔg_FMStatus.station Îª»ù×¼À´É¾µô
-//Èç¹ûg_FMStatus.station ÎªÃ»±£´æ£¬ÔòÒÔ g_FMStatus.freq Îª»ù×¼
+//åˆ é™¤å½“å‰ç”µå°
+//ä»¥g_FMStatus.station ä¸ºåŸºå‡†æ¥åˆ æ‰
+//å¦‚æœg_FMStatus.station ä¸ºæ²¡ä¿å­˜ï¼Œåˆ™ä»¥ g_FMStatus.freq ä¸ºåŸºå‡†
 uint8 cmd_fm_mid_delete(void *param1, void *param2)
 {
-    //¼´¾É´úÂëÀïµÄ:MC_DELONE ÃüÁî
+    //å³æ—§ä»£ç é‡Œçš„:MC_DELONE å‘½ä»¤
 
     uint8 k;
 
@@ -450,7 +450,7 @@ uint8 cmd_fm_mid_delete(void *param1, void *param2)
 
     if (g_FMStatus.station == 0)
     {
-        cmd_fm_mid_findstation(NULL, NULL); //Èç¹ûµçÌ¨Ã»±£´æ£¬È·ÈÏÊÇ·ñÕæµÄÃ»±£´æ
+        cmd_fm_mid_findstation(NULL, NULL); //å¦‚æœç”µå°æ²¡ä¿å­˜ï¼Œç¡®è®¤æ˜¯å¦çœŸçš„æ²¡ä¿å­˜
         if (g_FMStatus.station == 0)
         {
             return FALSE;
@@ -460,7 +460,7 @@ uint8 cmd_fm_mid_delete(void *param1, void *param2)
     //for (k = g_FMStatus.station; k < (g_FMStatus.station_count + 1); k++)
     for (k = g_FMStatus.station; k < (g_FMStatus.station_count); k++)
     {
-        m_FMStationTab[k - 1] = m_FMStationTab[k]; //ÖĞ¼äĞèÒªÉ¾³ı£¬ËùÒÔºóÃæµÄĞèÒªÇ°ÒÆÒ»Î»
+        m_FMStationTab[k - 1] = m_FMStationTab[k]; //ä¸­é—´éœ€è¦åˆ é™¤ï¼Œæ‰€ä»¥åé¢çš„éœ€è¦å‰ç§»ä¸€ä½
     }
     g_FMStatus.station_count--;
     m_FMStationTab[g_FMStatus.station_count] = 0;
@@ -469,10 +469,10 @@ uint8 cmd_fm_mid_delete(void *param1, void *param2)
     return TRUE;
 }
 
-//É¾³ıÈ«²¿µçÌ¨
+//åˆ é™¤å…¨éƒ¨ç”µå°
 uint8 cmd_fm_mid_delall(void *param1, void *param2)
 {
-    //¼´¾É´úÂëÀïµÄ:MC_DELALL ÃüÁî
+    //å³æ—§ä»£ç é‡Œçš„:MC_DELALL å‘½ä»¤
     uint8 i;
 
     param1 = param1;
@@ -488,7 +488,7 @@ uint8 cmd_fm_mid_delall(void *param1, void *param2)
     return 0;
 }
 
-//È·¶¨ËùÑ¡³ÇÊĞµÄµÚÒ»¸ö³ÇÊĞµçÌ¨
+//ç¡®å®šæ‰€é€‰åŸå¸‚çš„ç¬¬ä¸€ä¸ªåŸå¸‚ç”µå°
 uint8 cmd_fm_mid_selcityinit(void *param1, void *param2)
 {
     param1 = param1;
@@ -497,7 +497,7 @@ uint8 cmd_fm_mid_selcityinit(void *param1, void *param2)
     return 0;
 }
 
-//ÔÚËùÑ¡³ÇÊĞÖĞÉÏÏÂÇĞ»»³ÇÊĞµçÌ¨
+//åœ¨æ‰€é€‰åŸå¸‚ä¸­ä¸Šä¸‹åˆ‡æ¢åŸå¸‚ç”µå°
 uint8 cmd_fm_mid_cityswitch(void *param1, void *param2)
 {
     param1 = param1;
@@ -505,7 +505,7 @@ uint8 cmd_fm_mid_cityswitch(void *param1, void *param2)
     return 0;
 }
 
-//ÉèÖÃÉùÒô
+//è®¾ç½®å£°éŸ³
 uint8 cmd_fm_mid_setvolume(void *param1, void *param2)
 {
     uint8 Vol = (uint8) param1;
@@ -515,7 +515,7 @@ uint8 cmd_fm_mid_setvolume(void *param1, void *param2)
     return 0;
 }
 
-//µçÌ¨ÆµÂÊÎ¢µ÷£¬ÒÔ100KHZÎª²½½ø
+//ç”µå°é¢‘ç‡å¾®è°ƒï¼Œä»¥100KHZä¸ºæ­¥è¿›
 uint8 cmd_fm_mid_stepgrid(void *param1, void *param2)
 {
     uint16 Tempfreq;
@@ -566,37 +566,37 @@ uint8 cmd_fm_mid_stepgrid(void *param1, void *param2)
 
 const pfunc_cmd far fm_cmd_pfunc[CMD_COUNT] =
 {
-    /* FM ÖĞ¼ä²ãÃüÁîºê, ²¿·ÖÉæ¼°µ½µ÷ÓÃFMÇı¶¯½Ó¿Ú */
-    cmd_fm_open, //°²×°fmÇı¶¯, ½øĞĞÄ£×é³õÊ¼»¯
-    cmd_fm_close, //Ä£×é½øÈëstandby, ²¢Ğ¶ÔØfmÇı¶¯
-    cmd_fm_hardware, //FM Ó²¼şÏà¹ØÉèÖÃ
-    cmd_fm_setfreq, //ÉèÖÃµ¥¸öÆµµã²¥·Å
-    cmd_fm_mute, //FM¾²Òô»ò½â³ı¾²Òô
-    cmd_fm_setband, //ÉèÖÃ²¨¶Î
-    cmd_fm_setth, //ÉèÖÃËÑÌ¨ÃÅÏŞ
-    cmd_fm_search, //ÉèÖÃÈí¼şËÑÌ¨
-    cmd_fm_seek, //Æô¶¯seek (Ó²¼şËÑÌ¨)
-    cmd_fm_getseekflag, //»ñÈ¡seek×´Ì¬
-    cmd_fm_breakseek, //ÍË³öseek
+    /* FM ä¸­é—´å±‚å‘½ä»¤å®, éƒ¨åˆ†æ¶‰åŠåˆ°è°ƒç”¨FMé©±åŠ¨æ¥å£ */
+    cmd_fm_open, //å®‰è£…fmé©±åŠ¨, è¿›è¡Œæ¨¡ç»„åˆå§‹åŒ–
+    cmd_fm_close, //æ¨¡ç»„è¿›å…¥standby, å¹¶å¸è½½fmé©±åŠ¨
+    cmd_fm_hardware, //FM ç¡¬ä»¶ç›¸å…³è®¾ç½®
+    cmd_fm_setfreq, //è®¾ç½®å•ä¸ªé¢‘ç‚¹æ’­æ”¾
+    cmd_fm_mute, //FMé™éŸ³æˆ–è§£é™¤é™éŸ³
+    cmd_fm_setband, //è®¾ç½®æ³¢æ®µ
+    cmd_fm_setth, //è®¾ç½®æœå°é—¨é™
+    cmd_fm_search, //è®¾ç½®è½¯ä»¶æœå°
+    cmd_fm_seek, //å¯åŠ¨seek (ç¡¬ä»¶æœå°)
+    cmd_fm_getseekflag, //è·å–seekçŠ¶æ€
+    cmd_fm_breakseek, //é€€å‡ºseek
 
-    cmd_fm_getfreq, //»ñÈ¡µ±Ç°ÆµÂÊÖµ
-    cmd_fm_getintensity, //»ñÈ¡µ±Ç°µçÌ¨ĞÅºÅÇ¿¶È
-    cmd_fm_getstatus, //»ñÈ¡µ±Ç°µçÌ¨×´Ì¬
+    cmd_fm_getfreq, //è·å–å½“å‰é¢‘ç‡å€¼
+    cmd_fm_getintensity, //è·å–å½“å‰ç”µå°ä¿¡å·å¼ºåº¦
+    cmd_fm_getstatus, //è·å–å½“å‰ç”µå°çŠ¶æ€
 
-    //ÖĞ¼äÂß¼­²ã:ÓëFMÇı¶¯ÎŞ¹Ø
+    //ä¸­é—´é€»è¾‘å±‚:ä¸FMé©±åŠ¨æ— å…³
     cmd_fm_mid_play,
-    cmd_fm_mid_save, //±£´æµ±Ç°µçÌ¨
+    cmd_fm_mid_save, //ä¿å­˜å½“å‰ç”µå°
     cmd_fm_mid_savestation,
-    cmd_fm_mid_findstation, //²éÕÒµ±Ç°µçÌ¨¶ÔÓ¦µÄµçÌ¨±íÏîºÅ¡£
-    cmd_fm_mid_loadfreq, //¸ù¾İµçÌ¨±íÏîºÅ¼ÓÔØÆµÂÊ¡£
-    cmd_fm_mid_restore, //»¹Ô­µ±Ç°µçÌ¨
-    cmd_fm_mid_turn, //»»Ì¨
-    cmd_fm_mid_delete, //É¾³ıµ±Ç°µçÌ¨
-    cmd_fm_mid_delall, //É¾³ıÈ«²¿µçÌ¨
-    cmd_fm_mid_selcityinit, //È·¶¨ËùÑ¡³ÇÊĞµÄµÚÒ»¸ö³ÇÊĞµçÌ¨
-    cmd_fm_mid_cityswitch, //ÔÚËùÑ¡³ÇÊĞÖĞÉÏÏÂÇĞ»»³ÇÊĞµçÌ¨
+    cmd_fm_mid_findstation, //æŸ¥æ‰¾å½“å‰ç”µå°å¯¹åº”çš„ç”µå°è¡¨é¡¹å·ã€‚
+    cmd_fm_mid_loadfreq, //æ ¹æ®ç”µå°è¡¨é¡¹å·åŠ è½½é¢‘ç‡ã€‚
+    cmd_fm_mid_restore, //è¿˜åŸå½“å‰ç”µå°
+    cmd_fm_mid_turn, //æ¢å°
+    cmd_fm_mid_delete, //åˆ é™¤å½“å‰ç”µå°
+    cmd_fm_mid_delall, //åˆ é™¤å…¨éƒ¨ç”µå°
+    cmd_fm_mid_selcityinit, //ç¡®å®šæ‰€é€‰åŸå¸‚çš„ç¬¬ä¸€ä¸ªåŸå¸‚ç”µå°
+    cmd_fm_mid_cityswitch, //åœ¨æ‰€é€‰åŸå¸‚ä¸­ä¸Šä¸‹åˆ‡æ¢åŸå¸‚ç”µå°
 
-    cmd_fm_mid_setvolume, //ÉèÖÃÉùÒô
+    cmd_fm_mid_setvolume, //è®¾ç½®å£°éŸ³
     cmd_fm_mid_stepgrid
 };
 
@@ -604,7 +604,7 @@ const pfunc_cmd far fm_cmd_pfunc[CMD_COUNT] =
  ********************************************************************************
  *             uint8 FMcmd(uint8 cmd, uint16 param1, void *param2)
  *
- * Description : FMÃüÁî´¦Àí
+ * Description : FMå‘½ä»¤å¤„ç†
  *
  * Arguments   :
  *

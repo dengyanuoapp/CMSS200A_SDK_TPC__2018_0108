@@ -17,7 +17,7 @@ stmt  level    source
     7           *             All Right Reserved
     8           *
     9           *  $Id: show_stop.c,v 1.13 2009/10/09 09:53:51 dengyulin Exp $
-   10           *  History Record£º
+   10           *  History Recordï¼š
    11           *  2008-03-22  15:47
    12           *
    13           *********************************************************
@@ -33,8 +33,8 @@ stmt  level    source
    23          
    24          #pragma name(AP_STOP)
    25          
-   26          /*******************Íâ²¿º¯ÊıÉùÃ÷*********************/
-   27          /* ¸÷±ÈÌØÂÊ¶ÔÓ¦µÄÃ¿ÃëËùÂ¼µÄÉÈÇøÊı32kbps, 64kbps, 128kbps, 192kbps, 256kbps, 384kbps */
+   26          /*******************å¤–éƒ¨å‡½æ•°å£°æ˜*********************/
+   27          /* å„æ¯”ç‰¹ç‡å¯¹åº”çš„æ¯ç§’æ‰€å½•çš„æ‰‡åŒºæ•°32kbps, 64kbps, 128kbps, 192kbps, 256kbps, 384kbps */
    28          //const uint8 rec_bitrate_sector_ratio[] =
    29          //{ 8, 16, 32, 48, 64, 96 };
    30          const uint8 voice_ext[][4] =
@@ -43,11 +43,11 @@ stmt  level    source
    33          { "REC" };
    34          const uint8 g_dir_ext[] = "*  ";
    35          const uint8 g_dir_record[] = "RECORD     ";
-   36          /* ¸÷±ÈÌØÂÊ¶ÔÓ¦µÄ²ÉÑùÂÊÅäÖÃ, ĞèºÍcodec ÅäºÏ
-   37           ** Ä¿Ç°¸÷Ë÷Òı¶ÔÓ¦µÄ²ÉÑùÂÊÎª
+   36          /* å„æ¯”ç‰¹ç‡å¯¹åº”çš„é‡‡æ ·ç‡é…ç½®, éœ€å’Œcodec é…åˆ
+   37           ** ç›®å‰å„ç´¢å¼•å¯¹åº”çš„é‡‡æ ·ç‡ä¸º
    38           ** 8000,11025,12000,16000,22050,24000,32000,44100,48000
-   39           ** Ôİ¶¨32kbps,  64kbps, 128kbps, 192kbps, 256kbps ¶ÔÓ¦²ÉÑùÂÊ
-   40           ** ·Ö±ğ8kHz,  8kHz,  32kHz, 32kHz, 32kHz
+   39           ** æš‚å®š32kbps,  64kbps, 128kbps, 192kbps, 256kbps å¯¹åº”é‡‡æ ·ç‡
+   40           ** åˆ†åˆ«8kHz,  8kHz,  32kHz, 32kHz, 32kHz
    41           */
    42          /*
    43          
@@ -81,15 +81,15 @@ stmt  level    source
    69          
    70          */
    71          
-   72          //Ä¿Ç°Â¼ÒôµÄ²ÉÑùÂÊ¶¼ÊÇÍ³Ò»Îª48k,
+   72          //ç›®å‰å½•éŸ³çš„é‡‡æ ·ç‡éƒ½æ˜¯ç»Ÿä¸€ä¸º48k,
    73          
-   74          //Èç¹ûĞèÒªÆäËûµÄ²ÉÑùÂÊ£¬Ö»ĞèÒªĞŞ¸ÄFsrate_ap_codecÖĞµÄÖµ¾ÍOK,
+   74          //å¦‚æœéœ€è¦å…¶ä»–çš„é‡‡æ ·ç‡ï¼Œåªéœ€è¦ä¿®æ”¹Fsrate_ap_codecä¸­çš„å€¼å°±OK,
    75          
-   76          //Ä¿Ç°×î¸ßÖ»Ö§³Öµ½48K.
+   76          //ç›®å‰æœ€é«˜åªæ”¯æŒåˆ°48K.
    77          
    78          const uint8 Fsrate_ap_codec[] =
    79          
-   80          { 8, 8, 8, 8, 8, 8 }; //ÆäÖĞµÄ8¶ÔÓ¦µ½samplerate_tÖĞµÄ_FS_48K
+   80          { 8, 8, 8, 8, 8, 8 }; //å…¶ä¸­çš„8å¯¹åº”åˆ°samplerate_tä¸­çš„_FS_48K
    81          
    82          const int8 log_table[64] =
    83          {
@@ -101,17 +101,17 @@ stmt  level    source
    87          };
    88          const uint8 err_str[4] =
    89          { "ERR" };
-   90          /* ADPCM ÈıÖÖÄ£Ê½ÏÂ±ÈÌØÂÊÅäÖÃ*/
+   90          /* ADPCM ä¸‰ç§æ¨¡å¼ä¸‹æ¯”ç‰¹ç‡é…ç½®*/
    91          const ap_bitrate_e bitrate_ap_adpcm[3] =
    92              //{ AP_BT_64K, AP_BT_128K, AP_BT_256K};
    93          { AP_BT_384K, AP_BT_192K, AP_BT_384K }; /* FPGA */
    94          
-   95          /* PCM ÈıÖÖÄ£Ê½ÏÂ±ÈÌØÂÊÅäÖÃ*/
+   95          /* PCM ä¸‰ç§æ¨¡å¼ä¸‹æ¯”ç‰¹ç‡é…ç½®*/
    96          const ap_bitrate_e bitrate_ap_pcm[3] =
    97              //{ AP_BT_64K, AP_BT_128K, AP_BT_256K};
    98          { AP_BT_256K, AP_BT_128K, AP_BT_256K }; /* FPGA */
    99          
-  100          /* MP2 ÈıÖÖÄ£Ê½ÏÂ±ÈÌØÂÊÅäÖÃ*/
+  100          /* MP2 ä¸‰ç§æ¨¡å¼ä¸‹æ¯”ç‰¹ç‡é…ç½®*/
   101          const ap_bitrate_e bitrate_ap_mp2[3] =
   102          { AP_BT_64K, AP_BT_128K, AP_BT_256K };
   103          
@@ -123,16 +123,16 @@ stmt  level    source
   109          
   110          /*
   111           ********************************************************************************
-  112           * Description : È·¶¨Â¼ÒôµÄ±ÈÌØÂÊ¼°Í¨µÀÊı
+  112           * Description : ç¡®å®šå½•éŸ³çš„æ¯”ç‰¹ç‡åŠé€šé“æ•°
   113           *
   114           * Arguments   :  NULL
   115           *
   116           * Returns     :  NULL
   117           *
-  118           * Notes       :  ¸ù¾İ²Ëµ¥Ñ¡ÔñµÄÂ¼ÒôÄ£Ê½( ³¤Ê±, ÆÕÍ¨, ÓÅÖÊ)  ÒÔ¼°
-  119           *                   ¾ßÌåµÄÂ¼Òô¸ñÊ½( ADPCM,  PCM,  MP2) ,  ¾ö¶¨Â¼Òô²ÎÊı
+  118           * Notes       :  æ ¹æ®èœå•é€‰æ‹©çš„å½•éŸ³æ¨¡å¼( é•¿æ—¶, æ™®é€š, ä¼˜è´¨)  ä»¥åŠ
+  119           *                   å…·ä½“çš„å½•éŸ³æ ¼å¼( ADPCM,  PCM,  MP2) ,  å†³å®šå½•éŸ³å‚æ•°
   120           *
-  121           * ºóĞø¸ù¾İIC  Ö§³Ö¼°·½°¸¾ßÌåĞèÇó½øĞĞµ÷Õû
+  121           * åç»­æ ¹æ®IC  æ”¯æŒåŠæ–¹æ¡ˆå…·ä½“éœ€æ±‚è¿›è¡Œè°ƒæ•´
   122           ********************************************************************************
 C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 3   
 
@@ -176,7 +176,7 @@ stmt  level    source
                        rec_channel = DUAL_CH;
                        if ((rec_bitrate == AP_BT_64K) && (g_record_vars.rec_type == RECORD_FILE_TYPE_MP2))
                        {
-                           //MP2 64Kbps Â¼Òô µ¥ÉùµÀ
+                           //MP2 64Kbps å½•éŸ³ å•å£°é“
                            rec_channel = SINGLE_CH;
                        }
                    }
@@ -188,7 +188,7 @@ stmt  level    source
   172          
   173          /*
   174           ********************************************************************************
-  175           * Description : ¸ñÊ½»¯ÎÄ¼şÃû
+  175           * Description : æ ¼å¼åŒ–æ–‡ä»¶å
   176           *
   177           * Arguments   : NULL
   178           *
@@ -219,7 +219,7 @@ stmt  level    source
   201          #if 0
                /*
                 ********************************************************************************
-                * Description : Ê¹ÄÜDAC
+                * Description : ä½¿èƒ½DAC
                 *
                 * Arguments   : NULL
                 *
@@ -233,22 +233,22 @@ stmt  level    source
                {
                    dac_t dacattr;
                    dacattr.dacselect = 0;
-                   dacattr.rate = FS_44K1;//Ä¬ÈÏ
+                   dacattr.rate = FS_44K1;//é»˜è®¤
                    EnableDAC(&dacattr);
                }
                #endif
   222          /*
   223           ********************************************************************************
-  224           * Description : Éú³ÉĞÂµÄÂ¼ÒôÎÄ¼şÃû
+  224           * Description : ç”Ÿæˆæ–°çš„å½•éŸ³æ–‡ä»¶å
   225           *
   226           * Arguments   : NULL
   227           *
-  228           * Returns     : TRUE, ³É¹¦
-  229           FALSE, ±àºÅ01~99 ÎÄ¼ş¶¼´æÔÚ
-  230           È«¾Ö±äÁ¿
+  228           * Returns     : TRUE, æˆåŠŸ
+  229           FALSE, ç¼–å·01~99 æ–‡ä»¶éƒ½å­˜åœ¨
+  230           å…¨å±€å˜é‡
   231           g_record_vars.location
   232           g_record_vars.wav_num
-  233           g_file_name_time[], ÎÄ¼şÃû,ÎÄ¼şÊ±¼ä×Ö·û´®
+  233           g_file_name_time[], æ–‡ä»¶å,æ–‡ä»¶æ—¶é—´å­—ç¬¦ä¸²
   234           *
   235           * Notes       :
   236           *
@@ -291,14 +291,14 @@ stmt  level    source
   271          
   272          /*
   273           ********************************************************************************
-  274           * Description : ·ÖÎöÊ£Óà¿Õ¼ä,¼ÆËã¿ÉÂ¼ÒôÊ±¼ä
+  274           * Description : åˆ†æå‰©ä½™ç©ºé—´,è®¡ç®—å¯å½•éŸ³æ—¶é—´
   275           *
   276           * Arguments   :  NULL
   277           *
   278           * Returns     :  NULL
   279           *
-  280           * Notes       :  ¸ù¾İÊ£Óà¿Õ¼äg_free_space  ( ÒÔÉÈÇøÎªµ¥Î») , ¼ÆËã¿ÉÂ¼
-  281           *                Ê±¼ä
+  280           * Notes       :  æ ¹æ®å‰©ä½™ç©ºé—´g_free_space  ( ä»¥æ‰‡åŒºä¸ºå•ä½) , è®¡ç®—å¯å½•
+  281           *                æ—¶é—´
   282           ********************************************************************************
   283           */
   284          void parse_total_time(void)
@@ -323,7 +323,7 @@ stmt  level    source
   303   1      
   304   1          if (RecSpare != 0xffffffff)
   305   1          {
-  306   2              /* ÓÃÅäÖÃµÄÈİÁ¿ */
+  306   2              /* ç”¨é…ç½®çš„å®¹é‡ */
   307   2              g_free_space = total_space_setting - total_space_used;
   308   2              if (g_free_space <= SPACE_LOW)
   309   2              {
@@ -345,11 +345,11 @@ stmt  level    source
   323          
   324          /*
   325           ********************************************************************************
-  326           * Description : ¼ÆËãµ±Ç°Ä¿Â¼ÏÂµÄ×ÜÂ¼ÒôÎÄ¼ş¸öÊı
+  326           * Description : è®¡ç®—å½“å‰ç›®å½•ä¸‹çš„æ€»å½•éŸ³æ–‡ä»¶ä¸ªæ•°
   327           *
   328           * Arguments   :  NULL
   329           *
-  330           * Returns     :    g_file_num, ×ÜÂ¼ÒôÎÄ¼ş¸öÊı
+  330           * Returns     :    g_file_num, æ€»å½•éŸ³æ–‡ä»¶ä¸ªæ•°
   331           *
   332           * Notes       :
   333           *
@@ -399,7 +399,7 @@ stmt  level    source
   377   1      }
   378          uint8 init_rec_param(void)
   379          {
-  380   1          /* Â¼Òô×¼±¸¹ı³Ì*/
+  380   1          /* å½•éŸ³å‡†å¤‡è¿‡ç¨‹*/
   381   1          uint8 result;
   382   1          confirm_rec_param();
   383   1          if (g_record_vars.rec_type == RECORD_FILE_TYPE_MP2)
@@ -466,7 +466,7 @@ stmt  level    source
   442   3              }
   443   2          }
   444   1          parse_total_num();
-  445   1          if (g_file_num >= 200) //´óÓÚ200¸öÂ¼ÒôÎÄ¼ş
+  445   1          if (g_file_num >= 200) //å¤§äº200ä¸ªå½•éŸ³æ–‡ä»¶
   446   1          {
   447   2              retval = change_device(first_init);
   448   2              if (retval == 0)
@@ -482,23 +482,23 @@ stmt  level    source
   456   3                  goto continue_init;
   457   3              }
   458   2          }
-  459   1          format_filename(); //¸ñÊ½»¯Â¼ÒôÎÄ¼şÃû
-  460   1          if (!gen_filename()) //²úÉúÂ¼ÒôÎÄ¼şĞòºÅÃû
+  459   1          format_filename(); //æ ¼å¼åŒ–å½•éŸ³æ–‡ä»¶å
+  460   1          if (!gen_filename()) //äº§ç”Ÿå½•éŸ³æ–‡ä»¶åºå·å
   461   1          {
-  462   2              //ÒÑ´ïµ½¸ÃÄ¿Â¼Â¼ÒôÎÄ¼şÊıÏŞÖÆ
+  462   2              //å·²è¾¾åˆ°è¯¥ç›®å½•å½•éŸ³æ–‡ä»¶æ•°é™åˆ¶
   463   2              return show_err_msg();
   464   2          }
   465   1          return init_rec_param();
   466   1      }
   467          /*
   468           ********************************************************************************
-  469           * Description : »ñÈ¡µ±Ç°µÄÂ¼ÒôÔ´,²¢¼ÇÂ¼ÔÚg_resource.inputÖĞ.
+  469           * Description : è·å–å½“å‰çš„å½•éŸ³æº,å¹¶è®°å½•åœ¨g_resource.inputä¸­.
   470           *
   471           * Arguments   :
   472           *
   473           * Returns     :
   474           *
-  475           * Notes       :ÔÚµ÷ÓÃMC_SETRESOURCEÖ®Ç°,µ÷ÓÃ´Ëº¯Êı!
+  475           * Notes       :åœ¨è°ƒç”¨MC_SETRESOURCEä¹‹å‰,è°ƒç”¨æ­¤å‡½æ•°!
   476           *
   477           ********************************************************************************
   478           */
@@ -533,13 +533,13 @@ stmt  level    source
   507          
   508          /*
   509           ********************************************************************************
-  510           * Description :    ×¼±¸¿ªÊ¼WAV¸ñÊ½Â¼Òô
+  510           * Description :    å‡†å¤‡å¼€å§‹WAVæ ¼å¼å½•éŸ³
   511           *
   512           * Arguments   :  NULL
   513           *
   514           * Returns     :   success/fail
   515           *
-  516           * Notes       :   Ö÷ÒªÊÇµ÷ÓÃbasal½Ó¿Úº¯Êı·¢ÃüÁî
+  516           * Notes       :   ä¸»è¦æ˜¯è°ƒç”¨basalæ¥å£å‡½æ•°å‘å‘½ä»¤
   517           *
   518           ********************************************************************************
 C251 COMPILER V4.55,  show_stop                                                            23/05/16  10:42:21  PAGE 9   
@@ -549,7 +549,7 @@ stmt  level    source
   521          {
   522   1          uint8 result;
   523   1      
-  524   1          //³õÊ¼»¯codec ±äÁ¿,  ´«²Î2   ±êÊ¶Â¼Òô¸ñÊ½, ĞèºÍcodec  ¶¨ÒåÆ¥Åä
+  524   1          //åˆå§‹åŒ–codec å˜é‡,  ä¼ å‚2   æ ‡è¯†å½•éŸ³æ ¼å¼, éœ€å’Œcodec  å®šä¹‰åŒ¹é…
   525   1          result = recSendCommand(MC_OPEN, 2);
   526   1          recSendCommand(MC_RECODEMODE, (void *) g_record_vars.rec_encode);
   527   1          recSendCommand(MC_SET_RECORD_DELAY, (void *) g_record_vars.rec_DelayTime);
@@ -569,20 +569,20 @@ stmt  level    source
   541   1          Rec_format.bit_rate[2] = (currentBitrate[2]);
   542   1          recSendCommand(MC_SETAUDIOFMT, (void *) &Rec_format);
   543   1      
-  544   1          /* ´´½¨Â¼ÒôÎÄ¼ş*/
+  544   1          /* åˆ›å»ºå½•éŸ³æ–‡ä»¶*/
   545   1          result = recSendCommand(MC_LOAD, (void *) g_record_vars.location.filename);
   546   1          return result;
   547   1      }
   548          
   549          /*
   550           ********************************************************************************
-  551           * Description :    ×¼±¸¿ªÊ¼MP2   ¸ñÊ½Â¼Òô
+  551           * Description :    å‡†å¤‡å¼€å§‹MP2   æ ¼å¼å½•éŸ³
   552           *
   553           * Arguments   :  NULL
   554           *
   555           * Returns     :   success/fail
   556           *
-  557           * Notes       :   Ö÷ÒªÊÇµ÷ÓÃbasal½Ó¿Úº¯Êı·¢ÃüÁî
+  557           * Notes       :   ä¸»è¦æ˜¯è°ƒç”¨basalæ¥å£å‡½æ•°å‘å‘½ä»¤
   558           *
   559           ********************************************************************************
   560           */
@@ -621,21 +621,21 @@ stmt  level    source
   591   1          Rec_format.bit_rate[2] = (currentBitrate[2]);
   592   1          recSendCommand(MC_SETAUDIOFMT, (void *) &Rec_format);
   593   1      
-  594   1          /* ´´½¨Â¼ÒôÎÄ¼ş*/
+  594   1          /* åˆ›å»ºå½•éŸ³æ–‡ä»¶*/
   595   1          result = recSendCommand(MC_LOAD, (void *) g_record_vars.location.filename);
   596   1      
   597   1          return result;
   598   1      }
   599          /*
   600           ********************************************************************************
-  601           * Description : ÉèÖÃÂ¼ÒôÈ±Ê¡Ä¿Â¼
+  601           * Description : è®¾ç½®å½•éŸ³ç¼ºçœç›®å½•
   602           *
   603           * Arguments   :
   604           *
-  605           * Returns     : ³É¹¦or Ê§°Ü
+  605           * Returns     : æˆåŠŸor å¤±è´¥
   606           *
-  607           * Notes       :  ¸ù¾İÂ¼Òô¸ñÊ½, ÉèÖÃÈ±Ê¡Ä¿Â¼ÎªRECORD/VOICE
-  608           *                   »òRECORD/MUSIC
+  607           * Notes       :  æ ¹æ®å½•éŸ³æ ¼å¼, è®¾ç½®ç¼ºçœç›®å½•ä¸ºRECORD/VOICE
+  608           *                   æˆ–RECORD/MUSIC
   609           ********************************************************************************
   610           */
   611          BOOL reset_record_dir(bool need_init)
@@ -666,12 +666,12 @@ stmt  level    source
                    {
                        status = FS_MakeDir(g_dir_record);
                        if (!status)
-                           return FALSE; // ´´½¨Ä¿Â¼Ê§°Ü//create directory fail
+                           return FALSE; // åˆ›å»ºç›®å½•å¤±è´¥//create directory fail
                    }
                    else
                        FS_CD("\\");
                
-                   /* ÎªexFATÌí¼Ó, »ñÈ¡¶ÌÃû */
+                   /* ä¸ºexFATæ·»åŠ , è·å–çŸ­å */
                    memset(short_name, 0x0, 12);
                    status = FS_JustBeing(g_dir_record, short_name, 0x11);
                    if (!status)
@@ -708,12 +708,12 @@ stmt  level    source
   676   1          {
   677   2              status = FS_MakeDir(g_dir_voice);
   678   2              if (!status)
-  679   2                  return FALSE; // ´´½¨Ä¿Â¼Ê§°Ü
+  679   2                  return FALSE; // åˆ›å»ºç›®å½•å¤±è´¥
   680   2          }
   681   1          else
   682   1              FS_CD("\\");
   683   1      
-  684   1          /* ÎªexFATÌí¼Ó, »ñÈ¡¶ÌÃû */
+  684   1          /* ä¸ºexFATæ·»åŠ , è·å–çŸ­å */
   685   1          memset(short_name, 0x0, 12);
   686   1          status = FS_JustBeing(g_dir_voice, short_name, 0x11);
   687   1          if (!status)
@@ -755,17 +755,17 @@ stmt  level    source
   721          
   722          /*
   723           ********************************************************************************
-  724           * Description : ¸ù¾İËùÅäÖÃµÄÂ¼Òô·½Ê½£¬ÎªGet_Space×ö×¼±¸
+  724           * Description : æ ¹æ®æ‰€é…ç½®çš„å½•éŸ³æ–¹å¼ï¼Œä¸ºGet_Spaceåšå‡†å¤‡
   725           *
   726           * Arguments   : NULL
   727           *
   728           * Returns     : NULL
   729           *
-  730           * Notes       : ÈçÅäÖÃ×î³¤Â¼ÒôÊ±¼äÎª0£¬ Ôò±íÊ¾Ê¹ÓÃÊµ¼Ê´ÅÅÌÈİÁ¿Â¼Òô
-  731           *               ·ñÔò£¬±íÊ¾×î³¤Â¼ÒôÊ±¼äÎªËùÉèÖÃµÄĞ¡Ê±Êı
-  732           *               ÉèÖÃºÃÏµÍ³±äÁ¿£¬ ÎÄ¼şÏµÍ³FS_GetSpace½Ó¿Ú·µ»ØÈçÏÂ
-  733           * Èç¹û´ÅÅÌÊµ¼ÊÈİÁ¿´óÓÚËùÉèÖÃÈİÁ¿£¬Ôò·µ»ØÉèÖÃµÄÈİÁ¿
-  734           * Èç¹û´ÅÅÌÊµ¼ÊÈİÁ¿Ğ¡ÓÚËùÉèÖÃÈİÁ¿£¬Ôò·µ»Ø´ÅÅÌÊµ¼ÊÈİÁ¿
+  730           * Notes       : å¦‚é…ç½®æœ€é•¿å½•éŸ³æ—¶é—´ä¸º0ï¼Œ åˆ™è¡¨ç¤ºä½¿ç”¨å®é™…ç£ç›˜å®¹é‡å½•éŸ³
+  731           *               å¦åˆ™ï¼Œè¡¨ç¤ºæœ€é•¿å½•éŸ³æ—¶é—´ä¸ºæ‰€è®¾ç½®çš„å°æ—¶æ•°
+  732           *               è®¾ç½®å¥½ç³»ç»Ÿå˜é‡ï¼Œ æ–‡ä»¶ç³»ç»ŸFS_GetSpaceæ¥å£è¿”å›å¦‚ä¸‹
+  733           * å¦‚æœç£ç›˜å®é™…å®¹é‡å¤§äºæ‰€è®¾ç½®å®¹é‡ï¼Œåˆ™è¿”å›è®¾ç½®çš„å®¹é‡
+  734           * å¦‚æœç£ç›˜å®é™…å®¹é‡å°äºæ‰€è®¾ç½®å®¹é‡ï¼Œåˆ™è¿”å›ç£ç›˜å®é™…å®¹é‡
   735           ********************************************************************************
   736           */
   737          void near prepare_GetSpace(void)
@@ -774,12 +774,12 @@ stmt  level    source
   740   1      
   741   1          if(g_comval.RecordTime_max == 0)
   742   1          {
-  743   2              //ÓÃÊµ¼ÊÈİÁ¿
+  743   2              //ç”¨å®é™…å®¹é‡
   744   2              RecSpare = 0xffffffff;
   745   2          }
   746   1          else
   747   1          {
-  748   2              //ÓÃÉèÖÃÈİÁ¿
+  748   2              //ç”¨è®¾ç½®å®¹é‡
   749   2              total_sec_setting = (uint32)g_comval.RecordTime_max * 3600;
   750   2              RecSpare = (rec_bitrate_sector_ratio[(uint8)rec_bitrate]) * total_sec_setting;
   751   2              total_space_setting = RecSpare;
@@ -788,12 +788,12 @@ stmt  level    source
   754   1      }
   755          /*
   756           ********************************************************************************
-  757           * Description : ÉèÖÃÂ¼ÒôÈ±Ê¡Ä¿Â¼²¢¼ì²éÊ£ÓàÈİÁ¿
+  757           * Description : è®¾ç½®å½•éŸ³ç¼ºçœç›®å½•å¹¶æ£€æŸ¥å‰©ä½™å®¹é‡
   758           *
   759           * Arguments   : NULL
   760           *
-  761           * Returns     : true -- Â¼ÒôÈ±Ê¡Ä¿Â¼ÉèÖÃ³É¹¦, Ê£ÓàÈİÁ¿×ã¹»
-  762           *                   false -- Â¼ÒôÈ±Ê¡Ä¿Â¼ÉèÖÃÊ§°Ü»òÈİÁ¿ÒÑÂú
+  761           * Returns     : true -- å½•éŸ³ç¼ºçœç›®å½•è®¾ç½®æˆåŠŸ, å‰©ä½™å®¹é‡è¶³å¤Ÿ
+  762           *                   false -- å½•éŸ³ç¼ºçœç›®å½•è®¾ç½®å¤±è´¥æˆ–å®¹é‡å·²æ»¡
   763           * Notes       :
   764           *
   765           ********************************************************************************
@@ -823,7 +823,7 @@ stmt  level    source
   787   2          }
   788   1          if ((RecSpare != 0xffffffff) && (g_free_space < total_space_setting))
   789   1          {
-  790   2              /* ÓÃÅäÖÃµÄÈİÁ¿,µ«´ÅÅÌÊµ¼ÊÈİÁ¿Ğ¡ÓÚÅäÖÃÈİÁ¿ */
+  790   2              /* ç”¨é…ç½®çš„å®¹é‡,ä½†ç£ç›˜å®é™…å®¹é‡å°äºé…ç½®å®¹é‡ */
   791   2              total_space_setting = g_free_space;
   792   2          }
   793   1          return status;

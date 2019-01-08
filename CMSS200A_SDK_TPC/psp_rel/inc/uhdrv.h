@@ -73,180 +73,180 @@
  *
  */
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_Init
-º¯Êý¹¦ÄÜ£º  uhostÇý¶¯µÄ³õÊ¼»¯º¯Êý£¬ÔÚDRV_InstallµÄÊ±ºòµ÷ÓÃ£¬DRV_Install
-            Ö®ºóÒ²¿ÉÒÔËæÊ±µ÷ÓÃ£¬ÓÃÀ´»ñÈ¡usbÁ¬½Ó×´Ì¬Ïà¹ØµÄÐÅÏ¢
-º¯ÊýÊäÈë£º  mode:  ÅÌ·û
-º¯Êý·µ»Ø£º  0x01       success;
-            0xff    Ã»ÓÐ²åÈëminiAÏß
-            0xfe    ²åÈëÁËminiAÏß£¬µ«ÊÇÃ»ÓÐ²åÈëuÅÌ£¬»òÕßuÅÌÃ»ÓÐÁ¬½Ó
-            0xfd    Éè±¸²»Ö§³Ö
-            //0xfc    Êý¾Ý´«Êä´íÎó£¬ËµÃ÷µçÆøÐÔÄÜ²»ºÃ----------ÔÝÊ±²»ÊµÏÖ
-            ÆäËû    resverd
+å‡½æ•°åç§°ï¼š  UH_Init
+å‡½æ•°åŠŸèƒ½ï¼š  uhosté©±åŠ¨çš„åˆå§‹åŒ–å‡½æ•°ï¼Œåœ¨DRV_Installçš„æ—¶å€™è°ƒç”¨ï¼ŒDRV_Install
+            ä¹‹åŽä¹Ÿå¯ä»¥éšæ—¶è°ƒç”¨ï¼Œç”¨æ¥èŽ·å–usbè¿žæŽ¥çŠ¶æ€ç›¸å…³çš„ä¿¡æ¯
+å‡½æ•°è¾“å…¥ï¼š  mode:  ç›˜ç¬¦
+å‡½æ•°è¿”å›žï¼š  0x01       success;
+            0xff    æ²¡æœ‰æ’å…¥miniAçº¿
+            0xfe    æ’å…¥äº†miniAçº¿ï¼Œä½†æ˜¯æ²¡æœ‰æ’å…¥uç›˜ï¼Œæˆ–è€…uç›˜æ²¡æœ‰è¿žæŽ¥
+            0xfd    è®¾å¤‡ä¸æ”¯æŒ
+            //0xfc    æ•°æ®ä¼ è¾“é”™è¯¯ï¼Œè¯´æ˜Žç”µæ°”æ€§èƒ½ä¸å¥½----------æš‚æ—¶ä¸å®žçŽ°
+            å…¶ä»–    resverd
 *************************************************************/
 //non_banked byte UH_Init(unsigned char mode);
 #define UH_Init(mode) API_UH_Init(APINO_UD_Init,mode)
 uint8 API_UH_Init(uint8 cmd, char mode);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_Exit
-º¯Êý¹¦ÄÜ£º  uhostÇý¶¯µÄÍË³öº¯Êý£¬ÔÚDRV_UnInstallµÄÊ±ºòµ÷ÓÃ
-º¯ÊýÊäÈë£º
-º¯Êý·µ»Ø£º
+å‡½æ•°åç§°ï¼š  UH_Exit
+å‡½æ•°åŠŸèƒ½ï¼š  uhosté©±åŠ¨çš„é€€å‡ºå‡½æ•°ï¼Œåœ¨DRV_UnInstallçš„æ—¶å€™è°ƒç”¨
+å‡½æ•°è¾“å…¥ï¼š
+å‡½æ•°è¿”å›žï¼š
 *************************************************************/
 #define UH_Exit() API_UH_Exit(APINO_UH_Exit)
 void API_UH_Exit(uint8 cmd);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_SectorRead
-º¯Êý¹¦ÄÜ£º  ÉÈÇø¶Áº¯Êý
-º¯ÊýÊäÈë£º  shro:   ²Î¼ûstruct UD_RW
-º¯Êý·µ»Ø£º  0       success;
-            0xff    µØÖ·ÊäÈë´íÎó£¬Èç²»´æÔÚ»òÔ½½çµÄµØÖ·
-            0xfe    UÅÌÉÏ±¨ÁË¶ÁÊ§°Ü
-            ÆäËû    resverd
+å‡½æ•°åç§°ï¼š  UH_SectorRead
+å‡½æ•°åŠŸèƒ½ï¼š  æ‰‡åŒºè¯»å‡½æ•°
+å‡½æ•°è¾“å…¥ï¼š  shro:   å‚è§struct UD_RW
+å‡½æ•°è¿”å›žï¼š  0       success;
+            0xff    åœ°å€è¾“å…¥é”™è¯¯ï¼Œå¦‚ä¸å­˜åœ¨æˆ–è¶Šç•Œçš„åœ°å€
+            0xfe    Uç›˜ä¸ŠæŠ¥äº†è¯»å¤±è´¥
+            å…¶ä»–    resverd
 *************************************************************/
 #define UH_SectorRead(shro) API_UH_SectorRead(APINO_UH_SectorRead,shro)
 uint8 API_UH_SectorRead(uint8 cmd, UD_RW *shro);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_SectorWrite
-º¯Êý¹¦ÄÜ£º  ÉÈÇøÐ´º¯Êý
-º¯ÊýÊäÈë£º  shro:   ²Î¼ûstruct UD_RW
-º¯Êý·µ»Ø£º  0       success;
-            0xff    µØÖ·ÊäÈë´íÎó£¬Èç²»´æÔÚ»òÔ½½çµÄµØÖ·
-            0xfe    UÅÌÉÏ±¨ÁËÐ´Ê§°Ü
-            ÆäËû    resverd
+å‡½æ•°åç§°ï¼š  UH_SectorWrite
+å‡½æ•°åŠŸèƒ½ï¼š  æ‰‡åŒºå†™å‡½æ•°
+å‡½æ•°è¾“å…¥ï¼š  shro:   å‚è§struct UD_RW
+å‡½æ•°è¿”å›žï¼š  0       success;
+            0xff    åœ°å€è¾“å…¥é”™è¯¯ï¼Œå¦‚ä¸å­˜åœ¨æˆ–è¶Šç•Œçš„åœ°å€
+            0xfe    Uç›˜ä¸ŠæŠ¥äº†å†™å¤±è´¥
+            å…¶ä»–    resverd
 *************************************************************/
 #define UH_SectorWrite(shro) API_UH_SectorWrite(APINO_UH_SectorWrite,shro)
 uint8 API_UH_SectorWrite(uint8 cmd, UD_RW *shro);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_GetMaxLun
-º¯Êý¹¦ÄÜ£º  »ñÈ¡·ÖÇøÊýÄ¿
-º¯ÊýÊäÈë£º
-º¯Êý·µ»Ø£º  0¡«15   ·ÖÇøÊýÄ¿£¬¸ù¾ÝÐ­Òé¹æ¶¨È¡Öµ·¶Î§ÊÇ0¡«15¡£
-                    ×¢£º·µ»Ø3£¬´ú±í0¡«3£¬¹²ËÄ¸öÅÌ
-            ÆäËû    resverd
+å‡½æ•°åç§°ï¼š  UH_GetMaxLun
+å‡½æ•°åŠŸèƒ½ï¼š  èŽ·å–åˆ†åŒºæ•°ç›®
+å‡½æ•°è¾“å…¥ï¼š
+å‡½æ•°è¿”å›žï¼š  0ï½ž15   åˆ†åŒºæ•°ç›®ï¼Œæ ¹æ®åè®®è§„å®šå–å€¼èŒƒå›´æ˜¯0ï½ž15ã€‚
+                    æ³¨ï¼šè¿”å›ž3ï¼Œä»£è¡¨0ï½ž3ï¼Œå…±å››ä¸ªç›˜
+            å…¶ä»–    resverd
 *************************************************************/
 #define UH_GetMaxLun() API_UH_GetMaxLun(APINO_UH_GetMaxLun)
 uint8 API_UH_GetMaxLun(uint8 cmd);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_TestLunReady
-º¯Êý¹¦ÄÜ£º  ²âÊÔ¶ÔÓ¦·ÖÇøÓÐÃ»ÓÐ¼ÓÔØ´ÅÅÌ
-º¯ÊýÊäÈë£º  lun     ´ý²âÊÔµÄ·ÖÇøºÅ
-º¯Êý·µ»Ø£º  0       ¸Ã·ÖÇø¼ÓÔØÁË´ÅÅÌ
-            0xfa       ¸Ã·ÖÇøÃ»ÓÐ¼ÓÔØ´ÅÅÌ
-            0xfc       ´íÎóµÄlun²ÎÊýµÈ
-            ÆäËû    resverd
+å‡½æ•°åç§°ï¼š  UH_TestLunReady
+å‡½æ•°åŠŸèƒ½ï¼š  æµ‹è¯•å¯¹åº”åˆ†åŒºæœ‰æ²¡æœ‰åŠ è½½ç£ç›˜
+å‡½æ•°è¾“å…¥ï¼š  lun     å¾…æµ‹è¯•çš„åˆ†åŒºå·
+å‡½æ•°è¿”å›žï¼š  0       è¯¥åˆ†åŒºåŠ è½½äº†ç£ç›˜
+            0xfa       è¯¥åˆ†åŒºæ²¡æœ‰åŠ è½½ç£ç›˜
+            0xfc       é”™è¯¯çš„lunå‚æ•°ç­‰
+            å…¶ä»–    resverd
 *************************************************************/
 //uint8 UH_TestLunReady(unsigned char lun);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_GetCap
-º¯Êý¹¦ÄÜ£º  »ñµÃ¶ÔÓ¦´ÅÅÌµÄ´óÐ¡
-º¯ÊýÊäÈë£º  lun     ¶ÔÓ¦´ÅÅÌµÄ·ÖÇøºÅ
-º¯Êý·µ»Ø£º  ·ÖÇøµÄ´óÐ¡£¬ÒÔ512 byteÎªµ¥Î»£¬Ò»¸öblock´óÓÚ512µÄuÅÌ£¬uhostÇý¶¯»á½«Æä×ª»»³ÉÒÔ512 byteÎªµ¥Î»
+å‡½æ•°åç§°ï¼š  UH_GetCap
+å‡½æ•°åŠŸèƒ½ï¼š  èŽ·å¾—å¯¹åº”ç£ç›˜çš„å¤§å°
+å‡½æ•°è¾“å…¥ï¼š  lun     å¯¹åº”ç£ç›˜çš„åˆ†åŒºå·
+å‡½æ•°è¿”å›žï¼š  åˆ†åŒºçš„å¤§å°ï¼Œä»¥512 byteä¸ºå•ä½ï¼Œä¸€ä¸ªblockå¤§äºŽ512çš„uç›˜ï¼Œuhosté©±åŠ¨ä¼šå°†å…¶è½¬æ¢æˆä»¥512 byteä¸ºå•ä½
             0       error
 *************************************************************/
 #define UH_GetCap() API_UH_GetCap(APINO_UH_GetCap)
 uint32 API_UH_GetCap(uint8 cmd);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_GetSectorSize
-º¯Êý¹¦ÄÜ£º  »ñµÃuÅÌÒ»¸öSectorµÄ´óÐ¡
-º¯ÊýÊäÈë£º  lun     ¶ÔÓ¦´ÅÅÌµÄ·ÖÇøºÅ
-º¯Êý·µ»Ø£º  uÅÌÒ»¸öSectorµÄ´óÐ¡£¬Èç¹û·µ»Øn£¬ÔòÒ»¸öSectorµÄ´óÐ¡ÊÇn*512 byte
+å‡½æ•°åç§°ï¼š  UH_GetSectorSize
+å‡½æ•°åŠŸèƒ½ï¼š  èŽ·å¾—uç›˜ä¸€ä¸ªSectorçš„å¤§å°
+å‡½æ•°è¾“å…¥ï¼š  lun     å¯¹åº”ç£ç›˜çš„åˆ†åŒºå·
+å‡½æ•°è¿”å›žï¼š  uç›˜ä¸€ä¸ªSectorçš„å¤§å°ï¼Œå¦‚æžœè¿”å›žnï¼Œåˆ™ä¸€ä¸ªSectorçš„å¤§å°æ˜¯n*512 byte
             0       error
 *************************************************************/
 #define UH_GetSectorSize() API_UH_GetSectorSize(APINO_UH_GetSectorSize)
 uint8 API_UH_GetSectorSize(uint8 cmd);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_TestUdiskReady
-º¯Êý¹¦ÄÜ£º  ²âÊÔµ±Ç°Á¬½Ó×´Ì¬
-º¯ÊýÊäÈë£º
-º¯Êý·µ»Ø£º  0       ³É¹¦¡£miniA²åÈë£¬uÅÌÒ²²åÈë£¬²¢Á¬½Ó¡£´ËÊ±¿ÉÒÔ½øÐÐ¶Á£¬µÃµ½ÈÝÁ¿µÈ²Ù×÷
-            0xff    Ã»ÓÐ²åÈëminiAÏß
-            0xfe    ²åÈëÁËminiAÏß£¬µ«ÊÇÃ»ÓÐ²åÈëuÅÌ£¬»òÕßuÅÌÃ»ÓÐÁ¬½Ó
-            0xfd    Éè±¸²»Ö§³Ö
-            ÆäËû    resverd
-×¢£º»á½«Õâ¸öº¯Êý×ö³ÉUH_InitµÄ¼ò»¯°æ£¬Ö÷ÒªÍ¨¹ý²éÑ¯Ò»Ð©Èí¼þ±êÖ¾Î»À´·µ»Ø¶ÔÓ¦µÄÖµ
+å‡½æ•°åç§°ï¼š  UH_TestUdiskReady
+å‡½æ•°åŠŸèƒ½ï¼š  æµ‹è¯•å½“å‰è¿žæŽ¥çŠ¶æ€
+å‡½æ•°è¾“å…¥ï¼š
+å‡½æ•°è¿”å›žï¼š  0       æˆåŠŸã€‚miniAæ’å…¥ï¼Œuç›˜ä¹Ÿæ’å…¥ï¼Œå¹¶è¿žæŽ¥ã€‚æ­¤æ—¶å¯ä»¥è¿›è¡Œè¯»ï¼Œå¾—åˆ°å®¹é‡ç­‰æ“ä½œ
+            0xff    æ²¡æœ‰æ’å…¥miniAçº¿
+            0xfe    æ’å…¥äº†miniAçº¿ï¼Œä½†æ˜¯æ²¡æœ‰æ’å…¥uç›˜ï¼Œæˆ–è€…uç›˜æ²¡æœ‰è¿žæŽ¥
+            0xfd    è®¾å¤‡ä¸æ”¯æŒ
+            å…¶ä»–    resverd
+æ³¨ï¼šä¼šå°†è¿™ä¸ªå‡½æ•°åšæˆUH_Initçš„ç®€åŒ–ç‰ˆï¼Œä¸»è¦é€šè¿‡æŸ¥è¯¢ä¸€äº›è½¯ä»¶æ ‡å¿—ä½æ¥è¿”å›žå¯¹åº”çš„å€¼
 *************************************************************/
 //uint8 UH_TestUdiskReady(void);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_GetCurrentLun
-º¯Êý¹¦ÄÜ£º  »ñÈ¡µ±Ç°¼¤»îµÄ´ÅÅÌ·ÖÇøºÅ
-º¯ÊýÊäÈë£º
-º¯Êý·µ»Ø£º  0¡«15   µ±Ç°¼¤»îµÄ´ÅÅÌ·ÖÇøºÅ
-            ÆäËû    resverd
+å‡½æ•°åç§°ï¼š  UH_GetCurrentLun
+å‡½æ•°åŠŸèƒ½ï¼š  èŽ·å–å½“å‰æ¿€æ´»çš„ç£ç›˜åˆ†åŒºå·
+å‡½æ•°è¾“å…¥ï¼š
+å‡½æ•°è¿”å›žï¼š  0ï½ž15   å½“å‰æ¿€æ´»çš„ç£ç›˜åˆ†åŒºå·
+            å…¶ä»–    resverd
 *************************************************************/
 #define UH_GetCurrentLun() API_UH_GetCurrentLun(APINO_UH_GetCurrentLun)
 uint8 API_UH_GetCurrentLun(uint8 cmd);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_SetCurrentLun
-º¯Êý¹¦ÄÜ£º  Éè¶¨µ±Ç°¼¤»îµÄ´ÅÅÌ·ÖÇøºÅ£¬Èç¹û²»Éè¶¨µÄ»°£¬Ä¬ÈÏÎª0
-º¯ÊýÊäÈë£º  lun     ¶ÔÓ¦´ÅÅÌµÄ·ÖÇøºÅ
-º¯Êý·µ»Ø£º  0       success
-            0xfc       ´íÎóµÄlun²ÎÊýµÈ
-            0xfd    Éè±¸²»Ö§³Ö
-            ÆäËû    resverd
+å‡½æ•°åç§°ï¼š  UH_SetCurrentLun
+å‡½æ•°åŠŸèƒ½ï¼š  è®¾å®šå½“å‰æ¿€æ´»çš„ç£ç›˜åˆ†åŒºå·ï¼Œå¦‚æžœä¸è®¾å®šçš„è¯ï¼Œé»˜è®¤ä¸º0
+å‡½æ•°è¾“å…¥ï¼š  lun     å¯¹åº”ç£ç›˜çš„åˆ†åŒºå·
+å‡½æ•°è¿”å›žï¼š  0       success
+            0xfc       é”™è¯¯çš„lunå‚æ•°ç­‰
+            0xfd    è®¾å¤‡ä¸æ”¯æŒ
+            å…¶ä»–    resverd
 *************************************************************/
 //uint8 UH_SetCurrentLun(unsigned char lun);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_WordRead
-º¯Êý¹¦ÄÜ£º  ¶ÁÈ¡Ä³Ò»¸ölba£¬Ä³¸öÆ«ÒÆÁ¿µÄË«×Ö½ÚÊý¾Ý
-º¯ÊýÊäÈë£º  UD_RW
+å‡½æ•°åç§°ï¼š  UH_WordRead
+å‡½æ•°åŠŸèƒ½ï¼š  è¯»å–æŸä¸€ä¸ªlbaï¼ŒæŸä¸ªåç§»é‡çš„åŒå­—èŠ‚æ•°æ®
+å‡½æ•°è¾“å…¥ï¼š  UD_RW
             typedef struct
             {
-                dword   lba;        //wordËùÔÚÉÈÇøÄÚµÄµØÖ·
-                char    reserv;     //Î´ÓÃ
-                void    byteaddr;   //wordÔÚÉÈÇøÄÚµÄ×Ö½ÚÆ«ÒÆ
-                byte    reserv;     //Î´ÓÃ
+                dword   lba;        //wordæ‰€åœ¨æ‰‡åŒºå†…çš„åœ°å€
+                char    reserv;     //æœªç”¨
+                void    byteaddr;   //wordåœ¨æ‰‡åŒºå†…çš„å­—èŠ‚åç§»
+                byte    reserv;     //æœªç”¨
             }UD_RW;
-º¯Êý·µ»Ø£º  0       success
-            1       0xff    µØÖ·ÊäÈë´íÎó£¬Èç²»´æÔÚ»òÔ½½çµÄµØÖ·
-            ÆäËû    resverd
+å‡½æ•°è¿”å›žï¼š  0       success
+            1       0xff    åœ°å€è¾“å…¥é”™è¯¯ï¼Œå¦‚ä¸å­˜åœ¨æˆ–è¶Šç•Œçš„åœ°å€
+            å…¶ä»–    resverd
 *************************************************************/
 //int16 UH_WordRead(UD_RW *rwaddr);
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_DwordRead
-º¯Êý¹¦ÄÜ£º  ¶ÁÈ¡Ä³Ò»¸ölba£¬Ä³¸öÆ«ÒÆÁ¿µÄËÄ×Ö½ÚÊý¾Ý
-º¯ÊýÊäÈë£º  UD_RW
+å‡½æ•°åç§°ï¼š  UH_DwordRead
+å‡½æ•°åŠŸèƒ½ï¼š  è¯»å–æŸä¸€ä¸ªlbaï¼ŒæŸä¸ªåç§»é‡çš„å››å­—èŠ‚æ•°æ®
+å‡½æ•°è¾“å…¥ï¼š  UD_RW
             typedef struct
             {
-                dword   lba;        //wordËùÔÚÉÈÇøÄÚµÄµØÖ·
-                char    reserv;     //Î´ÓÃ
-                void    byteaddr;   //wordÔÚÉÈÇøÄÚµÄ×Ö½ÚÆ«ÒÆ
-                byte    reserv;     //Î´ÓÃ
+                dword   lba;        //wordæ‰€åœ¨æ‰‡åŒºå†…çš„åœ°å€
+                char    reserv;     //æœªç”¨
+                void    byteaddr;   //wordåœ¨æ‰‡åŒºå†…çš„å­—èŠ‚åç§»
+                byte    reserv;     //æœªç”¨
             }UD_RW;
-º¯Êý·µ»Ø£º  0       success
-            1       0xff    µØÖ·ÊäÈë´íÎó£¬Èç²»´æÔÚ»òÔ½½çµÄµØÖ·
-            ÆäËû    resverd
+å‡½æ•°è¿”å›žï¼š  0       success
+            1       0xff    åœ°å€è¾“å…¥é”™è¯¯ï¼Œå¦‚ä¸å­˜åœ¨æˆ–è¶Šç•Œçš„åœ°å€
+            å…¶ä»–    resverd
 *************************************************************/
 //int16 UH_DwordRead(UD_RW *rwaddr);
 
 
 /***********************************************************
-º¯ÊýÃû³Æ£º  UH_Update
-º¯Êý¹¦ÄÜ£º  ¿Õº¯Êý£¬FS_FClose()¹Ø±ÕÒ»¸öÎÄ¼þÊ±±»µ÷ÓÃ
-º¯ÊýÊäÈë£º
-º¯Êý·µ»Ø£º
+å‡½æ•°åç§°ï¼š  UH_Update
+å‡½æ•°åŠŸèƒ½ï¼š  ç©ºå‡½æ•°ï¼ŒFS_FClose()å…³é—­ä¸€ä¸ªæ–‡ä»¶æ—¶è¢«è°ƒç”¨
+å‡½æ•°è¾“å…¥ï¼š
+å‡½æ•°è¿”å›žï¼š
 *************************************************************/
 #define UH_Update() API_UH_Update(APINO_UH_Update)
 void API_UH_Update(uint8 cmd);
 
 
 /*
-message.h£º
-#define MSG_UH_IN               0xc0   //UÅÌ²åÈë
-#define MSG_UH_OUT              0xc1   //UÅÌ°Î³ö
-#define MSG_UH_UDISK_OUT        0xc2   //¿¨²ÛÖÐµÄ¿¨°Î³ö
+message.hï¼š
+#define MSG_UH_IN               0xc0   //Uç›˜æ’å…¥
+#define MSG_UH_OUT              0xc1   //Uç›˜æ‹”å‡º
+#define MSG_UH_UDISK_OUT        0xc2   //å¡æ§½ä¸­çš„å¡æ‹”å‡º
 */
 #define     ISR_CHECK_MODE
 extern uint8  sHOST_Glbal;
@@ -268,13 +268,13 @@ extern uint8  sHOST_Glbal;
 #define ERROR_DEVICE_NOT_IN            0x02
 #define ERROR_BUS_RESET_OVERTIME       0x06
 
-#define     BULK_IN_EP_NUM                                                  2 // BULK IN ¶ËµãºÅ,
-#define     BULK_OUT_EP_NUM                                                 1 // BULK OUT ¶ËµãºÅ
+#define     BULK_IN_EP_NUM                                                  2 // BULK IN ç«¯ç‚¹å·,
+#define     BULK_OUT_EP_NUM                                                 1 // BULK OUT ç«¯ç‚¹å·
 
-/* 1) ·Ç ¿¨U¶Ô¿½³¡¾°ÏÂ£¬Ê¹ÓÃÈ«ËÙÄ£Ê½£¬URAM£¨512byte£©×ö¶Ëµã»º³åÇø£¬IN¶ËµãºÍOUT¶Ëµã¸÷ÓÃ256byte(= 64 * 4)
- * 2) ¿¨U¶Ô¿½³¡¾°ÏÂ£¬Ê¹ÓÃ¸ßËÙÄ£Ê½£¬PCMRAM£¨4KB£©×ö¶Ëµã»º³åÇø£¬IN¶ËµãºÍOUT¶Ëµã¸÷ÓÃ2KB(= 512byte * 4)
+/* 1) éž å¡Uå¯¹æ‹·åœºæ™¯ä¸‹ï¼Œä½¿ç”¨å…¨é€Ÿæ¨¡å¼ï¼ŒURAMï¼ˆ512byteï¼‰åšç«¯ç‚¹ç¼“å†²åŒºï¼ŒINç«¯ç‚¹å’ŒOUTç«¯ç‚¹å„ç”¨256byte(= 64 * 4)
+ * 2) å¡Uå¯¹æ‹·åœºæ™¯ä¸‹ï¼Œä½¿ç”¨é«˜é€Ÿæ¨¡å¼ï¼ŒPCMRAMï¼ˆ4KBï¼‰åšç«¯ç‚¹ç¼“å†²åŒºï¼ŒINç«¯ç‚¹å’ŒOUTç«¯ç‚¹å„ç”¨2KB(= 512byte * 4)
  */
-#ifdef  __CARD_UDISK_TRANSFER__ // ¿¨U¶Ô¿½µÄ³¡¾°, Bulk in/out¸÷ÓÃ2KB
+#ifdef  __CARD_UDISK_TRANSFER__ // å¡Uå¯¹æ‹·çš„åœºæ™¯, Bulk in/outå„ç”¨2KB
 
 #define     EP_MAX_BUF_SIZE_BULK_IN                                         0x800 // 2KB
 #define     EP_MAX_BUF_SIZE_BULK_OUT                                        0x800 // 2KB
@@ -286,23 +286,23 @@ extern uint8  sHOST_Glbal;
 
 #endif  // #ifdef  __CARD_UDISK_TRANSFER__
 
-#ifdef  __CARD_UDISK_TRANSFER__ // ¿¨U¶Ô¿½µÄ³¡¾°, Bulk in/out¸÷ÓÃ2KB
-#define     EP_BUF_STA_ADDR_BULK_IN     0x380 // 0x380 bytesµÄ¿Õ¼äÖ¸ "URAM + FIR_RDS_RAM"
+#ifdef  __CARD_UDISK_TRANSFER__ // å¡Uå¯¹æ‹·çš„åœºæ™¯, Bulk in/outå„ç”¨2KB
+#define     EP_BUF_STA_ADDR_BULK_IN     0x380 // 0x380 bytesçš„ç©ºé—´æŒ‡ "URAM + FIR_RDS_RAM"
 #define     EP_BUF_STA_ADDR_BULK_OUT    (EP_BUF_STA_ADDR_BULK_IN + EP_MAX_BUF_SIZE_BULK_IN)
 #else
-#define     EP_BUF_STA_ADDR_BULK_IN     192 // 192 bytesµÄ¿Õ¼äÖ¸ EP0_IN¡¢EP0_OUTºÍEP3ÓÃµÄ¸÷64 bytesµÄ´óÐ¡
+#define     EP_BUF_STA_ADDR_BULK_IN     192 // 192 bytesçš„ç©ºé—´æŒ‡ EP0_INã€EP0_OUTå’ŒEP3ç”¨çš„å„64 bytesçš„å¤§å°
 #define     EP_BUF_STA_ADDR_BULK_OUT    (EP_BUF_STA_ADDR_BULK_IN + EP_MAX_BUF_SIZE_BULK_IN)
 #endif  // #ifdef  __CARD_UDISK_TRANSFER__
 
 #define WATCHDOG_CLEAR()                ClearWatchDog()
 #define delay_ms(x)                     TM_DelayMS(x)
 
-// enable external USB interrupt request(ÕâÊÇUSBÖÐ¶Ï¶ÔÍâµÄ×ÜÊ¹ÄÜÎ»)
+// enable external USB interrupt request(è¿™æ˜¯USBä¸­æ–­å¯¹å¤–çš„æ€»ä½¿èƒ½ä½)
 #define     ENABLE_EXT_USB_IRQ()                            (USBEIRQ = USBEIRQ | 0x08)
-// disable external USB interrupt request(ÕâÊÇUSBÖÐ¶Ï¶ÔÍâµÄ×ÜÊ¹ÄÜÎ»)
+// disable external USB interrupt request(è¿™æ˜¯USBä¸­æ–­å¯¹å¤–çš„æ€»ä½¿èƒ½ä½)
 #define     DISABLE_EXT_USB_IRQ()                           (USBEIRQ = USBEIRQ & 0xf7)
-/* close USB clock (ÕâÑùUSB controller²¿·Ö¿ÉÒÔÊ¡¹¦ºÄ£¬DP&DMµÄÊ±ÖÓÔ´Ó¦¸ÃÊÇAHBCLK£¬ËùÒÔ¹Ø±ÕµÄclock¸úDP&DMµÄÊ±ÖÓÔ´ÎÞ¹Ø).
- * ¹Ø±ÕPLLEN¼´¿É,ÆäËûÏñPLLEN, USBRESET ºÍ GoSuspend¶¼²»ÓÃ¹Ü,ÁíÍâPhy_DALLUALLENÊÇÄÚ²¿ÓÃµÄ,Ò²¿É¹Ø±Õ
+/* close USB clock (è¿™æ ·USB controlleréƒ¨åˆ†å¯ä»¥çœåŠŸè€—ï¼ŒDP&DMçš„æ—¶é’Ÿæºåº”è¯¥æ˜¯AHBCLKï¼Œæ‰€ä»¥å…³é—­çš„clockè·ŸDP&DMçš„æ—¶é’Ÿæºæ— å…³).
+ * å…³é—­PLLENå³å¯,å…¶ä»–åƒPLLEN, USBRESET å’Œ GoSuspendéƒ½ä¸ç”¨ç®¡,å¦å¤–Phy_DALLUALLENæ˜¯å†…éƒ¨ç”¨çš„,ä¹Ÿå¯å…³é—­
  */
 #define     CLOSE_USB_CONTROLLER_CLOCK() \
             (USB_PHYCTRL = USB_PHYCTRL & 0x3f)

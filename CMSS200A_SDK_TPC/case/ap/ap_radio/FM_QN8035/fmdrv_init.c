@@ -29,7 +29,7 @@ const uint16 rssi_snr_TH_tbl [20] =
 };
 
 /**********************************************************************
- * Description: ³õÊ¼»¯FMÄ£×é
+ * Description: åˆå§‹åŒ–FMæ¨¡ç»„
  *
  * Arguments: none
  *
@@ -41,15 +41,15 @@ const uint16 rssi_snr_TH_tbl [20] =
 uint8 QN_ChipInitialization(void)
 {
     //reset all registers, CCA_CH_DIS =1
-    QND_WriteReg(0x00, 0x81);//¶ÔËùÓĞ¼Ä´æÆ÷¸´Î»
-    TM_DelayMS(20); //ÑÓÊ±10MSÒÔÉÏ£¬µÈ´ı¸´Î»Íê³É
+    QND_WriteReg(0x00, 0x81);//å¯¹æ‰€æœ‰å¯„å­˜å™¨å¤ä½
+    TM_DelayMS(20); //å»¶æ—¶10MSä»¥ä¸Šï¼Œç­‰å¾…å¤ä½å®Œæˆ
 
     // change crystal frequency setting here
-    //ÉèÖÃbit7Ñ¡ÔñÊ±ÖÓÔ´
+    //è®¾ç½®bit7é€‰æ‹©æ—¶é’Ÿæº
     QNF_SetRegBit(0x01, 0x80, 0x00);//setting clock source type:  0  sine-wave clock or  1  digital clock
-    //ÒÔ0x15,0x16,0x17½øĞĞÉèÖÃÀ´Ñ¡ÔñÊ±ÖÓÆµÂÊ
-    //Èç¹ûÊ±ÖÓÆµÂÊÎª32.768KHzÔò¿ÉÒÔ²»¶ÔÕâ3¸ö¼Ä´æÆ÷½øĞĞ²Ù×÷(Ê¹ÓÃÄ¬ÈÏÖµ)
-    QND_WriteReg(XTAL_DIV0, QND_XTAL_DIV0); //ÉèÖÃÊ±ÖÓÆµÂÊ
+    //ä»¥0x15,0x16,0x17è¿›è¡Œè®¾ç½®æ¥é€‰æ‹©æ—¶é’Ÿé¢‘ç‡
+    //å¦‚æœæ—¶é’Ÿé¢‘ç‡ä¸º32.768KHzåˆ™å¯ä»¥ä¸å¯¹è¿™3ä¸ªå¯„å­˜å™¨è¿›è¡Œæ“ä½œ(ä½¿ç”¨é»˜è®¤å€¼)
+    QND_WriteReg(XTAL_DIV0, QND_XTAL_DIV0); //è®¾ç½®æ—¶é’Ÿé¢‘ç‡
     QND_WriteReg(XTAL_DIV1, QND_XTAL_DIV1);
     QND_WriteReg(XTAL_DIV2, QND_XTAL_DIV2);
 
@@ -59,11 +59,11 @@ uint8 QN_ChipInitialization(void)
     QND_WriteReg(0x2d, 0xD6);//notch filter threshold adjusting
     QND_WriteReg(0x43, 0x10);//notch filter threshold enable
 
-    //·¢ËÍÓĞÏŞ×´Ì¬»úĞ£ÑéÃüÁî¸øqn8035
+    //å‘é€æœ‰é™çŠ¶æ€æœºæ ¡éªŒå‘½ä»¤ç»™qn8035
     QND_WriteReg(0x00, 0x51);//reset the FSM
-    //·¢ËÍÓĞÏŞ×´Ì¬»ú¼ìÑéÃüÁîÍê³É
+    //å‘é€æœ‰é™çŠ¶æ€æœºæ£€éªŒå‘½ä»¤å®Œæˆ
     QND_WriteReg(0x00, 0x21);//enter standby mode
-    //µÈ´ıÓĞÏŞ×´Ì¬»ú¼ìÑéÍê³É
+    //ç­‰å¾…æœ‰é™çŠ¶æ€æœºæ£€éªŒå®Œæˆ
     TM_DelayMS(100);
 
     //these variables are used in QNF_SetCh() function.
@@ -146,13 +146,13 @@ uint8 FMdrv_setthrod(uint8 level)
  ********************************************************************************
  *             uint8 FMdrv_Init(uint8 mode)
  *
- * Description : FM ³õÊ¼»¯º¯Êı
+ * Description : FM åˆå§‹åŒ–å‡½æ•°
  *
- * Arguments   : mode: Ôİ²»Ê¹ÓÃ
+ * Arguments   : mode: æš‚ä¸ä½¿ç”¨
  *
- * Returns     : Èô³õÊ¼»¯³É¹¦,Ôò·µ»Ø1,·ñÔò,·µ»Ø0
+ * Returns     : è‹¥åˆå§‹åŒ–æˆåŠŸ,åˆ™è¿”å›1,å¦åˆ™,è¿”å›0
  *
- * Notes       : ÓÉÇı¶¯°²×°º¯Êıµ÷ÓÃ
+ * Notes       : ç”±é©±åŠ¨å®‰è£…å‡½æ•°è°ƒç”¨
  *
  ********************************************************************************
  */
@@ -174,15 +174,15 @@ uint8 FMdrv_Init(uint8 mode)
  ********************************************************************************
  *             uint8 FMdrv_hardware(uint8 onoff,  uint8 PA_mode)
  *
- * Description : FM Ïà¹ØÓ²¼ş²Ù×÷, ÈçAIN, PAµÈ
+ * Description : FM ç›¸å…³ç¡¬ä»¶æ“ä½œ, å¦‚AIN, PAç­‰
  *
- * Arguments   : onoff:  1--´ò¿ªFMÊ±    0--¹Ø±ÕFMÊ±
- *               PA_mode:   1-- Òª²Ù×÷PA    0--²»²Ù×÷PA
+ * Arguments   : onoff:  1--æ‰“å¼€FMæ—¶    0--å…³é—­FMæ—¶
+ *               PA_mode:   1-- è¦æ“ä½œPA    0--ä¸æ“ä½œPA
  *
- * Returns     : Èô³É¹¦,Ôò·µ»Ø1,·ñÔò,·µ»Ø0
+ * Returns     : è‹¥æˆåŠŸ,åˆ™è¿”å›1,å¦åˆ™,è¿”å›0
  *
- * Notes       : 1. ´Ëº¯ÊıÒª½áºÏÇı¶¯µÄ°²×°Ğ¶ÔØÀ´µ÷ÓÃ
- *               2. PA_mode Ö÷ÒªÊÇÎª¼æÈİÄ³Ğ©Ä£×é, ÔÚmain AP ÖĞĞèÒª½østandby¶øÓÃ
+ * Notes       : 1. æ­¤å‡½æ•°è¦ç»“åˆé©±åŠ¨çš„å®‰è£…å¸è½½æ¥è°ƒç”¨
+ *               2. PA_mode ä¸»è¦æ˜¯ä¸ºå…¼å®¹æŸäº›æ¨¡ç»„, åœ¨main AP ä¸­éœ€è¦è¿›standbyè€Œç”¨
  ********************************************************************************
  */
 uint8 FMdrv_hardware(uint8 onoff, uint8 PA_mode)
@@ -196,13 +196,13 @@ uint8 FMdrv_hardware(uint8 onoff, uint8 PA_mode)
  ********************************************************************************
  *             uint8 FMdrv_Exit(uint8 mode)
  *
- * Description : FMÇı¶¯ÍË³öº¯Êı
+ * Description : FMé©±åŠ¨é€€å‡ºå‡½æ•°
  *
- * Arguments   : mode: ÎŞÊµ¼Ê×÷ÓÃ
+ * Arguments   : mode: æ— å®é™…ä½œç”¨
  *
- * Returns     : ÎŞÊµ¼Ê×÷ÓÃ
+ * Returns     : æ— å®é™…ä½œç”¨
  *
- * Notes       : ÓÉÇı¶¯Ğ¶ÔØº¯Êıµ÷ÓÃ
+ * Notes       : ç”±é©±åŠ¨å¸è½½å‡½æ•°è°ƒç”¨
  *
  ********************************************************************************
  */
@@ -216,7 +216,7 @@ uint8 FMdrv_Exit(uint8 mode)
     return 1;
 }
 
-/* FM Ä£×é½øÈëStandby */
+/* FM æ¨¡ç»„è¿›å…¥Standby */
 uint8 FMdrv_Standby(void)
 {
     //first, enter standby

@@ -105,11 +105,11 @@ uint8 check_key(void)
 }
 /*
  ********************************************************************************
- * Description : µÚ¶ş²ãAP¼äÇĞ»»
+ * Description : ç¬¬äºŒå±‚APé—´åˆ‡æ¢
  *
- * Arguments   : Ö´ĞĞapÃû³Æ
+ * Arguments   : æ‰§è¡Œapåç§°
  *
- * Returns     :  ap ·µ»ØÖµ
+ * Returns     :  ap è¿”å›å€¼
  *
  *
  * Notes       :
@@ -203,11 +203,11 @@ int16 AP_Loop_Exec(int16 ap_name)
             VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval));
             break;
 
-        case RESULT_RECORD: //¿ªÊ¼Â¼Òô
+        case RESULT_RECORD: //å¼€å§‹å½•éŸ³
         case RESULT_FMREC_START:
 #ifdef MAIN_AP
-            //Èç¹û´ÓFM½øÈëÂ¼Òô£¬ÕâÀï²»×öÓïÒô²¥±¨¹¦ÄÜ£¬ÒÔ·À
-            //ÇĞ»»µ½ÆäËûapÊ±£¬FMµÄ¼àÌı¹¦ÄÜÃ»ÓĞ¹Ø±Õ
+            //å¦‚æœä»FMè¿›å…¥å½•éŸ³ï¼Œè¿™é‡Œä¸åšè¯­éŸ³æ’­æŠ¥åŠŸèƒ½ï¼Œä»¥é˜²
+            //åˆ‡æ¢åˆ°å…¶ä»–apæ—¶ï¼ŒFMçš„ç›‘å¬åŠŸèƒ½æ²¡æœ‰å…³é—­
             if(result == RESULT_FMREC_START)
             {
                 ResultCheck = RESULT_NULL;
@@ -232,14 +232,14 @@ int16 AP_Loop_Exec(int16 ap_name)
             result = ExecAP("ap_rec_p.ap", result);
             break;
 
-        case RESULT_USBAUDIO_PLAY: //Mode¼ü¹¦ÄÜ£¬ÓÉFMÇĞ»»µ½USB ÒôÏä
+        case RESULT_USBAUDIO_PLAY: //Modeé”®åŠŸèƒ½ï¼Œç”±FMåˆ‡æ¢åˆ°USB éŸ³ç®±
             result = USBDevice(USB_Audio);
             break;
         case RESULT_UDISK:
-        case RESULT_USBUDISK_PLAY: //Mode¼ü¹¦ÄÜ£¬ÓÉUSB ÒôÏäÇĞ»»µ½ UDISK
+        case RESULT_USBUDISK_PLAY: //Modeé”®åŠŸèƒ½ï¼Œç”±USB éŸ³ç®±åˆ‡æ¢åˆ° UDISK
             result = USBDevice(USB_disk);
             break;
-        case RESULT_USBTEST: //¼ÓÔØÒôĞ§µ÷ÊÔÍ¨ĞÅÄ£¿é
+        case RESULT_USBTEST: //åŠ è½½éŸ³æ•ˆè°ƒè¯•é€šä¿¡æ¨¡å—
             result = ExecAP("usbtest.ap", result);
             break;
         case RESULT_STANDBY:
@@ -256,11 +256,11 @@ int16 AP_Loop_Exec(int16 ap_name)
             result = RESULT_NULL;
             break;
         }
-        //ÏÈ¹ıÂËËùÓĞµÄÏûÏ¢£¬ÒÔÃâ¼ì²âµ½²»±ØÒªµÄÏûÏ¢
+        //å…ˆè¿‡æ»¤æ‰€æœ‰çš„æ¶ˆæ¯ï¼Œä»¥å…æ£€æµ‹åˆ°ä¸å¿…è¦çš„æ¶ˆæ¯
         while (ap_get_message() != NULL)
         {
         };
-        /*Ö§³Ö²å¿¨Ê±´ÓÓ¦ÓÃÍË³öĞèĞ¶ÔØ²å¿¨Çı¶¯*/
+        /*æ”¯æŒæ’å¡æ—¶ä»åº”ç”¨é€€å‡ºéœ€å¸è½½æ’å¡é©±åŠ¨*/
         DRV_UnInstall(DRV_STG);
         VMRead(&g_modifyval, VM_AP_FWCFG, sizeof(vm_cfg_t));
         if (g_modifyval.Magic != MAGIC_CFG)
@@ -273,12 +273,12 @@ int16 AP_Loop_Exec(int16 ap_name)
             memcpy(sKY_GetKeyTabAddress(), g_modifyval.KeyInfor.Table, g_modifyval.KeyInfor.Total);
         }
         read_var();
-        //¼ì²âµ½lineinÏß²åÈëÊ±£¬½«¸ÃÎ»ÖÃÆğÀ´
+        //æ£€æµ‹åˆ°lineinçº¿æ’å…¥æ—¶ï¼Œå°†è¯¥ä½ç½®èµ·æ¥
         if(result == RESULT_LINEIN)
         {
             result_from_plug = TRUE;
         }
-        //Ò»¼üÇĞ»»Ê±£¬»ñÈ¡ÏÂÒ»¸öapÖµ
+        //ä¸€é”®åˆ‡æ¢æ—¶ï¼Œè·å–ä¸‹ä¸€ä¸ªapå€¼
         if (result == RESULT_MAIN)
         {
             for (i = 0; i < g_modifyval.ApInfor.Total; i++)
@@ -316,7 +316,7 @@ uint16 near USBDevice(int16 State)
     uint16 result;
 #if 0	// not check usb status, because the status is wrong when charging.
     uint8 retval;
-    retval = GetUsbCableStatus(); //USBÏßÊÇ·ñÁ¬½Ó
+    retval = GetUsbCableStatus(); //USBçº¿æ˜¯å¦è¿æ¥
     //if((retval & 0xc0) == 0xc0)
     if((retval & 0x40) == 0x40)
     {
@@ -324,7 +324,7 @@ uint16 near USBDevice(int16 State)
         {
             longkey_flag = 0;
         }
-        result = USBDeviceService(State); // ½øÈëUSBÏàÓ¦¹¦ÄÜ
+        result = USBDeviceService(State); // è¿›å…¥USBç›¸åº”åŠŸèƒ½
     }
     else
     {

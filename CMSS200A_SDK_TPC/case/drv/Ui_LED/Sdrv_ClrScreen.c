@@ -21,7 +21,7 @@
 ///*
 //** FUNCTION:     ClearScreen
 //**
-//** Description:  ÃğµôËùÓĞsegment
+//** Description:  ç­æ‰æ‰€æœ‰segment
 //**
 //**  input
 //**     none

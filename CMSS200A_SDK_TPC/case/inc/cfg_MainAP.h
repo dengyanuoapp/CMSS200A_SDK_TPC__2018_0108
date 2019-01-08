@@ -1,12 +1,12 @@
 #ifndef MAIN_AP_H
 #define MAIN_AP_H
 
-//MUSIC±³¾°Í¼,µÚÒ»¸öÎªÖ÷½çÃæ£¬ÆäËûÎª¶¯»­
+//MUSICèƒŒæ™¯å›¾,ç¬¬ä¸€ä¸ªä¸ºä¸»ç•Œé¢ï¼Œå…¶ä»–ä¸ºåŠ¨ç”»
 #define PIC_ID_F_MAIN MUSIC1
 #define PIC_X_F_MAIN	0
 #define PIC_Y_F_MAIN	45
 
-//MUSIC·½Ìõ
+//MUSICæ–¹æ¡
 #define PIC_ID_F_MUSQ MUSQ
 #define PIC_X_F_MUSQ	0
 #define PIC_Y_F_MUSQ	0
@@ -16,7 +16,7 @@
 #define STR_X_MUSIC	255
 #define STR_Y_MUSIC	26
 
-//±³¾°Í¼
+//èƒŒæ™¯å›¾
 #define PIC_ID_UDLOCK_S UDLOCK_S
 #define PIC_X_UDLOCK_S	86
 #define PIC_Y_UDLOCK_S	80
@@ -39,7 +39,7 @@
 #define PIC_X_MUSICTYPE	34
 #define PIC_Y_MUSICTYPE	4
 
-//Ñ­»·Ä£Ê½
+//å¾ªç¯æ¨¡å¼
 #define PIC_ID_REPEAT    MLOOP1
 #define PIC_X_REPEAT	73
 #define PIC_Y_REPEAT	1
@@ -48,42 +48,42 @@
 #define PIC_X_EQ	101
 #define PIC_Y_EQ	4
 
-//Ğ¡Ê±
+//å°æ—¶
 #define PIC_ID_TIMEH     PRGNUM0
 #define PIC_X_TIMEH	25
 #define PIC_Y_TIMEH	34
 
-//·ÖÖÓ¸ßÎ»
+//åˆ†é’Ÿé«˜ä½
 #define PIC_ID_TIMEMH     PRGNUM0
 #define PIC_X_TIMEMH	49
 #define PIC_Y_TIMEMH	34
 
-//·ÖÖÓµÍÎ»
+//åˆ†é’Ÿä½ä½
 #define PIC_ID_TIMEML     PRGNUM0
 #define PIC_X_TIMEML	64
 #define PIC_Y_TIMEML	34
 
-//Ãë¸ßÎ»
+//ç§’é«˜ä½
 #define PIC_ID_TIMESH     PRGNUM0
 #define PIC_X_TIMESH	88
 #define PIC_Y_TIMESH	34
 
-//ÃëµÍÎ»
+//ç§’ä½ä½
 #define PIC_ID_TIMESL     PRGNUM0
 #define PIC_X_TIMESL	102
 #define PIC_Y_TIMESL	34
 
-//µç³ØµçÁ¿
+//ç”µæ± ç”µé‡
 #define PIC_ID_BATTERY    BATTERY1
 #define PIC_X_BATTERY	107
 #define PIC_Y_BATTERY	146
 
-/*ÌáÊ¾×Ö·û´®µÄÎ»ÖÃ×ø±ê*/
+/*æç¤ºå­—ç¬¦ä¸²çš„ä½ç½®åæ ‡*/
 #define PIC_X_PROMPT  255
 #define PIC_Y_PROMPT  72
 
 
-//ÁÙÊ±Ìí¼Ó£¬±£Ö¤Á´½Ó¹ı
+//ä¸´æ—¶æ·»åŠ ï¼Œä¿è¯é“¾æ¥è¿‡
 #define PIC_X_TTIMEHH	0
 #define PIC_Y_TTIMEHH	0
 

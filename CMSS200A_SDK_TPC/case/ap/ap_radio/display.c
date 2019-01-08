@@ -22,7 +22,7 @@ void RefreshMainScreen(void)
 branch_reflash:
     switch (CurUI_Type)
     {
-    case FMFreq_UI: //œ‘ æ∆µµ„
+    case FMFreq_UI: //ÊòæÁ§∫È¢ëÁÇπ
         /* stop or play icon */
         LEDDisplay(LED_PLAY, 0xff, !mute_flag);
         LEDDisplay(LED_PAUSE, 0xff, mute_flag);
@@ -43,7 +43,7 @@ branch_reflash:
         LEDDisplay(NUMBER4, buf[3], 1);
         break;
 
-    case FMChannel_UI://œ‘ æµÁÃ®∫≈
+    case FMChannel_UI://ÊòæÁ§∫ÁîµÂè∞Âè∑
         if (!g_FMStatus.station)
         {
             CurUI_Type = FMFreq_UI;

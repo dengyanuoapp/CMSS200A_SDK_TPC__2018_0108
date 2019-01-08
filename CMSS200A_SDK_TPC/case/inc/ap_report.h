@@ -14,57 +14,57 @@
  */
 #ifndef REPORT_H
 #define REPORT_H
-#include "actos.h"//ÏµÍ³Í·ÎÄ¼ş
-#include "mmcmd.h"//Ä£¿é²ãÃüÁîÃû¶¨Òå
-#include "basal.h"//basal module Í·ÎÄ¼ş
-#include "enhanced.h"//enhanced module Í·ÎÄ¼ş
-#include "ap_common.h"//¿Ø¼şÍ·ÎÄ¼ş
+#include "actos.h"//ç³»ç»Ÿå¤´æ–‡ä»¶
+#include "mmcmd.h"//æ¨¡å—å±‚å‘½ä»¤åå®šä¹‰
+#include "basal.h"//basal module å¤´æ–‡ä»¶
+#include "enhanced.h"//enhanced module å¤´æ–‡ä»¶
+#include "ap_common.h"//æ§ä»¶å¤´æ–‡ä»¶
 #include "uhdrv.h"
 #include "report_res.h"
 
 #include "fm_drv.h"
 
-#define TIME_REPORT_EN          //Ê±¼ä²¥±¨Ê¹ÄÜ¶¨Òå
-//#define DATE_REPORT_EN          //ÈÕÆÚ²¥±¨Ê¹ÄÜ¶¨Òå
+#define TIME_REPORT_EN          //æ—¶é—´æ’­æŠ¥ä½¿èƒ½å®šä¹‰
+//#define DATE_REPORT_EN          //æ—¥æœŸæ’­æŠ¥ä½¿èƒ½å®šä¹‰
 
 #ifdef MAIN_AP
-#define AP_MAIN_REPORT_EN       //Ö÷½çÃæ¶ÔÓ¦Ó¦ÓÃ²¥±¨Ê¹ÄÜ¶¨Òå
+#define AP_MAIN_REPORT_EN       //ä¸»ç•Œé¢å¯¹åº”åº”ç”¨æ’­æŠ¥ä½¿èƒ½å®šä¹‰
 #endif
 #ifdef MUSIC_AP
-#define AP_MUSIC_PEPORT_EN      //ÒôÀÖ²¥±¨Ê¹ÄÜ¶¨Òå
-#define AP_MUSIC_NAME           //ÒôÀÖ¸èÇúÃû²¥±¨Ê¹ÄÜ¶¨Òå
+#define AP_MUSIC_PEPORT_EN      //éŸ³ä¹æ’­æŠ¥ä½¿èƒ½å®šä¹‰
+#define AP_MUSIC_NAME           //éŸ³ä¹æ­Œæ›²åæ’­æŠ¥ä½¿èƒ½å®šä¹‰
 #endif
 #ifdef RADIO_AP
-#define AP_RADIO_REPORT_EN      //ÊÕÒô²¥±¨Ê¹ÄÜ¶¨Òå
+#define AP_RADIO_REPORT_EN      //æ”¶éŸ³æ’­æŠ¥ä½¿èƒ½å®šä¹‰
 #endif
 #ifdef LINEIN_AP
-#define AP_LINEIN_REPORT_EN     //LINEINÖĞµÄ²¥±¨Ê¹ÄÜ¶¨Òå
+#define AP_LINEIN_REPORT_EN     //LINEINä¸­çš„æ’­æŠ¥ä½¿èƒ½å®šä¹‰
 #endif
 #ifdef USOUND_AP
-#define AP_USOUND_REPORT_EN     //USBÒôÏäÖĞµÄ²¥±¨Ê¹ÄÜ¶¨Òå
+#define AP_USOUND_REPORT_EN     //USBéŸ³ç®±ä¸­çš„æ’­æŠ¥ä½¿èƒ½å®šä¹‰
 #endif
 
 typedef void (*tts_func)(char *);
 
 typedef struct
 {
-    char *report_buf;                       //´æÖî²¥±¨Êı¾İµÄÖ¸Õë£¬Ö¸Ïò²¥±¨µÄÊı¾İ¡£
-    char tts_lib_flag;                      //µ±Ç°TTSÀàĞÍ,1Îª±ê×¼¿â£¬0Îª´ÊÌõ
-    char open_pa_flag;                      //ÊÇ·ñ´ò¿ªPAµÄ±êÖ¾Î»
+    char *report_buf;                       //å­˜è¯¸æ’­æŠ¥æ•°æ®çš„æŒ‡é’ˆï¼ŒæŒ‡å‘æ’­æŠ¥çš„æ•°æ®ã€‚
+    char tts_lib_flag;                      //å½“å‰TTSç±»å‹,1ä¸ºæ ‡å‡†åº“ï¼Œ0ä¸ºè¯æ¡
+    char open_pa_flag;                      //æ˜¯å¦æ‰“å¼€PAçš„æ ‡å¿—ä½
 } info_report_t;
 
 //data
-extern BOOL report_stats;                   //µ±Ç°²¥·Å×´Ì¬  0:Í£Ö¹  1:²¥·Å
-extern BOOL pa_close_flag;                  //²¥±¨Ç°PAµÄ×´Ì¬
-extern unsigned char ext_report_msg;    //·µ»ØµÄÆäËüÏûÏ¢Öµ¡£Î»Í¼ÏûÏ¢
+extern BOOL report_stats;                   //å½“å‰æ’­æ”¾çŠ¶æ€  0:åœæ­¢  1:æ’­æ”¾
+extern BOOL pa_close_flag;                  //æ’­æŠ¥å‰PAçš„çŠ¶æ€
+extern unsigned char ext_report_msg;    //è¿”å›çš„å…¶å®ƒæ¶ˆæ¯å€¼ã€‚ä½å›¾æ¶ˆæ¯
 
-//ext_report_msg µÄÎ»Í¼ĞÅÏ¢
+//ext_report_msg çš„ä½å›¾ä¿¡æ¯
 #define REPORT_SD_OUT   0X1
 #define REPORT_UD_OUT   0X2
 #define REPORT_SD_IN    0X4
 #define REPORT_UD_IN    0X8
 
-//reportµÄĞÅÏ¢
+//reportçš„ä¿¡æ¯
 #define REPORT_ERROR    -1
 #define REPORT_OK       0
 

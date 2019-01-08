@@ -18,25 +18,25 @@ Copyright (c) 2003 by Actions, All Rights Reserved.
 #ifdef __C251__
 #define OLD_TYPEEXT
 
-// typedef unsigned char   bool;              // bool ±äÁ¿
+// typedef unsigned char   bool;              // bool å˜é‡
 #define  bool unsigned char
 
-typedef unsigned char   uint8;            // ÎŞ·ûºÅ8Î»ÕûĞÍ±äÁ¿ //
-typedef signed char     int8;             // ÓĞ·ûºÅ8Î»ÕûĞÍ±äÁ¿ //
+typedef unsigned char   uint8;            // æ— ç¬¦å·8ä½æ•´å‹å˜é‡ //
+typedef signed char     int8;             // æœ‰ç¬¦å·8ä½æ•´å‹å˜é‡ //
 
 #ifndef PC
-typedef unsigned int    uint16;           // ÎŞ·ûºÅ16Î»ÕûĞÍ±äÁ¿ //
-typedef signed int      int16;            // ÓĞ·ûºÅ16Î»ÕûĞÍ±äÁ¿ //
+typedef unsigned int    uint16;           // æ— ç¬¦å·16ä½æ•´å‹å˜é‡ //
+typedef signed int      int16;            // æœ‰ç¬¦å·16ä½æ•´å‹å˜é‡ //
 #else
-typedef unsigned short    uint16;           // ÎŞ·ûºÅ16Î»ÕûĞÍ±äÁ¿ //
-typedef signed short      int16;            // ÓĞ·ûºÅ16Î»ÕûĞÍ±äÁ¿ //
+typedef unsigned short    uint16;           // æ— ç¬¦å·16ä½æ•´å‹å˜é‡ //
+typedef signed short      int16;            // æœ‰ç¬¦å·16ä½æ•´å‹å˜é‡ //
 #endif //endof ifndef PC
 
-typedef unsigned int    IntAddr;		 // Ò»°ãÓÃ±£´æ±äÁ¿µØÖ·£¬ÓÉÓÚÔÚ²»Í¬ÏµÍ³ÏÂ£¬¸ÃµØÖ·¿í¶ÈÓĞ²îÒì£¬
-// ËùÒÔÌØ¶¨ÓÚ¸Ã±äÁ¿ÀàĞÍ£¬±ÜÃâ´úÂë´¦¹ı¶àµÄºê´¦Àí
+typedef unsigned int    IntAddr;		 // ä¸€èˆ¬ç”¨ä¿å­˜å˜é‡åœ°å€ï¼Œç”±äºåœ¨ä¸åŒç³»ç»Ÿä¸‹ï¼Œè¯¥åœ°å€å®½åº¦æœ‰å·®å¼‚ï¼Œ
+// æ‰€ä»¥ç‰¹å®šäºè¯¥å˜é‡ç±»å‹ï¼Œé¿å…ä»£ç å¤„è¿‡å¤šçš„å®å¤„ç†
 
-typedef unsigned long   uint32;           // ÎŞ·ûºÅ32Î»ÕûĞÍ±äÁ¿ //
-typedef signed long     int32;            // ÓĞ·ûºÅ32Î»ÕûĞÍ±äÁ¿ //
+typedef unsigned long   uint32;           // æ— ç¬¦å·32ä½æ•´å‹å˜é‡ //
+typedef signed long     int32;            // æœ‰ç¬¦å·32ä½æ•´å‹å˜é‡ //
 
 
 #ifdef OLD_TYPEEXT
@@ -44,13 +44,13 @@ typedef signed long     int32;            // ÓĞ·ûºÅ32Î»ÕûĞÍ±äÁ¿ //
 #ifndef __DEC
 // #define  uchar unsigned char
 #define  BYTE unsigned char
-#ifndef PC //10-4-11 ·ÀÖ¹Óëwindows.h³åÍ»
+#ifndef PC //10-4-11 é˜²æ­¢ä¸windows.hå†²çª
 #define  byte unsigned char
-typedef unsigned char   BOOL;              // BOOL ±äÁ¿
+typedef unsigned char   BOOL;              // BOOL å˜é‡
 #define  UCHAR unsigned char
 #else
 typedef  unsigned char byte;
-#define BOOL unsigned char              // BOOL ±äÁ¿
+#define BOOL unsigned char              // BOOL å˜é‡
 typedef  unsigned char UCHAR;
 #endif
 #endif	/* #ifndef __DEC */

@@ -13,10 +13,10 @@
 
 #pragma name(AP_KALACBK)
 
-int8 MicVolEar = 0x05; //Êä³öµ½¶ú»úµÄÊ±ºòMicµÄÄ¬ÈÏÒôÁ¿0~7
-//int8 far MicVolSpe = 0x03;              //Êä³öµ½À®°ÈµÄÊ±ºòMicµÄÄ¬ÈÏÒôÁ¿0~7
-int8 DECGainEar = 0x40; //¶ú»ú×´Ì¬ÏÂÄ¬ÈÏDECÔöÒæQ2.6¸ñÊ½
-//int8 far DECGainSpe = 0x80;              //À®°È×´Ì¬ÏÂÄ¬ÈÏDECÔöÒæQ2.6¸ñÊ½
+int8 MicVolEar = 0x05; //è¾“å‡ºåˆ°è€³æœºçš„æ—¶å€™Micçš„é»˜è®¤éŸ³é‡0~7
+//int8 far MicVolSpe = 0x03;              //è¾“å‡ºåˆ°å–‡å­çš„æ—¶å€™Micçš„é»˜è®¤éŸ³é‡0~7
+int8 DECGainEar = 0x40; //è€³æœºçŠ¶æ€ä¸‹é»˜è®¤DECå¢ç›ŠQ2.6æ ¼å¼
+//int8 far DECGainSpe = 0x80;              //å–‡å­çŠ¶æ€ä¸‹é»˜è®¤DECå¢ç›ŠQ2.6æ ¼å¼
 const uint8 KALAEQtemp[4][10] =
 {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 1
@@ -25,7 +25,7 @@ const uint8 KALAEQtemp[4][10] =
     5, 2, 0, 0, 0, 0, 0, 6, 0, 0 // 4
 };
 const uint16 CH_strint[] =
-{ LEARNMOD, SINGMOD };//ÇĞ»»¿¨À­OKÄ£Ê½
+{ LEARNMOD, SINGMOD };//åˆ‡æ¢å¡æ‹‰OKæ¨¡å¼
 const uint16 karaoke_EQ[] =
 { SOUEFF1, SOUEFF2, SOUEFF3, SOUEFF4 };
 const uint8 adc_param[10] =
@@ -35,9 +35,9 @@ const uint8 adc_param[10] =
  *****************************************************************************************************************
  *             void openMicRoute(char micgain)
  *
- * Description : ´ò¿ªMICÍ¨Â·£¬²¢¸ù¾İmicgainÉè¶¨MICÔöÒæ
+ * Description : æ‰“å¼€MICé€šè·¯ï¼Œå¹¶æ ¹æ®micgainè®¾å®šMICå¢ç›Š
  *
- * Arguments   : micgain = 0~7£¨20db~40db£©
+ * Arguments   : micgain = 0~7ï¼ˆ20db~40dbï¼‰
  *
  *
  * Returns     : void
@@ -66,7 +66,7 @@ void OpenMicRoute(int16 gain)
  *****************************************************************************************************************
  *             void CloseMicRoute(char micgain)
  *
- * Description : ¹Ø±ÕMICÍ¨Â·
+ * Description : å…³é—­MICé€šè·¯
  *
  * Arguments   : NULL
  *
@@ -86,9 +86,9 @@ void CloseMicRoute(void)
  ********************************************************************************
  *             void acc_vol_callback(int8 CNT)
  *
- * Description : »Øµ÷º¯Êı£¬ÉèÖÃ¿¨À­OK°éÒôµÈ¼¶
+ * Description : å›è°ƒå‡½æ•°ï¼Œè®¾ç½®å¡æ‹‰OKä¼´éŸ³ç­‰çº§
  *
- * Arguments   :int8 Vol  °éÒôµÈ¼¶(-1 ~ 1)
+ * Arguments   :int8 Vol  ä¼´éŸ³ç­‰çº§(-1 ~ 1)
  *
  * Returns     :
  *
@@ -117,10 +117,10 @@ void acc_vol_callback(int16 vol)
  *****************************************************************************************************************
  *             void SpeechMute(bool flag)
  *
- * Description : ´ò¿ª»ò¹Ø±ÕÈËÉùÏû³ıµçÂ·
+ * Description : æ‰“å¼€æˆ–å…³é—­äººå£°æ¶ˆé™¤ç”µè·¯
  *
- * Arguments   : flag = 0 ¹Ø±ÕÈËÉùÏû³ıµçÂ·
- *               flag = 1 ´ò¿ªÈËÉùÏû³ıµçÂ·
+ * Arguments   : flag = 0 å…³é—­äººå£°æ¶ˆé™¤ç”µè·¯
+ *               flag = 1 æ‰“å¼€äººå£°æ¶ˆé™¤ç”µè·¯
  *
  * Returns     : void
  *
@@ -133,15 +133,15 @@ void SpeechMute(uint16 flag)
     //uint8 sfr_bak;
     //sfr_bak = SFR_BANK;
     //SFR_BANK = BANK_AUIP;
-    if (flag == 0) //Ñ§Ï°Ä£Ê½, ¹Ø±ÕÈËÉùÏû³ı
+    if (flag == 0) //å­¦ä¹ æ¨¡å¼, å…³é—­äººå£°æ¶ˆé™¤
     {
         //DAC_CTL3 &= 0xbf;
         sCaraokeDisable();
     }
-    else //Ñİ³ªÄ£Ê½, ´ò¿ªÈËÉùÏû³ı
+    else //æ¼”å”±æ¨¡å¼, æ‰“å¼€äººå£°æ¶ˆé™¤
     {
         //DAC_CTL3 |= 0x40;
-        /* »ñÈ¡µ±Ç°¸èÇú²ÉÑùÂÊ */
+        /* è·å–å½“å‰æ­Œæ›²é‡‡æ ·ç‡ */
         musicpSendCommand(MC_GETSAPLE, (void *) (&g_Openparam.current_samplerate));
         sCaraokeEnable(g_Openparam.current_samplerate, 1);
     }
@@ -151,9 +151,9 @@ void SpeechMute(uint16 flag)
  *****************************************************************************************************************
  *             void setDECGain(int8 DecGain)
  *
- * Description : ÉèÖÃDECµÄÔöÒæ£¬ÔÚ¿¨À­OK×´Ì¬ÏÂµ÷½Ú°é×àÒôÁ¿
+ * Description : è®¾ç½®DECçš„å¢ç›Šï¼Œåœ¨å¡æ‹‰OKçŠ¶æ€ä¸‹è°ƒèŠ‚ä¼´å¥éŸ³é‡
  *
- * Arguments   : DecGain  ,USE Q4.20¸ñÊ½
+ * Arguments   : DecGain  ,USE Q4.20æ ¼å¼
  *
  * Returns     : void
  *
@@ -177,10 +177,10 @@ void setDECGain(uint8 DecGain)
  *****************************************************************************************************************
  *             void SetCaraokeEq(int8 eqmode,int8 eqval)
  *
- * Description : ¿¨À­OKÄ£Ê½ÏÂµÄ£Å£Ñ
+ * Description : å¡æ‹‰OKæ¨¡å¼ä¸‹çš„ï¼¥ï¼±
  *
- * Arguments   :  int8 eqmode  :Ìá¹©0~6¹²7¸öÆµ¶Î¹©EQÉèÖÃ
- *                int8 eqval µ±Ç°Æµ¶ÎµÄEQÊıÖµ
+ * Arguments   :  int8 eqmode  :æä¾›0~6å…±7ä¸ªé¢‘æ®µä¾›EQè®¾ç½®
+ *                int8 eqval å½“å‰é¢‘æ®µçš„EQæ•°å€¼
  * Returns     : void
  *
  * Notes       :
@@ -216,9 +216,9 @@ void setDECGain(uint8 DecGain)
  *****************************************************************************************************************
  *             void SetCaraokeEq(BYTE eqmode,BYTE eqval)
  *
- * Description : ¿¨À­OKÄ£Ê½ÏÂµÄ£Å£Ñ
+ * Description : å¡æ‹‰OKæ¨¡å¼ä¸‹çš„ï¼¥ï¼±
  *
- * Arguments   :  BYTE eqmode  :Ìá¹©0~3¹²4¸öÆµ¶Î¹©EQÄ£Ê½ÉèÖÃ ÉèÖÃ¹Ì¶¨µÄEQÖµ
+ * Arguments   :  BYTE eqmode  :æä¾›0~3å…±4ä¸ªé¢‘æ®µä¾›EQæ¨¡å¼è®¾ç½® è®¾ç½®å›ºå®šçš„EQå€¼
  *
  * Returns     : void
  *
@@ -247,11 +247,11 @@ void SetCaraokeEqMode(uint16 eqmode)
  *****************************************************************************************************************
  *             void SetVol(int8 volmode)
  *
- * Description : ´ò¿ªMICµçÂ·£¬²¢¸ù¾İVOLMODEÉè¶¨Ä¬ÈÏµÄMICÒôÁ¿ºÍDECÒôÁ¿
+ * Description : æ‰“å¼€MICç”µè·¯ï¼Œå¹¶æ ¹æ®VOLMODEè®¾å®šé»˜è®¤çš„MICéŸ³é‡å’ŒDECéŸ³é‡
  *
- * Arguments   : volmode£¬¸ù¾İvolmodeÅĞ¶Ïµ±Ç°ÊÇ¶ú»úÄ£Ê½»¹ÊÇÀ®°ÈÄ£Ê½£¬´Ó¶øÉèÖÃ²»Í¬µÄmic£¬dec²ÎÊı
- *               volmode = 0,»òÕß´óÓÚ2£¬¹Ø±Õmicin£¬½«dec VolÉèÖÃ³É²»½øĞĞ·Å´ó»òËõĞ¡
- *               volmode = 1£¬±íÊ¾À­¿¨OKÄ£Ê½
+ * Arguments   : volmodeï¼Œæ ¹æ®volmodeåˆ¤æ–­å½“å‰æ˜¯è€³æœºæ¨¡å¼è¿˜æ˜¯å–‡å­æ¨¡å¼ï¼Œä»è€Œè®¾ç½®ä¸åŒçš„micï¼Œdecå‚æ•°
+ *               volmode = 0,æˆ–è€…å¤§äº2ï¼Œå…³é—­micinï¼Œå°†dec Volè®¾ç½®æˆä¸è¿›è¡Œæ”¾å¤§æˆ–ç¼©å°
+ *               volmode = 1ï¼Œè¡¨ç¤ºæ‹‰å¡OKæ¨¡å¼
  *
  * Returns     : void
  *
@@ -261,15 +261,15 @@ void SetCaraokeEqMode(uint16 eqmode)
  */
 void SetVol(int8 volmode)
 {
-    if (volmode == 0) //·Ç¿¨À­OKÄ£Ê½£¬Õı³£²¥·Å¸èÇú
+    if (volmode == 0) //éå¡æ‹‰OKæ¨¡å¼ï¼Œæ­£å¸¸æ’­æ”¾æ­Œæ›²
     {
-        CloseMicRoute(); //¹Ø±ÕMICÍ¨µÀ
+        CloseMicRoute(); //å…³é—­MICé€šé“
         acc_vol_callback(0);
     }
     else if (volmode == 1)
     {
         acc_vol_callback(g_music_vars.acc_vol);
-        OpenMicRoute(0x02); //´ò¿ªMicÍ¨µÀ²¢Éè¶¨ÆäÔöÒæÎªÄ¬ÈÏÔöÒæ
+        OpenMicRoute(0x02); //æ‰“å¼€Micé€šé“å¹¶è®¾å®šå…¶å¢ç›Šä¸ºé»˜è®¤å¢ç›Š
     }
     else
     {
@@ -282,12 +282,12 @@ void SetVol(int8 volmode)
  *****************************************************************************************************************
  *             void CaraokeEnable(int8 volmode)
  *
- * Description : ´ò¿ªÈËÉùÏû³ıÄ£¿é£¬MicinÄ£¿é£¬²¢½«EQÉèÖÃ³É¿¨À­OKÄ£Ê½
+ * Description : æ‰“å¼€äººå£°æ¶ˆé™¤æ¨¡å—ï¼ŒMicinæ¨¡å—ï¼Œå¹¶å°†EQè®¾ç½®æˆå¡æ‹‰OKæ¨¡å¼
  *
- * Arguments   : volmode£¬¸ù¾İvolmodeÅĞ¶Ïµ±Ç°ÊÇ¶ú»úÄ£Ê½»¹ÊÇÀ®°ÈÄ£Ê½£¬´Ó¶øÉèÖÃ²»Í¬µÄmic£¬dec²ÎÊı
- *               volmode = 0,¹Ø±Õmicin£¬½«dec VolÉèÖÃ³É²»½øĞĞ·Å´ó»òËõĞ¡
- *               volmode = 1£¬±íÊ¾À®°ÈÄ£Ê½
- *               volmode = 2£¬±íÊ¾¶ú»úÄ£Ê½
+ * Arguments   : volmodeï¼Œæ ¹æ®volmodeåˆ¤æ–­å½“å‰æ˜¯è€³æœºæ¨¡å¼è¿˜æ˜¯å–‡å­æ¨¡å¼ï¼Œä»è€Œè®¾ç½®ä¸åŒçš„micï¼Œdecå‚æ•°
+ *               volmode = 0,å…³é—­micinï¼Œå°†dec Volè®¾ç½®æˆä¸è¿›è¡Œæ”¾å¤§æˆ–ç¼©å°
+ *               volmode = 1ï¼Œè¡¨ç¤ºå–‡å­æ¨¡å¼
+ *               volmode = 2ï¼Œè¡¨ç¤ºè€³æœºæ¨¡å¼
  *
  * Returns     : void
  *
@@ -298,15 +298,15 @@ void SetVol(int8 volmode)
 void CaraokeEnable(int8 volmode)
 {
     SpeechMute(volmode);
-    SetVol(1); //¸ù¾İ¶ú»ú»òÕßÀ®°ÈÑ¡ÔñÄ¬ÈÏmicÒôÁ¿£¬Ä¬ÈÏdecÒôÁ¿
-    SetCaraokeEqMode(0); //Éè¶¨¿¨À­OK EQ
+    SetVol(1); //æ ¹æ®è€³æœºæˆ–è€…å–‡å­é€‰æ‹©é»˜è®¤micéŸ³é‡ï¼Œé»˜è®¤decéŸ³é‡
+    SetCaraokeEqMode(0); //è®¾å®šå¡æ‹‰OK EQ
 }
 
 /*
  *****************************************************************************************************************
  *             void CaraokeDisable()
  *
- * Description :ÍË³ö¿¨À­OKÄ£Ê½
+ * Description :é€€å‡ºå¡æ‹‰OKæ¨¡å¼
  *
  * Arguments   : void
  *
@@ -325,7 +325,7 @@ void deal_caraok_msg(void)
 {
     if (g_music_vars.karaoke_flag == 1)
     {
-        /* »ñÈ¡µ±Ç°¸èÇú²ÉÑùÂÊ */
+        /* è·å–å½“å‰æ­Œæ›²é‡‡æ ·ç‡ */
         musicpSendCommand(MC_GETSAPLE, (void *) (&g_Openparam.current_samplerate));
         sCaraokeEnable(g_Openparam.current_samplerate, 1);
     }
@@ -335,12 +335,12 @@ void deal_caraok_msg(void)
     }
 }
 /********************************************************************************
- * Description :´¦Àímic¿ª¹Ø¹¦ÄÜ
+ * Description :å¤„ç†micå¼€å…³åŠŸèƒ½
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
 
  *

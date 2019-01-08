@@ -34,8 +34,8 @@ stmt  level    source
    22          extern uint8 fselError; // store error id;
    23          extern int8 fselDiskLetter;
    24          extern int8 fselDirLayer; //dir  layer
-   25          extern uint16 fselFileNoInDisk;// ÎÄ¼şÔÚÈ«ÅÌµÄĞòºÅ
-   26          extern uint16 fselTotalInDisk;// È«ÅÌÎÄ¼ş×ÜÊı
+   25          extern uint16 fselFileNoInDisk;// æ–‡ä»¶åœ¨å…¨ç›˜çš„åºå·
+   26          extern uint16 fselTotalInDisk;// å…¨ç›˜æ–‡ä»¶æ€»æ•°
    27          extern bool select_file_begin_flag;
    28          extern uint16 fselDirNoInDisk;
    29          
@@ -79,13 +79,13 @@ stmt  level    source
    65   1          uint8 dir_buf[74];
    66   1          ClearWatchDog();
    67   1      
-   68   1          /*¼ÓÈëÇı¶¯³õÊ¼»¯´úÂë£¬½â¾ö²å¿¨°Î³öÊ±µ÷ÓÃ½Ó¿ÚËÀ»úµÄÎÊÌâ*/
+   68   1          /*åŠ å…¥é©±åŠ¨åˆå§‹åŒ–ä»£ç ï¼Œè§£å†³æ’å¡æ‹”å‡ºæ—¶è°ƒç”¨æ¥å£æ­»æœºçš„é—®é¢˜*/
    69   1          if (!DRV_ActiveDrive(location->disk, 1))
    70   1          {
    71   2              fselError = FSEL_ERR_DISK;
    72   2              return FALSE;
    73   2          }
-   74   1          if(FALSE == FS_CD(":")) //±ÜÃâ´¦ÓÚ×îºóµÄÄ¿Â¼ÏîÊ±µ÷ÓÃFS_SetCurDir³ö´í
+   74   1          if(FALSE == FS_CD(":")) //é¿å…å¤„äºæœ€åçš„ç›®å½•é¡¹æ—¶è°ƒç”¨FS_SetCurDirå‡ºé”™
    75   1          {
    76   2              fselError = FSEL_ERR_SETDIR;
    77   2              return FALSE;
@@ -101,7 +101,7 @@ stmt  level    source
    87   2          }
    88   1          FS_SetCurDir_layer(dir_buf);
    89   1      
-   90   1          //ÒÑ¾­ÉèÖÃºÃÎÄ¼ş¼ĞµÄÂ·¾¶ÁË
+   90   1          //å·²ç»è®¾ç½®å¥½æ–‡ä»¶å¤¹çš„è·¯å¾„äº†
    91   1          if (!FS_SetCurDir(location->ClusterNo))
    92   1          {
    93   2              fselError = FSEL_ERR_SETDIR;
@@ -131,12 +131,12 @@ stmt  level    source
   117   1          {
   118   2              GetNumByLocation(location);
   119   2              fselFileNoInDisk = fselFileNoInDisk + location->fselFileNo;
-  120   2              FS_SetCurDirEntry(location->DirEntry);  //»Øµ½¸Õ²ÅµÄÎÄ¼ş
+  120   2              FS_SetCurDirEntry(location->DirEntry);  //å›åˆ°åˆšæ‰çš„æ–‡ä»¶
   121   2          }
   122   1      
 C251 COMPILER V4.55,  enhanced_selector_sub                                                13/12/18  16:27:39  PAGE 3   
 
-  123   1          select_file_begin_flag = FALSE;     //¶Ïµã´æÔÚÔò²»´ÓµÚÒ»Ê×¿ªÊ¼²¥
+  123   1          select_file_begin_flag = FALSE;     //æ–­ç‚¹å­˜åœ¨åˆ™ä¸ä»ç¬¬ä¸€é¦–å¼€å§‹æ’­
   124   1          return TRUE;
   125   1      }
   126          
@@ -157,10 +157,10 @@ stmt  level    source
   141   1          ClearWatchDog();
   142   1      
   143   1          location->disk = fselDiskLetter;
-  144   1          location->ClusterNo = FS_GetCurDir();//µ±Ç°Ä¿Â¼ÏîÔÚÎÄ¼şÏµÍ³ÖĞµÄÆ«ÒÆ
-  145   1          location->DirEntry = FS_GetCurDirEntry();//ÎÄ¼şÏîÔÚµ±Ç°Ä¿Â¼ÏîÖĞµÄÆ«ÒÆ
+  144   1          location->ClusterNo = FS_GetCurDir();//å½“å‰ç›®å½•é¡¹åœ¨æ–‡ä»¶ç³»ç»Ÿä¸­çš„åç§»
+  145   1          location->DirEntry = FS_GetCurDirEntry();//æ–‡ä»¶é¡¹åœ¨å½“å‰ç›®å½•é¡¹ä¸­çš„åç§»
   146   1      
-  147   1          if (!FS_GetName(location->filename, 0)) //»ñÈ¡8+3¶ÌÃû
+  147   1          if (!FS_GetName(location->filename, 0)) //è·å–8+3çŸ­å
   148   1          {
   149   2              return FALSE;
   150   2          }
@@ -174,10 +174,10 @@ stmt  level    source
   158   1          ClearWatchDog();
   159   1      
   160   1          location->disk = fselDiskLetter;
-  161   1          location->ClusterNo = FS_GetCurDir();//µ±Ç°Ä¿Â¼ÏîÔÚÎÄ¼şÏµÍ³ÖĞµÄÆ«ÒÆ
-  162   1          location->DirEntry = FS_GetCurDirEntry();//ÎÄ¼şÏîÔÚµ±Ç°Ä¿Â¼ÏîÖĞµÄÆ«ÒÆ
+  161   1          location->ClusterNo = FS_GetCurDir();//å½“å‰ç›®å½•é¡¹åœ¨æ–‡ä»¶ç³»ç»Ÿä¸­çš„åç§»
+  162   1          location->DirEntry = FS_GetCurDirEntry();//æ–‡ä»¶é¡¹åœ¨å½“å‰ç›®å½•é¡¹ä¸­çš„åç§»
   163   1      
-  164   1          if (!FS_GetName(location->filename, 0)) //»ñÈ¡8+3¶ÌÃû
+  164   1          if (!FS_GetName(location->filename, 0)) //è·å–8+3çŸ­å
   165   1          {
   166   2              return FALSE;
   167   2          }

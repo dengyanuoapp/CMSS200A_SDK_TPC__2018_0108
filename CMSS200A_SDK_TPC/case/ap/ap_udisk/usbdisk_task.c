@@ -38,9 +38,9 @@ void MsgManager(uint8 dispIndi)
     }
 
     i = GetSysMsg();
-    if (i == Msg_KeyPower) //MODE¼ü¹¦ÄÜ  UHOST¡¢CARD¡¢FM¡¢USBAUDIO¡¢UDISKUSB  Ñ­»·ÇĞ»»
+    if (i == Msg_KeyPower) //MODEé”®åŠŸèƒ½  UHOSTã€CARDã€FMã€USBAUDIOã€UDISKUSB  å¾ªç¯åˆ‡æ¢
     {
-        // ¶ÔÓ¦ºìÍâÒ£¿ØÉÏÃæµÄPower¼ü
+        // å¯¹åº”çº¢å¤–é¥æ§ä¸Šé¢çš„Poweré”®
         IRUSBExit = 1;
         return;
     }
@@ -51,7 +51,7 @@ void MsgManager(uint8 dispIndi)
         return;
     }
 #endif
-	else if (i == Msg_KeyMenu) //ÊÕµ½Menu¼ü
+	else if (i == Msg_KeyMenu) //æ”¶åˆ°Menué”®
     {
 #ifdef  BACKLIGHTCTL
         if(UdiskStatus == 0)
@@ -92,22 +92,22 @@ void MsgManager(uint8 dispIndi)
         g_rtc_counter = 0;
         if (!g_light_flag)
         {
-            LightOnOff(TRUE);//¿ª¹Ø±³¹â£¨TRUE: ¿ª, FALSE:¹Ø)
+            LightOnOff(TRUE);//å¼€å…³èƒŒå…‰ï¼ˆTRUE: å¼€, FALSE:å…³)
             g_light_flag = TRUE;
         }
     }
 #endif
 
-    else if ((i == MSG_RTC2HZ) && (dispIndi < 0x10)) //dispIndi>=0x10£¬Éı¼¶×´Ì¬,²»ÄÜµ÷ÓÃÉæ¼°µ½¶ÁflashSDÇøµÄ²Ù×ö.
+    else if ((i == MSG_RTC2HZ) && (dispIndi < 0x10)) //dispIndi>=0x10ï¼Œå‡çº§çŠ¶æ€,ä¸èƒ½è°ƒç”¨æ¶‰åŠåˆ°è¯»flashSDåŒºçš„æ“åš.
     {
 #ifdef  BACKLIGHTCTL
         g_rtc_counter++;
-        if(g_rtc_counter >= 120) //×Ô¶¯¹Ø±³¹â
+        if(g_rtc_counter >= 120) //è‡ªåŠ¨å…³èƒŒå…‰
 
         {
-            //¹Ø±³¹â
+            //å…³èƒŒå…‰
             g_rtc_counter = 130;
-            LightOnOff(FALSE); //¿ª¹Ø±³¹â£¨true: ¿ª, false:¹Ø)
+            LightOnOff(FALSE); //å¼€å…³èƒŒå…‰ï¼ˆtrue: å¼€, false:å…³)
             g_light_flag = FALSE;
         }
 #endif
@@ -123,7 +123,7 @@ void Display(uint8 dispIndi)
     uint8 IE0Bak;
     dispIndi = dispIndi;
     IE0Bak = IE0;
-    IE0 = IE0 & 0x7f; //ÏÔÊ¾Ê±²»¿ªÖĞ¶Ï£¬±ÜÃâµÍÆµÅÜÖĞ¶Ï·şÎñ£¨ÏÂÃæ´úÂë»á½µÆµ£©£¬½µµÍĞ§ÂÊ
+    IE0 = IE0 & 0x7f; //æ˜¾ç¤ºæ—¶ä¸å¼€ä¸­æ–­ï¼Œé¿å…ä½é¢‘è·‘ä¸­æ–­æœåŠ¡ï¼ˆä¸‹é¢ä»£ç ä¼šé™é¢‘ï¼‰ï¼Œé™ä½æ•ˆç‡
 
     if (dispIndi < 0x10)
     {
@@ -134,7 +134,7 @@ void Display(uint8 dispIndi)
         }
 
 #if 0
-        if(dispIndi == 0x00) //ÏÔÊ¾ÈÎÎñÖ¸Ê¾ 0:ÎŞÏÔÊ¾¶¯×÷  01:ÉÏ´«  02:ÏÂ´«  03:´«Êä½áÊø
+        if(dispIndi == 0x00) //æ˜¾ç¤ºä»»åŠ¡æŒ‡ç¤º 0:æ— æ˜¾ç¤ºåŠ¨ä½œ  01:ä¸Šä¼   02:ä¸‹ä¼   03:ä¼ è¾“ç»“æŸ
 
         {
             ResShowPic(UDISKRDY, 0, 16);
@@ -153,7 +153,7 @@ void Display(uint8 dispIndi)
     {
     }
 
-    IE0 = IE0Bak; //»Ö¸´ÖĞ¶Ï
+    IE0 = IE0Bak; //æ¢å¤ä¸­æ–­
 #endif
 }
 

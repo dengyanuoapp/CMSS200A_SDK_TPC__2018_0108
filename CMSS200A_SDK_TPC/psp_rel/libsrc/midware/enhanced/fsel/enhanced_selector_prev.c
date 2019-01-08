@@ -24,8 +24,8 @@ extern uint8 fselType; //Type of select,  Music or voice.
 extern uint8 fselError; // store error id;
 extern int8 fselDiskLetter;
 extern int8 fselDirLayer; //dir  layer
-extern uint16 fselFileNoInDisk;// ÎÄ¼şÔÚÈ«ÅÌµÄĞòºÅ
-extern uint16 fselTotalInDisk;// È«ÅÌÎÄ¼ş×ÜÊı
+extern uint16 fselFileNoInDisk;// æ–‡ä»¶åœ¨å…¨ç›˜çš„åºå·
+extern uint16 fselTotalInDisk;// å…¨ç›˜æ–‡ä»¶æ€»æ•°
 extern uint16 CurDirFileNum;
 extern uint16 fselDirNoInDisk;
 extern uint16 fselTotalDir;
@@ -68,7 +68,7 @@ static bool ReadDir();
 #pragma renamecode(MW_EH_FSEL_PREV)
 
 /********************************************************************************
- * Description : PREV²Ù×÷»ñÈ¡ºó×ºÃûBUFFERµÄµØÖ·
+ * Description : PREVæ“ä½œè·å–åç¼€åBUFFERçš„åœ°å€
  *
  * Arguments  :  None
  * Returns     :  the buffer of current file extend name
@@ -94,7 +94,7 @@ const uint8 *GetExtBuf_Prev(void)
 }
 
 /********************************************************************************
- * Description : PREV²Ù×÷»ñÈ¡ºó×ºÃûµÄ¸öÊı£¬ÀıÈçMUSICÖ§³ÖWMA MP3 WAVÒ»ÆğDIR
+ * Description : PREVæ“ä½œè·å–åç¼€åçš„ä¸ªæ•°ï¼Œä¾‹å¦‚MUSICæ”¯æŒWMA MP3 WAVä¸€èµ·DIR
  *
  * Arguments  :  None
  * Returns     :  the buffer of current file extend name
@@ -121,7 +121,7 @@ uint8 GetExtSize_Prev(void)
 
 
 /********************************************************************************
- * Description : »ñµÃµ±Ç°Ä¿Â¼µÄÄ³ÖÖÀàĞÍÎÄ¼şµÄ×ÜÊı
+ * Description : è·å¾—å½“å‰ç›®å½•çš„æŸç§ç±»å‹æ–‡ä»¶çš„æ€»æ•°
  * Arguments  :
  *            strDir: Dos 8.3 directory name
  *            bCheckValidDir: if check valid directory only
@@ -158,7 +158,7 @@ static uint16 ScanCurDir_FileNum(uint8 *strFile)
 
 /********************************************************************************
  * Description : select the next file and get the file name
- *ÏòÄ¿Â¼Ê×·½Ïò»ñÈ¡ÉÏÒ»¸öÎÄ¼ş
+ *å‘ç›®å½•é¦–æ–¹å‘è·å–ä¸Šä¸€ä¸ªæ–‡ä»¶
  ********************************************************************************/
 bool SelectPrevFile(uint8 *strFile)
 {
@@ -167,7 +167,7 @@ bool SelectPrevFile(uint8 *strFile)
 }
 
 /********************************************************************************
- * Description : Ñ¡ÔñÉÏÒ»¸öÎÄ¼ş¼Ğ
+ * Description : é€‰æ‹©ä¸Šä¸€ä¸ªæ–‡ä»¶å¤¹
  *
  * Arguments  : none
  *
@@ -184,9 +184,9 @@ bool fselPrevDir(uint8 *strDir)
 }
 
 /********************************************************************************
- * Description : Ò»°ãPREV²Ù×÷½øÈëµ½Ò»¸ö×ÓÄ¿Â¼£¬ ¾ÍĞèÒª¶¨Î»µ½×îºóµÄÎÄ¼ş¼Ğ
+ * Description : ä¸€èˆ¬PREVæ“ä½œè¿›å…¥åˆ°ä¸€ä¸ªå­ç›®å½•ï¼Œ å°±éœ€è¦å®šä½åˆ°æœ€åçš„æ–‡ä»¶å¤¹
  *
- * Arguments  : 	ÒòÎªÊÂÏÈ²»ÖªµÀ×Ü¹²¼¸¸öÄ¿Â¼£¬ËùÒÔĞèÒª´ÓÍ·¿ªÊ¼DIR
+ * Arguments  : 	å› ä¸ºäº‹å…ˆä¸çŸ¥é“æ€»å…±å‡ ä¸ªç›®å½•ï¼Œæ‰€ä»¥éœ€è¦ä»å¤´å¼€å§‹DIR
  strDir:output Dir name
  * Returns    :
  TRUE: Successful
@@ -208,7 +208,7 @@ bool SelLastDir(uint8 *strDir)
 }
 
 /********************************************************************************
- *Ñ¡ÔñÉÏÒ»¸öÎÄ¼ş
+ *é€‰æ‹©ä¸Šä¸€ä¸ªæ–‡ä»¶
  ********************************************************************************/
 
 bool SelectPrev_8Layer(uint8 *strFile)
@@ -218,20 +218,20 @@ bool SelectPrev_8Layer(uint8 *strFile)
 
     if (!SelectPrevFile(strFile))
     {
-        //¼ì²é¸¸Ä¿Â¼.
+        //æ£€æŸ¥çˆ¶ç›®å½•.
 ParentDiragainNext:
         ClearWatchDog();
         if (FALSE != FS_DirParPrev())
         {
             fselDirLayer--;
-            if (FALSE != fselPrevDir(strDir)) //Æ½¼¶Ä¿Â¼µÄÇ°Ò»¸öÄ¿Â¼
+            if (FALSE != fselPrevDir(strDir)) //å¹³çº§ç›®å½•çš„å‰ä¸€ä¸ªç›®å½•
             {
                 goto CurrentDiragainNext;
-                //Æ½¼¶¹ıÈ¥±£Ö¤LAYER²»»á´óÓÚ7
+                //å¹³çº§è¿‡å»ä¿è¯LAYERä¸ä¼šå¤§äº7
             }
             else
             {
-                //µ±Ç°Ä¿Â¼ÏÂÓĞĞ§µÄÎÄ¼ş
+                //å½“å‰ç›®å½•ä¸‹æœ‰æ•ˆçš„æ–‡ä»¶
                 if (FALSE == FS_DirLast())
                 {
                     return FALSE;
@@ -242,7 +242,7 @@ ParentDiragainNext:
                     fselDirNoInDisk--;
                     return TRUE;
                 }
-                //  µ±Ç°Ä¿Â¼·ÖÖ§Ã»ÓĞºÏÊÊµÄÎÄ¼ş,ÍË»ØÉÏ¼¶Ä¿Â¼
+                //  å½“å‰ç›®å½•åˆ†æ”¯æ²¡æœ‰åˆé€‚çš„æ–‡ä»¶,é€€å›ä¸Šçº§ç›®å½•
                 goto ParentDiragainNext;
             }
         }
@@ -251,16 +251,16 @@ ParentDiragainNext:
             fselError = FSEL_ERR_OUTOF;
             return FALSE;
         }
-        //Ñ°ÕÒµ±Ç°Ä¿Â¼ÏÂµÄËùÓĞÄ¿Â¼
+        //å¯»æ‰¾å½“å‰ç›®å½•ä¸‹çš„æ‰€æœ‰ç›®å½•
 CurrentDiragainNext:
         ClearWatchDog();
         FS_CD(FS_CD_SON);
         fselDirLayer++;
 
-        if (FALSE != SelLastDir(strDir)) //ÏòÏÂ²éÕÒÄ¿Â¼
+        if (FALSE != SelLastDir(strDir)) //å‘ä¸‹æŸ¥æ‰¾ç›®å½•
         {
             goto CurrentDiragainNext;
-            //Ò»Ö±ÕÒµ½¾¡Í·
+            //ä¸€ç›´æ‰¾åˆ°å°½å¤´
         }
         else
         {
@@ -274,7 +274,7 @@ CurrentDiragainNext:
                 fselDirNoInDisk--;
                 return TRUE;
             }
-            //  µ±Ç°Ä¿Â¼·ÖÖ§Ã»ÓĞºÏÊÊµÄÎÄ¼ş,ÍË»ØÉÏ¼¶Ä¿Â¼
+            //  å½“å‰ç›®å½•åˆ†æ”¯æ²¡æœ‰åˆé€‚çš„æ–‡ä»¶,é€€å›ä¸Šçº§ç›®å½•
             goto ParentDiragainNext;
         }
     }
@@ -382,7 +382,7 @@ bool fselGetPrev(uint8 *strFile)
                 return TRUE;
             }
         }
-        else   //ĞèÒª´ÓµÚÒ»Ê×ÇĞ»»µ½×îºóÒ»Ê×
+        else   //éœ€è¦ä»ç¬¬ä¸€é¦–åˆ‡æ¢åˆ°æœ€åä¸€é¦–
         {
             if(dir_list_flag == 0)
             {
@@ -446,7 +446,7 @@ bool fselGetPrev(uint8 *strFile)
         {
             fselFileNoInDisk--;
         }
-        else    //ÒÑ¾­µ½µ±Ç°Ä¿Â¼µÚÒ»Ê×¸è£¬·µ»ØÄ¿Â¼Î²¿ªÊ¼
+        else    //å·²ç»åˆ°å½“å‰ç›®å½•ç¬¬ä¸€é¦–æ­Œï¼Œè¿”å›ç›®å½•å°¾å¼€å§‹
         {
             FS_DirLast();
             if(!FS_DirPrev(strFile, GetExtBuf_Prev(), FS_DIR_FILE_CONT, GetExtSize_Prev()))
@@ -467,7 +467,7 @@ bool fselGetPrev(uint8 *strFile)
 /********************************************************************************
  * Description : Select the last folder file
  *
- * Ö»Ğè»»ÎÄ¼ş¼Ğ¾Í¿ÉÒÔÁË
+ * åªéœ€æ¢æ–‡ä»¶å¤¹å°±å¯ä»¥äº†
  ********************************************************************************/
 bool fselGetPrevFolder (uint8 *strFile)
 {
@@ -485,7 +485,7 @@ bool fselGetPrevFolder (uint8 *strFile)
             break;
         }
     }
-    if(!fselGetPrev(strFile))   //ÇĞ»»µ½ÉÏÒ»Ä¿Â¼×îºóÒ»¸öÎÄ¼ş
+    if(!fselGetPrev(strFile))   //åˆ‡æ¢åˆ°ä¸Šä¸€ç›®å½•æœ€åä¸€ä¸ªæ–‡ä»¶
     {
         fselMode = mode;
         return FALSE;

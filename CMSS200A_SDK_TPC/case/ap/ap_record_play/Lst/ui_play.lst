@@ -31,9 +31,9 @@ stmt  level    source
    21   1          uint8 key;
    22   1      
    23   1          memset(&BreakPTSave, 0, sizeof(breakPT_t));
-   24   1          g_Openparam.filename = g_record_vars.location.filename;//ÎÄ¼şÃûµØÖ·
-   25   1          g_Openparam.BreakPTSave = &BreakPTSave;//±¸·İ²ÎÊıµØÖ·
-   26   1          g_Openparam.typeerror = 0;//Ä¬ÈÏÎªÕı³£¸ñÊ½ÎÄ¼ş
+   24   1          g_Openparam.filename = g_record_vars.location.filename;//æ–‡ä»¶ååœ°å€
+   25   1          g_Openparam.BreakPTSave = &BreakPTSave;//å¤‡ä»½å‚æ•°åœ°å€
+   26   1          g_Openparam.typeerror = 0;//é»˜è®¤ä¸ºæ­£å¸¸æ ¼å¼æ–‡ä»¶
    27   1          g_Openparam.SoftVolumeMax = 0;
    28   1          g_Openparam.FadeInTime = 0x03;
    29   1      #ifndef MUSIC_MP3
@@ -46,7 +46,7 @@ stmt  level    source
    36   2              goto play_exit;
    37   2          }
    38   1          if((g_record_vars.location.disk != 'M') && \
-   39   1                  (FALSE == FS_CD(FS_CD_ROOT))) //±ÜÃâ´¦ÓÚ×îºóµÄÄ¿Â¼ÏîÊ±µ÷ÓÃFS_SetCurDir³ö´í
+   39   1                  (FALSE == FS_CD(FS_CD_ROOT))) //é¿å…å¤„äºæœ€åçš„ç›®å½•é¡¹æ—¶è°ƒç”¨FS_SetCurDirå‡ºé”™
    40   1          {
    41   2              result = RESULT_MAIN;
    42   2              goto play_exit;
@@ -166,9 +166,9 @@ stmt  level    source
   152          
   153          /*
   154           ********************************************************************************
-  155           * Description : ÏÔÊ¾µ±Ç°µÄÊ±¼ä
+  155           * Description : æ˜¾ç¤ºå½“å‰çš„æ—¶é—´
   156           *
-  157           * Arguments   : mode   Ë¢ĞÂÄ£Ê½  0--Ö»Ë¢µ±Ç°Ê±¼ä   1--Ë¢µ±Ç°Ê±¼äºÍÊ£Óà¿ÉÂ¼Ê±¼ä
+  157           * Arguments   : mode   åˆ·æ–°æ¨¡å¼  0--åªåˆ·å½“å‰æ—¶é—´   1--åˆ·å½“å‰æ—¶é—´å’Œå‰©ä½™å¯å½•æ—¶é—´
   158           *
   159           * Returns     :  NULL
   160           *
@@ -183,8 +183,8 @@ stmt  level    source
   169   1          uint8 temp_buffer[5];
   170   1      
   171   1      #ifdef MUSIC_MP3
-                   if (mp3pSendCommand(MC_GETTIME, (void *)&curtime_buf) == 0) //Ö±½Óµ÷ÓÃapSendCommand·ÀÖ¹ÇĞbank£¨AP_UI_
-             -PLY±¾Éí±»ÇĞ³öÈ¥£©£¬ÔÚ¸ß±ÈÌØÂÊ¸èÇúÊ±·ÀÖ¹ÓĞ¿¨ÒôÏÖÏó
+                   if (mp3pSendCommand(MC_GETTIME, (void *)&curtime_buf) == 0) //ç›´æ¥è°ƒç”¨apSendCommandé˜²æ­¢åˆ‡bankï¼ˆAP_UI_
+             -PLYæœ¬èº«è¢«åˆ‡å‡ºå»ï¼‰ï¼Œåœ¨é«˜æ¯”ç‰¹ç‡æ­Œæ›²æ—¶é˜²æ­¢æœ‰å¡éŸ³ç°è±¡
                #else
   174   1          if (wavpSendCommand(MC_GETTIME, (void *)&curtime_buf) == 0)
   175   1      #endif
@@ -205,7 +205,7 @@ stmt  level    source
 C251 COMPILER V4.55,  ui_play                                                              23/05/16  10:42:44  PAGE 4   
 
   190           ********************************************************************************
-  191           * Description : UI½çÃæÏÔÊ¾
+  191           * Description : UIç•Œé¢æ˜¾ç¤º
   192           *
   193           * Arguments   : NULL
   194           *
@@ -222,7 +222,7 @@ stmt  level    source
   205   1          LEDDisplay(LED_PAUSE, 0xff, 0);
   206   1          LEDDisplay(LED_PLAY, 0xff, 1);
   207   1      
-  208   1          /*  ÏÔÊ¾Â¼ÒôÄ¿±ê´æ´¢½éÖÊ */
+  208   1          /*  æ˜¾ç¤ºå½•éŸ³ç›®æ ‡å­˜å‚¨ä»‹è´¨ */
   209   1          if(g_record_vars.location.disk == 'M')
   210   1          {
   211   2              LEDDisplay(LED_USB, 0xff, 0);
@@ -256,18 +256,18 @@ stmt  level    source
   239           ********************************************************************************
   240           *             void deal_play_status(void)
   241           *
-  242           * Description : ´¦Àí²¥·Å¹ı³ÌÖĞµÄÒì³£Çé¿ö
+  242           * Description : å¤„ç†æ’­æ”¾è¿‡ç¨‹ä¸­çš„å¼‚å¸¸æƒ…å†µ
   243           *
   244           *
   245           * Arguments   : void
   246           *
   247           * Returns     : void
   248           *
-  249           * Notes       :1.Èç¹û·Ç²¥·Å×´Ì¬ÏÂ£¬ÔòÖ±½Ó·µ»Ø
-  250           *                         2.Èç¹û²¥·Å³ö´í£¬Ôò×ªµ½³ö´í´¦Àíº¯Êı´¦Àí
-  251           *                         3.Èç¹û²¥·Åµ½Î²£¬Ôò×ªµ½ÎÄ¼şÎ²´¦Àíº¯Êı´¦Àí
-  252           *                         4.Èç¹û²¥·Åµ½Í·£¬Ôò×ªµ½ÎÄ¼şÍ·´¦Àíº¯Êı´¦Àí
-  253           *                         5.Õı³£Çé¿öÏÂ²»¶ÏË¢ĞÂ²¥·ÅÊ±¼ä
+  249           * Notes       :1.å¦‚æœéæ’­æ”¾çŠ¶æ€ä¸‹ï¼Œåˆ™ç›´æ¥è¿”å›
+  250           *                         2.å¦‚æœæ’­æ”¾å‡ºé”™ï¼Œåˆ™è½¬åˆ°å‡ºé”™å¤„ç†å‡½æ•°å¤„ç†
+  251           *                         3.å¦‚æœæ’­æ”¾åˆ°å°¾ï¼Œåˆ™è½¬åˆ°æ–‡ä»¶å°¾å¤„ç†å‡½æ•°å¤„ç†
+  252           *                         4.å¦‚æœæ’­æ”¾åˆ°å¤´ï¼Œåˆ™è½¬åˆ°æ–‡ä»¶å¤´å¤„ç†å‡½æ•°å¤„ç†
+  253           *                         5.æ­£å¸¸æƒ…å†µä¸‹ä¸æ–­åˆ·æ–°æ’­æ”¾æ—¶é—´
   254           ********************************************************************************
   255           */
 C251 COMPILER V4.55,  ui_play                                                              23/05/16  10:42:44  PAGE 5   
@@ -277,8 +277,8 @@ stmt  level    source
   258   1          uint8 retval = 0;
   259   1          music_play_status_t status_buf;
   260   1      
-  261   1          apSendCommand(MC_GETSTATUS, Music_WAV, (void *)(&status_buf)); //Ö±½Óµ÷ÓÃapSendCommand·ÀÖ¹ÇĞbank£¨AP_
-             -UI_PLY±¾Éí±»ÇĞ³öÈ¥£©£¬ÔÚ¸ß±ÈÌØÂÊ¸èÇúÊ±·ÀÖ¹ÓĞ¿¨ÒôÏÖÏó
+  261   1          apSendCommand(MC_GETSTATUS, Music_WAV, (void *)(&status_buf)); //ç›´æ¥è°ƒç”¨apSendCommandé˜²æ­¢åˆ‡bankï¼ˆAP_
+             -UI_PLYæœ¬èº«è¢«åˆ‡å‡ºå»ï¼‰ï¼Œåœ¨é«˜æ¯”ç‰¹ç‡æ­Œæ›²æ—¶é˜²æ­¢æœ‰å¡éŸ³ç°è±¡
   262   1          if (status_buf.status == PLAYING_ERROR)
   263   1          {
   264   2              ap_sleep(3);

@@ -12,7 +12,7 @@
 ********************************************************************************
 ********************************************************************************
 */
-#ifndef _KEY_H			//·ÀÖ¹ÖØ¶¨Òå
+#ifndef _KEY_H			//é˜²æ­¢é‡å®šä¹‰
 #define _KEY_H
 #include "actapi.h"
 #include "port.h"
@@ -139,12 +139,12 @@
 #define Msg_Keyautosleep  0x1e
 #define Msg_KeyUSBTest          0x1F
 
-#define Msg_KeyShortUp        0xC2    //¶Ì°´¼üÌ§Æğ 
-#define Msg_KeyLongUp         0xC3    //³¤°´¼üÌ§Æğ 
-#define Msg_KeyHold           0xC4        //±ÜÃâºÍMsg_KeyLoop|AP_KEY_UP³åÍ»£¬Mars£¬2008-04-16
+#define Msg_KeyShortUp        0xC2    //çŸ­æŒ‰é”®æŠ¬èµ· 
+#define Msg_KeyLongUp         0xC3    //é•¿æŒ‰é”®æŠ¬èµ· 
+#define Msg_KeyHold           0xC4        //é¿å…å’ŒMsg_KeyLoop|AP_KEY_UPå†²çªï¼ŒMarsï¼Œ2008-04-16
 #define Msg_KeyUnHold         0xC5
 #define Msg_HalfSecond        0xC6
-#define Msg_DeviceMsg        0xC7          //ÓĞ¿¨»òuÅÌ°Î²åÇé¿ö
+#define Msg_DeviceMsg        0xC7          //æœ‰å¡æˆ–uç›˜æ‹”æ’æƒ…å†µ
 #define Msg_NOKEY              0xFF
 /*define key message of ap  */
 #define AP_KEY_LONG       0x80
@@ -189,9 +189,9 @@
 
 
 #define AP_KEY_USBTEST Msg_KeyUSBTest
-#ifdef __A251__       //»ã±àÊ¹ÓÃµÄ¶¨Òå 
+#ifdef __A251__       //æ±‡ç¼–ä½¿ç”¨çš„å®šä¹‰ 
 
-////»ã±àµ÷ÓÃÍ¨¹ıºêµ÷ÓÃ
+////æ±‡ç¼–è°ƒç”¨é€šè¿‡å®è°ƒç”¨
 //mKY_HoldCheck  macro
 //        ld      hl,API_HoldCheck
 //        rst     RSTBankAPI
@@ -226,32 +226,32 @@
 //        rst        RSTBankAPI
 //        endm
 
-//#ifdef __IAR_SYSTEMS_ICC            //CÓïÑÔÊ¹ÓÃµÄ¶¨Òå
+//#ifdef __IAR_SYSTEMS_ICC            //Cè¯­è¨€ä½¿ç”¨çš„å®šä¹‰
 //
-//non_banked bool sKY_HoldCheck(void);        //TRUEÎªHOLD£¬FALSEÎªUNHOLD
-//non_banked bool sKY_SetBLightColor(char BLightColor);//ÉèÖÃ±³¹âÑÕÉ«¡£for s2 by ccm
-//non_banked bool    sKY_OpenBacklight(void);    //´ò¿ª±³¹â
-//non_banked bool    sKY_CloseBacklight(void);    //¹Ø±Õ±³¹â
-//non_banked bool sKY_ChargeSet(char Setting);    //¹Ø±Õ±³¹â
+//non_banked bool sKY_HoldCheck(void);        //TRUEä¸ºHOLDï¼ŒFALSEä¸ºUNHOLD
+//non_banked bool sKY_SetBLightColor(char BLightColor);//è®¾ç½®èƒŒå…‰é¢œè‰²ã€‚for s2 by ccm
+//non_banked bool    sKY_OpenBacklight(void);    //æ‰“å¼€èƒŒå…‰
+//non_banked bool    sKY_CloseBacklight(void);    //å…³é—­èƒŒå…‰
+//non_banked bool sKY_ChargeSet(char Setting);    //å…³é—­èƒŒå…‰
 //non_banked bool sKY_Beep(char value);           //key tone
-//non_banked char sKY_ChargeGetandSet(void);      //³äµç¼ì²â
+//non_banked char sKY_ChargeGetandSet(void);      //å……ç”µæ£€æµ‹
 //#endif /* __IAR_SYSTEMS_ICC */
 //
-//#ifdef __IAR_SYSTEMS_ASM        //»ã±àÊ¹ÓÃµÄ¶¨Òå
+//#ifdef __IAR_SYSTEMS_ASM        //æ±‡ç¼–ä½¿ç”¨çš„å®šä¹‰
 //
-////BANKA£¬º¯ÊıµÄµØÖ·
-//#define API_HoldCheck       0x0200 + API_KY_BaseNoA		//02µÄÈ¡Öµ¸ù¾İky_hard_bnkif.msaÖĞµÄÅÅÁĞ
+////BANKAï¼Œå‡½æ•°çš„åœ°å€
+//#define API_HoldCheck       0x0200 + API_KY_BaseNoA		//02çš„å–å€¼æ ¹æ®ky_hard_bnkif.msaä¸­çš„æ’åˆ—
 //#define	API_OpenBacklight	0x0300 + API_KY_BaseNoA
 //#define	API_CloseBacklight	0x0400 + API_KY_BaseNoA
 //#define API_ChargeSet          0x0600 + API_KY_BaseNoA
 //#define API_Beep                0x0700 + API_KY_BaseNoA
 //#define API_ChargeGetandSet                0x0001 + API_KY_BaseNoA
-////#define API_CardPowerOn      0x0101 + API_KY_BaseNoA        //ÔÚ"actapi.h"ÖĞ¶¨Òå
+////#define API_CardPowerOn      0x0101 + API_KY_BaseNoA        //åœ¨"actapi.h"ä¸­å®šä¹‰
 //#define API_CtcIRQIntercept       0x0201 + API_KY_BaseNoA
 //#define API_CtcIRQRelease        0x0301 + API_KY_BaseNoA
 //#define API_GetKeyTabAddress  0x0401 + API_KY_BaseNoA
 //
-////»ã±àµ÷ÓÃÍ¨¹ıºêµ÷ÓÃ
+////æ±‡ç¼–è°ƒç”¨é€šè¿‡å®è°ƒç”¨
 //mKY_HoldCheck  macro
 //        ld      hl,API_HoldCheck
 //        rst     RSTBankAPI

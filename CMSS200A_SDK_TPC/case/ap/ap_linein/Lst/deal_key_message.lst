@@ -37,7 +37,7 @@ stmt  level    source
    26   1          LEDClearScreen();
    27   1          while (1)
    28   1          {
-   29   2              if (need_draw) //ÆÁÄ»ÖØ»­
+   29   2              if (need_draw) //å±å¹•é‡ç”»
    30   2              {
    31   3                  ui_display();
    32   3                  need_draw = FALSE;
@@ -65,7 +65,7 @@ stmt  level    source
    54   3                  SetCurUI_Type(Linein_UI);
    55   3              }
    56   2              break;
-   57   2          case AP_KEY_PLAY | AP_KEY_UP: //play°´¼ü×÷·µ»Ø´¦Àí
+   57   2          case AP_KEY_PLAY | AP_KEY_UP: //playæŒ‰é”®ä½œè¿”å›å¤„ç†
 C251 COMPILER V4.55,  deal_key_message                                                     23/05/16  10:41:38  PAGE 2   
 
    58   2              if (CurUI_Type != Linein_UI)
@@ -74,11 +74,11 @@ stmt  level    source
    61   3              }
    62   2              break;
    63   2      
-   64   2          case AP_KEY_MODE | AP_KEY_UP: //APÇĞ»»ÈÈ¼ü
+   64   2          case AP_KEY_MODE | AP_KEY_UP: //APåˆ‡æ¢çƒ­é”®
    65   2              return RESULT_MAIN;
    66   2              break;
    67   2      
-   68   2          case AP_KEY_MUTE | AP_KEY_UP: //muteÉèÖÃ
+   68   2          case AP_KEY_MUTE | AP_KEY_UP: //muteè®¾ç½®
    69   2              mute_flag = !mute_flag;
    70   2              if (mute_flag)
    71   2              {
@@ -91,15 +91,15 @@ stmt  level    source
    78   2              SetCurUI_Type(Linein_UI);
    79   2              break;
    80   2      
-   81   2          case AP_KEY_VOL | AP_KEY_UP: //µ÷½ÚÒôÁ¿
+   81   2          case AP_KEY_VOL | AP_KEY_UP: //è°ƒèŠ‚éŸ³é‡
    82   2              key = Key_None;
    83   2              goto set_vol;
    84   2              break;
-   85   2          case AP_KEY_VOLADD| AP_KEY_UP: //µ÷½ÚÒôÁ¿
-   86   2          case AP_KEY_VOLADD| AP_KEY_LONG: //µ÷½ÚÒôÁ¿
+   85   2          case AP_KEY_VOLADD| AP_KEY_UP: //è°ƒèŠ‚éŸ³é‡
+   86   2          case AP_KEY_VOLADD| AP_KEY_LONG: //è°ƒèŠ‚éŸ³é‡
    87   2              key = Key_Next;
-   88   2          case AP_KEY_VOLSUB| AP_KEY_UP: //µ÷½ÚÒôÁ¿
-   89   2          case AP_KEY_VOLSUB| AP_KEY_LONG: //µ÷½ÚÒôÁ¿
+   88   2          case AP_KEY_VOLSUB| AP_KEY_UP: //è°ƒèŠ‚éŸ³é‡
+   89   2          case AP_KEY_VOLSUB| AP_KEY_LONG: //è°ƒèŠ‚éŸ³é‡
    90   2      set_vol:
    91   2              deal_vol_msg(key, Linein_UI);
    92   2              break;
@@ -162,7 +162,7 @@ stmt  level    source
   147   2              //        result = RESULT_MAIN;
   148   2              break;
   149   2      
-  150   2          default: //ÈÈ¼ü´¦Àí
+  150   2          default: //çƒ­é”®å¤„ç†
   151   2              result = ap_handle_hotkey_core(key);
   152   2              break;
   153   2          }

@@ -61,7 +61,7 @@ stmt  level    source
    47          #pragma renamecode(?PR?RCODE)
    48          #pragma ROM(HUGE)
    49          
-   50          //´Ë¶¨ÒåÎª±ÜÃâÆÁ±Îµô´òÓ¡ºó£¬udiskÓ¦ÓÃ±àÒë³£Á¿¶Î¶¨ÒåÎ´Ê¹ÓÃµ¼ÖÂµÄ±àÒë´íÎó¡£
+   50          //æ­¤å®šä¹‰ä¸ºé¿å…å±è”½æ‰æ‰“å°åï¼Œudiskåº”ç”¨ç¼–è¯‘å¸¸é‡æ®µå®šä¹‰æœªä½¿ç”¨å¯¼è‡´çš„ç¼–è¯‘é”™è¯¯ã€‚
    51          #ifndef _PRINT_DEBUG_
    52          const uint8 ConstSeg3 = 'A';
    53          #endif
@@ -152,13 +152,13 @@ stmt  level    source
              -*
   130           *                                           IfIsConnect
   131           *
-  132           * Description: ÅĞ¶ÏÊÇ·ñÁªÏß»ò´«ÊäTimeout, Èç¹ûÓĞÒì³£, ¾ÍÖ±½ÓÍË³öÖĞ¶Ï·şÎñ³ÌĞò.
+  132           * Description: åˆ¤æ–­æ˜¯å¦è”çº¿æˆ–ä¼ è¾“Timeout, å¦‚æœæœ‰å¼‚å¸¸, å°±ç›´æ¥é€€å‡ºä¸­æ–­æœåŠ¡ç¨‹åº.
   133           *
   134           * Arguments  : None.
   135           *
   136           * Returns    : None.
   137           *
-  138           * Note(s)    : Êı¾İ´«ÊäÊ§°ÜÊ±,PC»á·¢ËÍBus Resetµ½Ğ¡»ú;»òÕß¶ÁĞ´¹ı³ÌÖĞ°ÎÏß.
+  138           * Note(s)    : æ•°æ®ä¼ è¾“å¤±è´¥æ—¶,PCä¼šå‘é€Bus Resetåˆ°å°æœº;æˆ–è€…è¯»å†™è¿‡ç¨‹ä¸­æ‹”çº¿.
   139           ********************************************************************************************************
              -*
   140           */
@@ -198,9 +198,9 @@ stmt  level    source
   174   2              {
   175   3                  SFR_BANK = BANK_DMA0;
   176   3              }
-  177   2              //½«DMAÍ£Ö¹
+  177   2              //å°†DMAåœæ­¢
   178   2              DMAnCTL0 = DMA0CTL0 & (uint8) 0xfe;
-  179   2              //FIFOÖ±Í¨Ä£Ê½½áÊøºó¹Ø±ÕÖ±Í¨ÅäÖÃ£¬±ÜÃâDMAµÄÅäÖÃ´¦ÓÚfifoÖ±Í¨Ä£Ê½,µ¼ÖÂºóĞø´æ´¢½éÖÊ´¦ÀíÒì³£
+  179   2              //FIFOç›´é€šæ¨¡å¼ç»“æŸåå…³é—­ç›´é€šé…ç½®ï¼Œé¿å…DMAçš„é…ç½®å¤„äºfifoç›´é€šæ¨¡å¼,å¯¼è‡´åç»­å­˜å‚¨ä»‹è´¨å¤„ç†å¼‚å¸¸
   180   2              DMAnCTL1 = 0x00;
 C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 4   
 
@@ -208,7 +208,7 @@ stmt  level    source
   182   2      
   183   2              SFR_BANK = BANK_USB;
   184   2                      UDMAM = 0x0c;
-  185   2              //ÇåFIFOºÍEPAÖĞ¶ÏÎªÏÂÒ»¸öCBW×¼±¸
+  185   2              //æ¸…FIFOå’ŒEPAä¸­æ–­ä¸ºä¸‹ä¸€ä¸ªCBWå‡†å¤‡
   186   2              EPB_OutRdy_ShortPacketNAK();
   187   2          }
   188   1      
@@ -247,10 +247,10 @@ stmt  level    source
   219          {
   220   1          Usbirq_hcusbirq |= 0x10;
   221   1      
-  222   1          //Õı³£UdiskÃ¶¾ÙÖ»»á·¢ËÍÁ½´ÎReset,Ö®ºóµÄReset¾ùÎª´íÎóºóPC·¢ËÍµÄ
+  222   1          //æ­£å¸¸Udiskæšä¸¾åªä¼šå‘é€ä¸¤æ¬¡Reset,ä¹‹åçš„Resetå‡ä¸ºé”™è¯¯åPCå‘é€çš„
   223   1          usb_reset_enter_cnt++;
   224   1      
-  225   1          //·¢Éúbus resetºó¶Ô²¿·Ö±äÁ¿½øĞĞÖØÖÃ£¬½â¾ö´«ÊäÖĞ·¢Éúbus resetºóÍË³öuÅÌÎÊÌâ¡£
+  225   1          //å‘ç”Ÿbus resetåå¯¹éƒ¨åˆ†å˜é‡è¿›è¡Œé‡ç½®ï¼Œè§£å†³ä¼ è¾“ä¸­å‘ç”Ÿbus resetåé€€å‡ºuç›˜é—®é¢˜ã€‚
   226   1          Suspend_Flag = 0x00;
   227   1      
   228   1          ConfigValue = 0;
@@ -336,7 +336,7 @@ stmt  level    source
   301   2      #ifdef _PRINT_DEBUG_
                        prints("S1\n");
                #endif
-  304   2              //USB plug-in±êÖ¾·´Ó³ÕæÊµÇé¿öĞèÒª×î³¤3msÑÓ³ÙÊ±¼ä
+  304   2              //USB plug-inæ ‡å¿—åæ˜ çœŸå®æƒ…å†µéœ€è¦æœ€é•¿3mså»¶è¿Ÿæ—¶é—´
   305   2              smDelay(3);
 C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 6   
 
@@ -344,7 +344,7 @@ stmt  level    source
   307   2              //if plug off usb line,don't send suspend message to AP
   308   2              if ((DPDMCTRL & 0x40) != 0x00)
   309   2              {
-  310   3                  //ESD²âÊÔ²úÉúsuspend£¬ÑÓÊ±1s×óÓÒ,ÈçPC·¢ËÍbus reset,Ôò²»´¦Àísuspend
+  310   3                  //ESDæµ‹è¯•äº§ç”Ÿsuspendï¼Œå»¶æ—¶1så·¦å³,å¦‚PCå‘é€bus reset,åˆ™ä¸å¤„ç†suspend
   311   3                  tmp = 4;
   312   3                  while ((tmp--) != 0x00)
   313   3                  {
@@ -358,9 +358,9 @@ stmt  level    source
   321   3      
   322   3                  if ((Usbirq_hcusbirq & 0x10) == 0x00)
   323   3                  {
-  324   4                      //ÕæÕıµÄsuspend×´Ì¬,Ó²¼ş»Ö¸´Ä¬ÈÏ×´Ì¬
+  324   4                      //çœŸæ­£çš„suspendçŠ¶æ€,ç¡¬ä»¶æ¢å¤é»˜è®¤çŠ¶æ€
   325   4                      usb_pwr_suspnd_fnsh = 0;
-  326   4                      //Çåreset±ê¼Ç,²»ÈÃÉè±¸ÇáÒ×½øÈëFull SpeedÄ£Ê½
+  326   4                      //æ¸…resetæ ‡è®°,ä¸è®©è®¾å¤‡è½»æ˜“è¿›å…¥Full Speedæ¨¡å¼
   327   4                      usb_reset_enter_cnt = 0;
   328   4                      //0:no suspend; 1:recieve suspend; 2:has handle suspend
   329   4                      Suspend_Flag++;
@@ -375,7 +375,7 @@ stmt  level    source
                #endif
   339   4                  }
   340   3              }
-  341   2              //Èç¹û·¢ÉúĞ´²Ù×÷,°Ñ×îºóÒ»´Î´«ÊäÊı¾İĞ´ÈëFlash
+  341   2              //å¦‚æœå‘ç”Ÿå†™æ“ä½œ,æŠŠæœ€åä¸€æ¬¡ä¼ è¾“æ•°æ®å†™å…¥Flash
   342   2              UD_Update();
   343   2          }
   344   1      }
@@ -391,7 +391,7 @@ stmt  level    source
   353           *
   354           * Returns    : None.
   355           *
-  356           * Note(s)    : Éè±¸ÔÚÊÕµ½Bus reset,²¢Íê³ÉChirp J/KµÄ·¢ËÍºó,»á²úÉúHigh SpeedÖĞ¶Ï.
+  356           * Note(s)    : è®¾å¤‡åœ¨æ”¶åˆ°Bus reset,å¹¶å®ŒæˆChirp J/Kçš„å‘é€å,ä¼šäº§ç”ŸHigh Speedä¸­æ–­.
   357           ********************************************************************************************************
              -*
   358           */
@@ -405,7 +405,7 @@ stmt  level    source
   366   1          {
   367   2              if (usb_reset_enter_cnt >= 2)
   368   2              {
-  369   3                  //disable high speed,bit4Éè¼Æ´íÎó,´ËÎ»Ó¦Ğ´1,µ«Ã¿´Î¶Á³ö¾ùÊÇ0
+  369   3                  //disable high speed,bit4è®¾è®¡é”™è¯¯,æ­¤ä½åº”å†™1,ä½†æ¯æ¬¡è¯»å‡ºå‡æ˜¯0
 C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 7   
 
   370   3      #ifdef _PRINT_DEBUG_
@@ -440,7 +440,7 @@ stmt  level    source
   397          /*
   398           ********************************************************************************
   399           *                           OTG_PHY_Setting
-  400           * Description : USB PHYÉèÖÃ
+  400           * Description : USB PHYè®¾ç½®
   401           * Arguments   : d: address; e: value.
   402           * Returns     : none
   403           * Notes       : FPGA version, Just for GL6005 PHY setting.
@@ -466,7 +466,7 @@ stmt  level    source
              -*
   423           *                                           UDiskHandle
   424           *
-  425           * Description: ²éÑ¯¡¢¸üĞÂUDisk×´Ì¬£¬²¢¸ù¾İ×´Ì¬×÷ÏàÓ¦´¦Àí.
+  425           * Description: æŸ¥è¯¢ã€æ›´æ–°UDiskçŠ¶æ€ï¼Œå¹¶æ ¹æ®çŠ¶æ€ä½œç›¸åº”å¤„ç†.
   426           *
   427           * Arguments  : None.
   428           *
@@ -491,14 +491,14 @@ stmt  level    source
   444   1      
   445   1          if (IsAdfuCondition == 0x00)
   446   1          {
-  447   2              //set config Ö®ºóÉèÖÃusb_reset_enter_cntÎª0x00,²»ÔÙ½øĞĞ³äµçÆ÷ÅĞ¶Ï
+  447   2              //set config ä¹‹åè®¾ç½®usb_reset_enter_cntä¸º0x00,ä¸å†è¿›è¡Œå……ç”µå™¨åˆ¤æ–­
   448   2              if (usb_pwr_suspnd_fnsh == 0x00)
   449   2              {
   450   3                  //Suspend_Flag 0:no suspend; 81:recieve suspend; 82:has handle suspend
   451   3                  if ((usb_reset_enter_cnt == 0x00) && (Suspend_Flag == 0x00))
   452   3                  {
-  453   4                      //²é¶¨Ê±,connect_idle_cnt:¼ÆÊıÆ÷Ö¸Õë  prv_connect_idle_tm:1Hz±ä»¯¼ÇÂ¼±äÁ¿  c-1:¼ÆÊıÖµ,µ¥Î
-             -»Îª1Ãë
+  453   4                      //æŸ¥å®šæ—¶,connect_idle_cnt:è®¡æ•°å™¨æŒ‡é’ˆ  prv_connect_idle_tm:1Hzå˜åŒ–è®°å½•å˜é‡  c-1:è®¡æ•°å€¼,å•
+             -æ™ƒ1ç§’
   454   4      
   455   4                      timecount = 15;
   456   4                      if (SplitDiskFlag != 0x00)
@@ -507,7 +507,7 @@ stmt  level    source
   459   5                      }
   460   4                      if (CheckTimer(&connect_idle_cnt, &prv_connect_idle_tm, timecount) != 0x00)
   461   4                      {
-  462   5                          //²åÈëµÄÊÇ³äµçÆ÷,³¤Ê±¼äÃ»ÓĞbus reset
+  462   5                          //æ’å…¥çš„æ˜¯å……ç”µå™¨,é•¿æ—¶é—´æ²¡æœ‰bus reset
   463   5      #ifdef _PRINT_DEBUG_
                                    prints("IsCharge?-");
                #endif
@@ -524,10 +524,10 @@ stmt  level    source
   476   2              return;
   477   2          }
   478   1      
-  479   1          //°ÎÏß±êÖ¾
+  479   1          //æ‹”çº¿æ ‡å¿—
   480   1          if (PullLineFlag != 0x00)
   481   1          {
-  482   2              //½øÈëÍË³ö×´Ì¬
+  482   2              //è¿›å…¥é€€å‡ºçŠ¶æ€
   483   2              USB_State = 0x40;
   484   2              TransferFlag = 0x40;
   485   2              return;
@@ -544,22 +544,22 @@ stmt  level    source
   496   2              SwitchToADFUFlag = 0x00;
 C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 9   
 
-  497   2              //ÇĞ»»µ½ADFU
+  497   2              //åˆ‡æ¢åˆ°ADFU
   498   2              USB_State = 0x51;
   499   2              TransferFlag = 0x51;
   500   2              return;
   501   2          }
-  502   1          //PCµ¯³ö±êÖ¾
+  502   1          //PCå¼¹å‡ºæ ‡å¿—
   503   1          else if (PcEjectFlag != 0x00)
   504   1          {
-  505   2              //½øÈëÍË³ö×´Ì¬
+  505   2              //è¿›å…¥é€€å‡ºçŠ¶æ€
   506   2              USB_State = 0x30;
   507   2              return;
   508   2          }
   509   1          else if (PartiEjectFlag != 0x00)
   510   1          {
   511   2              PartiEjectFlag = 0x00;
-  512   2              //½øÈë·ÖÇøÍË³ö×´Ì¬
+  512   2              //è¿›å…¥åˆ†åŒºé€€å‡ºçŠ¶æ€
   513   2              USB_State = 0x60;
   514   2              return;
   515   2          }
@@ -570,23 +570,23 @@ stmt  level    source
   520   1          switch (USB_State)
   521   1          {
   522   2          case 0x00:
-  523   2              //¿ÕÏĞ×´Ì¬
+  523   2              //ç©ºé—²çŠ¶æ€
   524   2              sState_0_Handle();
   525   2              break;
   526   2          case 0x10:
-  527   2              //ÉÏ´«×´Ì¬
+  527   2              //ä¸Šä¼ çŠ¶æ€
   528   2              sState_10_Handle();
   529   2              break;
   530   2          case 0x20:
-  531   2              //ÏÂ´«×´Ì¬
+  531   2              //ä¸‹ä¼ çŠ¶æ€
   532   2              sState_20_Handle();
   533   2              break;
   534   2          case 0x51:
-  535   2              //¸Ã×´Ì¬Ö÷Òª´¦ÀíÇĞ»»µ½ADFUºó£¬ÊÕµ½µÄµÚÒ»¸ö CMD_TestUnitReady_ÃüÁî,»Ö¸´ÖĞ¶Ï
+  535   2              //è¯¥çŠ¶æ€ä¸»è¦å¤„ç†åˆ‡æ¢åˆ°ADFUåï¼Œæ”¶åˆ°çš„ç¬¬ä¸€ä¸ª CMD_TestUnitReady_å‘½ä»¤,æ¢å¤ä¸­æ–­
   536   2              UdiskReady();
   537   2              break;
   538   2          case 0x60:
-  539   2              //·ÖÇøµ¯³ö´¦Àí
+  539   2              //åˆ†åŒºå¼¹å‡ºå¤„ç†
   540   2              sSplitDiskEject();
   541   2              break;
   542   2          case 0x80:
@@ -597,12 +597,12 @@ stmt  level    source
   547   2              SFR_BANK = BANK_USB;
   548   2              if ((DPDMCTRL & 0x40) == 0x00)
   549   2              {
-  550   3                  //ÒÑ°Î³ö
+  550   3                  //å·²æ‹”å‡º
   551   3                  USB_State = 0x40;
   552   3              }
   553   2              else
   554   2              {
-  555   3                  //¿ÕÏĞ×´Ì¬
+  555   3                  //ç©ºé—²çŠ¶æ€
   556   3                  USB_State = 0x00;
   557   3              }
   558   2              SFR_BANK = sfrbak;
@@ -617,7 +617,7 @@ stmt  level    source
              -*
   565           *                                           ADFUHandle
   566           *
-  567           * Description: ²éÑ¯¡¢¸üĞÂADFU×´Ì¬£¬²¢¸ù¾İ×´Ì¬×÷ÏàÓ¦´¦Àí.
+  567           * Description: æŸ¥è¯¢ã€æ›´æ–°ADFUçŠ¶æ€ï¼Œå¹¶æ ¹æ®çŠ¶æ€ä½œç›¸åº”å¤„ç†.
   568           *
   569           * Arguments  : None.
   570           *
@@ -631,24 +631,24 @@ stmt  level    source
   577          {
   578   1          uint32 callentryRetValue;
   579   1      
-  580   1          //ÊÇ·ñÒÑ¾­°ÎÏß 55h±íÊ¾Á¬½Ó£¬77h±íÊ¾²»Á¬½Ó
+  580   1          //æ˜¯å¦å·²ç»æ‹”çº¿ 55hè¡¨ç¤ºè¿æ¥ï¼Œ77hè¡¨ç¤ºä¸è¿æ¥
   581   1          if (PullLineFlag == 0x00)
   582   1          {
-  583   2              //FWOpStatus:ÉÏÔØ»¹ÊÇÏÂÔØ²Ù×÷Íê³É 01:ÏÂÔØ 02:ÉÏÔØ
+  583   2              //FWOpStatus:ä¸Šè½½è¿˜æ˜¯ä¸‹è½½æ“ä½œå®Œæˆ 01:ä¸‹è½½ 02:ä¸Šè½½
   584   2              if (FWOpStatus != 0x00)
   585   2              {
-  586   3                  //FWÉÏÔØ»òÏÂÔØÍê³ÉÑÓÊ±2Ãë
+  586   3                  //FWä¸Šè½½æˆ–ä¸‹è½½å®Œæˆå»¶æ—¶2ç§’
   587   3                  sFWUpgOkDelay(FWOpStatus);
   588   3              }
   589   2              else
   590   2              {
-  591   3                  //ÊÇ·ñÓĞ¹¦ÄÜµ÷ÓÃÈÎÎñ
+  591   3                  //æ˜¯å¦æœ‰åŠŸèƒ½è°ƒç”¨ä»»åŠ¡
   592   3                  if (CallingTaskFlag != 0x00)
   593   3                  {
   594   4                      CallingTaskFlag = 0x00;
-  595   4                      callentryRetValue = (*((uint32( *)()) (CallingTaskAdd)))(); //¹¦ÄÜµ÷ÓÃÈë¿ÚµØÖ·
-  596   4                      CallingTaskResult = callentryRetValue >> 16; //×´Ì¬½á¹¹µÄµØÖ·
-  597   4                      StatusLength = (uint16) callentryRetValue; //×´Ì¬½á¹¹µÄ³¤¶È
+  595   4                      callentryRetValue = (*((uint32( *)()) (CallingTaskAdd)))(); //åŠŸèƒ½è°ƒç”¨å…¥å£åœ°å€
+  596   4                      CallingTaskResult = callentryRetValue >> 16; //çŠ¶æ€ç»“æ„çš„åœ°å€
+  597   4                      StatusLength = (uint16) callentryRetValue; //çŠ¶æ€ç»“æ„çš„é•¿åº¦
   598   4                  }
   599   3              }
   600   2              UdiskReady();
@@ -658,7 +658,7 @@ stmt  level    source
   604   2              //prints("ADFU PullLine-");
   605   2              PullLineFlag = 0x00;
   606   2              FWOpStatus = 0x01;
-  607   2              TransferFlag = 0x61; //ADFUµÄ×´Ì¬
+  607   2              TransferFlag = 0x61; //ADFUçš„çŠ¶æ€
   608   2          }
   609   1      }
   610          
@@ -667,9 +667,9 @@ stmt  level    source
              -*
   613           *                                           sFWUpgOkDelay
   614           *
-  615           * Description: FWÉÏÔØ»òÏÂÔØÍê³ÉÑÓÊ±2Ãë.
+  615           * Description: FWä¸Šè½½æˆ–ä¸‹è½½å®Œæˆå»¶æ—¶2ç§’.
   616           *
-  617           * Arguments  : fwup_direction: ÉÏÔØ»¹ÊÇÏÂÔØ²Ù×÷Íê³É 01:ÏÂÔØ 02:ÉÏÔØ.
+  617           * Arguments  : fwup_direction: ä¸Šè½½è¿˜æ˜¯ä¸‹è½½æ“ä½œå®Œæˆ 01:ä¸‹è½½ 02:ä¸Šè½½.
   618           *
   619           * Returns    : None.
   620           *
@@ -683,9 +683,9 @@ stmt  level    source
   625          {
   626   1          if (fwup_direction == 0x01) //need reboot
   627   1          {
-  628   2              //ÉıÍê¼¶²»ÔÙÏìÓ¦ÖĞ¶Ï
+  628   2              //å‡å®Œçº§ä¸å†å“åº”ä¸­æ–­
   629   2              IE0 &= 0x7f;
-  630   2              //²»ÔÊĞíÔÚUdiskReady´ò¿ªÖĞ¶Ï
+  630   2              //ä¸å…è®¸åœ¨UdiskReadyæ‰“å¼€ä¸­æ–­
   631   2              StatusCheckFlag = 0x00;
   632   2      
   633   2              if (CheckTimer(&AdfuTimerCtl, &PrevRTCTimerValue1, USBIDLECOUNTERVALUE) != 0x00)
@@ -699,7 +699,7 @@ stmt  level    source
   641   3                  UDiskExit();
   642   3                  //UD_Exit();
   643   3      
-  644   3                  //LBA-NAND flash²»Ö§³Ö0xFFÃüÁî£¬ËùÒÔÌØ´ËĞŞ¸Ä
+  644   3                  //LBA-NAND flashä¸æ”¯æŒ0xFFå‘½ä»¤ï¼Œæ‰€ä»¥ç‰¹æ­¤ä¿®æ”¹
   645   3                  if (flash_type == 0x03)
   646   3                  {
   647   4                      /*fixme:need
@@ -711,22 +711,22 @@ stmt  level    source
   653   3      
   654   3                  SFR_BANK = BANK_RTC;
   655   3      
-  656   3                  WDCTL =  0x8a; //watchdogÊ¹ÄÜ²¢ÖØÆô
+  656   3                  WDCTL =  0x8a; //watchdogä½¿èƒ½å¹¶é‡å¯
   657   3      
   658   3                  while (1)
   659   3                  {
-  660   4                      ; //Watch DogÆğÀ´»áÖØÆô
+  660   4                      ; //Watch Dogèµ·æ¥ä¼šé‡å¯
   661   4                  }
   662   3              }
   663   2          }
   664   1          else
   665   1          {
   666   2              //prints("go idle-");
-  667   2              //ÑÓÊ±ËÄÃë,»Ø¿ÕÏĞ×´Ì¬
+  667   2              //å»¶æ—¶å››ç§’,å›ç©ºé—²çŠ¶æ€
   668   2              if (CheckTimer(&AdfuTimerCtl, &PrevRTCTimerValue1, USBIDLECOUNTERVALUE * 2) != 0x00)
   669   2              {
   670   3                  FWOpStatus = 0x00;
-  671   3                  TransferFlag = 0x00; //»Øµ½Ready×´Ì¬
+  671   3                  TransferFlag = 0x00; //å›åˆ°ReadyçŠ¶æ€
   672   3              }
   673   2          }
   674   1      }
@@ -736,7 +736,7 @@ stmt  level    source
              -*
   678           *                                           sState_0_Handle
   679           *
-  680           * Description: ¿ÕÏĞ×´Ì¬´¦Àíº¯Êı.
+  680           * Description: ç©ºé—²çŠ¶æ€å¤„ç†å‡½æ•°.
   681           *
   682           * Arguments  : None.
   683           *
@@ -750,22 +750,22 @@ stmt  level    source
 
   689          void sState_0_Handle(void)
   690          {
-  691   1          //ÊÇ·ñ¿ªÊ¼Ã¦,UpOrDownLoad»¹Î´±»³õÊ¼»¯,EP1ÔÚ×ö³ıread,writeÍâµÄ½»Á÷,01:ÉÏ´«  02:ÏÂ´«
+  691   1          //æ˜¯å¦å¼€å§‹å¿™,UpOrDownLoadè¿˜æœªè¢«åˆå§‹åŒ–,EP1åœ¨åšé™¤read,writeå¤–çš„äº¤æµ,01:ä¸Šä¼   02:ä¸‹ä¼ 
   692   1          if ((USBBusy == 0x00) || (UpOrDownLoad == 0x00))
   693   1          {
-  694   2              //ÎªÏÂÒ»´ÎÊÕCBW×¼±¸Ep1
+  694   2              //ä¸ºä¸‹ä¸€æ¬¡æ”¶CBWå‡†å¤‡Ep1
   695   2              UdiskReady();
   696   2          }
   697   1          else
   698   1          {
   699   2              if (UpOrDownLoad == 0x01)
   700   2              {
-  701   3                  //½øÈëÉÏ´«×´Ì¬
+  701   3                  //è¿›å…¥ä¸Šä¼ çŠ¶æ€
   702   3                  USB_State = 0x10;
   703   3              }
   704   2              else if (UpOrDownLoad == 0x02)
   705   2              {
-  706   3                  //½øÈëÏÂ´«×´Ì¬
+  706   3                  //è¿›å…¥ä¸‹ä¼ çŠ¶æ€
   707   3                  USB_State = 0x20;
   708   3              }
   709   2              else
@@ -779,7 +779,7 @@ stmt  level    source
              -*
   717           *                                           sState_10_Handle
   718           *
-  719           * Description: ÉÏ´«×´Ì¬.
+  719           * Description: ä¸Šä¼ çŠ¶æ€.
   720           *
   721           * Arguments  : None.
   722           *
@@ -791,19 +791,19 @@ stmt  level    source
   727           */
   728          void sState_10_Handle(void)
   729          {
-  730   1          //01:ÉÏ´«  02:ÏÂ´«
+  730   1          //01:ä¸Šä¼   02:ä¸‹ä¼ 
   731   1          if (UpOrDownLoad == 0x01)
   732   1          {
-  733   2              //²é¶¨Ê±,UsbIdleCounter:¼ÆÊıÆ÷Ö¸Õë  PrevRTCTimerValue1:1Hz±ä»¯¼ÇÂ¼±äÁ¿  USBIDLECOUNTERVALUE:¼ÆÊıÖ
-             -µ,µ¥Î»Îª1Ãë
+  733   2              //æŸ¥å®šæ—¶,UsbIdleCounter:è®¡æ•°å™¨æŒ‡é’ˆ  PrevRTCTimerValue1:1Hzå˜åŒ–è®°å½•å˜é‡  USBIDLECOUNTERVALUE:è®¡æ•°
+             -,å•ä½ä¸º1ç§’
   734   2              if (CheckTimer(&UsbIdleCounter, &PrevRTCTimerValue1, USBIDLECOUNTERVALUE) == 0x00)
   735   2              {
-  736   3                  //ÎªÏÂÒ»´ÎÊÕCBW×¼±¸Ep1¡£ÏÔÊ¾²»Õ¼ÓÃDMA£¬¿ÉÒÔÓëUÅÌÏìÓ¦Ò»Æğ½øĞĞ
+  736   3                  //ä¸ºä¸‹ä¸€æ¬¡æ”¶CBWå‡†å¤‡Ep1ã€‚æ˜¾ç¤ºä¸å ç”¨DMAï¼Œå¯ä»¥ä¸Uç›˜å“åº”ä¸€èµ·è¿›è¡Œ
   737   3                  UdiskReady();
   738   3              }
   739   2              else
   740   2              {
-  741   3                  //Ò»¶ÎÊ±¼äÊÕ²»µ½USBÖĞ¶Ï,½øÈëµ½¿ÕÏĞ×´Ì¬
+  741   3                  //ä¸€æ®µæ—¶é—´æ”¶ä¸åˆ°USBä¸­æ–­,è¿›å…¥åˆ°ç©ºé—²çŠ¶æ€
   742   3                  sGoInState0();
   743   3              }
   744   2          }
@@ -820,7 +820,7 @@ stmt  level    source
              -*
   753           *                                           sState_20_Handle
   754           *
-  755           * Description: ÏÂ´«×´Ì¬´¦Àíº¯Êı.
+  755           * Description: ä¸‹ä¼ çŠ¶æ€å¤„ç†å‡½æ•°.
   756           *
   757           * Arguments  : None.
   758           *
@@ -834,11 +834,11 @@ stmt  level    source
   765          {
   766   1          if (UpOrDownLoad == 0x02)
   767   1          {
-  768   2              //ÊÇ·ñ½øÈë¿ÕÏĞ
+  768   2              //æ˜¯å¦è¿›å…¥ç©ºé—²
   769   2              if (CheckTimer(&Counter_30s, &PrevRTCTimerValue2, COUNTERVALUE_30S) == 0x00)
   770   2              {
-  771   3                  //·¢ÁË¿É°ÎUÅÌÃüÁîÃ»ÓĞ  0:²»¿É°ÎÏß£¬01h:¿É°ÎÏß¡£²»¿ÉÒÀ¿¿¸Ã±äÁ¿¾ö¶¨ÊÇ·ñ°ÎÏß
-  772   3                  //ÒòÎªÔÚXPÏÂÔÚ´«Êä¹ı³ÌÖĞÈç¹ûÓĞ°ü²å½ø(ÎÒÃÇµÄ¹¤¾ßÈí¼ş)Ò²»á·¢¿É°ÎÏß
+  771   3                  //å‘äº†å¯æ‹”Uç›˜å‘½ä»¤æ²¡æœ‰  0:ä¸å¯æ‹”çº¿ï¼Œ01h:å¯æ‹”çº¿ã€‚ä¸å¯ä¾é è¯¥å˜é‡å†³å®šæ˜¯å¦æ‹”çº¿
+  772   3                  //å› ä¸ºåœ¨XPä¸‹åœ¨ä¼ è¾“è¿‡ç¨‹ä¸­å¦‚æœæœ‰åŒ…æ’è¿›(æˆ‘ä»¬çš„å·¥å…·è½¯ä»¶)ä¹Ÿä¼šå‘å¯æ‹”çº¿
   773   3                  if ((Removable == 0x00) || (CheckTimer(&UsbIdleCounter, &PrevRTCTimerValue1, USBIDLECOUNTERVA
              -LUE) == 0x00))
   774   3                  {
@@ -846,13 +846,13 @@ stmt  level    source
   776   4                  }
   777   3                  else
   778   3                  {
-  779   4                      //Ò»¶ÎÊ±¼äÊÕ²»µ½USBÖĞ¶Ï,½øÈëµ½¿ÕÏĞ×´Ì¬
+  779   4                      //ä¸€æ®µæ—¶é—´æ”¶ä¸åˆ°USBä¸­æ–­,è¿›å…¥åˆ°ç©ºé—²çŠ¶æ€
   780   4                      sGoInState0();
   781   4                  }
   782   3              }
   783   2              else
   784   2              {
-  785   3                  //Ò»¶ÎÊ±¼äÊÕ²»µ½USBÖĞ¶Ï,½øÈëµ½¿ÕÏĞ×´Ì¬
+  785   3                  //ä¸€æ®µæ—¶é—´æ”¶ä¸åˆ°USBä¸­æ–­,è¿›å…¥åˆ°ç©ºé—²çŠ¶æ€
   786   3                  sGoInState0();
   787   3              }
   788   2          }
@@ -867,7 +867,7 @@ stmt  level    source
              -*
   797           *                                           sGoInState0
   798           *
-  799           * Description: Ò»¶ÎÊ±¼äÊÕ²»µ½USBÖĞ¶Ï, ½øÈëµ½¿ÕÏĞ×´Ì¬.
+  799           * Description: ä¸€æ®µæ—¶é—´æ”¶ä¸åˆ°USBä¸­æ–­, è¿›å…¥åˆ°ç©ºé—²çŠ¶æ€.
   800           *
   801           * Arguments  : None.
   802           *
@@ -879,16 +879,16 @@ stmt  level    source
   807           */
   808          void sGoInState0(void)
   809          {
-  810   1          //Èç¹û·¢ÉúĞ´²Ù×÷,°Ñ×îºóÒ»´Î´«ÊäÊı¾İĞ´ÈëFlash
+  810   1          //å¦‚æœå‘ç”Ÿå†™æ“ä½œ,æŠŠæœ€åä¸€æ¬¡ä¼ è¾“æ•°æ®å†™å…¥Flash
   811   1          UD_Update();
   812   1      
 C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 14  
 
-  813   1          //Îª½øÈë¿ÕÏĞ×´Ì¬µÄÏÔÊ¾¶ø²»ÏìÓ¦USBÖĞ¶Ï
+  813   1          //ä¸ºè¿›å…¥ç©ºé—²çŠ¶æ€çš„æ˜¾ç¤ºè€Œä¸å“åº”USBä¸­æ–­
   814   1          UdiskUnReady();
   815   1          USB_State = 0x00;
   816   1          USBBusy = 0x00;
-  817   1          //´Ó¿ÕÏĞµ½¶ÁĞ´µÄÏÔÊ¾±ØĞë·¢ÔÚ¹ØUSBÖĞ¶ÏÌõ¼şÏÂ(for brom can't run at 48M clock)
+  817   1          //ä»ç©ºé—²åˆ°è¯»å†™çš„æ˜¾ç¤ºå¿…é¡»å‘åœ¨å…³USBä¸­æ–­æ¡ä»¶ä¸‹(for brom can't run at 48M clock)
   818   1          UpOrDownLoadBak = 0x00;
   819   1      }
   820          
@@ -903,7 +903,7 @@ stmt  level    source
   828           *
   829           * Returns    : None.
   830           *
-  831           * Note(s)    : Èç¹û±¨ÉÏ¿¨ÅÌ·û,PC¾Í»á¶Á¿¨ÅÌ,ÔÚU-modeÄ£Ê½ÏÂ,±ØĞë¶Á¿¨²ÅÄÜ½áÊø,¹Ê±ØĞë°²×°¿¨Çı¶¯.
+  831           * Note(s)    : å¦‚æœæŠ¥ä¸Šå¡ç›˜ç¬¦,PCå°±ä¼šè¯»å¡ç›˜,åœ¨U-modeæ¨¡å¼ä¸‹,å¿…é¡»è¯»å¡æ‰èƒ½ç»“æŸ,æ•…å¿…é¡»å®‰è£…å¡é©±åŠ¨.
   832           ********************************************************************************************************
              -*
   833           */
@@ -915,7 +915,7 @@ stmt  level    source
   839   1          //single lun of card mode need install card driver
   840   1          if ((DiskAppearSelect != 0x03) && (ShowMultiDiskFlag == 0))
   841   1          {
-  842   2              CardExistFlag = 0; //°²×°Ê§°Ü,ÎŞ¿¨±êÖ¾
+  842   2              CardExistFlag = 0; //å®‰è£…å¤±è´¥,æ— å¡æ ‡å¿—
   843   2      
   844   2          }
   845   1          else
@@ -926,10 +926,10 @@ stmt  level    source
   850   3              }
   851   2              else
   852   2              {
-  853   3                  if (DRV_CheckCard(1) == 2) //¼ì²â¿¨ÊÇ·ñ²åÉÏºÍ¿¨ÀàĞÍ:0:¿¨²»´æÔÚ; 1:MS¿¨; 2:SD/MMC¿¨,ÎŞĞ´±£»¤; 
-             -0x11:Ğ´±£»¤µÄSD¿¨.
+  853   3                  if (DRV_CheckCard(1) == 2) //æ£€æµ‹å¡æ˜¯å¦æ’ä¸Šå’Œå¡ç±»å‹:0:å¡ä¸å­˜åœ¨; 1:MSå¡; 2:SD/MMCå¡,æ— å†™ä¿æŠ¤; 
+             -0x11:å†™ä¿æŠ¤çš„SDå¡.
   854   3                  {
-  855   4                      //char DRV_Install(const char *filename, word param);; param=0:¿ìËÙ 01:ÂıËÙ
+  855   4                      //char DRV_Install(const char *filename, word param);; param=0:å¿«é€Ÿ 01:æ…¢é€Ÿ
   856   4                      drv_install_flag = (uint8) DRV_Install(FFSDCardDrvName, 0);
   857   4                  }
   858   3                  else
@@ -938,12 +938,12 @@ stmt  level    source
   861   4                  }
   862   3              }
   863   2      
-  864   2              //0:Ê§°Ü  01h:³É¹¦
+  864   2              //0:å¤±è´¥  01h:æˆåŠŸ
   865   2              if (drv_install_flag == 0x01)
   866   2              {
-  867   3                  CardCapacity = (uint32) UD_SDCardGetCap(); //ÒÔÉÈÇøÎªµ¥Î»
-  868   3                  CardExistFlag = 1; //ÓĞ¿¨±êÖ¾
-  869   3                  RWCardError = 0; //Çåcard¶ÁĞ´´íÎó±êÖ¾
+  867   3                  CardCapacity = (uint32) UD_SDCardGetCap(); //ä»¥æ‰‡åŒºä¸ºå•ä½
+  868   3                  CardExistFlag = 1; //æœ‰å¡æ ‡å¿—
+  869   3                  RWCardError = 0; //æ¸…cardè¯»å†™é”™è¯¯æ ‡å¿—
   870   3      
   871   3                  Formatcap_cmd_info_DiskCard.CurrentCap = CardCapacity;
   872   3                  Formatcap_cmd_info_DiskCard.FomatableCap = CardCapacity;
@@ -964,7 +964,7 @@ stmt  level    source
              -*
   885           *                                           UDiskGetDiskInfo
   886           *
-  887           * Description: È¡µÃ´ÅÅÌÊıÄ¿Çé¿ö,ÒªÔÚµ÷ÓÃUdiskInitºóµ÷ÓÃ.
+  887           * Description: å–å¾—ç£ç›˜æ•°ç›®æƒ…å†µ,è¦åœ¨è°ƒç”¨UdiskInitåè°ƒç”¨.
   888           *
   889           * Arguments  : None.
   890           *
@@ -981,15 +981,15 @@ stmt  level    source
   900   1          cDiskInfo = 0;
   901   1          if (SplitDiskFlag != 0)
   902   1          {
-  903   2              cDiskInfo = cDiskInfo | 0x80; //bit7:ÊÇ·ñ·ÖÇø
+  903   2              cDiskInfo = cDiskInfo | 0x80; //bit7:æ˜¯å¦åˆ†åŒº
   904   2          }
   905   1          if (EncryptFlag != 0)
   906   1          {
-  907   2              cDiskInfo = cDiskInfo | 0x40; //bit6:ÊÇ·ñ¼ÓÃÜ
+  907   2              cDiskInfo = cDiskInfo | 0x40; //bit6:æ˜¯å¦åŠ å¯†
   908   2          }
   909   1          if (CardExistFlag != 0)
   910   1          {
-  911   2              cDiskInfo = cDiskInfo | 0x20; //bit5:ÊÇ·ñ²å¿¨
+  911   2              cDiskInfo = cDiskInfo | 0x20; //bit5:æ˜¯å¦æ’å¡
   912   2          }
   913   1      
   914   1          return cDiskInfo;
@@ -1000,7 +1000,7 @@ stmt  level    source
              -*
   919           *                                           UDiskCheckWP
   920           *
-  921           * Description: ÉèÖÃ´ÅÅÌĞ´±£»¤¼ì²é.
+  921           * Description: è®¾ç½®ç£ç›˜å†™ä¿æŠ¤æ£€æŸ¥.
   922           *
   923           * Arguments  : e:Card Or Flash.
   924           *
@@ -1061,7 +1061,7 @@ stmt  level    source
              -*
   974           *                                           DisableSuspend
   975           *
-  976           * Description: ½ûÖ¹suspend.
+  976           * Description: ç¦æ­¢suspend.
   977           *
   978           * Arguments  : None.
   979           *
@@ -1081,7 +1081,7 @@ stmt  level    source
              -*
   992           *                                           AlwaysShowCardDisk
   993           *
-  994           * Description: ²åÏß¼´ÏÔÊ¾¿¨ÅÌ·û.
+  994           * Description: æ’çº¿å³æ˜¾ç¤ºå¡ç›˜ç¬¦.
   995           *
   996           * Arguments  : 0: disable 1: enable.
   997           *
@@ -1103,7 +1103,7 @@ stmt  level    source
              -*
  1010           *                                           UDiskGetCardStatus
  1011           *
- 1012           * Description: ²éÑ¯¿¨ÊÇ·ñ´æÔÚ.
+ 1012           * Description: æŸ¥è¯¢å¡æ˜¯å¦å­˜åœ¨.
  1013           *
  1014           * Arguments  : 0: disable 1: enable.
  1015           *
@@ -1123,7 +1123,7 @@ stmt  level    source
              -*
  1028           *                                           UDiskCardInitInternal
  1029           *
- 1030           * Description: ¿¨ÖØ³õÊ¼»¯.
+ 1030           * Description: å¡é‡åˆå§‹åŒ–.
  1031           *
  1032           * Arguments  : None.
  1033           *
@@ -1198,11 +1198,11 @@ stmt  level    source
              -*
  1097           *                                           CheckTimer
  1098           *
- 1099           * Description: ²é¶¨Ê±.
+ 1099           * Description: æŸ¥å®šæ—¶.
  1100           *
- 1101           * Arguments  : hl: ¼ÆÊıÆ÷Ö¸Õë; de: 1Hz±ä»¯¼ÇÂ¼±äÁ¿; c-1: ¼ÆÊıÖµ, µ¥Î»Îª1Ãë.
+ 1101           * Arguments  : hl: è®¡æ•°å™¨æŒ‡é’ˆ; de: 1Hzå˜åŒ–è®°å½•å˜é‡; c-1: è®¡æ•°å€¼, å•ä½ä¸º1ç§’.
  1102           *
- 1103           * Returns    : a: Ö¸¶¨Ê±¼äÊÇ·ñÒÑµ½: 1:yes; 0:no.
+ 1103           * Returns    : a: æŒ‡å®šæ—¶é—´æ˜¯å¦å·²åˆ°: 1:yes; 0:no.
  1104           *
  1105           * Note(s)    : None.
  1106           ********************************************************************************************************
@@ -1225,7 +1225,7 @@ stmt  level    source
 C251 COMPILER V4.55,  UDisk20IRQMain                                                       15/07/16  15:45:43  PAGE 19  
 
  1122   2              *timerrecord = RTCTimeS;
- 1123   2              //Óëµ½´ï¿ÕÏĞÊ±µÄÊıÖµ±È½Ï
+ 1123   2              //ä¸åˆ°è¾¾ç©ºé—²æ—¶çš„æ•°å€¼æ¯”è¾ƒ
  1124   2              if (*countrecord < count)
  1125   2              {
  1126   3                  *countrecord += 1;
@@ -1246,7 +1246,7 @@ stmt  level    source
              -*
  1141           *                                           sSplitDiskEject
  1142           *
- 1143           * Description: ¼ÓÃÜÅÌÍê³Éºó, ·ÖÇøµ¯³ö´¦Àí.
+ 1143           * Description: åŠ å¯†ç›˜å®Œæˆå, åˆ†åŒºå¼¹å‡ºå¤„ç†.
  1144           *
  1145           * Arguments  : None.
  1146           *
@@ -1262,10 +1262,10 @@ stmt  level    source
  1155   1          {
  1156   2              EjectFlag++;
  1157   2      
- 1158   2              //ÍË³öÇ°ÇåÀíÏÖ³¡³ÌĞòÈë¿Ú
+ 1158   2              //é€€å‡ºå‰æ¸…ç†ç°åœºç¨‹åºå…¥å£
  1159   2              UDiskExit();
  1160   2              UDiskInitInternal();
- 1161   2              //»Ö¸´initÊ±±»ÇåµÄ×´Ì¬
+ 1161   2              //æ¢å¤initæ—¶è¢«æ¸…çš„çŠ¶æ€
  1162   2              USB_State = 0x60;
  1163   2          }
  1164   1          else
@@ -1305,10 +1305,10 @@ stmt  level    source
  1194   1          IE0bak = IE0;
  1195   1          IE0 = IE0 & 0x7f;
  1196   1      
- 1197   1          //ÔÚ×´Ì¬²éÑ¯¹ı³Ì·¢ÉúÁËÖĞ¶Ï£¬Ó¦³öÈ¥ÅÜÒ»ÏÂÏÔÊ¾ÈÎÎñÔÙ´ò¿ªUSB£¬±£Ö¤ÏÔÊ¾¼°Ê±
+ 1197   1          //åœ¨çŠ¶æ€æŸ¥è¯¢è¿‡ç¨‹å‘ç”Ÿäº†ä¸­æ–­ï¼Œåº”å‡ºå»è·‘ä¸€ä¸‹æ˜¾ç¤ºä»»åŠ¡å†æ‰“å¼€USBï¼Œä¿è¯æ˜¾ç¤ºåŠæ—¶
  1198   1          if (StatusCheckFlag != 0x00)
  1199   1          {
- 1200   2              //ÅÜµ½ÕâÀïĞÂµÄCBWÊµ¼ÊÒÑ¾­ÊÕµ½EPA FIFO£¬Ö»Ğè¿ªÖĞ¶ÏÏìÓ¦¼´¿É,Enable USB Interrupt
+ 1200   2              //è·‘åˆ°è¿™é‡Œæ–°çš„CBWå®é™…å·²ç»æ”¶åˆ°EPA FIFOï¼Œåªéœ€å¼€ä¸­æ–­å“åº”å³å¯,Enable USB Interrupt
  1201   2              AIE = AIE | 0x01;
  1202   2          }
  1203   1      
@@ -1333,7 +1333,7 @@ stmt  level    source
  1220           */
  1221          void UdiskUnReady(void)
  1222          {
- 1223   1          //Îª½øÈë¿ÕÏĞ×´Ì¬µÄÏÔÊ¾¶ø²»ÏìÓ¦USBÖĞ¶Ï,Disable USB Interrupt
+ 1223   1          //ä¸ºè¿›å…¥ç©ºé—²çŠ¶æ€çš„æ˜¾ç¤ºè€Œä¸å“åº”USBä¸­æ–­,Disable USB Interrupt
  1224   1          AIE = AIE & (uint8) 0xfe;
  1225   1      }
  1226          
@@ -1365,26 +1365,26 @@ stmt  level    source
  1248   1          //0: mac OSX system    1: windows system
  1249   1          if (OSType == 0x00)
  1250   1          {
- 1251   2              //usb disconnect,ÊµÏÖÔÚÆ»¹ûÏµÍ³ÏÂ¿¨°ÎµôºóÅÌ·ûÏûÊ§Ğ§¹û
+ 1251   2              //usb disconnect,å®ç°åœ¨è‹¹æœç³»ç»Ÿä¸‹å¡æ‹”æ‰åç›˜ç¬¦æ¶ˆå¤±æ•ˆæœ
  1252   2              UsbCTRL_STUS |= 0x40;
  1253   2          }
  1254   1      
- 1255   1          //¿¨ID
+ 1255   1          //å¡ID
  1256   1          if (DRV_DetectUD(1) != 0x20)
  1257   1          {
- 1258   2              CardExistFlag = 0x00; //Çå¿Õ¿¨´æÔÚ±êÖ¾
+ 1258   2              CardExistFlag = 0x00; //æ¸…ç©ºå¡å­˜åœ¨æ ‡å¿—
  1259   2      
- 1260   2              //¿¨ÔÚ×öumodeĞ´Ê±£¬°Î¿¨£¬»áÓĞ¼ÌĞøĞ´µÄ¶¯×÷£¬Èç¹ûĞ¶ÔØ¿¨Çı¶¯£¬»áµ¼ÖÂºóĞøµÄumodeĞ´´í£¬¹Ê×¢ÊÍĞ¶ÔØ¶¯×÷
- 1261   2              //DRV_UnInstall(DRV_SDFF); //Ğ¶ÔØ¿¨Çı¶¯£¬±ÜÃâ¿¨µçÔ´Ã»ÓĞ¹Ø±Õ£¬µ¼ÖÂ²å¿¨Ê±Ğ¡»úÖØÆô
+ 1260   2              //å¡åœ¨åšumodeå†™æ—¶ï¼Œæ‹”å¡ï¼Œä¼šæœ‰ç»§ç»­å†™çš„åŠ¨ä½œï¼Œå¦‚æœå¸è½½å¡é©±åŠ¨ï¼Œä¼šå¯¼è‡´åç»­çš„umodeå†™é”™ï¼Œæ•…æ³¨é‡Šå¸è½½åŠ¨ä½œ
+ 1261   2              //DRV_UnInstall(DRV_SDFF); //å¸è½½å¡é©±åŠ¨ï¼Œé¿å…å¡ç”µæºæ²¡æœ‰å…³é—­ï¼Œå¯¼è‡´æ’å¡æ—¶å°æœºé‡å¯
  1262   2          }
  1263   1      
- 1264   1          //¿ªUSBÖĞ¶Ï
+ 1264   1          //å¼€USBä¸­æ–­
  1265   1          AIE = AIE | 0x01;
  1266   1      
  1267   1          //0: mac OSX system    1: windows system
  1268   1          if (OSType == 0x00)
  1269   1          {
- 1270   2              //D+ Pull high, ´ËÊ±£¬PC ²Å¼ì²âµ½ÓĞusb device ²åÉÏ
+ 1270   2              //D+ Pull high, æ­¤æ—¶ï¼ŒPC æ‰æ£€æµ‹åˆ°æœ‰usb device æ’ä¸Š
  1271   2              UsbCTRL_STUS &= (uint8) 0xbf;
  1272   2          }
  1273   1          IE0 = IE0bak;
@@ -1412,10 +1412,10 @@ stmt  level    source
  1293          uint8 CardWPCheck(void)
  1294          {
  1295   1          CardWPFlag = 0;
- 1296   1          //Èç¹û¿¨²»´æÔÚ¾Í²»ÓÃÅĞ¶Ï¿¨µÄĞ´±£»¤±êÖ¾£¬·ÀÖ¹¿¨µÄÇı¶¯Ã»°²×°³É¹¦Ê±£¬µ÷ÓÃmUD_SDCardWPDetectÊ±³ÌĞòÅÜ·É
+ 1296   1          //å¦‚æœå¡ä¸å­˜åœ¨å°±ä¸ç”¨åˆ¤æ–­å¡çš„å†™ä¿æŠ¤æ ‡å¿—ï¼Œé˜²æ­¢å¡çš„é©±åŠ¨æ²¡å®‰è£…æˆåŠŸæ—¶ï¼Œè°ƒç”¨mUD_SDCardWPDetectæ—¶ç¨‹åºè·‘é£
  1297   1          if (CardExistFlag != 0x00)
  1298   1          {
- 1299   2              //½«¼ì²â½á¹û·ÅÈë¿¨Ğ´±£»¤±êÖ¾
+ 1299   2              //å°†æ£€æµ‹ç»“æœæ”¾å…¥å¡å†™ä¿æŠ¤æ ‡å¿—
  1300   2              //        CardWPFlag = (uint8)UD_SDCardWPDetect();              // not support
  1301   2          }
  1302   1      

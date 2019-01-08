@@ -28,14 +28,14 @@
 #include "cfgRADIO_AP.h"
 #endif
 //define this flag when release
-#define SupportCard              // Ö§³Ö²å¿¨ 
-#define SupportWMAREC          //Ö§³ÖWMA¸ñÊ½Â¼Òô 
-#define Msg_CTC2HZ             //Ê¹ÓÃCTC¶¨Ê±µÄ2HZÏûÏ¢
-#define UNICODE_SUPPORT       //Ö§³Öunicode¶à¹úÓïÑÔÇı¶¯
-#define NEWFORMATRES          //Ö§³ÖExcelÊäÈëUnicode±àÂëĞÂ¸ñÊ½ResÎÄ¼ş
-//#define ALARM_CLOCK             //Ö§³ÖÄÖÖÓ¹¦ÄÜ
-//#define AUTO_FMREC              //Ö§³ÖFM¶¨Ê±×Ô¶¯Â¼Òô¹¦ÄÜ
-#define  FUN_SWITCH_KEY            /* Ö§³ÖÒ»¼ü¹¦ÄÜÇĞ»» */
+#define SupportCard              // æ”¯æŒæ’å¡ 
+#define SupportWMAREC          //æ”¯æŒWMAæ ¼å¼å½•éŸ³ 
+#define Msg_CTC2HZ             //ä½¿ç”¨CTCå®šæ—¶çš„2HZæ¶ˆæ¯
+#define UNICODE_SUPPORT       //æ”¯æŒunicodeå¤šå›½è¯­è¨€é©±åŠ¨
+#define NEWFORMATRES          //æ”¯æŒExcelè¾“å…¥Unicodeç¼–ç æ–°æ ¼å¼Resæ–‡ä»¶
+//#define ALARM_CLOCK             //æ”¯æŒé—¹é’ŸåŠŸèƒ½
+//#define AUTO_FMREC              //æ”¯æŒFMå®šæ—¶è‡ªåŠ¨å½•éŸ³åŠŸèƒ½
+#define  FUN_SWITCH_KEY            /* æ”¯æŒä¸€é”®åŠŸèƒ½åˆ‡æ¢ */
 
 
 #define SOFTVOL_MAX    40
@@ -43,77 +43,77 @@
 //card base or nor base define
 //#define USE_CARDBASE
 
-//¹Ì¼şÅäÖÃÏà¹Øºê
-#define SIZE_CONFIGFILE_HEAD     16                 //fwcfg.bin Í·ĞÅÏ¢½á¹¹×Ö½ÚÊı
-#define SIZE_ONE_ITEM      32              // cfg_item_t ½á¹¹×Ö½ÚÊı
+//å›ºä»¶é…ç½®ç›¸å…³å®
+#define SIZE_CONFIGFILE_HEAD     16                 //fwcfg.bin å¤´ä¿¡æ¯ç»“æ„å­—èŠ‚æ•°
+#define SIZE_ONE_ITEM      32              // cfg_item_t ç»“æ„å­—èŠ‚æ•°
 
-#define SIZE_PARA_HEAD    16          //²ÎÊıÅäÖÃÀàÍ·ĞÅÏ¢½á¹¹³¤¶È
-#define SIZE_PARA_ONEITEM    48    //²ÎÊıÅäÖÃÀàµ¥ÏîÅäÖÃÏî³¤¶È
-#define SIZE_STRINGSET_ITEM    64     //×Ö·û´®ÅäÖÃÀà½á¹¹µ¥Ïî³¤¶È
+#define SIZE_PARA_HEAD    16          //å‚æ•°é…ç½®ç±»å¤´ä¿¡æ¯ç»“æ„é•¿åº¦
+#define SIZE_PARA_ONEITEM    48    //å‚æ•°é…ç½®ç±»å•é¡¹é…ç½®é¡¹é•¿åº¦
+#define SIZE_STRINGSET_ITEM    64     //å­—ç¬¦ä¸²é…ç½®ç±»ç»“æ„å•é¡¹é•¿åº¦
 
-#define SIZE_APCFG_HEAD      16       // ap config ÅäÖÃÏîÍ·½á¹¹³¤¶È
-#define SIZE_APINFOR_ITEM    32       // ap ÅäÖÃÏîµ¥Ïî³¤¶È
+#define SIZE_APCFG_HEAD      16       // ap config é…ç½®é¡¹å¤´ç»“æ„é•¿åº¦
+#define SIZE_APINFOR_ITEM    32       // ap é…ç½®é¡¹å•é¡¹é•¿åº¦
 
-#define SIZE_FUNC_HEAD     16       //¹¦ÄÜÅäÖÃÏîÍ·½á¹¹³¤¶È
+#define SIZE_FUNC_HEAD     16       //åŠŸèƒ½é…ç½®é¡¹å¤´ç»“æ„é•¿åº¦
 
-#define  SLEEPTIME_VALUE       0               //¹Ø»úÊ±¼ä
+#define  SLEEPTIME_VALUE       0               //å…³æœºæ—¶é—´
 #define  SLEEPTIME_MAX          120
 #define  SLEEPTIME_MIN           0
 #define  SLEEPTIME_STEP           10
 
-#define  VOLUME_VALUE       40               //ÒôÁ¿µÈ¼¶
+#define  VOLUME_VALUE       40               //éŸ³é‡ç­‰çº§
 #define  VOLUME_MAX          40
 #define  VOLUME_MIN           0
 #define  VOLUME_STEP           1
 
-#define  DEFVOLUME_VALUE       40               //Ä¬ÈÏÒôÁ¿32
+#define  DEFVOLUME_VALUE       40               //é»˜è®¤éŸ³é‡32
 #define  DEFVOLUME_MAX          40
 #define  DEFVOLUME_MIN           0
 #define  DEFVOLUME_STEP           1
 
-#define  RECGAIN_VALUE       15               //Â¼ÒôÔöÒæ
+#define  RECGAIN_VALUE       15               //å½•éŸ³å¢ç›Š
 #define  RECGAIN_MAX          15
 #define  RECGAIN_MIN           0
 #define  RECGAIN_STEP           1
 
-#define  RECTIME_VALUE       3               //×î´óÂ¼ÒôÊ±¼ä
+#define  RECTIME_VALUE       3               //æœ€å¤§å½•éŸ³æ—¶é—´
 #define  RECTIME_MAX          20
 #define  RECTIME_MIN           0
 #define  RECTIME_STEP           1
 
-#define  NOR_RECTIME_VALUE       15               //Ä¬ÈÏ norÂ¼ÒôÒôÁ¿£¨µ¥Î»ÎªS£©
-#define  NOR_RECTIME_MAX          15			  //×î´ónorÂ¼ÒôÊ±¼ä	 (Ãë)
+#define  NOR_RECTIME_VALUE       15               //é»˜è®¤ norå½•éŸ³éŸ³é‡ï¼ˆå•ä½ä¸ºSï¼‰
+#define  NOR_RECTIME_MAX          15			  //æœ€å¤§norå½•éŸ³æ—¶é—´	 (ç§’)
 #define  NOR_RECTIME_MIN           1
 #define  NOR_RECTIME_STEP           1
 
 #ifdef __C251__
-/*¹Ì¼şÅäÖÃÏà¹ØÊı¾İ½á¹¹¶¨Òå*/
+/*å›ºä»¶é…ç½®ç›¸å…³æ•°æ®ç»“æ„å®šä¹‰*/
 typedef struct
 {
-    uint8  Total; //Ö§³ÖµÄÓïÑÔ×ÜÊı,×î´ó25ÖÖÓïÑÔ
-    uint8  Active;//µ±Ç°Ä¬ÈÏÓïÑÔµÄIDºÅ
-    uint8  Table[62]; //ÓïÑÔIDºÅÊı×é£¬Ã¿¸öÊı×é³ÉÔ±±íÊ¾²»Í¬ÓïÑÔµÄID£¬È¡Öµ·¶Î§ÎªÎª0-29£¬0xff±íÊ¾µ½½áÎ²
+    uint8  Total; //æ”¯æŒçš„è¯­è¨€æ€»æ•°,æœ€å¤§25ç§è¯­è¨€
+    uint8  Active;//å½“å‰é»˜è®¤è¯­è¨€çš„IDå·
+    uint8  Table[62]; //è¯­è¨€IDå·æ•°ç»„ï¼Œæ¯ä¸ªæ•°ç»„æˆå‘˜è¡¨ç¤ºä¸åŒè¯­è¨€çš„IDï¼Œå–å€¼èŒƒå›´ä¸ºä¸º0-29ï¼Œ0xffè¡¨ç¤ºåˆ°ç»“å°¾
 } lan_set_t;    // 64 bytes
 
 typedef struct
 {
-    uint8  Total;      //Ö§³ÖµÄ°´¼ü¶¨Òå×ÜÊı£¬×î¶àÖ§³Ö16¸ö°´¼ü
-    uint8  Table[16];  //°´¼üÏûÏ¢Öµ¶¨ÒåÊı×é£¬Ã¿¸öÊı×é³ÉÔ±±íÊ¾²»Í¬µÄ°´¼üÏûÏ¢
+    uint8  Total;      //æ”¯æŒçš„æŒ‰é”®å®šä¹‰æ€»æ•°ï¼Œæœ€å¤šæ”¯æŒ16ä¸ªæŒ‰é”®
+    uint8  Table[16];  //æŒ‰é”®æ¶ˆæ¯å€¼å®šä¹‰æ•°ç»„ï¼Œæ¯ä¸ªæ•°ç»„æˆå‘˜è¡¨ç¤ºä¸åŒçš„æŒ‰é”®æ¶ˆæ¯
 } key_set_t;   // 17 bytes
 
 typedef struct
 {
-    uint8  Total;     //Ö§³ÖµÄAPµÄ×ÜÊı
-    uint8  Active;    //½øÈëÖ÷²Ëµ¥Ä¬ÈÏapµÄ±àºÅ
-    uint8 Table[16]; //AP¶ÔÓ¦µÄÊı×é£¬Ã¿¸öÊı×é³ÉÔ±Á½¸ö×Ö½Ú£¬µÚÒ»¸ö±íÊ¾AP±àºÅ,µÚ¶ş¸ö±íÊ¾AP×´Ì¬
+    uint8  Total;     //æ”¯æŒçš„APçš„æ€»æ•°
+    uint8  Active;    //è¿›å…¥ä¸»èœå•é»˜è®¤apçš„ç¼–å·
+    uint8 Table[16]; //APå¯¹åº”çš„æ•°ç»„ï¼Œæ¯ä¸ªæ•°ç»„æˆå‘˜ä¸¤ä¸ªå­—èŠ‚ï¼Œç¬¬ä¸€ä¸ªè¡¨ç¤ºAPç¼–å·,ç¬¬äºŒä¸ªè¡¨ç¤ºAPçŠ¶æ€
 } ap_set_t;  // 18 bytes
 
 typedef struct
 {
-    uint8  DefValue;  //Ä¬ÈÏÖµ
-    uint8  Max;      //×î´óÖµ
-    uint8  Min;      //×îĞ¡Öµ
-    uint8  Step;     //²½³¤
+    uint8  DefValue;  //é»˜è®¤å€¼
+    uint8  Max;      //æœ€å¤§å€¼
+    uint8  Min;      //æœ€å°å€¼
+    uint8  Step;     //æ­¥é•¿
 } value_set_t;  // 4 bytes
 
 typedef struct
@@ -126,20 +126,20 @@ typedef struct
     value_set_t   Volume;
     value_set_t   VolDefault;
     value_set_t   RecordGain;
-    value_set_t   RecordTimeMax; //Ö§³Ö×î´óÂ¼ÒôÊ±¼ä
-    value_set_t   Nor_RecordTimeMax; //Ö§³Önor ×î´óÂ¼ÒôÊ±¼ä,µ¥Î»ÎªÃë
+    value_set_t   RecordTimeMax; //æ”¯æŒæœ€å¤§å½•éŸ³æ—¶é—´
+    value_set_t   Nor_RecordTimeMax; //æ”¯æŒnor æœ€å¤§å½•éŸ³æ—¶é—´,å•ä½ä¸ºç§’
     uint8  DevVesion[32];
     uint8  FirmwareDate[32];
-    uint8  FMBuildInFlag;	  //FMÖ§³Ö£¬0£¬²»Ö§³Ö£¬1£¬Ö§³Ö
-    uint8  ClassDFlag;	  //DÀà¹¦·Å£¬Íâ¹ÒÀ®°ÈÊ±Ê¹ÓÃ£¬0£¬²»Ö§³Ö£¬1£¬Ö§³Ö
-    uint8  KeyToneFlag;//°´¼üÒô¹¦ÄÜÖ§³Ö   0£¬ ²»Ö§³Ö°´¼üÒô£» 1£¬Ö§³Ö
-    uint8  Support_WAV;     // Ö§³ÖWAVÂ¼Òô¡£0£¬Ö»Ö§³Ömp3Â¼Òô£¬1-Ö»Ö§³ÖWAVÂ¼Òô
-    uint8  TTS_Report;     // TTS ²¥±¨¹¦ÄÜÖ§³Ö   0£¬ ²»Ö§³ÖTTS   1£¬ Ö§³Ö
-    uint8  Support_NorRec; // Nor Â¼Òô¹¦ÄÜÖ§³Ö   0£¬ ²»Ö§³ÖNorÂ¼Òô£¬Ê¹ÓÃ¿¨»òuÅÌ½éÖÊÂ¼Òô    1£¬ Ö§³ÖNorÂ¼Òô
+    uint8  FMBuildInFlag;	  //FMæ”¯æŒï¼Œ0ï¼Œä¸æ”¯æŒï¼Œ1ï¼Œæ”¯æŒ
+    uint8  ClassDFlag;	  //Dç±»åŠŸæ”¾ï¼Œå¤–æŒ‚å–‡å­æ—¶ä½¿ç”¨ï¼Œ0ï¼Œä¸æ”¯æŒï¼Œ1ï¼Œæ”¯æŒ
+    uint8  KeyToneFlag;//æŒ‰é”®éŸ³åŠŸèƒ½æ”¯æŒ   0ï¼Œ ä¸æ”¯æŒæŒ‰é”®éŸ³ï¼› 1ï¼Œæ”¯æŒ
+    uint8  Support_WAV;     // æ”¯æŒWAVå½•éŸ³ã€‚0ï¼Œåªæ”¯æŒmp3å½•éŸ³ï¼Œ1-åªæ”¯æŒWAVå½•éŸ³
+    uint8  TTS_Report;     // TTS æ’­æŠ¥åŠŸèƒ½æ”¯æŒ   0ï¼Œ ä¸æ”¯æŒTTS   1ï¼Œ æ”¯æŒ
+    uint8  Support_NorRec; // Nor å½•éŸ³åŠŸèƒ½æ”¯æŒ   0ï¼Œ ä¸æ”¯æŒNorå½•éŸ³ï¼Œä½¿ç”¨å¡æˆ–uç›˜ä»‹è´¨å½•éŸ³    1ï¼Œ æ”¯æŒNorå½•éŸ³
 } vm_cfg_t;
 
 
-/*ÅäÖÃÏîÊı¾İ½á¹¹¶¨Òå*/
+/*é…ç½®é¡¹æ•°æ®ç»“æ„å®šä¹‰*/
 typedef struct
 {
     char   CfgMagic[4];
@@ -155,7 +155,7 @@ typedef struct
 } cfg_item_t; // 32 bytes
 
 
-/*²ÎÊıÀàÅäÖÃÏîÍ·ĞÅÏ¢Êı¾İ½á¹¹¶¨Òå*/
+/*å‚æ•°ç±»é…ç½®é¡¹å¤´ä¿¡æ¯æ•°æ®ç»“æ„å®šä¹‰*/
 typedef struct
 {
     uint32 ValueOffset;
@@ -165,7 +165,7 @@ typedef struct
     char   Reserv[6];
 } paraset_head_t; //16 bytes
 
-/*ÊıÖµÀàÅäÖÃÏîÊı¾İ½á¹¹¶¨Òå*/
+/*æ•°å€¼ç±»é…ç½®é¡¹æ•°æ®ç»“æ„å®šä¹‰*/
 typedef struct
 {
     uint8  DefValue;
@@ -177,7 +177,7 @@ typedef struct
     char   CName[16];
 } value_t; //48 bytes
 
-/*×Ö·û´®ÀàÅäÖÃÏîÊı¾İ½á¹¹¶¨Òå*/
+/*å­—ç¬¦ä¸²ç±»é…ç½®é¡¹æ•°æ®ç»“æ„å®šä¹‰*/
 typedef struct
 {
     char   StringCfg[32];
@@ -185,7 +185,7 @@ typedef struct
     char   CName[16];
 } string_t; //64 bytes
 
-/*°´¼üÀàÅäÖÃÏîÊı¾İ½á¹¹¶¨Òå*/
+/*æŒ‰é”®ç±»é…ç½®é¡¹æ•°æ®ç»“æ„å®šä¹‰*/
 typedef struct
 {
     uint8  TotalKey;
@@ -197,11 +197,11 @@ typedef struct
 typedef struct
 {
     uint8  Value;
-    uint8  Status; //0 ±íÊ¾¿ÉÅäÖÃµÄ°´¼ü£¬1±íÊ¾²»¿ÉÅäÖÃ
+    uint8  Status; //0 è¡¨ç¤ºå¯é…ç½®çš„æŒ‰é”®ï¼Œ1è¡¨ç¤ºä¸å¯é…ç½®
     char   Description[14];
 } key_infor_t; //16 bytes
 
-/*APÅäÖÃÏîÍ·ĞÅÏ¢Êı¾İ½á¹¹¶¨Òå*/
+/*APé…ç½®é¡¹å¤´ä¿¡æ¯æ•°æ®ç»“æ„å®šä¹‰*/
 typedef struct
 {
     uint8  Total;
@@ -209,7 +209,7 @@ typedef struct
     char   Reserv[14];
 } ap_cfg_head_t; //16 bytes
 
-/*ap ÅäÖÃĞÅÏ¢Êı¾İ½á¹¹*/
+/*ap é…ç½®ä¿¡æ¯æ•°æ®ç»“æ„*/
 typedef struct
 {
     uint8  Index;
@@ -220,29 +220,29 @@ typedef struct
 
 typedef struct
 {
-    uint8  Total; //Ö§³ÖµÄÓïÑÔ×ÜÊı,×î´ó25ÖÖÓïÑÔ
-    uint8  Active;//µ±Ç°Ä¬ÈÏÓïÑÔµÄIDºÅ
-    uint8  Table[62]; //ÓïÑÔIDºÅÊı×é£¬Ã¿¸öÊı×é³ÉÔ±±íÊ¾²»Í¬ÓïÑÔµÄID£¬È¡Öµ·¶Î§ÎªÎª0-29£¬0xff±íÊ¾µ½½áÎ²
+    uint8  Total; //æ”¯æŒçš„è¯­è¨€æ€»æ•°,æœ€å¤§25ç§è¯­è¨€
+    uint8  Active;//å½“å‰é»˜è®¤è¯­è¨€çš„IDå·
+    uint8  Table[62]; //è¯­è¨€IDå·æ•°ç»„ï¼Œæ¯ä¸ªæ•°ç»„æˆå‘˜è¡¨ç¤ºä¸åŒè¯­è¨€çš„IDï¼Œå–å€¼èŒƒå›´ä¸ºä¸º0-29ï¼Œ0xffè¡¨ç¤ºåˆ°ç»“å°¾
 } lang_infor_t; //64 bytes
 
 typedef struct
 {
-    uint8  Total; //µ±Ç°¿ÉÌæ»»µÄ¹Ì¼şÎÄ¼ş
-    uint8  Reserv[15]; //±£Áô
+    uint8  Total; //å½“å‰å¯æ›¿æ¢çš„å›ºä»¶æ–‡ä»¶
+    uint8  Reserv[15]; //ä¿ç•™
 } file_ex_t; //16 bytes
 
 typedef struct
 {
-    uint8  Total; //µ±Ç°¿ÉÅäÖÃÏîµÄ×ÜÊı
-    uint8  Reserv[15]; //±£Áô
+    uint8  Total; //å½“å‰å¯é…ç½®é¡¹çš„æ€»æ•°
+    uint8  Reserv[15]; //ä¿ç•™
 } func_cfg_t; //16 bytes
 
 typedef struct
 {
-    uint8  State; //¹¦ÄÜÖ§³ÖÏîµÄ×´Ì¬£¬0£¬²»Ö§³Ö£¬1£¬Ö§³Ö¡£
-    uint8  Reserv[15]; //±£Áô
-    uint8  EName[16];  //Ó¢ÎÄÃû
-    uint8  CName[16];  //ÖĞÎÄÃû
+    uint8  State; //åŠŸèƒ½æ”¯æŒé¡¹çš„çŠ¶æ€ï¼Œ0ï¼Œä¸æ”¯æŒï¼Œ1ï¼Œæ”¯æŒã€‚
+    uint8  Reserv[15]; //ä¿ç•™
+    uint8  EName[16];  //è‹±æ–‡å
+    uint8  CName[16];  //ä¸­æ–‡å
 } func_item_t; //48 bytes
 
 #endif      /*end of #ifdef __C251__*/

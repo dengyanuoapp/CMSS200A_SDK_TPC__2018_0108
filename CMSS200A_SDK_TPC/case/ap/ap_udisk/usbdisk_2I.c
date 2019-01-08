@@ -39,13 +39,13 @@ WORD wUDiskDisp[3] =
 //{
 //    char i;
 //#ifdef ONLINEDEVICE_SWITCH
-//    //ÒÑÊÕµ½Menu¼ü,²»ÔÙÊÕÏûÏ¢,ÒÔ·À·Ç¿ÕÏĞ×´Ì¬ÏÂÅÜ¸Ãº¯Êı°ÑKeyUpÊÕ×ß    // quinn 070427 modify
+//    //å·²æ”¶åˆ°Menué”®,ä¸å†æ”¶æ¶ˆæ¯,ä»¥é˜²éç©ºé—²çŠ¶æ€ä¸‹è·‘è¯¥å‡½æ•°æŠŠKeyUpæ”¶èµ°    // quinn 070427 modify
 //    if(MenuKeyPress==1 || PlayKeyPress==1)
 //#else
 //    if(MenuKeyPress==1)
 //#endif
 //            return;
-//    //ÊÕµ½Menu¼ü
+//    //æ”¶åˆ°Menué”®
 //    if((i = GetSysMsg()) == Msg_KeyMenu)
 //    {
 //        if(USBStatus==0)
@@ -84,15 +84,15 @@ WORD wUDiskDisp[3] =
 //    char    i,j,k;
 //    char    *card_wp_flag = (char *)0x9c; //card hold status
 //    k = input8(0x27);
-//    output8(0x27,0x0);          //ÏÔÊ¾Ê±²»¿ªÖĞ¶Ï£¬±ÜÃâµÍÆµÅÜÖĞ¶Ï·şÎñ£¨ÏÂÃæ´úÂë»á½µÆµ£©£¬½µµÍĞ§ÂÊ
+//    output8(0x27,0x0);          //æ˜¾ç¤ºæ—¶ä¸å¼€ä¸­æ–­ï¼Œé¿å…ä½é¢‘è·‘ä¸­æ–­æœåŠ¡ï¼ˆä¸‹é¢ä»£ç ä¼šé™é¢‘ï¼‰ï¼Œé™ä½æ•ˆç‡
 //
 //    i = input8(0x00);
-//    output8(0x00,i | 0x81);     //ÏÔÊ¾ÆÁ²»Ö§³Ö60MHzËÍÆÁ£¬½µÆµ
+//    output8(0x00,i | 0x81);     //æ˜¾ç¤ºå±ä¸æ”¯æŒ60MHzé€å±ï¼Œé™é¢‘
 //
 //    for(j=0; j<0x40; j++){}
 //    if(dispIndi<0x10)
 //    {
-//        if(dispIndi==0x00)               //ÏÔÊ¾ÈÎÎñÖ¸Ê¾ 0:ÎŞÏÔÊ¾¶¯×÷  01:ÉÏ´«  02:ÏÂ´«  03:´«Êä½áÊø
+//        if(dispIndi==0x00)               //æ˜¾ç¤ºä»»åŠ¡æŒ‡ç¤º 0:æ— æ˜¾ç¤ºåŠ¨ä½œ  01:ä¸Šä¼   02:ä¸‹ä¼   03:ä¼ è¾“ç»“æŸ
 //        {
 //                ResShowPic(UDISKRDY, PIC_X_B_UDISKRDY, PIC_Y_B_UDISKRDY);
 //                UDiskRdyFlag = TRUE;
@@ -157,45 +157,45 @@ WORD wUDiskDisp[3] =
 //    }
 //
 //displayend:
-//    output8(0x00,i);        //Éı»ØÆµÂÊ
+//    output8(0x00,i);        //å‡å›é¢‘ç‡
 //    for(j=0;j<0x40;j++){}
-//    output8(0x27,k);      //»Ö¸´ÖĞ¶Ï
+//    output8(0x27,k);      //æ¢å¤ä¸­æ–­
 //}
 
 
 bool UDiskInitAll(int para)
 {
     int i;
-    //    //°²×°udÇı¶¯
+    //    //å®‰è£…udé©±åŠ¨
     //    res_fp = ResOpen("ui30.res");
-    //    ResShowPic(UDISKRDY,0,0);                  //ÏÔÊ¾¿ÕÏĞ»­Ãæ
+    //    ResShowPic(UDISKRDY,0,0);                  //æ˜¾ç¤ºç©ºé—²ç”»é¢
     //    if(DRV_DetectUD(0x00) == 0xff)
     //    {
     //        return 0;
     //    }
     //    else
     //    {
-    //        DRV_ActiveUD(0x00,MODE_FAST);       //¿ìËÙÄ£Ê½udÇı¶¯
+    //        DRV_ActiveUD(0x00,MODE_FAST);       //å¿«é€Ÿæ¨¡å¼udé©±åŠ¨
     //    }
     //#ifndef NEWFORMATRES
-    //    //FILE_IM//VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval));     //¶ÁVRAM
+    //    //FILE_IM//VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval));     //è¯»VRAM
     //#endif
-    //    if(g_comval.magic != MAGIC_COMVAL)      //È¡Áª»úÄ£Ê½Éè¶¨
+    //    if(g_comval.magic != MAGIC_COMVAL)      //å–è”æœºæ¨¡å¼è®¾å®š
     //    {
     //           GetDefaultComval(&g_comval);
     //    }
     //    //==================================================================================
-    //    //**********************ÒÔÏÂº¯Êıµ÷ÓÃ´ÎĞò²»ÄÜ¸Ä¶¯***************************************
+    //    //**********************ä»¥ä¸‹å‡½æ•°è°ƒç”¨æ¬¡åºä¸èƒ½æ”¹åŠ¨***************************************
     //    //==================================================================================
     //     //DISPLAY_IM//DispBuf=(char *)DISPLAY_BUFFER_ADDR;
-    //    UDiskSetDiskNum(g_comval.OnlineMode);   //ÉèÖÃÁª»úÄ£Ê½
+    //    UDiskSetDiskNum(g_comval.OnlineMode);   //è®¾ç½®è”æœºæ¨¡å¼
     //#ifdef SupportCard
-    //    AlwaysShowCardDisk(1);                  //ÉèÖÃÊÇ·ñÏÔÊ¾¶àÅÌ·û
+    //    AlwaysShowCardDisk(1);                  //è®¾ç½®æ˜¯å¦æ˜¾ç¤ºå¤šç›˜ç¬¦
     //#endif
-    //    UDiskInit((void *)FlashLed);            //UÅÌ³õÊ¼ÖÕ»¯,ÊäÈë²ÎÊı:callbackº¯Êı£¬ÊôĞÔ...
+    //    UDiskInit((void *)FlashLed);            //Uç›˜åˆå§‹ç»ˆåŒ–,è¾“å…¥å‚æ•°:callbackå‡½æ•°ï¼Œå±æ€§...
 
-    //    /*¼ì²âholdÊ±È¥¶¶*/
-    //    if(sKY_HoldCheck())                     //HOLD±íÊ¾ĞèÒªĞ´±£»¤
+    //    /*æ£€æµ‹holdæ—¶å»æŠ–*/
+    //    if(sKY_HoldCheck())                     //HOLDè¡¨ç¤ºéœ€è¦å†™ä¿æŠ¤
     //    {
     //        int i,j;
     //        for(i=0;i<20;i++)
@@ -218,8 +218,8 @@ bool UDiskInitAll(int para)
     //        }
     //    }
     //    sysinfopt=&sysinfo;
-    //    GetSysInfo(sysinfopt);          //È¡µÃADFU UPDµÄĞÅÏ¢Í·
-    UDiskRun(para); //Æô¶¯USBÒıÇæ
+    //    GetSysInfo(sysinfopt);          //å–å¾—ADFU UPDçš„ä¿¡æ¯å¤´
+    UDiskRun(para); //å¯åŠ¨USBå¼•æ“
     return 1;
 }
 void FlashLed(void)

@@ -12,7 +12,7 @@ extern Music_type_a ALARMCheckMusicType(uint8 *filename);
 
 extern Open_param_t g_Openparam;
 extern uint16 playing_count;
-extern uint8 play_times;//²¥·Å´ÎÊý
+extern uint8 play_times;//æ’­æ”¾æ¬¡æ•°
 extern bool AlarmMusicpSendCommand(uint8 cmd, void *param);
 extern void AlarmGetInfo(void);
 

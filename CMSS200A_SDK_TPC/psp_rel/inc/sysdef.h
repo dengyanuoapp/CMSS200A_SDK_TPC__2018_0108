@@ -21,53 +21,53 @@
 //#define ColorSrcreen
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//´Ë´¦¶¨Òåactos°æ±¾
+//æ­¤å¤„å®šä¹‰actosç‰ˆæœ¬
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #define SysVer  0x30
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//´Ë´¦¶¨ÒåSDµÄÈİÁ¿
+//æ­¤å¤„å®šä¹‰SDçš„å®¹é‡
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#define SD_CAP              0x400000//0x2000000          //system disk cap,4096KB. flash blockµÄ±¶Êı, ÏÖÈ¡128KB
-#define VM_CAP              0x010000//0x1200000                //vram & hds locationarea: 8MB. ĞèÎªflash blockÈİÁ¿µÄ±¶Êı, ÏÖÈ¡128KB
+#define SD_CAP              0x400000//0x2000000          //system disk cap,4096KB. flash blockçš„å€æ•°, ç°å–128KB
+#define VM_CAP              0x010000//0x1200000                //vram & hds locationarea: 8MB. éœ€ä¸ºflash blockå®¹é‡çš„å€æ•°, ç°å–128KB
 #define MI_CAP              0x0//0x1440000                //mtp infor area cap: 0x1440 sector
 #define UI_CAP              0x002000//0x02000                //usb disk infor area cap
 
 
-#define DEVCERTOFFSET       0x000080                //DEVCERTÆğÊ¼Æ«ÒÆ£¨ÉÈÇøÎªµ¥Î»£©Õ¼ÓÃ16K, (VM_CAPÄÚ) 0~0x7fÊÇÏµÍ³VRAM
-#define SYNCLISTOFFSET      0x0000a0                //SYNCLIST£¬Õ¼ÓÃ0.5K
-#define SECURETIMEOFFSET    0x0000a1                //SECURETIME£¬Õ¼ÓÃ0.5K
-#define SECCLKCHLGOFFSET    0x0000a2                //SECCLKCHLG£¬Õ¼ÓÃ0.5K
-#define SYNCLISTDYNAMIC     0x0000a3                //SYNCLIST£¬Õ¼ÓÃ20K
-#define SECCLKRESPOFFSET    0x0000a3                //SECCLKRESP£¬Õ¼ÓÃ20K
-#define XMLINFOOFFSET       0x0000a3                //XMLINFO£¬Õ¼ÓÃ20K
-#define METERCERTOFFSET     0x0000a3                //METERCERT£¬Õ¼ÓÃ20K
-#define METERCHLGOFFSET     0x0000a3                //METERCHLG£¬Õ¼ÓÃ20K
-#define METERRESPOFFSET     0x0000a3                //METERRESPOFFSET£¬Õ¼ÓÃ20K
-#define STATEQUERYOFFSET    0x0000a3                //METERRESPOFFSET£¬Õ¼ÓÃ20K
+#define DEVCERTOFFSET       0x000080                //DEVCERTèµ·å§‹åç§»ï¼ˆæ‰‡åŒºä¸ºå•ä½ï¼‰å ç”¨16K, (VM_CAPå†…) 0~0x7fæ˜¯ç³»ç»ŸVRAM
+#define SYNCLISTOFFSET      0x0000a0                //SYNCLISTï¼Œå ç”¨0.5K
+#define SECURETIMEOFFSET    0x0000a1                //SECURETIMEï¼Œå ç”¨0.5K
+#define SECCLKCHLGOFFSET    0x0000a2                //SECCLKCHLGï¼Œå ç”¨0.5K
+#define SYNCLISTDYNAMIC     0x0000a3                //SYNCLISTï¼Œå ç”¨20K
+#define SECCLKRESPOFFSET    0x0000a3                //SECCLKRESPï¼Œå ç”¨20K
+#define XMLINFOOFFSET       0x0000a3                //XMLINFOï¼Œå ç”¨20K
+#define METERCERTOFFSET     0x0000a3                //METERCERTï¼Œå ç”¨20K
+#define METERCHLGOFFSET     0x0000a3                //METERCHLGï¼Œå ç”¨20K
+#define METERRESPOFFSET     0x0000a3                //METERRESPOFFSETï¼Œå ç”¨20K
+#define STATEQUERYOFFSET    0x0000a3                //METERRESPOFFSETï¼Œå ç”¨20K
 
-#define HDSOFFSET           0x000100                //drm hdsÎÄ¼şÆğÊ¼Æ«ÒÆ£¨ÉÈÇøÎªµ¥Î»£©(VM_CAPÄÚ)
+#define HDSOFFSET           0x000100                //drm hdsæ–‡ä»¶èµ·å§‹åç§»ï¼ˆæ‰‡åŒºä¸ºå•ä½ï¼‰(VM_CAPå†…)
 
 #define FlashDiskOffset     0x9000                  //VM_CAP >>9 mtp infor(0x1450) start addr in ud area
 #define VMFSOffset          0x8000
 #define DrvOffset           0x410                  //(VM_CAP + MI_CAP + UI_CAP)>>9  usb disk start addr in ud area
 
 
-#define DrvOffset0      DrvOffset                   //´Ë²ÎÊıÓÃÓÚusbdiskºÍÎÄ¼şÏµÍ³×ö
-#define DrvOffset1      0x0000                      //Æ«ÒÆÓÃ£¬Ëû½«Í¬checkpartitionÓë
-#define DrvOffset2      0x0000                      //ÎÄ¼şÏµÍ³Çı¶¯µÄÊäÈë²ÎÊıÅäºÏÊ¹ÓÃ
-#define DrvOffset3      0x0000                      //xxxxnnnn,ÆäÖĞxxxxÎª0~3±íÊ¾Æ«ÒÆµÄÖÖÀà(drvoffsetmod)
-//nnnn±íÊ¾udºÅ£¨checkpartition)»ò·ÖÇøºÅ(fs_init)
+#define DrvOffset0      DrvOffset                   //æ­¤å‚æ•°ç”¨äºusbdiskå’Œæ–‡ä»¶ç³»ç»Ÿåš
+#define DrvOffset1      0x0000                      //åç§»ç”¨ï¼Œä»–å°†åŒcheckpartitionä¸
+#define DrvOffset2      0x0000                      //æ–‡ä»¶ç³»ç»Ÿé©±åŠ¨çš„è¾“å…¥å‚æ•°é…åˆä½¿ç”¨
+#define DrvOffset3      0x0000                      //xxxxnnnn,å…¶ä¸­xxxxä¸º0~3è¡¨ç¤ºåç§»çš„ç§ç±»(drvoffsetmod)
+//nnnnè¡¨ç¤ºudå·ï¼ˆcheckpartition)æˆ–åˆ†åŒºå·(fs_init)
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// ic °æ±¾
+// ic ç‰ˆæœ¬
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //#define ICVer3935
 #define ICVer3951
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// chip enable ·ÖÅä
+// chip enable åˆ†é…
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #ifdef ICVer3935
 #define BootFlashCE     0x06
@@ -81,7 +81,7 @@
 #define DisplayCE       0x05
 #endif
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//¶¨ÒåDMAÑÓÊ±
+//å®šä¹‰DMAå»¶æ—¶
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #define    WaitState    0x03
 
@@ -90,7 +90,7 @@
 #define WatchdogTime        2
 #endif
 
-//ÎªÁË¼Ó¿ì¿ª»úËÙ¶È£¬²»¶¨Òå´Ë±äÁ¿½«²»Ğ£Ñéfontlib(*.$$$)
+//ä¸ºäº†åŠ å¿«å¼€æœºé€Ÿåº¦ï¼Œä¸å®šä¹‰æ­¤å˜é‡å°†ä¸æ ¡éªŒfontlib(*.$$$)
 //#define  CheckFontLib
 
 #endif  /*_SYSDEF_H*/

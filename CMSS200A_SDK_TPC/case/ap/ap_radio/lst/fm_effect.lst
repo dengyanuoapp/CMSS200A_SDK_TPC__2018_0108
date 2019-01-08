@@ -12,7 +12,7 @@ stmt  level    source
     1          #include "ap_radio.h"
     2          #include "actos.h"
     3          #include "ap_common.h"
-    4          #include "decC.h"       //ÉèÖÃEQÊ±Ê¹ÓÃ
+    4          #include "decC.h"       //è®¾ç½®EQæ—¶ä½¿ç”¨
     5          #pragma name(FM_EFFECT)
     6          
     7          const uint8 EQtemp[8][10] =
@@ -44,17 +44,17 @@ stmt  level    source
    33   2              g_decControlInfor.EQFlag = 0x67;
    34   2              if (dat == NULL)
    35   2              {
-   36   3                  //´ÓVRAM¶Á£¬±£´æµÄ²ÎÊı¼°Ê±ÉúĞ§
+   36   3                  //ä»VRAMè¯»ï¼Œä¿å­˜çš„å‚æ•°åŠæ—¶ç”Ÿæ•ˆ
    37   3                  VMRead(&g_eq_para, VM_PCSET_EQ, sizeof(EQ_VM_t));
    38   3                  if (g_eq_para.magic != EQ_VRAM_MAGIC)
    39   3                  {
-   40   4                      //Ê¹ÓÃ´úÂëÄ¬ÈÏEQ±í
+   40   4                      //ä½¿ç”¨ä»£ç é»˜è®¤EQè¡¨
    41   4                      memcpy(g_decControlInfor.EQVal, (void *) EQtemp[(uint8) g_comval.eq_type],
    42   4                             sizeof(g_decControlInfor.EQVal));
    43   4                  }
    44   3                  else
    45   3                  {
-   46   4                      //Ê¹ÓÃ¹¤¾ßÉèÖÃEQ±í
+   46   4                      //ä½¿ç”¨å·¥å…·è®¾ç½®EQè¡¨
    47   4                      memcpy(g_decControlInfor.EQVal, (void *) &g_eq_para.left_eq_para[(uint8) ONE_EQPARA_BYTE
    48   4                              * g_comval.eq_type], ONE_EQPARA_BYTE);
    49   4                  }
@@ -77,13 +77,13 @@ stmt  level    source
    64   2              {
    65   3                  if (g_eq_para.magic != EQ_VRAM_MAGIC)
    66   3                  {
-   67   4                      //Ê¹ÓÃ´úÂëÄ¬ÈÏEQ±í
+   67   4                      //ä½¿ç”¨ä»£ç é»˜è®¤EQè¡¨
    68   4                      memcpy(g_decControlInfor.EQVal, (void *) EQtemp[(uint8) g_comval.eq_type],
    69   4                             sizeof(g_decControlInfor.EQVal));
    70   4                  }
    71   3                  else
    72   3                  {
-   73   4                      //Ê¹ÓÃ¹¤¾ßÉèÖÃEQ±í
+   73   4                      //ä½¿ç”¨å·¥å…·è®¾ç½®EQè¡¨
    74   4                      memcpy(g_decControlInfor.EQVal, (void *) &g_eq_para.right_eq_para[(uint8) ONE_EQPARA_BYTE
    75   4                              * g_comval.eq_type], ONE_EQPARA_BYTE);
    76   4                  }
@@ -105,7 +105,7 @@ stmt  level    source
    92           * Arguments  :
    93           *
    94           * Returns     :
-   95           *            ÎŞ
+   95           *            æ— 
    96           * Notes       :
    97           *
    98           ********************************************************************************/
@@ -121,7 +121,7 @@ stmt  level    source
   108           ********************************************************************************
   109           *             void deal_eq_msg(void)
   110           *
-  111           * Description : ´¦ÀíEQÄ£Ê½µ÷½ÚÏûÏ¢
+  111           * Description : å¤„ç†EQæ¨¡å¼è°ƒèŠ‚æ¶ˆæ¯
   112           *
   113           *
   114           * Arguments   :
@@ -193,7 +193,7 @@ stmt  level    source
   178   1          set_eq_data(g_comval.eq_type, NULL);
   179   1      
   180   1          decinitAnalog(AD_FM); //demo layout error
-  181   1          //TM_DelayMS(50); //ÑÓÊ±£¬·ÀÖ¹PAPA Éù
+  181   1          //TM_DelayMS(50); //å»¶æ—¶ï¼Œé˜²æ­¢PAPA å£°
   182   1          decstartAnalog(AD_FM);
   183   1          SetAINGain(7, 0 );
   184   1          volume_callback(g_comval.volume);
@@ -207,9 +207,9 @@ stmt  level    source
   190           ********************************************************************************
   191           *             void    volume_callback(uint16 Vol)
   192           *
-  193           * Description : ÒôÁ¿ÉèÖÃµÄCALLBACKº¯Êı
+  193           * Description : éŸ³é‡è®¾ç½®çš„CALLBACKå‡½æ•°
   194           *
-  195           * Arguments   :    µ±Ç°ĞèÉèÖÃµÄÒôÁ¿Öµ
+  195           * Arguments   :    å½“å‰éœ€è®¾ç½®çš„éŸ³é‡å€¼
   196           *
   197           * Returns     :
   198           *
@@ -219,7 +219,7 @@ stmt  level    source
   202           */
   203          void volume_callback(uint16 Vol)
   204          {
-  205   1          //ÊµÊ±¸Ä±äÒôÁ¿µÄÖµ
+  205   1          //å®æ—¶æ”¹å˜éŸ³é‡çš„å€¼
   206   1          g_comval.vol_display = (uint8) Vol;
   207   1          if (g_comval.VolumeMax != 0)
   208   1          {

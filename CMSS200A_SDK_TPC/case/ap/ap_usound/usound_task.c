@@ -24,24 +24,24 @@ extern uint8 usb_state;
 
 SD_FILE *res_fp;
 region_t res_region;
-uint8 ui_auto_select = FALSE; //ÊÇ·ñ×Ô¶¯È·ÈÏ
+uint8 ui_auto_select = FALSE; //æ˜¯å¦è‡ªåŠ¨ç¡®è®¤
 uint32 pic_entry_offset;
 uint32 string_entry_offset;
 uint8 p_device_name[] = "USND";
-uint8 g_light_time = 0; //¹Ø±³¹âÊ±¼ä,0.5ÃëÎªµ¥Î»
-uint8 g_light_mode = 0; //¹ØÁÁ¶ÈÄ£Ê½£¬0£º±ä°µ£¬1£º±äºÚ
-uint8 g_contrast_num = 0; //¶Ô±È¶È
-uint16 g_sleep_time = 0; //Ë¯ÃßÊ±¼ä,0.5ÃëÎªµ¥Î»
-uint16 g_standby_time = 0; //×Ô¶¯¹Ø»úÊ±¼ä,0.5ÃëÎªµ¥Î»
-uint16 g_rtc_counter = 0; //rtc ÏûÏ¢¼ÆÊı
-uint8 g_light_flag = TRUE;//±³¾°µÆ¿ª¹Ø±êÖ¾
-uint8 g_charge_counter = 0; //¼ì²â³äµç×´Ì¬µÄ¼ÆÊıÆ÷£¬²åÉÏUSB¾Í¿ªÊ¼¼ì²âµÚÒ»´Î
-uint16 g_low_counter = 0;//±¨µÍµç¼ÆÊıÆ÷
-uint16 key_count = 0; //µ±Ç°°´¼üÏûÏ¢·¢ÉúµÄ´ÎÊı
-uint8 key_value = Msg_KeyNull; //µ±Ç°°´¼üµÄÖµ
-uint16 lowPower_counter = 0;//µÍµç·¢Éú´ÎÊı
-uint8 file_name[12]; //´æ·ÅÎÄ¼ş¶ÌÃûÊı×Ö
-uint8 cur_value = 0; //µ±Ç°µÄµç³ØµçÁ¿Öµ£¬Ö÷ÒªÓÃÓÚ³äµçÏÔÊ¾
+uint8 g_light_time = 0; //å…³èƒŒå…‰æ—¶é—´,0.5ç§’ä¸ºå•ä½
+uint8 g_light_mode = 0; //å…³äº®åº¦æ¨¡å¼ï¼Œ0ï¼šå˜æš—ï¼Œ1ï¼šå˜é»‘
+uint8 g_contrast_num = 0; //å¯¹æ¯”åº¦
+uint16 g_sleep_time = 0; //ç¡çœ æ—¶é—´,0.5ç§’ä¸ºå•ä½
+uint16 g_standby_time = 0; //è‡ªåŠ¨å…³æœºæ—¶é—´,0.5ç§’ä¸ºå•ä½
+uint16 g_rtc_counter = 0; //rtc æ¶ˆæ¯è®¡æ•°
+uint8 g_light_flag = TRUE;//èƒŒæ™¯ç¯å¼€å…³æ ‡å¿—
+uint8 g_charge_counter = 0; //æ£€æµ‹å……ç”µçŠ¶æ€çš„è®¡æ•°å™¨ï¼Œæ’ä¸ŠUSBå°±å¼€å§‹æ£€æµ‹ç¬¬ä¸€æ¬¡
+uint16 g_low_counter = 0;//æŠ¥ä½ç”µè®¡æ•°å™¨
+uint16 key_count = 0; //å½“å‰æŒ‰é”®æ¶ˆæ¯å‘ç”Ÿçš„æ¬¡æ•°
+uint8 key_value = Msg_KeyNull; //å½“å‰æŒ‰é”®çš„å€¼
+uint16 lowPower_counter = 0;//ä½ç”µå‘ç”Ÿæ¬¡æ•°
+uint8 file_name[12]; //å­˜æ”¾æ–‡ä»¶çŸ­åæ•°å­—
+uint8 cur_value = 0; //å½“å‰çš„ç”µæ± ç”µé‡å€¼ï¼Œä¸»è¦ç”¨äºå……ç”µæ˜¾ç¤º
 uint8 batvalue[5] =
 { 0x5c, 0x5f, 0x64, 0x69, 0x6e };
 uint8 double_key_flag = 0;
@@ -197,14 +197,14 @@ int16 Usound_loop(void)
     int16 retval;
     BOOL Audioloop = 1;
 
-    //³õÊ¼»¯²»Ê¹ÄÜUSOUNDÂ¼Òô
+    //åˆå§‹åŒ–ä¸ä½¿èƒ½USOUNDå½•éŸ³
     urec_en = FALSE;
     memset(file_name, 0xff, 12);
     while (Audioloop != 0)
     {
         ClearWatchDog();
 
-        if (0x00 != (usb_state & 0x04)) //°ÎÏß´¦Àí
+        if (0x00 != (usb_state & 0x04)) //æ‹”çº¿å¤„ç†
         {
             Audioloop = FALSE;
             retval = RESULT_MAIN;
@@ -232,7 +232,7 @@ int16 Usound_loop(void)
 		
         switch (key_v)
         {
-            /* mode¼ü×÷ÎªusoundÂ¼ÒôÊ¹ÄÜ¼ü */
+            /* modeé”®ä½œä¸ºusoundå½•éŸ³ä½¿èƒ½é”® */
 		case AP_MSG_WAIT_TIMEOUT:
 			if (key != 0)
             {
@@ -241,7 +241,7 @@ int16 Usound_loop(void)
             }
 			break;
         case AP_KEY_MODE | AP_KEY_UP:
-            //´ò¿ªUSOUNDÂ¼Òô
+            //æ‰“å¼€USOUNDå½•éŸ³
             key = 0;
             //LEDClearScreen();
             //LEDPuts(NUMBER1, p_device_name, 1);
@@ -262,7 +262,7 @@ int16 Usound_loop(void)
             need_draw = TRUE;
             break;
 
-            /* ³¤°´mode·µ»Ømain AP */
+            /* é•¿æŒ‰modeè¿”å›main AP */
         case AP_KEY_MODE | AP_KEY_LONG:
             longkey_flag = 1;
             Audioloop = 0;
@@ -343,7 +343,7 @@ int16 Usound_loop(void)
             break;
 
 #ifdef FUN_SWITCH_KEY
-        case AP_KEY_FUNCTION | AP_KEY_UP: //Mode¼ü£¬UHost\Card\FM\USBÒôÏä °´ÏÂÑ­»·ÇĞ»»
+        case AP_KEY_FUNCTION | AP_KEY_UP: //Modeé”®ï¼ŒUHost\Card\FM\USBéŸ³ç®± æŒ‰ä¸‹å¾ªç¯åˆ‡æ¢
             Audioloop = 0;
             retval = RESULT_USBUDISK_PLAY;
             break;
@@ -370,17 +370,17 @@ int16 Usound_loop(void)
 void volume_callback(int16 Vol)
 {
 
-    //ÊµÊ±¸Ä±äÒôÁ¿µÄÖµ
+    //å®æ—¶æ”¹å˜éŸ³é‡çš„å€¼
     g_comval.volume = Vol; // (uint8) Vol * SOFTVOL_MAX / g_comval.VolumeMax;
     OutPutVolume(g_comval.volume);
 }
 /********************************************************************************
- * Description : ´¦ÀíÒôÁ¿¼ü
+ * Description : å¤„ç†éŸ³é‡é”®
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -415,12 +415,12 @@ uint8 deal_usound_vol_msg(uint8 key)
 
 /*
  ********************************************************************************
- * Description : ´¦ÀíÏµÍ³ÏûÏ¢, ·µ»Ø°´¼üÏûÏ¢, Í¬Ê±¸ºÔğ¿ª/¹Ø±³¹â
- ap_get_message_core() µÄÈë¿Ú
+ * Description : å¤„ç†ç³»ç»Ÿæ¶ˆæ¯, è¿”å›æŒ‰é”®æ¶ˆæ¯, åŒæ—¶è´Ÿè´£å¼€/å…³èƒŒå…‰
+ ap_get_message_core() çš„å…¥å£
  *
  * Arguments   :
  *
- * Returns     : ·µ»ØapÄÜ¹»Ê¶±ğµÄÏûÏ¢, Èç¹ûÃ»ÓĞÏµÍ³ÏûÏ¢, ·µ»Ø AP_KEY_NULL
+ * Returns     : è¿”å›apèƒ½å¤Ÿè¯†åˆ«çš„æ¶ˆæ¯, å¦‚æœæ²¡æœ‰ç³»ç»Ÿæ¶ˆæ¯, è¿”å› AP_KEY_NULL
  *
  * Notes       :
  ********************************************************************************
@@ -510,12 +510,12 @@ void slider_atoi4(uint8 *str, int16 count)
 
 /*
  ********************************************************************************
- * Description : ´¦ÀíÈÈ¼üÏûÏ¢, ·µ»Ø½á¹ûÏûÏ¢
+ * Description : å¤„ç†çƒ­é”®æ¶ˆæ¯, è¿”å›ç»“æœæ¶ˆæ¯
  *
- * Arguments   : key, °´¼üÏûÏ¢
+ * Arguments   : key, æŒ‰é”®æ¶ˆæ¯
  *
- * Returns     : Èç¹ûÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø½á¹ûÏûÏ¢
- Èç¹ûÃ»ÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø0
+ * Returns     : å¦‚æœæœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›ç»“æœæ¶ˆæ¯
+ å¦‚æœæ²¡æœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›0
  *
  * Notes       :
  *
@@ -530,20 +530,20 @@ uint8 ap_handle_hotkey_core(uint8 key)
      }*/
     switch (key)
     {
-    case AP_KEY_PLAY | AP_KEY_LONG: //³¤°´play·¢standby
-    case AP_MSG_STANDBY: //×Ô¶¯¹Ø»ú								 
-    case AP_MSG_FORCE_STANDBY: //Ê¹ÓÃÉÏÁ½¸ö»á±¨label duplicate
+    case AP_KEY_PLAY | AP_KEY_LONG: //é•¿æŒ‰playå‘standby
+    case AP_MSG_STANDBY: //è‡ªåŠ¨å…³æœº								 
+    case AP_MSG_FORCE_STANDBY: //ä½¿ç”¨ä¸Šä¸¤ä¸ªä¼šæŠ¥label duplicate
 		long_key_flag=0;
 		break;
         return RESULT_STANDBY;
 
-    case AP_KEY_MODE | AP_KEY_LONG: //³¤°´menu½øÈëmain
+    case AP_KEY_MODE | AP_KEY_LONG: //é•¿æŒ‰menuè¿›å…¥main
         return RESULT_MAIN;
 
     case RESULT_AUTO_BACK:
         return RESULT_AUTO_BACK;
 
-    case AP_KEY_AB | AP_KEY_UP: //½øÈëÂ¼Òô
+    case AP_KEY_AB | AP_KEY_UP: //è¿›å…¥å½•éŸ³
         return RESULT_RECORD;
     case AP_MSG_SD_OUT:
         //ui_show_CardOut();
@@ -553,13 +553,13 @@ uint8 ap_handle_hotkey_core(uint8 key)
         return RESULT_REDRAW;
 
         /*case AP_MSG_LOCK: //locked
-         if (ui_run_realtime == TRUE) //ÊµÊ±Ä£Ê½²»ÏÔÊ¾lock
+         if (ui_run_realtime == TRUE) //å®æ—¶æ¨¡å¼ä¸æ˜¾ç¤ºlock
          {
          return 0;
          }
          else
          {
-         ui_show_lock(1); //ÕâÀï²»´¦ÀíÈÈ¼ü,·ÀÖ¹Ç¶Ì×
+         ui_show_lock(1); //è¿™é‡Œä¸å¤„ç†çƒ­é”®,é˜²æ­¢åµŒå¥—
          return RESULT_REDRAW;
          }*/
 #ifdef CHECKALARM
@@ -580,13 +580,13 @@ uint8 ap_handle_hotkey_core(uint8 key)
 
 /*
  ********************************************************************************
- * Description : ´¦ÀíÈÈ¼üÏûÏ¢, ·µ»Ø½á¹ûÏûÏ¢
- ap_handle_hotkey_core() µÄÈë¿Ú
+ * Description : å¤„ç†çƒ­é”®æ¶ˆæ¯, è¿”å›ç»“æœæ¶ˆæ¯
+ ap_handle_hotkey_core() çš„å…¥å£
  *
- * Arguments   : key, °´¼üÏûÏ¢
+ * Arguments   : key, æŒ‰é”®æ¶ˆæ¯
  *
- * Returns     : Èç¹ûÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø½á¹ûÏûÏ¢
- Èç¹ûÃ»ÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø0
+ * Returns     : å¦‚æœæœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›ç»“æœæ¶ˆæ¯
+ å¦‚æœæ²¡æœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›0
  *
  * Notes       :
  *
@@ -612,13 +612,13 @@ void Lightmodeset(bool OnOff)
     //StandbyScreen(OnOff);
 }
 /********************************************************************************
- * Description : »ñÈ¡³äµçÆ÷µÄ×´Ì¬
+ * Description : è·å–å……ç”µå™¨çš„çŠ¶æ€
  *
  * Arguments  :
  *
  *
- * Returns     :dpdm_status=0X80Îª³äµçÆ÷
- *            ÎŞ
+ * Returns     :dpdm_status=0X80ä¸ºå……ç”µå™¨
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -634,15 +634,15 @@ uint8 GetDC5VStatus(void)
 }
 /*
  ********************************************************************************
- * Description : ´¦ÀíÏµÍ³ÏûÏ¢, ·µ»Ø°´¼üÏûÏ¢, Í¬Ê±¸ºÔğ¿ª/¹Ø±³¹â
+ * Description : å¤„ç†ç³»ç»Ÿæ¶ˆæ¯, è¿”å›æŒ‰é”®æ¶ˆæ¯, åŒæ—¶è´Ÿè´£å¼€/å…³èƒŒå…‰
  *
- * Arguments   : key, ÏµÍ³ÏûÏ¢
+ * Arguments   : key, ç³»ç»Ÿæ¶ˆæ¯
  *
- * Returns     : ·µ»ØapÄÜ¹»Ê¶±ğµÄÏûÏ¢, Èç¹ûÃ»ÓĞÏµÍ³ÏûÏ¢, ·µ»Ø AP_KEY_NULL
+ * Returns     : è¿”å›apèƒ½å¤Ÿè¯†åˆ«çš„æ¶ˆæ¯, å¦‚æœæ²¡æœ‰ç³»ç»Ÿæ¶ˆæ¯, è¿”å› AP_KEY_NULL
  *
  * Notes       :
 
- * °´¼üÊ±Ğò:
+ * æŒ‰é”®æ—¶åº:
  *  0.....1.2....1.5........... (s)
  *  key    long   hold    up    (>1.2s)
  *  key  up            (<1.2s)
@@ -653,17 +653,17 @@ uint8 GetDC5VStatus(void)
  */
 uint8 ap_get_message_core(uint8 key)
 {
-    //    static WORD key_count=0;      //µ±Ç°°´¼üÏûÏ¢·¢ÉúµÄ´ÎÊı
-    //    static uint8 key_value = Msg_KeyNull;   //µ±Ç°°´¼üµÄÖµ
+    //    static WORD key_count=0;      //å½“å‰æŒ‰é”®æ¶ˆæ¯å‘ç”Ÿçš„æ¬¡æ•°
+    //    static uint8 key_value = Msg_KeyNull;   //å½“å‰æŒ‰é”®çš„å€¼
 #ifdef EAR_PROTECT
     bool counter_flag = FALSE;
 #endif
     //    uint8 sfr_bak;
     uint8 sysOnOff = 0;
-    /*°´¼üÏûÏ¢ºÍÉÏ´ÎµÄÒ»ÑùÊ±µÄ´¦Àí*/
+    /*æŒ‰é”®æ¶ˆæ¯å’Œä¸Šæ¬¡çš„ä¸€æ ·æ—¶çš„å¤„ç†*/
     if (key == key_value)
     {
-        /*±³¹âÃ»¿ªÊ±£¬µÈÌ§Æğ¼ü¿ª±³¹â£¬ºöÂÔ°´¼ü*/
+        /*èƒŒå…‰æ²¡å¼€æ—¶ï¼Œç­‰æŠ¬èµ·é”®å¼€èƒŒå…‰ï¼Œå¿½ç•¥æŒ‰é”®*/
         g_rtc_counter = 0;
         key_count++;
         if (!g_light_flag)
@@ -678,15 +678,15 @@ uint8 ap_get_message_core(uint8 key)
 				FF_Play_mode=double_key_flag;
 				double_key_flag=0;
 				long_key_flag = 1;
-				key = (uint8) (key | AP_KEY_LONG); //¡·1.2s,·¢Key holdÏûÏ¢ 
+				key = (uint8) (key | AP_KEY_LONG); //ã€‹1.2s,å‘Key holdæ¶ˆæ¯ 
 			//	prints("\n FF_Play");
 				return key;
             }
 		}
-        /*°´×¡°´¼üÊ±£¬320ms·¢ËÍÒ»´ÎÏàÍ¬°´¼üÏûÏ¢*/
+        /*æŒ‰ä½æŒ‰é”®æ—¶ï¼Œ320mså‘é€ä¸€æ¬¡ç›¸åŒæŒ‰é”®æ¶ˆæ¯*/
 		if (key_count >= 4)
         {
-            key = (uint8) (key | AP_KEY_LONG); //¡·1.2s,·¢Key holdÏûÏ¢           
+            key = (uint8) (key | AP_KEY_LONG); //ã€‹1.2s,å‘Key holdæ¶ˆæ¯           
 			long_key_flag = 1;
         }
         else
@@ -718,7 +718,7 @@ uint8 ap_get_message_core(uint8 key)
 			
 		}
 		
-        /*key_valueµÄÖÃĞè¸Ä±ä*/
+        /*key_valueçš„ç½®éœ€æ”¹å˜*/
 		if (key_value == AP_KEY_PLAY)
 		{
 			if (double_key_flag == 0)
@@ -740,9 +740,9 @@ uint8 ap_get_message_core(uint8 key)
         key_value = key;
         if (!g_light_flag)
         {
-            Lightmodeset(TRUE);//¿ª±³¹â
+            Lightmodeset(TRUE);//å¼€èƒŒå…‰
             g_light_flag = TRUE;
-            /*Êä³ö°´¼üÒô*/
+            /*è¾“å‡ºæŒ‰é”®éŸ³*/
             //Open_KeyTone(g_comval.KeyTone);
             return NULL;
         }
@@ -770,16 +770,16 @@ uint8 ap_get_message_core(uint8 key)
 
         
 
-        /*2HZ¼ÆÊ±ÎŞ²Ù×÷·µ»Ø*/
+        /*2HZè®¡æ—¶æ— æ“ä½œè¿”å›*/
         if ((g_rtc_counter % 16) == 0)
         {
             return AP_MSG_WAIT_TIMEOUT;
         }
 
-        /*AP´¦ÀíµÄ2HZÏûÏ¢*/
+        /*APå¤„ç†çš„2HZæ¶ˆæ¯*/
         if (key == MSG_RTC2HZ)
         {
-#ifdef CHECKALARM	 //ÔÚAP¹¤³ÌÀï¶¨Òå
+#ifdef CHECKALARM	 //åœ¨APå·¥ç¨‹é‡Œå®šä¹‰
             if (alarmtimerflag == 1)
             {
                 if (g_comval.g_alarm.curAlarmType == ALARAMType)
@@ -799,7 +799,7 @@ uint8 ap_get_message_core(uint8 key)
                     else
                     {
                         key = AP_MSG_ALARM;
-                        Lightmodeset(TRUE);//¿ª¹Ø±³¹â£¨TRUE: ¿ª, FALSE:¹Ø£©
+                        Lightmodeset(TRUE);//å¼€å…³èƒŒå…‰ï¼ˆTRUE: å¼€, FALSE:å…³ï¼‰
                     }
                 }
                 else
@@ -813,7 +813,7 @@ uint8 ap_get_message_core(uint8 key)
                             VMWrite(&g_comval, VM_SYSTEM);
                         }
                         key = AP_MSG_FM;
-                        Lightmodeset(TRUE);//¿ª¹Ø±³¹â£¨TRUE: ¿ª, FALSE:¹Ø£©
+                        Lightmodeset(TRUE);//å¼€å…³èƒŒå…‰ï¼ˆTRUE: å¼€, FALSE:å…³ï¼‰
                     }
                     else
                     {
@@ -849,7 +849,7 @@ uint8 ap_get_message_core(uint8 key)
 #endif
         }
 
-        /*³äµç¼ì²â2HZ¼ÆÊ±£¬Ã¿30s¼à²âÒ»´Î³äµç×´Ì¬*/
+        /*å……ç”µæ£€æµ‹2HZè®¡æ—¶ï¼Œæ¯30sç›‘æµ‹ä¸€æ¬¡å……ç”µçŠ¶æ€*/
         if (GetDC5VStatus() == 0x80)
         {
             if (g_charge_counter == 60)
@@ -878,7 +878,7 @@ uint8 ap_get_message_core(uint8 key)
 
 #if 0
     case MSG_LOW_POWER:
-        /*ÏµÍ³µÍµçÏûÏ¢´¦ÀíÎªÇ¿ÖÆ¹Ø»ú*/
+        /*ç³»ç»Ÿä½ç”µæ¶ˆæ¯å¤„ç†ä¸ºå¼ºåˆ¶å…³æœº*/
         lowPower_counter++;
         if (lowPower_counter >= 3)
         {
@@ -903,11 +903,11 @@ uint8 ap_get_message_core(uint8 key)
         key = AP_KEY_NULL;
         break;
 
-    case MSG_SD_IN:/*²å¿¨×´Ì¬*/
+    case MSG_SD_IN:/*æ’å¡çŠ¶æ€*/
         key = AP_MSG_SD_IN;
         if (!g_light_flag)
         {
-            Lightmodeset(TRUE);//¿ª±³¹â
+            Lightmodeset(TRUE);//å¼€èƒŒå…‰
             g_light_flag = TRUE;
             g_rtc_counter = 0;
         }
@@ -917,7 +917,7 @@ uint8 ap_get_message_core(uint8 key)
     case MSG_UH_IN:
         if(!g_light_flag)
         {
-            Lightmodeset(TRUE);//¿ª±³¹â
+            Lightmodeset(TRUE);//å¼€èƒŒå…‰
             g_light_flag = TRUE;
             g_rtc_counter = 0;
         }
@@ -927,7 +927,7 @@ uint8 ap_get_message_core(uint8 key)
     case MSG_UH_OUT:
         if(!g_light_flag)
         {
-            Lightmodeset(TRUE);//¿ª±³¹â
+            Lightmodeset(TRUE);//å¼€èƒŒå…‰
             g_light_flag = TRUE;
             g_rtc_counter = 0;
         }
@@ -935,16 +935,16 @@ uint8 ap_get_message_core(uint8 key)
         break;
 #endif
 
-    case MSG_SD_OUT:/*²¦¿¨×´Ì¬*/
+    case MSG_SD_OUT:/*æ‹¨å¡çŠ¶æ€*/
         key = AP_MSG_SD_OUT;
         break;	
-    default: /*ĞÂ°´¼ü´¦Àí*/
+    default: /*æ–°æŒ‰é”®å¤„ç†*/
         g_rtc_counter = 0;
         key_count = 1;
         key_value = key;
         if (!g_light_flag)
         {
-            /*Èç±³µÆÃ»¿ª£¬²»´¦ÀíÏûÏ¢*/
+            /*å¦‚èƒŒç¯æ²¡å¼€ï¼Œä¸å¤„ç†æ¶ˆæ¯*/
             key_count = 0;
             //g_rtc_counter = 0;
             //return NULL;

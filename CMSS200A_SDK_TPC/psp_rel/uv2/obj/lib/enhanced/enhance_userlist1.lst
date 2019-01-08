@@ -56,7 +56,7 @@ stmt  level    source
    44   1      
    45   1          if(memcmp(head.magic, vfilename1, 6) == 0)
    46   1          {
-   47   2              //magic ÕýÈ·
+   47   2              //magic æ­£ç¡®
    48   2              User_fileoffset = head.first_offset;
    49   2              User_LastOffset = head.last_offset;
    50   2              User_ItemTotal = head.total_item;

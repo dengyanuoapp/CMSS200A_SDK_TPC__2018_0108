@@ -17,7 +17,7 @@
 extern unsigned long systemtime;
 
 #pragma ROM(HUGE)
-//record operations of Udisk mode;0x00 Ã»ÓĞ½øĞĞusidkĞ´²Ù×÷£»bit0 == 1, UDisk write;bit4 == 1, MTP write.
+//record operations of Udisk mode;0x00 æ²¡æœ‰è¿›è¡Œusidkå†™æ“ä½œï¼›bit0 == 1, UDisk write;bit4 == 1, MTP write.
 extern uint8 UDiskOperationInfo;
 
 static void lsNotSuppCMD(void);
@@ -60,7 +60,7 @@ static void Udisk_FIFOMode_Write(uint32 readnum);
 //#pragma ROM(HUGE)
 #pragma ROM(HUGE)
 
-//´Ë¶¨ÒåÎª±ÜÃâÆÁ±Îµô´òÓ¡ºó£¬udiskÓ¦ÓÃ±àÒë³£Á¿¶Î¶¨ÒåÎ´Ê¹ÓÃµ¼ÖÂµÄ±àÒë´íÎó¡£
+//æ­¤å®šä¹‰ä¸ºé¿å…å±è”½æ‰æ‰“å°åï¼Œudiskåº”ç”¨ç¼–è¯‘å¸¸é‡æ®µå®šä¹‰æœªä½¿ç”¨å¯¼è‡´çš„ç¼–è¯‘é”™è¯¯ã€‚
 #ifndef _PRINT_DEBUG_
 const uint8 ConstSeg1 = 'A';
 #endif
@@ -81,7 +81,7 @@ const uint8 ConstSeg1 = 'A';
 void Bulk_Out_Handle(void)
 {
     uint8 i;
-    //±êÖ¾ÔÚ²é×´Ì¬¹ı³ÌÓĞUSBÖĞ¶Ï·¢Éú
+    //æ ‡å¿—åœ¨æŸ¥çŠ¶æ€è¿‡ç¨‹æœ‰USBä¸­æ–­å‘ç”Ÿ
     StatusCheckFlag = 0;
     illegalLBAFlag = 0;
     flash_normal_rw_sctrs = 0x00;
@@ -95,7 +95,7 @@ void Bulk_Out_Handle(void)
     USBEIRQ = USBEIRQ | (uint8) 0x80;
     SHORTPCKIRQ = SHORTPCKIRQ | 0x20;
 
-    //½«_dCBWDataTransferLength³¤¶È´ÓĞ¡¶Ë×ªÎª´ó¶Ë
+    //å°†_dCBWDataTransferLengthé•¿åº¦ä»å°ç«¯è½¬ä¸ºå¤§ç«¯
     EndianReverse((uint8 *) (&CBW_data_buffer._dCBWDataTransferLength), 4);
 
     if (cbw_count != 2)
@@ -113,13 +113,13 @@ void Bulk_Out_Handle(void)
         //save _dCBWTag using at _dCSWTag reply
         CSWBuffer._dCSWTag = CBW_data_buffer._dCBWTag;
 
-        //AutoRun¹âÅÌ´æÔÚ±êÖ¾: 0:²»´æÔÚ; ·Ç0:´æÔÚ
+        //AutoRunå…‰ç›˜å­˜åœ¨æ ‡å¿—: 0:ä¸å­˜åœ¨; é0:å­˜åœ¨
         if (AutoRunDiskFlag == 0)
         {
             CBW_data_buffer._bCBWLUN++;
         }
 
-        //ÓÃ»§µÄÅÌ·ûÑ¡Ôñ  0:¶àÅÌ·û(Ä¬ÈÏ)  01h:ÆÕÍ¨ÅÌ  02h:¼ÓÃÜÅÌ  03h:²å¿¨
+        //ç”¨æˆ·çš„ç›˜ç¬¦é€‰æ‹©  0:å¤šç›˜ç¬¦(é»˜è®¤)  01h:æ™®é€šç›˜  02h:åŠ å¯†ç›˜  03h:æ’å¡
         if (DiskAppearSelect == 2)
         {
             CBW_data_buffer._bCBWLUN++;
@@ -130,7 +130,7 @@ void Bulk_Out_Handle(void)
             CBW_data_buffer._bCBWLUN += 2;
         }
 
-        //Ã»ÓĞ¼ÓÃÜÅÌ,·ÃÎÊ¼ÓÃÜÅÌÔòÄ¬ÈÏÔÚ·ÃÎÊ¿¨ÅÌ·û
+        //æ²¡æœ‰åŠ å¯†ç›˜,è®¿é—®åŠ å¯†ç›˜åˆ™é»˜è®¤åœ¨è®¿é—®å¡ç›˜ç¬¦
         if (CBW_data_buffer._bCBWLUN == 0x02)
         {
             if (SplitDiskFlag == 0x00)
@@ -139,48 +139,48 @@ void Bulk_Out_Handle(void)
             }
         }
 
-        //CBWCBµÚÒ»¸ö×Ö½ÚÊÇÃüÁî×Ö½Ú
+        //CBWCBç¬¬ä¸€ä¸ªå­—èŠ‚æ˜¯å‘½ä»¤å­—èŠ‚
         switch (CBW_data_buffer._CBWCB[0])
         {
         case 0x00:
             CMD_TestUnitReady_();
             break;
         case 0x28:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_Read10_();
             break;
         case 0x2a:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             //for autorun
             CMD_Write10_();
             break;
         case 0x1e:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             //for autorun
             CMD_PreventMediumRemoval_();
             break;
         case 0x25:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             //for autorun
             CMD_ReadCapacities_();
             break;
         case 0x23:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             //for autorun
             CMD_ReadFormatCapacities_();
             break;
         case 0x12:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             //for autorun
@@ -189,38 +189,38 @@ void Bulk_Out_Handle(void)
         case 0x5a: //CMD_ModeSense10_
         case 0x1a: //CMD_ModeSense06_,Command Descriptor Block(CDB) For SCSI Device
 
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_ModeSense_();
             break;
         case 0x55:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_ModeSelect_();
             break;
         case 0x03:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_RequestSense_();
             break;
         case 0x2f:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_Verify_();
             break;
         case 0x1b:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_StartStopUnit_();
             break;
 
         case 0xdd:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_Philips_();
@@ -228,31 +228,31 @@ void Bulk_Out_Handle(void)
 
             //for autorun cmd
         case 0x43:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_Read_TOC();
             break;
         case 0xbd:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_WriteCD_();
             break;
         case 0x51:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_ReadDiscInformation();
             break;
         case 0x45:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_PlayAudio();
             break;
         case 0xce:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_Read_Autorun_Record_();
@@ -260,40 +260,40 @@ void Bulk_Out_Handle(void)
             //for autorun end
 
 
-            //×Ô¶¨ÒåÀàĞ­Òé
+            //è‡ªå®šä¹‰ç±»åè®®
         case 0xcb:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_SwitchToADFU();
             break;
         case 0xcc:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             CMD_IsActions();
             break;
         case 0xca:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             Get_User_DefinedID();
             break;
         case 0xb0:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
             IsAdfuCondition = 0;
             USBBusy = 1;
             Set_Device_Info();
             break;
         case 0xcd:
-            //³ıÁËTestUnitReady_,ÆäËû²Ù×÷ÈÏÎªÃ¦¡£USBBusyÔÚstate0Ê±±»²éÑ¯
-            //cdÃüÁîÎªÍ³Ò»ºóµÄset/get infomationĞ­ÒéÃüÁî×Ö
+            //é™¤äº†TestUnitReady_,å…¶ä»–æ“ä½œè®¤ä¸ºå¿™ã€‚USBBusyåœ¨state0æ—¶è¢«æŸ¥è¯¢
+            //cdå‘½ä»¤ä¸ºç»Ÿä¸€åçš„set/get infomationåè®®å‘½ä»¤å­—
             IsAdfuCondition = 0;
             USBBusy = 1;
             Access_Device_Info();
             break;
 
-            //½øÈëADFUÃüÁî
+            //è¿›å…¥ADFUå‘½ä»¤
         case 0x05:
             IsAdfuCondition = 1;
             USBBusy = 1;
@@ -353,7 +353,7 @@ void Bulk_Out_Handle(void)
 static void lsNotSuppCMD(void)
 {
     IsAdfuCondition = 0x01;
-    //·µ»ØÈÎÒâÊı£¬±ÜÃâ98ËÀ»ú
+    //è¿”å›ä»»æ„æ•°ï¼Œé¿å…98æ­»æœº
     Send_Data_To_PC((uint8 *) &Cap_cmd_info_DiskA, CBW_data_buffer._dCBWDataTransferLength);
     CSWBuffer._bCSWStatus = 0x01;
     ReportCSW(0);
@@ -379,7 +379,7 @@ static void CMD_TestUnitReady_(void)
 
     errorflag = 0;
 
-    //updata£¬mast call card operate
+    //updataï¼Œmast call card operate
     if (IsInAdfuState != 0xff)
     {
         switch (CBW_data_buffer._bCBWLUN)
@@ -394,7 +394,7 @@ static void CMD_TestUnitReady_(void)
 
             if (OSType == 0x00) //mac OSX system
             {
-                //ÊµÏÖÔÚÆ»¹ûÏµÍ³ÏÂÈ¡ÏûAutorunÅÌ·ûµÄĞ§¹û
+                //å®ç°åœ¨è‹¹æœç³»ç»Ÿä¸‹å–æ¶ˆAutorunç›˜ç¬¦çš„æ•ˆæœ
                 if (AutoRunDiskFlag == 0xff)
                 {
 #ifdef _PRINT_DEBUG_
@@ -406,25 +406,25 @@ static void CMD_TestUnitReady_(void)
                 }
             }
             break;
-        case 0x01: //ÆÕÍ¨ÅÌ
+        case 0x01: //æ™®é€šç›˜
             break;
-        case 0x02: //¼ÓÃÜÅÌ
-            //ÃÜÂëÍ¨¹ı¸Ã±äÁ¿»áÖÃÎ»
+        case 0x02: //åŠ å¯†ç›˜
+            //å¯†ç é€šè¿‡è¯¥å˜é‡ä¼šç½®ä½
             if (MediaChgFlag != 0)
             {
                 MediaChgFlag = 0;
-                //ÃÜÂëÍ¨¹ı,µØÖ·¼ÆËãÇĞ»»µ½DiskB
+                //å¯†ç é€šè¿‡,åœ°å€è®¡ç®—åˆ‡æ¢åˆ°DiskB
                 PasswdPassOk++;
                 //Media Change
                 errorflag = 0x03;
             }
             break;
-        case 0x03: //¿¨ÅÌ
+        case 0x03: //å¡ç›˜
             cardstatus = 0x00;
-            //ÅĞ¶Ï¿¨´æÔÚ±êÖ¾£¬0£ºĞèÒªÌ½²â¿¨£» 1£º¼ÌĞø
+            //åˆ¤æ–­å¡å­˜åœ¨æ ‡å¿—ï¼Œ0ï¼šéœ€è¦æ¢æµ‹å¡ï¼› 1ï¼šç»§ç»­
             if (CardExistFlag == 0x00)
             {
-                //¿¨Ã»ÓĞ²åÈëµÄÇé¿öÏÂ²»ĞèÈ¥×ö¿¨Çı¶¯µÄÖØĞÂ³õÊ¼»¯
+                //å¡æ²¡æœ‰æ’å…¥çš„æƒ…å†µä¸‹ä¸éœ€å»åšå¡é©±åŠ¨çš„é‡æ–°åˆå§‹åŒ–
                 cardstatus = 0x01;
             }
             else
@@ -432,7 +432,7 @@ static void CMD_TestUnitReady_(void)
                 CardWPCheck();
                 if (RWCardError != 0)
                 {
-                    //ÅĞ¶Ï¶ÁĞ´¿¨ÊÇ·ñ³ö´í£¬0£ºÎŞ´í£¬Ö±½Ó·µ»ØCSW£»1£ºÓĞ´í£¬ĞèÒªÖØĞÂÌ½²â¿¨
+                    //åˆ¤æ–­è¯»å†™å¡æ˜¯å¦å‡ºé”™ï¼Œ0ï¼šæ— é”™ï¼Œç›´æ¥è¿”å›CSWï¼›1ï¼šæœ‰é”™ï¼Œéœ€è¦é‡æ–°æ¢æµ‹å¡
                     cardstatus = 0x01;
                 }
             }
@@ -440,7 +440,7 @@ static void CMD_TestUnitReady_(void)
             {
                 if (CardDetectState != 0x00)
                 {
-                    //µ÷ÓÃ¿¨³õÊ¼»¯£¬»áĞŞ¸ÄCardExistFlag
+                    //è°ƒç”¨å¡åˆå§‹åŒ–ï¼Œä¼šä¿®æ”¹CardExistFlag
                     sCardCapCheck();
                 }
 
@@ -487,7 +487,7 @@ void CMD_Read10_(void)
     Compute_LBA();
     EPA_In_Rdy();
 
-    //nand base,²»²å¿¨µÄÇé¿öÏÂPC»áÓĞÒ»´Î¶Á¿¨µÄ²Ù×÷,²»×°ÔØ¿¨Çı¶¯,Ö±½ÓËÍËæ»úÊı¾İµ½PC
+    //nand base,ä¸æ’å¡çš„æƒ…å†µä¸‹PCä¼šæœ‰ä¸€æ¬¡è¯»å¡çš„æ“ä½œ,ä¸è£…è½½å¡é©±åŠ¨,ç›´æ¥é€éšæœºæ•°æ®åˆ°PC
     if ((CardExistFlag == 0x00) && (flashorcard_rwflag == 0x01))
     {
         while (udisk_rw_sctr_num != 0x00)
@@ -548,7 +548,7 @@ void CMD_Read10_(void)
     {
         if (IsInAdfuState != 0xff)
         {
-            //¿¨ÊÇ·ñ³ö´í
+            //å¡æ˜¯å¦å‡ºé”™
             if ((CardExistFlag == 0x00) && (RWCardError != 0x00))
             {
                 errorflag = 0x04;
@@ -566,7 +566,7 @@ void CMD_Read10_(void)
 
     ReportCSW(errorflag);
 
-    //nand flashµÄ¶ÁĞ´µ÷ÓÃÍê³Éºó£¬Çå³ıÊÇ·ñ½øÈë¿ÕÏĞ×´Ì¬µÄ¼ÆÊıÖµ
+    //nand flashçš„è¯»å†™è°ƒç”¨å®Œæˆåï¼Œæ¸…é™¤æ˜¯å¦è¿›å…¥ç©ºé—²çŠ¶æ€çš„è®¡æ•°å€¼
     PrevRTCTimerValue1 = 0x00;
     PrevRTCTimerValue2 = 0x00;
 }
@@ -595,7 +595,7 @@ void CMD_Write10_(void)
     /* record udisk write 2010-12-31 16:29*/
     UDiskOperationInfo = UDiskOperationInfo | 0x01;
 
-    //ÊäÈëLBA£¬(udisk_rw_sctr_num)
+    //è¾“å…¥LBAï¼Œ(udisk_rw_sctr_num)
     Compute_LBA();
 
     EPB_OutRdy_FIFOFullNAK();
@@ -605,7 +605,7 @@ void CMD_Write10_(void)
         flash_disk_write_flag++;
     }
 
-    //¼ì²éÊÇ·ñ¼ÓÃÜÅÌĞ­Òé²Ù×÷
+    //æ£€æŸ¥æ˜¯å¦åŠ å¯†ç›˜åè®®æ“ä½œ
     if ((sWriteCheckForEncryp() != 0x00) || (illegalLBAFlag != 0x00))
     {
         while (udisk_rw_sctr_num != 0)
@@ -621,7 +621,7 @@ void CMD_Write10_(void)
             DMA_Data_Transfer(&dma_transfer);
             Wait_PrevDMA_TransEnd();
 
-            //¼ì²é¼ÓÃÜÅÌÊÇ·ñÒªĞ´
+            //æ£€æŸ¥åŠ å¯†ç›˜æ˜¯å¦è¦å†™
             if (sEncrypParseInWR() == 0x00)
             {
                 sectors_trans_once = 0x01;
@@ -651,12 +651,12 @@ void CMD_Write10_(void)
         //        Udisk_Parse_MBR();
     }
 
-    //Éı¼¶ÖĞ£¬ÆÁ±ÎËùÓĞÓĞ¿ÉÄÜ¶Ô¿¨µÄ·ÃÎÊ£¬ÒòÎªÓÉÓÚÎŞ¿¨¶ø±¨´í£¬»áÊ¹Éı¼¶Ê§°Ü
+    //å‡çº§ä¸­ï¼Œå±è”½æ‰€æœ‰æœ‰å¯èƒ½å¯¹å¡çš„è®¿é—®ï¼Œå› ä¸ºç”±äºæ— å¡è€ŒæŠ¥é”™ï¼Œä¼šä½¿å‡çº§å¤±è´¥
     if (IsInAdfuState != 0xff)
     {
         if ((flashorcard_rwflag != 0x00) && (RWCardError != 0x00))
         {
-            //»áĞŞ¸ÄCardExistFlag,RWCardError
+            //ä¼šä¿®æ”¹CardExistFlag,RWCardError
             //sCardCapCheck();
             RWCardError = 0x01;
         }
@@ -668,7 +668,7 @@ void CMD_Write10_(void)
             {
                 errorflag = 2;
             }
-            //¹âÅÌĞ´ÊôĞÔÇå0
+            //å…‰ç›˜å†™å±æ€§æ¸…0
             bWriteCD_ROM = 0;
         }
         else if (CBW_data_buffer._bCBWLUN == 0x01)
@@ -701,7 +701,7 @@ void CMD_Write10_(void)
 
     ReportCSW(errorflag);
 
-    //nand flashµÄ¶ÁĞ´µ÷ÓÃÍê³Éºó£¬Çå³ıÊÇ·ñ½øÈë¿ÕÏĞ×´Ì¬µÄ¼ÆÊıÖµ
+    //nand flashçš„è¯»å†™è°ƒç”¨å®Œæˆåï¼Œæ¸…é™¤æ˜¯å¦è¿›å…¥ç©ºé—²çŠ¶æ€çš„è®¡æ•°å€¼
     PrevRTCTimerValue1 = 0x00;
     PrevRTCTimerValue2 = 0x00;
 }
@@ -723,7 +723,7 @@ static void CMD_PreventMediumRemoval_(void)
 {
     if ((CBW_data_buffer._CBWCB[4] & 0x01) == 0x00)
     {
-        //ÔÚPCĞ´ÎÄ¼şÊ±,	PCÔÊĞí°ÎÏßºó,Á¢¼´update flash,¼õÉÙPCĞ´ÍêÎÄ¼şĞ¡»úÁ¢¼´µôµç,Ğ´µÄÎÄ¼şÊı¾İ´íÎóµÄ»úÂÊ.
+        //åœ¨PCå†™æ–‡ä»¶æ—¶,	PCå…è®¸æ‹”çº¿å,ç«‹å³update flash,å‡å°‘PCå†™å®Œæ–‡ä»¶å°æœºç«‹å³æ‰ç”µ,å†™çš„æ–‡ä»¶æ•°æ®é”™è¯¯çš„æœºç‡.
         UD_Update(); // need fix
         //USB Not Busy
         Removable = 0x01;
@@ -862,7 +862,7 @@ static void ReadCapacities(void)
  *
  * Returns    : None.
  *
- * Note(s)    : WindowsÏµÍ³½øÈëUÅÌºó,µÚÒ»¸öCBWÃüÁîÎª0x12.
+ * Note(s)    : Windowsç³»ç»Ÿè¿›å…¥Uç›˜å,ç¬¬ä¸€ä¸ªCBWå‘½ä»¤ä¸º0x12.
  *********************************************************************************************************
  */
 static void CMD_Inquiry_(void)
@@ -870,7 +870,7 @@ static void CMD_Inquiry_(void)
     uint8 *data_p;
     if (cbw_count == 1)
     {
-        //0: mac OSX system    1: windows system  ÓÃÓÚÊµÏÖÔÚÆ»¹ûÏµÍ³ÏÂ¿¨°ÎµôºóÅÌ·ûÏûÊ§Ğ§¹û
+        //0: mac OSX system    1: windows system  ç”¨äºå®ç°åœ¨è‹¹æœç³»ç»Ÿä¸‹å¡æ‹”æ‰åç›˜ç¬¦æ¶ˆå¤±æ•ˆæœ
         OSType = 1;
     }
     if (CBW_data_buffer._bCBWLUN == 0x00)
@@ -991,7 +991,7 @@ static void CMD_RequestSense_(void)
 {
     uint8 *data_p;
 
-    //XPÏÂµ±¿¨²»´æÔÚÊ±»áÔÚTestReadyÖĞ²»Í£±¨´í£¬´Ë¾äÊ¹Ğ¡»ú²»½øÈëÃ¦×´Ì¬
+    //XPä¸‹å½“å¡ä¸å­˜åœ¨æ—¶ä¼šåœ¨TestReadyä¸­ä¸åœæŠ¥é”™ï¼Œæ­¤å¥ä½¿å°æœºä¸è¿›å…¥å¿™çŠ¶æ€
     USBBusy = 0;
     ErrorReportFlag = 0;
 
@@ -1064,9 +1064,9 @@ static void CMD_StartStopUnit_(void)
 {
     if (CBW_data_buffer._CBWCB[4] == 0x02)
     {
-        //ÖÃPCµ¯³ö±êÖ¾
+        //ç½®PCå¼¹å‡ºæ ‡å¿—
         PcEjectFlag = 0x01;
-        //Á¿²ú¹¤¾ßÔÚwin7ºÍwin vistaÏÂ²»ÄÜ·¢ËÍsuspend,Í¨¹ı´ËÃüÁîÊµÏÖ¶ÏÏß
+        //é‡äº§å·¥å…·åœ¨win7å’Œwin vistaä¸‹ä¸èƒ½å‘é€suspend,é€šè¿‡æ­¤å‘½ä»¤å®ç°æ–­çº¿
         FWOpStatus = 0x01;
     }
 
@@ -1077,7 +1077,7 @@ static void CMD_StartStopUnit_(void)
  *********************************************************************************************************
  *                                           CMD_Philips_
  *
- * Description: ĞÂÔöĞ­Òé,ÎªÖ§³ÖPD¿Í»§philips,ÉÏ±¨¿Í»§µÄĞÅÏ¢
+ * Description: æ–°å¢åè®®,ä¸ºæ”¯æŒPDå®¢æˆ·philips,ä¸ŠæŠ¥å®¢æˆ·çš„ä¿¡æ¯
  *
  * Arguments  : None.
  *
@@ -1140,12 +1140,12 @@ void CMD_Philips_(void)
  */
 static void CMD_SwitchToADFU(void)
 {
-    //flash·Ç±£»¤/µ¥ÅÌ·ûÇé¿öÏÂ²»ĞèÒªÅĞ¶ÏÊÇ·ñÊÇĞ´FlashÅÌ
+    //flashéä¿æŠ¤/å•ç›˜ç¬¦æƒ…å†µä¸‹ä¸éœ€è¦åˆ¤æ–­æ˜¯å¦æ˜¯å†™Flashç›˜
     if ((FlashWPFlag == 0x00) && ((DiskAppearSelect != 0x00) || (CBW_data_buffer._bCBWLUN == 0x01)))
     {
         CanSwitchToADFU = 0xff;
         SwitchToADFUFlag = 0xff;
-        //ÈÏÎªÊÇ½øÈëÉı¼¶×´Ì¬£¬ÓÃÓÚÉı¼¶Ê±ÆÁ±ÎPC¶Ô¿¨µÄread²Ù×÷
+        //è®¤ä¸ºæ˜¯è¿›å…¥å‡çº§çŠ¶æ€ï¼Œç”¨äºå‡çº§æ—¶å±è”½PCå¯¹å¡çš„readæ“ä½œ
         IsInAdfuState = 0xff;
     }
     else
@@ -1184,7 +1184,7 @@ static void CMD_IsActions(void)
 
     IsReadCapAndReadRec0 = 0x00;
 
-    //µ¥ÅÌ·ûÇé¿öÏÂ²»ĞèÒªÅĞ¶ÏÊÇ·ñÊÇĞ´FlashÅÌ£¬Ğ´Flash?
+    //å•ç›˜ç¬¦æƒ…å†µä¸‹ä¸éœ€è¦åˆ¤æ–­æ˜¯å¦æ˜¯å†™Flashç›˜ï¼Œå†™Flash?
     if ((DiskAppearSelect != 0x00) || (CBW_data_buffer._bCBWLUN == 0x01))
     {
         if (CBW_data_buffer._dCBWDataTransferLength == 0x0B)
@@ -1208,7 +1208,7 @@ static void CMD_IsActions(void)
  *********************************************************************************************************
  *                                           Get_User_DefinedID
  *
- * Description:ADFU protocol handle, ¶ÁÈ¡Éè±¸¹Ì¼şÁ¿²úÊ±Ğ´ÈëLFI_HeadÖĞµÄÓÃ»§×Ô¶¨ÒåID.
+ * Description:ADFU protocol handle, è¯»å–è®¾å¤‡å›ºä»¶é‡äº§æ—¶å†™å…¥LFI_Headä¸­çš„ç”¨æˆ·è‡ªå®šä¹‰ID.
  *
  * Arguments  : None.
  *
@@ -1219,7 +1219,7 @@ static void CMD_IsActions(void)
  */
 static void Get_User_DefinedID(void)
 {
-    //¶ÁSDÇøÍ·ÉÈÇøÊı¾İµ½UramÖĞDataBufferÆğÊ¼µÄµØ·½È¥
+    //è¯»SDåŒºå¤´æ‰‡åŒºæ•°æ®åˆ°Uramä¸­DataBufferèµ·å§‹çš„åœ°æ–¹å»
     sFlash_Rds(RW_FIX, 0x00, DATABUFFER);
 
     *((uint16 *) ((uint8 *) DATABUFFER + 284)) = 50;
@@ -1236,7 +1236,7 @@ static void Get_User_DefinedID(void)
  *********************************************************************************************************
  *                                           Data_Decrypt_Xor
  *
- * Description: ¶ÔÊı¾İ½øĞĞ½âÃÜ(²»ÄÜ´óÓÚ256byte).
+ * Description: å¯¹æ•°æ®è¿›è¡Œè§£å¯†(ä¸èƒ½å¤§äº256byte).
  *
  * Arguments  : dataAddr:data address; dataLength:data decrypt length.
  *
@@ -1260,13 +1260,13 @@ static void Data_Decrypt_Xor(uint8 *dataAddr, uint8 dataLength)
  *********************************************************************************************************
  *                                           Set_Device_Info
  *
- * Description: ÉèÖÃÉè±¸ĞÅÏ¢(ÈçDeviceID¡¢Ê±¼äµÈ)
+ * Description: è®¾ç½®è®¾å¤‡ä¿¡æ¯(å¦‚DeviceIDã€æ—¶é—´ç­‰)
  *
  * Arguments  : None.
  *
  * Returns    : None.
  *
- * Note(s)    : Ä¬ÈÏÖ»ÓĞĞ´·½Ïò,ÉèÖÃÊ±¼ä.
+ * Note(s)    : é»˜è®¤åªæœ‰å†™æ–¹å‘,è®¾ç½®æ—¶é—´.
  *********************************************************************************************************
  */
 static void Set_Device_Info(void)
@@ -1294,11 +1294,11 @@ static void Set_Device_Info(void)
     TM_SetDate((date_t *) TempBuffer);
     TM_SetTime((time_t *) (TempBuffer + 4));
 
-    //½«systemtime Ğ´»Øµ½VRAMÖĞ
+    //å°†systemtime å†™å›åˆ°VRAMä¸­
     sFlash_Rds(RW_FIX, SDDiskCap, DATABUFFER);
-    //½«È«¾Ö±äÁ¿systemtime¸üĞÂVramÖĞÈ¥
+    //å°†å…¨å±€å˜é‡systemtimeæ›´æ–°Vramä¸­å»
     kval_p = DATABUFFER;
-    kval_p->systemtime = systemtime; //È«¾Ö±äÁ¿
+    kval_p->systemtime = systemtime; //å…¨å±€å˜é‡
     sFlash_Wrts(RW_FIX, SDDiskCap, DATABUFFER);
 
     ReportCSW(0);
@@ -1308,13 +1308,13 @@ static void Set_Device_Info(void)
  *********************************************************************************************************
  *                                           Access_Device_Info
  *
- * Description: set/get infomation£¬´ËĞ­ÒéÎªÍ³Ò»ºóµÄset/get infomationĞ­Òé
+ * Description: set/get infomationï¼Œæ­¤åè®®ä¸ºç»Ÿä¸€åçš„set/get infomationåè®®
  *
  * Arguments  : None.
  *
  * Returns    : None.
  *
- * Note(s)    : µ±Ç°´ËĞ­Òé½öÓÃÀ´´¦ÀíÍ¼Æ¬¡¢ÊÓÆµ×ª»»¹¤¾ß»ñÈ¡ÆÁµÄ´óĞ¡
+ * Note(s)    : å½“å‰æ­¤åè®®ä»…ç”¨æ¥å¤„ç†å›¾ç‰‡ã€è§†é¢‘è½¬æ¢å·¥å…·è·å–å±çš„å¤§å°
  *********************************************************************************************************
  */
 static void Access_Device_Info(void)
@@ -1460,22 +1460,22 @@ void bulk_out_back(void)
 {
     if ((sFlashLedFlag) != 0x00)
     {
-        //ÊÇ·ñÒªÉÁµÆ
+        //æ˜¯å¦è¦é—ªç¯
         (*((void( *)()) (sFlashLed)))();
     }
 
-    //ÊÕµ½ADFU detachÃüÁîºó,²»»áÁ¢¼´¶ÏÏß,ĞèÒª½«Ö®ºóµÄÃüÁî×ª»»ÎªADFUÃüÁî,·ÀÖ¹USB×´Ì¬¸üĞÂ,Ë¢Í¼ÖØÆô
+    //æ”¶åˆ°ADFU detachå‘½ä»¤å,ä¸ä¼šç«‹å³æ–­çº¿,éœ€è¦å°†ä¹‹åçš„å‘½ä»¤è½¬æ¢ä¸ºADFUå‘½ä»¤,é˜²æ­¢USBçŠ¶æ€æ›´æ–°,åˆ·å›¾é‡å¯
     IsAdfuCondition = detach_cmd_rcv | IsAdfuCondition;
     if (IsAdfuCondition == 0x00)
     {
-        //CMD_TestUnitReady_ÃüÁî²»ÄÜÓ°ÏìUpOrDownLoad£¬Ò²¼´²»ÄÜÓ°ÏìÏÔÊ¾
+        //CMD_TestUnitReady_å‘½ä»¤ä¸èƒ½å½±å“UpOrDownLoadï¼Œä¹Ÿå³ä¸èƒ½å½±å“æ˜¾ç¤º
         if (USBBusy != 0x00)
         {
             if (UpOrDownLoadBak != UpOrDownLoad)
             {
-                //01:ÉÏ´«  02:ÏÂ´«
+                //01:ä¸Šä¼   02:ä¸‹ä¼ 
                 UpOrDownLoadBak = UpOrDownLoad;
-                //disable USB INT,×öÏÔÊ¾ÈÎÎñ
+                //disable USB INT,åšæ˜¾ç¤ºä»»åŠ¡
                 AIE = AIE & (uint8) 0xfe;
             }
         }
@@ -1491,13 +1491,13 @@ void bulk_out_back(void)
  *********************************************************************************************************
  *                                           Fix_Nrmlmode_RWSctrs
  *
- * Description: ¼ÆËãUdisk¶ÁĞ´FlashĞèÒªÓÃÆÕÍ¨Ä£Ê½ºÍUmode¶ÁĞ´µÄÉÈÇøÊı,²¢¼ÆËãºóÒ»´ÎĞèÒªÓÃÆÕÍ¨Ä£Ê½¶ÁĞ´ÉÈÇøÊı.
+ * Description: è®¡ç®—Udiskè¯»å†™Flashéœ€è¦ç”¨æ™®é€šæ¨¡å¼å’ŒUmodeè¯»å†™çš„æ‰‡åŒºæ•°,å¹¶è®¡ç®—åä¸€æ¬¡éœ€è¦ç”¨æ™®é€šæ¨¡å¼è¯»å†™æ‰‡åŒºæ•°.
  *
  * Arguments  : None.
  *
- * Returns    : a: ±¾´ÎUDiskĞèÓÃÆÕÍ¨Ä£Ê½¶ÁĞ´µÄÉÈÇøÊı.
+ * Returns    : a: æœ¬æ¬¡UDiskéœ€ç”¨æ™®é€šæ¨¡å¼è¯»å†™çš„æ‰‡åŒºæ•°.
  *
- * Note(s)    : »á¸üĞÂ×ÜµÄUmode¶ÁĞ´ÉÈÇøÊıºÍ½áÎ²µÄÆÕÍ¨Ä£Ê½¶ÁĞ´ÉÈÇøÊı,Ã»ÓĞ±£»¤Ê¹ÓÃ¹ıµÄ¼Ä´æÆ÷.
+ * Note(s)    : ä¼šæ›´æ–°æ€»çš„Umodeè¯»å†™æ‰‡åŒºæ•°å’Œç»“å°¾çš„æ™®é€šæ¨¡å¼è¯»å†™æ‰‡åŒºæ•°,æ²¡æœ‰ä¿æŠ¤ä½¿ç”¨è¿‡çš„å¯„å­˜å™¨.
  *********************************************************************************************************
  */
 static uint16 Fix_Nrmlmode_RWSctrs(void)
@@ -1508,7 +1508,7 @@ static uint16 Fix_Nrmlmode_RWSctrs(void)
     uint8 pagesize;
 
     pagesize = (uint8) flash_page_sctrnum;
-    //pageÄÚsectorÊıÎª2µÄÕû´ÎÃİ
+    //pageå†…sectoræ•°ä¸º2çš„æ•´æ¬¡å¹‚
     tmp = (uint16) LBA & (pagesize - 1);
 
     if (tmp != 0x00)
@@ -1561,13 +1561,13 @@ static uint32 Ajust_Data_Length(uint32 length, uint32 largestLength)
  *********************************************************************************************************
  *                                           Udisk_NrmlMode_Read
  *
- * Description: UdiskÏÂÆÕÍ¨Ä£Ê½¶Á(ÒòFlashÖ»ÓĞPage¶ÔÆëµØÖ·²ÅÄÜÊ¹ÓÃ¿ìËÙÄ£Ê½¶ÁĞ´).
+ * Description: Udiskä¸‹æ™®é€šæ¨¡å¼è¯»(å› Flashåªæœ‰Pageå¯¹é½åœ°å€æ‰èƒ½ä½¿ç”¨å¿«é€Ÿæ¨¡å¼è¯»å†™).
  *
- * Arguments  : e: Udisk·Ç¿ìËÙÄ£Ê½¶ÁÉÈÇøÊı.
+ * Arguments  : e: Udiskéå¿«é€Ÿæ¨¡å¼è¯»æ‰‡åŒºæ•°.
  *
  * Returns    : None.
  *
- * Note(s)    : Ö»Õë¶ÔFlash×÷´ËPage¶ÔÆë¶Á¶¯×÷,Ã»ÓĞ±£»¤Ê¹ÓÃ¹ıµÄ¼Ä´æÆ÷.
+ * Note(s)    : åªé’ˆå¯¹Flashä½œæ­¤Pageå¯¹é½è¯»åŠ¨ä½œ,æ²¡æœ‰ä¿æŠ¤ä½¿ç”¨è¿‡çš„å¯„å­˜å™¨.
  *********************************************************************************************************
  */
 static void Udisk_NrmlMode_Read(uint32 readnum)
@@ -1595,13 +1595,13 @@ static void Udisk_NrmlMode_Read(uint32 readnum)
  *********************************************************************************************************
  *                                           Udisk_NrmlMode_Write
  *
- * Description: UdiskÏÂÆÕÍ¨Ä£Ê½Ğ´(ÒòFlashÖ»ÓĞPage¶ÔÆëµØÖ·²ÅÄÜÊ¹ÓÃ¿ìËÙÄ£Ê½¶ÁĞ´).
+ * Description: Udiskä¸‹æ™®é€šæ¨¡å¼å†™(å› Flashåªæœ‰Pageå¯¹é½åœ°å€æ‰èƒ½ä½¿ç”¨å¿«é€Ÿæ¨¡å¼è¯»å†™).
  *
- * Arguments  : e: UdiskÆÕÍ¨Ä£Ê½Ğ´ÉÈÇøÊı.
+ * Arguments  : e: Udiskæ™®é€šæ¨¡å¼å†™æ‰‡åŒºæ•°.
  *
  * Returns    : None.
  *
- * Note(s)    : Ö»Õë¶ÔFlash×÷´ËPage¶ÔÆëĞ´¶¯×÷,Ã»ÓĞ±£»¤Ê¹ÓÃ¹ıµÄ¼Ä´æÆ÷.
+ * Note(s)    : åªé’ˆå¯¹Flashä½œæ­¤Pageå¯¹é½å†™åŠ¨ä½œ,æ²¡æœ‰ä¿æŠ¤ä½¿ç”¨è¿‡çš„å¯„å­˜å™¨.
  *********************************************************************************************************
  */
 static void Udisk_NrmlMode_Write(uint32 readnum)
@@ -1630,9 +1630,9 @@ static void Udisk_NrmlMode_Write(uint32 readnum)
  *********************************************************************************************************
  *                                           Udisk_FIFOMode_Read
  *
- * Description: UdiskÏÂFIFOÖ±Í¨Ä£Ê½¶Á.
+ * Description: Udiskä¸‹FIFOç›´é€šæ¨¡å¼è¯».
  *
- * Arguments  : readnum: Udisk¶ÁÉÈÇøÊı.
+ * Arguments  : readnum: Udiskè¯»æ‰‡åŒºæ•°.
  *
  * Returns    : None.
  *
@@ -1680,13 +1680,13 @@ static void Udisk_FIFOMode_Read(uint32 readnum)
  *********************************************************************************************************
  *                                           Udisk_FIFOMode_Write
  *
- * Description: UdiskÏÂFIFOÖ±Í¨Ä£Ê½Ğ´(ÒòFlashÖ»ÓĞPage¶ÔÆëµØÖ·²ÅÄÜÊ¹ÓÃ¿ìËÙÄ£Ê½¶ÁĞ´).
+ * Description: Udiskä¸‹FIFOç›´é€šæ¨¡å¼å†™(å› Flashåªæœ‰Pageå¯¹é½åœ°å€æ‰èƒ½ä½¿ç”¨å¿«é€Ÿæ¨¡å¼è¯»å†™).
  *
- * Arguments  : readnum: UdiskĞ´ÉÈÇøÊı.
+ * Arguments  : readnum: Udiskå†™æ‰‡åŒºæ•°.
  *
  * Returns    : None.
  *
- * Note(s)    :Ö»Õë¶ÔFlash×÷´ËPage¶ÔÆëĞ´¶¯×÷
+ * Note(s)    :åªé’ˆå¯¹Flashä½œæ­¤Pageå¯¹é½å†™åŠ¨ä½œ
  *********************************************************************************************************
  */
 static void Udisk_FIFOMode_Write(uint32 readnum)

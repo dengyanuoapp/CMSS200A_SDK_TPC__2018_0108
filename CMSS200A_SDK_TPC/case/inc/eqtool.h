@@ -14,23 +14,23 @@
  */
 #ifndef EQTOOL_H
 #define EQTOOL_H
-#include "actos.h"//ÏµÍ³Í·ÎÄ¼ş
-#include "mmcmd.h"//Ä£¿é²ãÃüÁîÃû¶¨Òå
-#include "basal.h"//basal module Í·ÎÄ¼ş
-#include "enhanced.h"//enhanced module Í·ÎÄ¼ş
-#include "ap_common.h"//¿Ø¼şÍ·ÎÄ¼ş
+#include "actos.h"//ç³»ç»Ÿå¤´æ–‡ä»¶
+#include "mmcmd.h"//æ¨¡å—å±‚å‘½ä»¤åå®šä¹‰
+#include "basal.h"//basal module å¤´æ–‡ä»¶
+#include "enhanced.h"//enhanced module å¤´æ–‡ä»¶
+#include "ap_common.h"//æ§ä»¶å¤´æ–‡ä»¶
 #include "uhdrv.h"
 #include "report_res.h"
 
 #include "usbtest.h"
-#include "decC.h"       //ÉèÖÃEQÊ±Ê¹ÓÃ
+#include "decC.h"       //è®¾ç½®EQæ—¶ä½¿ç”¨
 
 
 #define  EQ_VRAM_MAGIC       0xaa55
 #define  SRS_VRAM_MAGIC       0x55aa
 
-#define  SUPPORT_EQ_CNT       8         // 1:normal 2:Rock 3:Pop 4:Classic 5:Soft 6:Jazz 7:Dbb 8:×Ô¶¨Òå
-#define  ONE_EQPARA_BYTE         7          //Ò»ÖÖÒôĞ§²ÎÊı±íÓĞ7¸ö×Ö½Ú
+#define  SUPPORT_EQ_CNT       8         // 1:normal 2:Rock 3:Pop 4:Classic 5:Soft 6:Jazz 7:Dbb 8:è‡ªå®šä¹‰
+#define  ONE_EQPARA_BYTE         7          //ä¸€ç§éŸ³æ•ˆå‚æ•°è¡¨æœ‰7ä¸ªå­—èŠ‚
 
 
 
@@ -45,7 +45,7 @@ typedef struct
     uint16 magic;
     uint8   left_eq_para[ONE_EQPARA_BYTE *SUPPORT_EQ_CNT];
     uint8   right_eq_para[ONE_EQPARA_BYTE *SUPPORT_EQ_CNT];
-} EQ_VM_t;  // 114 ×Ö½Ú
+} EQ_VM_t;  // 114 å­—èŠ‚
 
 
 

@@ -26,7 +26,7 @@ uint16 show_ui_func(uint8 mode)
     LEDClearScreen();
     while (1)
     {
-        if (need_draw) //ÆÁÄ»ÖØ»­
+        if (need_draw) //å±å¹•é‡ç”»
         {
             ui_display();
             need_draw = FALSE;
@@ -54,18 +54,18 @@ int16 deal_key_msg(void)
             SetCurUI_Type(Linein_UI);
         }
         break;
-    case AP_KEY_PLAY | AP_KEY_UP: //play°´¼ü×÷·µ»Ø´¦Àí
+    case AP_KEY_PLAY | AP_KEY_UP: //playæŒ‰é”®ä½œè¿”å›å¤„ç†
         if (CurUI_Type != Linein_UI)
         {
             SetCurUI_Type(Linein_UI);
         }
         break;
 
-    case AP_KEY_MODE | AP_KEY_UP: //APÇĞ»»ÈÈ¼ü
+    case AP_KEY_MODE | AP_KEY_UP: //APåˆ‡æ¢çƒ­é”®
         return RESULT_MAIN;
         break;
 
-    case AP_KEY_MUTE | AP_KEY_UP: //muteÉèÖÃ
+    case AP_KEY_MUTE | AP_KEY_UP: //muteè®¾ç½®
         mute_flag = !mute_flag;
         if (mute_flag)
         {
@@ -78,15 +78,15 @@ int16 deal_key_msg(void)
         SetCurUI_Type(Linein_UI);
         break;
 
-    case AP_KEY_VOL | AP_KEY_UP: //µ÷½ÚÒôÁ¿
+    case AP_KEY_VOL | AP_KEY_UP: //è°ƒèŠ‚éŸ³é‡
         key = Key_None;
         goto set_vol;
         break;
-    case AP_KEY_VOLADD| AP_KEY_UP: //µ÷½ÚÒôÁ¿
-    case AP_KEY_VOLADD| AP_KEY_LONG: //µ÷½ÚÒôÁ¿
+    case AP_KEY_VOLADD| AP_KEY_UP: //è°ƒèŠ‚éŸ³é‡
+    case AP_KEY_VOLADD| AP_KEY_LONG: //è°ƒèŠ‚éŸ³é‡
         key = Key_Next;
-    case AP_KEY_VOLSUB| AP_KEY_UP: //µ÷½ÚÒôÁ¿
-    case AP_KEY_VOLSUB| AP_KEY_LONG: //µ÷½ÚÒôÁ¿
+    case AP_KEY_VOLSUB| AP_KEY_UP: //è°ƒèŠ‚éŸ³é‡
+    case AP_KEY_VOLSUB| AP_KEY_LONG: //è°ƒèŠ‚éŸ³é‡
 set_vol:
         deal_vol_msg(key, Linein_UI);
         break;
@@ -147,7 +147,7 @@ set_eq:
         //        result = RESULT_MAIN;
         break;
 
-    default: //ÈÈ¼ü´¦Àí
+    default: //çƒ­é”®å¤„ç†
         result = ap_handle_hotkey_core(key);
         break;
     }

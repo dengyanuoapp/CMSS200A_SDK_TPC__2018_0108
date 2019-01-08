@@ -24,9 +24,9 @@ stmt  level    source
    13           * \brief
    14           * \author   wanghaijing
    15           * \par      GENERAL DESCRIPTION:
-   16           *               ÕâÀï¶ÔÎÄ¼ş½øĞĞÃèÊö
+   16           *               è¿™é‡Œå¯¹æ–‡ä»¶è¿›è¡Œæè¿°
    17           * \par      EXTERNALIZED FUNCTIONS:
-   18           *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+   18           *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
    19           *
    20           *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
    21           *
@@ -42,14 +42,14 @@ stmt  level    source
    31          bool UDiskInitAll(int para)
    32          {
    33   1          bool ret;
-   34   1          //    /*µÍµçÄ£Ê½ÏÂ½øĞĞ³äµç*/
+   34   1          //    /*ä½ç”µæ¨¡å¼ä¸‹è¿›è¡Œå……ç”µ*/
    35   1          //    if(GetBattery() < 0x13)
    36   1          //    {
    37   1          //       sKY_ChargeSet(1);
    38   1          //       sKY_ChargeGetandSet();
    39   1          //    }
    40   1      
-   41   1          //½«ramµÄclk¾ùÇĞ»»µ½mcu clk,±ÜÃâÓ¦ÓÃÍË³öµ½uÅÌ,clk²»¶Ôµ¼ÖÂÊ¹ÓÃÎÊÌâ.
+   41   1          //å°†ramçš„clkå‡åˆ‡æ¢åˆ°mcu clk,é¿å…åº”ç”¨é€€å‡ºåˆ°uç›˜,clkä¸å¯¹å¯¼è‡´ä½¿ç”¨é—®é¢˜.
    42   1          RamToMcu();
    43   1      
    44   1          if (DRV_DetectUD(0x00) == 0xff)
@@ -58,25 +58,25 @@ stmt  level    source
    47   2          }
    48   1          else
    49   1          {
-   50   2              DRV_ActiveUD(0x00, MODE_FAST); //¿ìËÙÄ£Ê½udÇı¶¯
+   50   2              DRV_ActiveUD(0x00, MODE_FAST); //å¿«é€Ÿæ¨¡å¼udé©±åŠ¨
    51   2          }
    52   1      
    53   1          //read comval
-   54   1          VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval)); //¶ÁVRAM
+   54   1          VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval)); //è¯»VRAM
    55   1      
    56   1          //==================================================================================
-   57   1          //**********************ÒÔÏÂº¯Êıµ÷ÓÃ´ÎĞò²»ÄÜ¸Ä¶¯***************************************
+   57   1          //**********************ä»¥ä¸‹å‡½æ•°è°ƒç”¨æ¬¡åºä¸èƒ½æ”¹åŠ¨***************************************
 C251 COMPILER V4.55,  usbdisk_enter2exit                                                   13/12/18  16:28:50  PAGE 2   
 
    58   1          //==================================================================================
-   59   1          UDiskSetDiskNum(3); //ÉèÖÃÁª»úÄ£Ê½
+   59   1          UDiskSetDiskNum(3); //è®¾ç½®è”æœºæ¨¡å¼
    60   1      
-   61   1          AlwaysShowCardDisk(0); //ÉèÖÃÊÇ·ñÏÔÊ¾¶àÅÌ·û  //reagan modify 2009-1-6 13:39
+   61   1          AlwaysShowCardDisk(0); //è®¾ç½®æ˜¯å¦æ˜¾ç¤ºå¤šç›˜ç¬¦  //reagan modify 2009-1-6 13:39
    62   1      
-   63   1          //UÅÌ³õÊ¼ÖÕ»¯,ÊäÈë²ÎÊı:callbackº¯Êı£¬ÊôĞÔ...
+   63   1          //Uç›˜åˆå§‹ç»ˆåŒ–,è¾“å…¥å‚æ•°:callbackå‡½æ•°ï¼Œå±æ€§...
    64   1          UDiskInit(0, g_comval.udisk_setting);
    65   1      
-   66   1          ret = UDiskRun(para); //Æô¶¯USBÒıÇæ
+   66   1          ret = UDiskRun(para); //å¯åŠ¨USBå¼•æ“
    67   1          return ret;
    68   1      }
    69          
@@ -120,7 +120,7 @@ stmt  level    source
   107   1      
   108   1          DRV_ActiveUD(0x00, MODE_SLOW);
   109   1      
-  110   1          //°´ModeÍË³ö
+  110   1          //æŒ‰Modeé€€å‡º
   111   1          if (UdiskStatus == 0x00)
   112   1          {
   113   2              if (reckeypress == 1)
@@ -138,22 +138,22 @@ stmt  level    source
 
   124   3              }
   125   2          }
-  126   1          //Éı¼¶ÍË³ö
+  126   1          //å‡çº§é€€å‡º
   127   1          else if (UdiskStatus == 0x50)
   128   1          {
   129   2              ret = RESULT_UPGRADE;
   130   2          }
   131   1          else
   132   1          {
-  133   2              //°ÎÏß,µ¯³ö
+  133   2              //æ‹”çº¿,å¼¹å‡º
   134   2              ret = 0;
   135   2          }
-  136   1          //MODE¼ü¹¦ÄÜ  UHOST¡¢CARD¡¢FM¡¢USBAUDIO¡¢UDISKUSB  Ñ­»·ÇĞ»»
-  137   1          // ¶ÔÓ¦ºìÍâÒ£¿ØÉÏÃæµÄPower¼ü
+  136   1          //MODEé”®åŠŸèƒ½  UHOSTã€CARDã€FMã€USBAUDIOã€UDISKUSB  å¾ªç¯åˆ‡æ¢
+  137   1          // å¯¹åº”çº¢å¤–é¥æ§ä¸Šé¢çš„Poweré”®
   138   1          if (IRUSBExit)
   139   1          {
   140   2              ret = RESULT_NULL;
-  141   2              //        ret = RESULT_MUSIC_PLAY; //    RESULT_MUSIC_PLAY SD Card ×¼±¸Ê±¼ä²»¹»µ¼ÖÂÓÖ½øÈë FM
+  141   2              //        ret = RESULT_MUSIC_PLAY; //    RESULT_MUSIC_PLAY SD Card å‡†å¤‡æ—¶é—´ä¸å¤Ÿå¯¼è‡´åˆè¿›å…¥ FM
   142   2          }
   143   1          power_control();
   144   1          return ret; //RESULT_USBAUDIO_PLAY

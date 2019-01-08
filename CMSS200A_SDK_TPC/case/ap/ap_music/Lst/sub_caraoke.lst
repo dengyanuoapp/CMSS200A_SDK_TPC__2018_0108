@@ -23,10 +23,10 @@ stmt  level    source
    13          
    14          #pragma name(AP_KALACBK)
    15          
-   16          int8 MicVolEar = 0x05; //Êä³öµ½¶ú»úµÄÊ±ºòMicµÄÄ¬ÈÏÒôÁ¿0~7
-   17          //int8 far MicVolSpe = 0x03;              //Êä³öµ½À®°ÈµÄÊ±ºòMicµÄÄ¬ÈÏÒôÁ¿0~7
-   18          int8 DECGainEar = 0x40; //¶ú»ú×´Ì¬ÏÂÄ¬ÈÏDECÔöÒæQ2.6¸ñÊ½
-   19          //int8 far DECGainSpe = 0x80;              //À®°È×´Ì¬ÏÂÄ¬ÈÏDECÔöÒæQ2.6¸ñÊ½
+   16          int8 MicVolEar = 0x05; //è¾“å‡ºåˆ°è€³æœºçš„æ—¶å€™Micçš„é»˜è®¤éŸ³é‡0~7
+   17          //int8 far MicVolSpe = 0x03;              //è¾“å‡ºåˆ°å–‡å­çš„æ—¶å€™Micçš„é»˜è®¤éŸ³é‡0~7
+   18          int8 DECGainEar = 0x40; //è€³æœºçŠ¶æ€ä¸‹é»˜è®¤DECå¢ç›ŠQ2.6æ ¼å¼
+   19          //int8 far DECGainSpe = 0x80;              //å–‡å­çŠ¶æ€ä¸‹é»˜è®¤DECå¢ç›ŠQ2.6æ ¼å¼
    20          const uint8 KALAEQtemp[4][10] =
    21          {
    22              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 1
@@ -35,7 +35,7 @@ stmt  level    source
    25              5, 2, 0, 0, 0, 0, 0, 6, 0, 0 // 4
    26          };
    27          const uint16 CH_strint[] =
-   28          { LEARNMOD, SINGMOD };//ÇĞ»»¿¨À­OKÄ£Ê½
+   28          { LEARNMOD, SINGMOD };//åˆ‡æ¢å¡æ‹‰OKæ¨¡å¼
    29          const uint16 karaoke_EQ[] =
    30          { SOUEFF1, SOUEFF2, SOUEFF3, SOUEFF4 };
    31          const uint8 adc_param[10] =
@@ -46,9 +46,9 @@ stmt  level    source
              -*********
    36           *             void openMicRoute(char micgain)
    37           *
-   38           * Description : ´ò¿ªMICÍ¨Â·£¬²¢¸ù¾İmicgainÉè¶¨MICÔöÒæ
+   38           * Description : æ‰“å¼€MICé€šè·¯ï¼Œå¹¶æ ¹æ®micgainè®¾å®šMICå¢ç›Š
    39           *
-   40           * Arguments   : micgain = 0~7£¨20db~40db£©
+   40           * Arguments   : micgain = 0~7ï¼ˆ20db~40dbï¼‰
    41           *
    42           *
    43           * Returns     : void
@@ -81,7 +81,7 @@ stmt  level    source
              -*********
    67           *             void CloseMicRoute(char micgain)
    68           *
-   69           * Description : ¹Ø±ÕMICÍ¨Â·
+   69           * Description : å…³é—­MICé€šè·¯
    70           *
    71           * Arguments   : NULL
    72           *
@@ -102,9 +102,9 @@ stmt  level    source
    86           ********************************************************************************
    87           *             void acc_vol_callback(int8 CNT)
    88           *
-   89           * Description : »Øµ÷º¯Êı£¬ÉèÖÃ¿¨À­OK°éÒôµÈ¼¶
+   89           * Description : å›è°ƒå‡½æ•°ï¼Œè®¾ç½®å¡æ‹‰OKä¼´éŸ³ç­‰çº§
    90           *
-   91           * Arguments   :int8 Vol  °éÒôµÈ¼¶(-1 ~ 1)
+   91           * Arguments   :int8 Vol  ä¼´éŸ³ç­‰çº§(-1 ~ 1)
    92           *
    93           * Returns     :
    94           *
@@ -136,10 +136,10 @@ stmt  level    source
   119           *
 C251 COMPILER V4.55,  sub_caraoke                                                          23/05/16  10:41:54  PAGE 3   
 
-  120           * Description : ´ò¿ª»ò¹Ø±ÕÈËÉùÏû³ıµçÂ·
+  120           * Description : æ‰“å¼€æˆ–å…³é—­äººå£°æ¶ˆé™¤ç”µè·¯
   121           *
-  122           * Arguments   : flag = 0 ¹Ø±ÕÈËÉùÏû³ıµçÂ·
-  123           *               flag = 1 ´ò¿ªÈËÉùÏû³ıµçÂ·
+  122           * Arguments   : flag = 0 å…³é—­äººå£°æ¶ˆé™¤ç”µè·¯
+  123           *               flag = 1 æ‰“å¼€äººå£°æ¶ˆé™¤ç”µè·¯
   124           *
   125           * Returns     : void
   126           *
@@ -153,15 +153,15 @@ stmt  level    source
   133   1          //uint8 sfr_bak;
   134   1          //sfr_bak = SFR_BANK;
   135   1          //SFR_BANK = BANK_AUIP;
-  136   1          if (flag == 0) //Ñ§Ï°Ä£Ê½, ¹Ø±ÕÈËÉùÏû³ı
+  136   1          if (flag == 0) //å­¦ä¹ æ¨¡å¼, å…³é—­äººå£°æ¶ˆé™¤
   137   1          {
   138   2              //DAC_CTL3 &= 0xbf;
   139   2              sCaraokeDisable();
   140   2          }
-  141   1          else //Ñİ³ªÄ£Ê½, ´ò¿ªÈËÉùÏû³ı
+  141   1          else //æ¼”å”±æ¨¡å¼, æ‰“å¼€äººå£°æ¶ˆé™¤
   142   1          {
   143   2              //DAC_CTL3 |= 0x40;
-  144   2              /* »ñÈ¡µ±Ç°¸èÇú²ÉÑùÂÊ */
+  144   2              /* è·å–å½“å‰æ­Œæ›²é‡‡æ ·ç‡ */
   145   2              musicpSendCommand(MC_GETSAPLE, (void *) (&g_Openparam.current_samplerate));
   146   2              sCaraokeEnable(g_Openparam.current_samplerate, 1);
   147   2          }
@@ -172,9 +172,9 @@ stmt  level    source
              -*********
   152           *             void setDECGain(int8 DecGain)
   153           *
-  154           * Description : ÉèÖÃDECµÄÔöÒæ£¬ÔÚ¿¨À­OK×´Ì¬ÏÂµ÷½Ú°é×àÒôÁ¿
+  154           * Description : è®¾ç½®DECçš„å¢ç›Šï¼Œåœ¨å¡æ‹‰OKçŠ¶æ€ä¸‹è°ƒèŠ‚ä¼´å¥éŸ³é‡
   155           *
-  156           * Arguments   : DecGain  ,USE Q4.20¸ñÊ½
+  156           * Arguments   : DecGain  ,USE Q4.20æ ¼å¼
   157           *
   158           * Returns     : void
   159           *
@@ -200,12 +200,12 @@ stmt  level    source
              -*********
   178           *             void SetCaraokeEq(int8 eqmode,int8 eqval)
   179           *
-  180           * Description : ¿¨À­OKÄ£Ê½ÏÂµÄ£Å£Ñ
+  180           * Description : å¡æ‹‰OKæ¨¡å¼ä¸‹çš„ï¼¥ï¼±
   181           *
 C251 COMPILER V4.55,  sub_caraoke                                                          23/05/16  10:41:54  PAGE 4   
 
-  182           * Arguments   :  int8 eqmode  :Ìá¹©0~6¹²7¸öÆµ¶Î¹©EQÉèÖÃ
-  183           *                int8 eqval µ±Ç°Æµ¶ÎµÄEQÊıÖµ
+  182           * Arguments   :  int8 eqmode  :æä¾›0~6å…±7ä¸ªé¢‘æ®µä¾›EQè®¾ç½®
+  183           *                int8 eqval å½“å‰é¢‘æ®µçš„EQæ•°å€¼
   184           * Returns     : void
   185           *
   186           * Notes       :
@@ -243,9 +243,9 @@ stmt  level    source
              -*********
   217           *             void SetCaraokeEq(BYTE eqmode,BYTE eqval)
   218           *
-  219           * Description : ¿¨À­OKÄ£Ê½ÏÂµÄ£Å£Ñ
+  219           * Description : å¡æ‹‰OKæ¨¡å¼ä¸‹çš„ï¼¥ï¼±
   220           *
-  221           * Arguments   :  BYTE eqmode  :Ìá¹©0~3¹²4¸öÆµ¶Î¹©EQÄ£Ê½ÉèÖÃ ÉèÖÃ¹Ì¶¨µÄEQÖµ
+  221           * Arguments   :  BYTE eqmode  :æä¾›0~3å…±4ä¸ªé¢‘æ®µä¾›EQæ¨¡å¼è®¾ç½® è®¾ç½®å›ºå®šçš„EQå€¼
   222           *
   223           * Returns     : void
   224           *
@@ -278,11 +278,11 @@ stmt  level    source
              -*********
   248           *             void SetVol(int8 volmode)
   249           *
-  250           * Description : ´ò¿ªMICµçÂ·£¬²¢¸ù¾İVOLMODEÉè¶¨Ä¬ÈÏµÄMICÒôÁ¿ºÍDECÒôÁ¿
+  250           * Description : æ‰“å¼€MICç”µè·¯ï¼Œå¹¶æ ¹æ®VOLMODEè®¾å®šé»˜è®¤çš„MICéŸ³é‡å’ŒDECéŸ³é‡
   251           *
-  252           * Arguments   : volmode£¬¸ù¾İvolmodeÅĞ¶Ïµ±Ç°ÊÇ¶ú»úÄ£Ê½»¹ÊÇÀ®°ÈÄ£Ê½£¬´Ó¶øÉèÖÃ²»Í¬µÄmic£¬dec²ÎÊı
-  253           *               volmode = 0,»òÕß´óÓÚ2£¬¹Ø±Õmicin£¬½«dec VolÉèÖÃ³É²»½øĞĞ·Å´ó»òËõĞ¡
-  254           *               volmode = 1£¬±íÊ¾À­¿¨OKÄ£Ê½
+  252           * Arguments   : volmodeï¼Œæ ¹æ®volmodeåˆ¤æ–­å½“å‰æ˜¯è€³æœºæ¨¡å¼è¿˜æ˜¯å–‡å­æ¨¡å¼ï¼Œä»è€Œè®¾ç½®ä¸åŒçš„micï¼Œdecå‚æ•°
+  253           *               volmode = 0,æˆ–è€…å¤§äº2ï¼Œå…³é—­micinï¼Œå°†dec Volè®¾ç½®æˆä¸è¿›è¡Œæ”¾å¤§æˆ–ç¼©å°
+  254           *               volmode = 1ï¼Œè¡¨ç¤ºæ‹‰å¡OKæ¨¡å¼
   255           *
   256           * Returns     : void
   257           *
@@ -293,15 +293,15 @@ stmt  level    source
   261           */
   262          void SetVol(int8 volmode)
   263          {
-  264   1          if (volmode == 0) //·Ç¿¨À­OKÄ£Ê½£¬Õı³£²¥·Å¸èÇú
+  264   1          if (volmode == 0) //éå¡æ‹‰OKæ¨¡å¼ï¼Œæ­£å¸¸æ’­æ”¾æ­Œæ›²
   265   1          {
-  266   2              CloseMicRoute(); //¹Ø±ÕMICÍ¨µÀ
+  266   2              CloseMicRoute(); //å…³é—­MICé€šé“
   267   2              acc_vol_callback(0);
   268   2          }
   269   1          else if (volmode == 1)
   270   1          {
   271   2              acc_vol_callback(g_music_vars.acc_vol);
-  272   2              OpenMicRoute(0x02); //´ò¿ªMicÍ¨µÀ²¢Éè¶¨ÆäÔöÒæÎªÄ¬ÈÏÔöÒæ
+  272   2              OpenMicRoute(0x02); //æ‰“å¼€Micé€šé“å¹¶è®¾å®šå…¶å¢ç›Šä¸ºé»˜è®¤å¢ç›Š
   273   2          }
   274   1          else
   275   1          {
@@ -315,12 +315,12 @@ stmt  level    source
              -*********
   283           *             void CaraokeEnable(int8 volmode)
   284           *
-  285           * Description : ´ò¿ªÈËÉùÏû³ıÄ£¿é£¬MicinÄ£¿é£¬²¢½«EQÉèÖÃ³É¿¨À­OKÄ£Ê½
+  285           * Description : æ‰“å¼€äººå£°æ¶ˆé™¤æ¨¡å—ï¼ŒMicinæ¨¡å—ï¼Œå¹¶å°†EQè®¾ç½®æˆå¡æ‹‰OKæ¨¡å¼
   286           *
-  287           * Arguments   : volmode£¬¸ù¾İvolmodeÅĞ¶Ïµ±Ç°ÊÇ¶ú»úÄ£Ê½»¹ÊÇÀ®°ÈÄ£Ê½£¬´Ó¶øÉèÖÃ²»Í¬µÄmic£¬dec²ÎÊı
-  288           *               volmode = 0,¹Ø±Õmicin£¬½«dec VolÉèÖÃ³É²»½øĞĞ·Å´ó»òËõĞ¡
-  289           *               volmode = 1£¬±íÊ¾À®°ÈÄ£Ê½
-  290           *               volmode = 2£¬±íÊ¾¶ú»úÄ£Ê½
+  287           * Arguments   : volmodeï¼Œæ ¹æ®volmodeåˆ¤æ–­å½“å‰æ˜¯è€³æœºæ¨¡å¼è¿˜æ˜¯å–‡å­æ¨¡å¼ï¼Œä»è€Œè®¾ç½®ä¸åŒçš„micï¼Œdecå‚æ•°
+  288           *               volmode = 0,å…³é—­micinï¼Œå°†dec Volè®¾ç½®æˆä¸è¿›è¡Œæ”¾å¤§æˆ–ç¼©å°
+  289           *               volmode = 1ï¼Œè¡¨ç¤ºå–‡å­æ¨¡å¼
+  290           *               volmode = 2ï¼Œè¡¨ç¤ºè€³æœºæ¨¡å¼
   291           *
   292           * Returns     : void
   293           *
@@ -332,8 +332,8 @@ stmt  level    source
   298          void CaraokeEnable(int8 volmode)
   299          {
   300   1          SpeechMute(volmode);
-  301   1          SetVol(1); //¸ù¾İ¶ú»ú»òÕßÀ®°ÈÑ¡ÔñÄ¬ÈÏmicÒôÁ¿£¬Ä¬ÈÏdecÒôÁ¿
-  302   1          SetCaraokeEqMode(0); //Éè¶¨¿¨À­OK EQ
+  301   1          SetVol(1); //æ ¹æ®è€³æœºæˆ–è€…å–‡å­é€‰æ‹©é»˜è®¤micéŸ³é‡ï¼Œé»˜è®¤decéŸ³é‡
+  302   1          SetCaraokeEqMode(0); //è®¾å®šå¡æ‹‰OK EQ
   303   1      }
   304          
   305          /*
@@ -343,7 +343,7 @@ stmt  level    source
              -*********
   307           *             void CaraokeDisable()
   308           *
-  309           * Description :ÍË³ö¿¨À­OKÄ£Ê½
+  309           * Description :é€€å‡ºå¡æ‹‰OKæ¨¡å¼
   310           *
   311           * Arguments   : void
   312           *
@@ -363,7 +363,7 @@ stmt  level    source
   325          {
   326   1          if (g_music_vars.karaoke_flag == 1)
   327   1          {
-  328   2              /* »ñÈ¡µ±Ç°¸èÇú²ÉÑùÂÊ */
+  328   2              /* è·å–å½“å‰æ­Œæ›²é‡‡æ ·ç‡ */
   329   2              musicpSendCommand(MC_GETSAPLE, (void *) (&g_Openparam.current_samplerate));
   330   2              sCaraokeEnable(g_Openparam.current_samplerate, 1);
   331   2          }
@@ -373,12 +373,12 @@ stmt  level    source
   335   2          }
   336   1      }
   337          /********************************************************************************
-  338           * Description :´¦Àímic¿ª¹Ø¹¦ÄÜ
+  338           * Description :å¤„ç†micå¼€å…³åŠŸèƒ½
   339           *
   340           * Arguments  :
   341           *
   342           * Returns     :
-  343           *            ÎŞ
+  343           *            æ— 
   344           * Notes       :
   345          
   346           *

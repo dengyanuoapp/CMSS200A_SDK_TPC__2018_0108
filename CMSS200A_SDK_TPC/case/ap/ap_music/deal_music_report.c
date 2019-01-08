@@ -16,16 +16,16 @@
 #if defined(MUSIC_AP)
 #pragma name(MUSIC_REPORT)
 unsigned char far name_buf[63];
-//ÅĞ¶Ï×Ö·ûÊÇ·ñÎªÊı×Ö
+//åˆ¤æ–­å­—ç¬¦æ˜¯å¦ä¸ºæ•°å­—
 #define data_is_num(dat)        ((dat>='0') && (dat<='9'))
-//ÅĞ¶Ï×Ö·ûÊÇ·ñÎª×ÖÄ¸
+//åˆ¤æ–­å­—ç¬¦æ˜¯å¦ä¸ºå­—æ¯
 #define data_is_alpha(dat)      (((dat>='a') && (dat<='z')) || ((dat>='A') && (dat<='Z')))
 /********************************************************************************
- * Description : ²¥±¨µ±Ç°ÒôÀÖtagĞÅÏ¢
+ * Description : æ’­æŠ¥å½“å‰éŸ³ä¹tagä¿¡æ¯
  *
- * Arguments   : char *report_buf ¸èÇúµÄĞèÒª²¥±¨µÄtag
- *               char cur_disk µ±Ç°µÄÅÌ·û
- * Returns     : 0:ÎŞÊÕµ½ÌØÊâµÄ°´¼üÏûÏ¢ ÆäËü£ºÌØÊâµÄÏûÏ¢ĞèÒªÉÏ²ã´¦Àí
+ * Arguments   : char *report_buf æ­Œæ›²çš„éœ€è¦æ’­æŠ¥çš„tag
+ *               char cur_disk å½“å‰çš„ç›˜ç¬¦
+ * Returns     : 0:æ— æ”¶åˆ°ç‰¹æ®Šçš„æŒ‰é”®æ¶ˆæ¯ å…¶å®ƒï¼šç‰¹æ®Šçš„æ¶ˆæ¯éœ€è¦ä¸Šå±‚å¤„ç†
  *
  * Notes       :
  *
@@ -46,14 +46,14 @@ int report_music_tag(char *report_buf, char cur_disk)
     return result;
 }
 /********************************************************************************
- * Description : ¼ì²éID3Êı¾İµÄbufferÊÇ·ñÎªunicode,²¢É¾³ıunicode±êÖ¾
+ * Description : æ£€æŸ¥ID3æ•°æ®çš„bufferæ˜¯å¦ä¸ºunicode,å¹¶åˆ é™¤unicodeæ ‡å¿—
  *
- * Arguments   : char *buf ´æ·ÅID3Êı¾İµÄbuffer
+ * Arguments   : char *buf å­˜æ”¾ID3æ•°æ®çš„buffer
  *
- * Returns     : bit0 0£ºTITE²»ÊÇUNICODE
- *                    1£ºTITEÊÇUNICODE
- *               bit1 0£ºTPE1²»ÊÇUNICODE
- *                    1£ºTPE1ÊÇUNICODE
+ * Returns     : bit0 0ï¼šTITEä¸æ˜¯UNICODE
+ *                    1ï¼šTITEæ˜¯UNICODE
+ *               bit1 0ï¼šTPE1ä¸æ˜¯UNICODE
+ *                    1ï¼šTPE1æ˜¯UNICODE
  * Notes       :
  *
  ********************************************************************************/
@@ -80,11 +80,11 @@ BOOL check_MP3_id3(unsigned char *buf)
     return ret;
 }
 /********************************************************************************
- * Description : ´¦Àí¸èÇúµÄID3ĞÅÏ¢£¬Ö»´¦ÀíTITEºÍTPE1£¬²¢È¥µôASCII
+ * Description : å¤„ç†æ­Œæ›²çš„ID3ä¿¡æ¯ï¼Œåªå¤„ç†TITEå’ŒTPE1ï¼Œå¹¶å»æ‰ASCII
  *
- * Arguments   : char *g_TagInfoBuf ID3ĞÅÏ¢
+ * Arguments   : char *g_TagInfoBuf ID3ä¿¡æ¯
  *               char type: 0(MP3) 1(wma)
- * Returns     : ÔİÊ±Ã»ÓĞÊ¹ÓÃ
+ * Returns     : æš‚æ—¶æ²¡æœ‰ä½¿ç”¨
  *
  * Notes       :
  *
@@ -96,7 +96,7 @@ int convert_music_id3_string(char *report_buf, char type)
     unsigned char i, j;
 
     memcpy(name_buf, report_buf, 60);
-    //wmaµÄID3ĞÅÏ¢ÎªUNICODE
+    //wmaçš„ID3ä¿¡æ¯ä¸ºUNICODE
     if(type == 1)
     {
         uni_flag = 0x3;
@@ -106,12 +106,12 @@ int convert_music_id3_string(char *report_buf, char type)
         uni_flag = check_MP3_id3(name_buf);
     }
 
-    //ÓïÑÔÎªÖĞÎÄ£¬²¢ÇÒTITE£¨¸èÇú±êÌâ£©²»Îª¿ÕµÄÊ±ºò
+    //è¯­è¨€ä¸ºä¸­æ–‡ï¼Œå¹¶ä¸”TITEï¼ˆæ­Œæ›²æ ‡é¢˜ï¼‰ä¸ä¸ºç©ºçš„æ—¶å€™
     if((uni_flag && (name_buf[0] || name_buf[1])) ||
             (!uni_flag && name_buf[0]) || (uni_flag && (name_buf[30] || name_buf[31])) ||
             (!uni_flag && name_buf[30]))
     {
-        //Èç¹ûÊÇunicode£¬×ª»¯ÎªÄÚÂë
+        //å¦‚æœæ˜¯unicodeï¼Œè½¬åŒ–ä¸ºå†…ç 
         if(uni_flag)
         {
             if(uni_flag & 0x1)
@@ -124,7 +124,7 @@ int convert_music_id3_string(char *report_buf, char type)
             }
         }
 
-        //Á¬½ÓtitleºÍartist£¬²¢É¾³ıÄÚÂëÖĞµÄascii²¿·Ö(Êı×Ö³ıÍâ)
+        //è¿æ¥titleå’Œartistï¼Œå¹¶åˆ é™¤å†…ç ä¸­çš„asciiéƒ¨åˆ†(æ•°å­—é™¤å¤–)
         for(i = 0, j = 0; i < 58;)
         {
             if(!name_buf[i])
@@ -132,7 +132,7 @@ int convert_music_id3_string(char *report_buf, char type)
                 if(i < 30)
                 {
                     i = 30;
-                    //Èç¹ûtitle²»Îª¿Õ£¬ÔÚtitleºÍartistÖĞ¼äÔö¼ÓÁ½¸ö¿Õ¸ñ£¨¾²ÒôÊı¾İÖ¡£©
+                    //å¦‚æœtitleä¸ä¸ºç©ºï¼Œåœ¨titleå’Œartistä¸­é—´å¢åŠ ä¸¤ä¸ªç©ºæ ¼ï¼ˆé™éŸ³æ•°æ®å¸§ï¼‰
                     if(j)
                     {
                         report_buf[j++] = ' ';
@@ -145,7 +145,7 @@ int convert_music_id3_string(char *report_buf, char type)
                     break;
                 }
             }
-            else if(data_is_num(name_buf[i])) //±£ÁôÊı×Ö²¿·Ö
+            else if(data_is_num(name_buf[i])) //ä¿ç•™æ•°å­—éƒ¨åˆ†
 
             {
                 report_buf[j++] = name_buf[i++];
@@ -159,7 +159,7 @@ int convert_music_id3_string(char *report_buf, char type)
             else
             {
                 report_buf[j++] = name_buf[i++];
-                //´¦Àí°ë¸öÖĞÎÄ×Ö·ûµÄÇé¿ö
+                //å¤„ç†åŠä¸ªä¸­æ–‡å­—ç¬¦çš„æƒ…å†µ
                 if(name_buf[i])
                 {
                     report_buf[j++] = name_buf[i++];
@@ -173,17 +173,17 @@ int convert_music_id3_string(char *report_buf, char type)
         report_buf[j] = 0;
     }
 
-    //Ôö¼Ó¾²ÒôÊı¾İÖ¡(×Ö·û´®¿ªÍ·¼ÓÒ»¸ö¿Õ¸ñ£¬×îºó¼ÓÁ½¸ö¿Õ¸ñ)
+    //å¢åŠ é™éŸ³æ•°æ®å¸§(å­—ç¬¦ä¸²å¼€å¤´åŠ ä¸€ä¸ªç©ºæ ¼ï¼Œæœ€ååŠ ä¸¤ä¸ªç©ºæ ¼)
     //report_str_fix(report_buf);
 
     return result;
 }
 /********************************************************************************
- * Description : ´¦Àí¸èÇúµÄ³¤Ãû£¬Èç¹û³¤ÃûÎª¿Õ£¬ÔòÊ¹ÓÃ¶ÌÃû,
- *               ²¢½«Êı¾İÔİ´æÔÚreport_bufÖĞ
- * Arguments   : char *name ÒôÀÖµÄ¶ÌÎÄ¼şÃû
+ * Description : å¤„ç†æ­Œæ›²çš„é•¿åï¼Œå¦‚æœé•¿åä¸ºç©ºï¼Œåˆ™ä½¿ç”¨çŸ­å,
+ *               å¹¶å°†æ•°æ®æš‚å­˜åœ¨report_bufä¸­
+ * Arguments   : char *name éŸ³ä¹çš„çŸ­æ–‡ä»¶å
  *
- * Returns     : ÔİÊ±Ã»ÓĞÊ¹ÓÃ
+ * Returns     : æš‚æ—¶æ²¡æœ‰ä½¿ç”¨
  *
  * Notes       :
  *
@@ -195,7 +195,7 @@ int convert_music_name_string(char *report_buf)
     unsigned char len;
 
     {
-        result = FS_GetName(report_buf, 29); //È¡³ö³¤Ãû
+        result = FS_GetName(report_buf, 29); //å–å‡ºé•¿å
 
         memcpy(name_buf, report_buf, 60);
         if (result != 0)
@@ -211,12 +211,12 @@ int convert_music_name_string(char *report_buf)
             len = 8;
         }
 
-        //É¾³ı¸èÇúµÄºó×º
+        //åˆ é™¤æ­Œæ›²çš„åç¼€
         name_buf[len] = 0;
         //name_buf[len+1] = 0;
         for(i = 0, j = 0; (j < len) && (i < 57);)
         {
-            if(data_is_num(name_buf[j])) //´¦ÀíÎÄ¼şÃûµÄÊı×Ö²¿·Ö
+            if(data_is_num(name_buf[j])) //å¤„ç†æ–‡ä»¶åçš„æ•°å­—éƒ¨åˆ†
 
             {
                 report_buf[i++] = name_buf[j++];
@@ -227,10 +227,10 @@ int convert_music_name_string(char *report_buf)
                 j++;
                 continue;
             }
-            else if(name_buf[j] < (unsigned char)0x80) //É¾³ıµôËùÓĞµÄASCII(Êı×Ö³ıÍâ),½«ASCII ×ª»¯Îª¿Õ¸ñ
+            else if(name_buf[j] < (unsigned char)0x80) //åˆ é™¤æ‰æ‰€æœ‰çš„ASCII(æ•°å­—é™¤å¤–),å°†ASCII è½¬åŒ–ä¸ºç©ºæ ¼
 
             {
-                //¿Õ¸ñÌí¼ÓÈ¥³ıÁ½ÖÖÇé¿ö£¬1¡¢·ÇÎÄ¼şÃû¿ªÍ· 2¡¢ÉÏÒ»¸ö×Ö·û²»ÊÇ¿Õ¸ñ
+                //ç©ºæ ¼æ·»åŠ å»é™¤ä¸¤ç§æƒ…å†µï¼Œ1ã€éæ–‡ä»¶åå¼€å¤´ 2ã€ä¸Šä¸€ä¸ªå­—ç¬¦ä¸æ˜¯ç©ºæ ¼
                 if((i) && (report_buf[i - 1] != ' '))
                 {
                     report_buf[i++] = ' ';
@@ -247,17 +247,17 @@ int convert_music_name_string(char *report_buf)
                 }
                 else
                 {
-                    //´¦Àí°ë¸öÖĞÎÄ×Ö·ûµÄÇé¿ö
+                    //å¤„ç†åŠä¸ªä¸­æ–‡å­—ç¬¦çš„æƒ…å†µ
                     i--;
                 }
             }
         }
 
-        //Ìí¼Ó½áÊø·û
+        //æ·»åŠ ç»“æŸç¬¦
         report_buf[i] = 0;
     }
 
-    //Ôö¼Ó¾²ÒôÊı¾İÖ¡(×Ö·û´®¿ªÍ·¼ÓÒ»¸ö¿Õ¸ñ£¬×îºó¼ÓÁ½¸ö¿Õ¸ñ)
+    //å¢åŠ é™éŸ³æ•°æ®å¸§(å­—ç¬¦ä¸²å¼€å¤´åŠ ä¸€ä¸ªç©ºæ ¼ï¼Œæœ€ååŠ ä¸¤ä¸ªç©ºæ ¼)
     //report_str_fix(report_buf);
 
     return result;

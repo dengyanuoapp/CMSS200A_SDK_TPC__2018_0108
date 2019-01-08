@@ -17,76 +17,76 @@
 #include "ap_common.h"
 #include "enhanced.h"
 #include "basal.h"
-#include "mmcmd.h"//Ä£¿é²ãÃüÁîÃû¶¨Òå
+#include "mmcmd.h"//æ¨¡å—å±‚å‘½ä»¤åå®šä¹‰
 //#define	 TEST_HOST	1
 
 //message
-#define  RESULT_USER_STOP        (RESULT_USER1+1)    //ÓÃ»§°´¼ü½áÊø
-#define  RESULT_LOW_POWER_STOP   (RESULT_USER1+2)    //µÍµçÑ¹½áÊø
+#define  RESULT_USER_STOP        (RESULT_USER1+1)    //ç”¨æˆ·æŒ‰é”®ç»“æŸ
+#define  RESULT_LOW_POWER_STOP   (RESULT_USER1+2)    //ä½ç”µå‹ç»“æŸ
 #define  RESULT_DIR_CHANGED      (RESULT_USER1+3)
-#define  RESULT_TRACKED          (RESULT_USER1+5)    //·ÖÇúÍË³ö½á¹û
+#define  RESULT_TRACKED          (RESULT_USER1+5)    //åˆ†æ›²é€€å‡ºç»“æœ
 //event
-#define  AP_EVENT_CODEC_ERR    AP_EVENT_9    //codec ³ö´í
-//main(int param) ¶¨ÒåÈë¿Ú²ÎÊıµÄÖµ
-#define  NON_FMREC      0                     //·ÇFMÂ¼Òô,´ËÊ±Â¼ÒôÔ´ÓÉg_mrecord_vars.rec_source¾ö¶¨
-#define  MICREC_START   1                   //RESULT_RECORD         //·ÇFM½ø³ÌÏÂ,°´REC¼üÖ±½Ó½øÈëMICÂ¼Òô.
-#define  FMREC_START    RESULT_FMREC_START    //FMÂ¼Òô.FM½ø³ÌÊÕÌıµçÌ¨Ê±°´ÈÈ¼üREC½øĞĞµÄFMÂ¼Òô
-#define  FMREC_NOSTART  RESULT_FMREC_NOSTART  //FMÂ¼Òô.FM½ø³ÌÊÕÌıµçÌ¨Ê±Ñ¡Ôñ"µçÌ¨Â¼Òô"²Ëµ¥½øĞĞµÄFMÂ¼Òô
+#define  AP_EVENT_CODEC_ERR    AP_EVENT_9    //codec å‡ºé”™
+//main(int param) å®šä¹‰å…¥å£å‚æ•°çš„å€¼
+#define  NON_FMREC      0                     //éFMå½•éŸ³,æ­¤æ—¶å½•éŸ³æºç”±g_mrecord_vars.rec_sourceå†³å®š
+#define  MICREC_START   1                   //RESULT_RECORD         //éFMè¿›ç¨‹ä¸‹,æŒ‰RECé”®ç›´æ¥è¿›å…¥MICå½•éŸ³.
+#define  FMREC_START    RESULT_FMREC_START    //FMå½•éŸ³.FMè¿›ç¨‹æ”¶å¬ç”µå°æ—¶æŒ‰çƒ­é”®RECè¿›è¡Œçš„FMå½•éŸ³
+#define  FMREC_NOSTART  RESULT_FMREC_NOSTART  //FMå½•éŸ³.FMè¿›ç¨‹æ”¶å¬ç”µå°æ—¶é€‰æ‹©"ç”µå°å½•éŸ³"èœå•è¿›è¡Œçš„FMå½•éŸ³
 #define  FMREC_AUSTART  RESULT_AUTORECORD_START
 
-//Â¼ÒôÔ´³£Á¿¶¨Òå(È«¾Ö±äÁ¿:g_rec_from»áÓÃµ½!)
+//å½•éŸ³æºå¸¸é‡å®šä¹‰(å…¨å±€å˜é‡:g_rec_fromä¼šç”¨åˆ°!)
 #define  R_SPDIF          0x80
 #define  R_FM             0x40
 #define  R_LINEIN         0x20
 #define  R_MIC            0x10
 
 //defines
-#define SPACE_LOW           150L          // exFAT Support //60L    //Ê£ÓàÉÈÇøÊı
-#define LOW_POWER_COUNT     4      //Í£Ö¹Â¼ÒôÊ±µÍµçÑ¹·¢ÉúµÄ´ÎÊı
+#define SPACE_LOW           150L          // exFAT Support //60L    //å‰©ä½™æ‰‡åŒºæ•°
+#define LOW_POWER_COUNT     4      //åœæ­¢å½•éŸ³æ—¶ä½ç”µå‹å‘ç”Ÿçš„æ¬¡æ•°
 //#define FPGA_DEBUG_ADC
 
 
-/* Â¼Òô¸ñÊ½Ã¶¾Ù*/
+/* å½•éŸ³æ ¼å¼æšä¸¾*/
 typedef enum
 {
     RECORD_FILE_TYPE_WAV = 0, RECORD_FILE_TYPE_MP2
 } ap_rectype_e;
 
-/* Â¼Òô²ÉÑùÂÊÃ¶¾Ù*/
+/* å½•éŸ³é‡‡æ ·ç‡æšä¸¾*/
 typedef enum
 {
     AP_FS_8K = 0, AP_FS_12K, AP_FS_32K, AP_FS_48K
 } ap_samplerate_e;
 
-/* Â¼Òô±ÈÌØÂÊÃ¶¾Ù*/
+/* å½•éŸ³æ¯”ç‰¹ç‡æšä¸¾*/
 typedef enum
 {
     AP_BT_32K = 0, AP_BT_64K, AP_BT_128K, AP_BT_192K, AP_BT_256K, AP_BT_384K
-    /* FPGA ½×¶Î, ADPCM Ë«ÉùµÀÎª384KBPS */
+    /* FPGA é˜¶æ®µ, ADPCM åŒå£°é“ä¸º384KBPS */
 } ap_bitrate_e;
 
-/* Â¼ÒôÔ´Ã¶¾Ù*/
+/* å½•éŸ³æºæšä¸¾*/
 typedef enum
 {
     AP_MICIN = 0, AP_LINEIN, AP_FMIN
 } ap_inputSelect_e;
 
-/* Â¼ÒôVRAM Êı¾İÇø±¸·İ½á¹¹*/
+/* å½•éŸ³VRAM æ•°æ®åŒºå¤‡ä»½ç»“æ„*/
 typedef struct
 {
-    uint16 maigc; //ÓÃÀ´ÅĞ¶ÏvmÀïµÄÊı¾İÊÇ·ñÓĞĞ§
+    uint16 maigc; //ç”¨æ¥åˆ¤æ–­vmé‡Œçš„æ•°æ®æ˜¯å¦æœ‰æ•ˆ
     file_location_t location;
-    uint16 wav_num; //µ±Ç°Â¼ÒôÎÄ¼şµÄ±àºÅ
-    uint16 mp2_num; //µ±Ç°Â¼Òômp2ÎÄ¼ş±àºÅ
+    uint16 wav_num; //å½“å‰å½•éŸ³æ–‡ä»¶çš„ç¼–å·
+    uint16 mp2_num; //å½“å‰å½•éŸ³mp2æ–‡ä»¶ç¼–å·
 
-    /* ¸ù¾İÂ¼ÒôÄ£Ê½,  Â¼Òô¸ñÊ½ÒÔ¼°wav ±àÂë·½Ê½È·¶¨FS,  Bitrate ¼°channel num */
-    uint8 rec_mode; //0:  ³¤Ê±Â¼Òô  1:  ÆÕÍ¨Â¼Òô  2:  ÓÅÖÊÂ¼Òô
-    wav_encmode_t rec_encode; //wav ¸ñÊ½±àÂë·½Ê½,  ADPCM  or PCM
-    ap_rectype_e rec_type; //Â¼Òô¸ñÊ½
-    ap_inputSelect_e rec_source; //µ±Ç°ÉèÖÃµÄÂ¼ÒôÔ´
+    /* æ ¹æ®å½•éŸ³æ¨¡å¼,  å½•éŸ³æ ¼å¼ä»¥åŠwav ç¼–ç æ–¹å¼ç¡®å®šFS,  Bitrate åŠchannel num */
+    uint8 rec_mode; //0:  é•¿æ—¶å½•éŸ³  1:  æ™®é€šå½•éŸ³  2:  ä¼˜è´¨å½•éŸ³
+    wav_encmode_t rec_encode; //wav æ ¼å¼ç¼–ç æ–¹å¼,  ADPCM  or PCM
+    ap_rectype_e rec_type; //å½•éŸ³æ ¼å¼
+    ap_inputSelect_e rec_source; //å½“å‰è®¾ç½®çš„å½•éŸ³æº
     //uint8 channelnum;
-    //uint8 Rec_Fsrate; //²ÉÑùÂÊ
-    //uint8 rec_bitrate; //0/1/2/3/4/5:32/48/64/96/128/192bps.(Í¨¹ıBitRate_Tab[]×ª»»³Émodule²ãµÄ½Ó¿Ú²ÎÊı)
+    //uint8 Rec_Fsrate; //é‡‡æ ·ç‡
+    //uint8 rec_bitrate; //0/1/2/3/4/5:32/48/64/96/128/192bps.(é€šè¿‡BitRate_Tab[]è½¬æ¢æˆmoduleå±‚çš„æ¥å£å‚æ•°)
 
     uint8 rec_InputGain;//5
     uint8 rec_ADCGain;//3
@@ -125,21 +125,21 @@ typedef uint16 (*MenuCallBack)(void);
 extern record_vars_t g_record_vars;
 //extern fmrecord_vars_t fm_record_vars;
 extern audio_format_t Rec_format;
-extern wav_rec_status_t rec_stat; //Â¼Òô×´Ì¬
+extern wav_rec_status_t rec_stat; //å½•éŸ³çŠ¶æ€
 extern uint32 total_sec;
 extern bool isFmRecord;
 extern uint8 avrEnableSave;
 extern ap_inputSelect_e inputSelSave;
 
-extern uint8 g_file_num; //Â¼ÒôÎÄ¼ş×Ü¸öÊı
+extern uint8 g_file_num; //å½•éŸ³æ–‡ä»¶æ€»ä¸ªæ•°
 //extern uint8 g_total_time[];          //00:00:00
 extern uint8 g_now_time[]; //00:00:00
-extern time_t_ext g_total_time; //×ÜÊ±¼äÏÔÊ¾
-extern time_t g_rec_time; //ÊµÊ±ÏÔÊ¾Â¼ÒôµÄÊ±¼ä
+extern time_t_ext g_total_time; //æ€»æ—¶é—´æ˜¾ç¤º
+extern time_t g_rec_time; //å®æ—¶æ˜¾ç¤ºå½•éŸ³çš„æ—¶é—´
 extern uint8 g_file_name_time[16]; //"WAV01 2004/01/01"
 
-extern uint32 g_free_space; //Ê£Óà´ÅÅÌ¿Õ¼ä
-extern uint32 g_file_size; //µ±Ç°Â¼ÒôÎÄ¼şµÄpageÊı
+extern uint32 g_free_space; //å‰©ä½™ç£ç›˜ç©ºé—´
+extern uint32 g_file_size; //å½“å‰å½•éŸ³æ–‡ä»¶çš„pageæ•°
 extern uint16 g_rec_event;
 
 extern resource_t inputSelect;
@@ -163,11 +163,11 @@ extern const uint16 stop_string[];// = {RSTOP1, RECORDFILETYPE,RECORDSETTING, CH
 extern const uint16 stop_string_card[];// = {RSTOP1, MSTOP2, RECORDFILETYPE, RECORDSETTING,CHANGEVO};
 
 extern const uint8 rec_bitrate_sector_ratio[];
-/* Â¼Òô±ÈÌØÂÊ*/
+/* å½•éŸ³æ¯”ç‰¹ç‡*/
 extern ap_bitrate_e rec_bitrate;
-/* Â¼Òô²ÉÑùÂÊ*/
+/* å½•éŸ³é‡‡æ ·ç‡*/
 extern ap_samplerate_e Rec_Fsrate;
-/* Â¼ÒôÍ¨µÀÊı*/
+/* å½•éŸ³é€šé“æ•°*/
 extern channelnum_t rec_channel;
 
 //extern uint8 dir_name[30];
@@ -177,26 +177,26 @@ extern bool need_fetch_space;
 extern bool card_exist;
 extern bool UDisk_exist;
 
-/* ËùÉèÖÃµÄÂ¼ÒôÈİÁ¿: ÉÈÇøÎªµ¥Î» */
+/* æ‰€è®¾ç½®çš„å½•éŸ³å®¹é‡: æ‰‡åŒºä¸ºå•ä½ */
 extern DLL_IMP uint32 RecSpare;
-/* ÅäÖÃµÄ¿ÉÂ¼ÉÈÇøÊı */
+/* é…ç½®çš„å¯å½•æ‰‡åŒºæ•° */
 extern uint32 total_space_setting;
 
-/* µ¥´Î½øÈëÂ¼Òô£¬ÀÛ¼ÆÒÑÂ¼ÉÈÇøÊı */
+/* å•æ¬¡è¿›å…¥å½•éŸ³ï¼Œç´¯è®¡å·²å½•æ‰‡åŒºæ•° */
 extern uint32 total_space_used;
 
-/* µ¥¸öÎÄ¼şµÄÉÈÇøÊı */
+/* å•ä¸ªæ–‡ä»¶çš„æ‰‡åŒºæ•° */
 extern uint32 onefile_space;
 extern uint8 rec_status;
 extern uint8 need_change_rec_status;
 extern uint8 review_disk;
-/* ADPCM ÈıÖÖÄ£Ê½ÏÂ±ÈÌØÂÊÅäÖÃ*/
+/* ADPCM ä¸‰ç§æ¨¡å¼ä¸‹æ¯”ç‰¹ç‡é…ç½®*/
 extern const ap_bitrate_e bitrate_ap_adpcm[3];
 
-/* PCM ÈıÖÖÄ£Ê½ÏÂ±ÈÌØÂÊÅäÖÃ*/
+/* PCM ä¸‰ç§æ¨¡å¼ä¸‹æ¯”ç‰¹ç‡é…ç½®*/
 extern const ap_bitrate_e bitrate_ap_pcm[3];
 
-/* MP2 ÈıÖÖÄ£Ê½ÏÂ±ÈÌØÂÊÅäÖÃ*/
+/* MP2 ä¸‰ç§æ¨¡å¼ä¸‹æ¯”ç‰¹ç‡é…ç½®*/
 extern const ap_bitrate_e bitrate_ap_mp2[3];
 extern const uint8 *g_dir_voice;
 extern bool overflag;

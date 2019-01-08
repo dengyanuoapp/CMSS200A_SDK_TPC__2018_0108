@@ -1,18 +1,18 @@
-1��welcome����ĵ�ַ�ʹ�С
-   ��ʼ��ַ������0xff9800����С���ó���2KB������ַ��Χ��0xff9800~0xff9fff
+1、welcome代码的地址和大小
+   起始地址必须是0xff9800，大小不得超过2KB，即地址范围是0xff9800~0xff9fff
    
-2��ͼƬ��Դ
-   Ϊ���Ͻӿڶ�ȡ�����ʱ���ͼƬ��Դ���а�512byte���롣��1023byte����̼�����1024byte��
+2、图片资源
+   为符合接口读取，打包时会对图片资源进行按512byte补齐。即1023byte打进固件会变成1024byte。
    
    
-3���ӿ�
-   �ṩ�����ӿڣ�һΪ��ȡ��ʾbuffer����ʼ��ַ�ͳ��ȣ���һ��Ϊ��������ȡlogo���ݵ���buffer
+3、接口
+   提供两个接口，一为获取显示buffer的起始地址和长度，另一个为按扇区读取logo数据到此buffer
    
    sGetLogoData?_
-   ������WR6 -- res��Դ����ƫ�ƣ� 0��ʼ�� R11 -- ��ȡ����������
-   ���أ� R11 -- 0 ��ȷ    
+   参数：WR6 -- res资源扇区偏移， 0起始； R11 -- 读取的扇区个数
+   返回： R11 -- 0 正确    
 
 
    sGetBuffInfo?_:
-   ��������
-   ���أ� WR4 -- buffer��ַ�� WR6 -- buffer����
+   参数：无
+   返回： WR4 -- buffer地址； WR6 -- buffer长度

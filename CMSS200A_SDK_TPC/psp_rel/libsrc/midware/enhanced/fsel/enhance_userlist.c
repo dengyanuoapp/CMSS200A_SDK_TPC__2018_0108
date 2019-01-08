@@ -66,7 +66,7 @@ uint8 fselSetLocationPL(file_location_t  *location)
     {
         if (!FS_SetCurDir(location->ClusterNo))
         {
-            fselError = FSEL_ERR_SETDIR;                             //Ä¿Â¼²»´æÔÚ
+            fselError = FSEL_ERR_SETDIR;                             //ç›®å½•ä¸å­˜åœ¨
             return FALSE;
         }
         if (FALSE == FS_SetCurDirEntry(location->DirEntry))

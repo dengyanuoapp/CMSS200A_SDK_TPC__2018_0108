@@ -17,7 +17,7 @@
 #define NUMBERADDR 4
 #define ICON_TOTAL  18
 #define NUMBER       35
-// º¯Êý±í
+// å‡½æ•°è¡¨
 //void Drv_Entrance(void);
 
 bool Sdrv_Init(uint8 api_no);

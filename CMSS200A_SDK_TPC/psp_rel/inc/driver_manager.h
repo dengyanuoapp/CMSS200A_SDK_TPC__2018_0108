@@ -10,7 +10,7 @@
  ********************************************************************************/
 /*!
  * \file     driver_manager.h
- * \brief    Çı¶¯¹ÜÀí
+ * \brief    é©±åŠ¨ç®¡ç†
  * \author   wuyueqian
  * \version  1.0
  * \date  2011/9/10
@@ -19,47 +19,47 @@
 #define _DRIVER_MANAGER_H
 
 //-------------------------------------
-//bank a ×ÊÔ´·ÖÅä  ×¢Òâ£ºbank a²»ÄÜ´óÓÚ128¸öbank
+//bank a èµ„æºåˆ†é…  æ³¨æ„ï¼šbank aä¸èƒ½å¤§äº128ä¸ªbank
 //-------------------------------------
-//ÏµÍ³Ààº¯ÊıµÄapi·ÖÅä 40  bank a ×ÊÔ´
+//ç³»ç»Ÿç±»å‡½æ•°çš„apiåˆ†é… 40  bank a èµ„æº
 #define SYS_BaseNoA      	0
-//´æ´¢ÀàÇı¶¯¹Ì¶¨Òª·ÖÅä 3 bank a ×ÊÔ´
+//å­˜å‚¨ç±»é©±åŠ¨å›ºå®šè¦åˆ†é… 3 bank a èµ„æº
 #define STG_BaseNoA      	40
-//ÎÄ¼şÏµÍ³Çı¶¯¹Ì¶¨Òª·ÖÅä 18 bank a ×ÊÔ´
+//æ–‡ä»¶ç³»ç»Ÿé©±åŠ¨å›ºå®šè¦åˆ†é… 18 bank a èµ„æº
 #define FS_BaseNoA      	43
-//ÏÔÊ¾Çı¶¯¹Ì¶¨Òª·ÖÅä 5 bank a ×ÊÔ´
+//æ˜¾ç¤ºé©±åŠ¨å›ºå®šè¦åˆ†é… 5 bank a èµ„æº
 #define UI_BaseNoA       	61
-//¼üÅÌÇı¶¯¹Ì¶¨Òª·ÖÅä 6 bank a ×ÊÔ´
+//é”®ç›˜é©±åŠ¨å›ºå®šè¦åˆ†é… 6 bank a èµ„æº
 #define KY_BaseNoA      	66
-//miniÎÄ¼şÏµÍ³Çı¶¯¹Ì¶¨Òª·ÖÅä 5 bank a ×ÊÔ´
+//miniæ–‡ä»¶ç³»ç»Ÿé©±åŠ¨å›ºå®šè¦åˆ†é… 5 bank a èµ„æº
 #define MFS_BaseNoA   		72
-//¿ìËÙSD¿¨Çı¶¯¹Ì¶¨Òª·ÖÅä 3 bank a ×ÊÔ´
+//å¿«é€ŸSDå¡é©±åŠ¨å›ºå®šè¦åˆ†é… 3 bank a èµ„æº
 #define SDFF_BaseNoA     	77
-//FMÇı¶¯¹Ì¶¨Òª·ÖÅä 5 bank a ×ÊÔ´
+//FMé©±åŠ¨å›ºå®šè¦åˆ†é… 5 bank a èµ„æº
 #define FM_BaseNoA     		80
-//Î´·ÖÅä 43 bank a ×ÊÔ´
+//æœªåˆ†é… 43 bank a èµ„æº
 #define RESERVE_BaseNoA  	85
 
 //-------------------------------------
-//bank b ×ÊÔ´·ÖÅä  ×¢Òâ£ºbank b²»ÄÜ´óÓÚ124¸öbank
+//bank b èµ„æºåˆ†é…  æ³¨æ„ï¼šbank bä¸èƒ½å¤§äº124ä¸ªbank
 //-------------------------------------
-//ÏµÍ³Ààº¯ÊıµÄapi·ÖÅä 10  bank b ×ÊÔ´
+//ç³»ç»Ÿç±»å‡½æ•°çš„apiåˆ†é… 10  bank b èµ„æº
 #define SYS_BaseNoB 	   	0
-//´æ´¢ÀàÇı¶¯¹Ì¶¨Òª·ÖÅä 8 bank b ×ÊÔ´
+//å­˜å‚¨ç±»é©±åŠ¨å›ºå®šè¦åˆ†é… 8 bank b èµ„æº
 #define STG_BaseNoB      	10
-//ÎÄ¼şÏµÍ³Çı¶¯¹Ì¶¨Òª·ÖÅä 35 bank b ×ÊÔ´
+//æ–‡ä»¶ç³»ç»Ÿé©±åŠ¨å›ºå®šè¦åˆ†é… 35 bank b èµ„æº
 #define FS_BaseNoB      	18
-//ÏÔÊ¾Çı¶¯¹Ì¶¨Òª·ÖÅä 20 bank b ×ÊÔ´
+//æ˜¾ç¤ºé©±åŠ¨å›ºå®šè¦åˆ†é… 20 bank b èµ„æº
 #define UI_BaseNoB       	53
-//¼üÅÌÇı¶¯¹Ì¶¨Òª·ÖÅä 3 bank b ×ÊÔ´
+//é”®ç›˜é©±åŠ¨å›ºå®šè¦åˆ†é… 3 bank b èµ„æº
 #define KY_BaseNoB      	73
-//miniÎÄ¼şÏµÍ³Çı¶¯¹Ì¶¨Òª·ÖÅä 10 bank b ×ÊÔ´
+//miniæ–‡ä»¶ç³»ç»Ÿé©±åŠ¨å›ºå®šè¦åˆ†é… 10 bank b èµ„æº
 #define MFS_BaseNoB   		76
-//¿ìËÙSD¿¨Çı¶¯¹Ì¶¨Òª·ÖÅä 3 bank b ×ÊÔ´
+//å¿«é€ŸSDå¡é©±åŠ¨å›ºå®šè¦åˆ†é… 3 bank b èµ„æº
 #define SDFF_BaseNoB     	86
-//FMÇı¶¯¹Ì¶¨Òª·ÖÅä 5 bank b ×ÊÔ´
+//FMé©±åŠ¨å›ºå®šè¦åˆ†é… 5 bank b èµ„æº
 #define FM_BaseNoB     		89
-//Î´·ÖÅä 30 bank b ×ÊÔ´
+//æœªåˆ†é… 30 bank b èµ„æº
 #define RESERVE_BaseNoB 	94
 
 typedef struct
@@ -75,19 +75,19 @@ typedef struct
 
 typedef struct
 {
-    unsigned char file_type;	//FILE_DRV  ¡®D¡¯
-    unsigned char drv_type;		//Çı¶¯ÀàĞÍ
-    unsigned short text_addr;//³£×¤´úÂë¶ÎÔÚÄÚ´æÖĞµÄµØÖ·
-    unsigned short text_length;//³£×¤¶Î´úÂë¶Î³¤¶È
-    unsigned short text2_addr;//³£×¤´úÂë¶ÎÔÚÄÚ´æÖĞµÄµØÖ·
-    unsigned short text2_length;//³£×¤¶Î´úÂë¶Î³¤¶È
-    unsigned short data_addr;//³£×¤Êı¾İ¶ÎÔÚÄÚ´æÖĞµÄµØÖ·
-    unsigned short data_length;//³£×¤Êı¾İ¶Î³¤¶È£¨²»°üÀ¨BSS¶Î£©
-    unsigned long drv_init_entry;//³õÊ¼»¯º¯ÊıµØÖ·
-    unsigned long drv_exit_entry;//ÍË³öº¯ÊıµØÖ·
-    unsigned long drv_banka_file_offset;//Bank A banksÔÚÇı¶¯³ÌĞòÎÄ¼şÖĞµÄÆğÊ¼µØÖ·
-    unsigned long drv_bankb_file_offset;//Bank B banksÔÚÇı¶¯³ÌĞòÎÄ¼şÖĞµÄÆğÊ¼µØÖ·
-    //	unsigned long drv_bankc_file_offset;//Bank C banksÔÚÇı¶¯³ÌĞòÎÄ¼şÖĞµÄÆğÊ¼µØÖ·
+    unsigned char file_type;	//FILE_DRV  â€˜Dâ€™
+    unsigned char drv_type;		//é©±åŠ¨ç±»å‹
+    unsigned short text_addr;//å¸¸é©»ä»£ç æ®µåœ¨å†…å­˜ä¸­çš„åœ°å€
+    unsigned short text_length;//å¸¸é©»æ®µä»£ç æ®µé•¿åº¦
+    unsigned short text2_addr;//å¸¸é©»ä»£ç æ®µåœ¨å†…å­˜ä¸­çš„åœ°å€
+    unsigned short text2_length;//å¸¸é©»æ®µä»£ç æ®µé•¿åº¦
+    unsigned short data_addr;//å¸¸é©»æ•°æ®æ®µåœ¨å†…å­˜ä¸­çš„åœ°å€
+    unsigned short data_length;//å¸¸é©»æ•°æ®æ®µé•¿åº¦ï¼ˆä¸åŒ…æ‹¬BSSæ®µï¼‰
+    unsigned long drv_init_entry;//åˆå§‹åŒ–å‡½æ•°åœ°å€
+    unsigned long drv_exit_entry;//é€€å‡ºå‡½æ•°åœ°å€
+    unsigned long drv_banka_file_offset;//Bank A banksåœ¨é©±åŠ¨ç¨‹åºæ–‡ä»¶ä¸­çš„èµ·å§‹åœ°å€
+    unsigned long drv_bankb_file_offset;//Bank B banksåœ¨é©±åŠ¨ç¨‹åºæ–‡ä»¶ä¸­çš„èµ·å§‹åœ°å€
+    //	unsigned long drv_bankc_file_offset;//Bank C banksåœ¨é©±åŠ¨ç¨‹åºæ–‡ä»¶ä¸­çš„èµ·å§‹åœ°å€
     unsigned long drv_op_entry;//entry
 } drv_head_t;
 

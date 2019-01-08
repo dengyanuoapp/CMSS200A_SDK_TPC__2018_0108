@@ -28,16 +28,16 @@ stmt  level    source
    18          
    19          #pragma name(ALARM_MAIN)
    20          const uint8 ExtAlarmstr1[3][4] =
-   21          { "MP3", "WMA", "WAV" };//ÎÄ¼şºó×ºÊı×é
+   21          { "MP3", "WMA", "WAV" };//æ–‡ä»¶åç¼€æ•°ç»„
    22          const uint8 ExtNext[4] =
    23          { "*  " };
    24          uint8 key;
-   25          uint8 playing_flag = FALSE;//²¥·Å×´Ì¬0-Í£Ö¹×´Ì¬£¬1-ÔİÍ£×´Ì¬2-²¥·Å×´Ì¬
+   25          uint8 playing_flag = FALSE;//æ’­æ”¾çŠ¶æ€0-åœæ­¢çŠ¶æ€ï¼Œ1-æš‚åœçŠ¶æ€2-æ’­æ”¾çŠ¶æ€
    26          uint16 playing_count;
    27          Music_type_a g_currentMusicType;
    28          Open_param_t g_Openparam;
-   29          uint8 play_times;//²¥·Å´ÎÊı
-   30          uint8 g_TagInfoBuf[92];//ÓÃÓÚ·ÅTAGĞÅÏ¢µÄBUF
+   29          uint8 play_times;//æ’­æ”¾æ¬¡æ•°
+   30          uint8 g_TagInfoBuf[92];//ç”¨äºæ”¾TAGä¿¡æ¯çš„BUF
    31          uint8 SearchAlarmFile(void);
    32          extern uint8 play_alarm_music(uint8 type);
    33          int16 main(int16 param)
@@ -91,7 +91,7 @@ stmt  level    source
    79   3              }
    80   2              else
    81   2              {
-   82   3                  strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //Ê¹ÓÃÄÚ²¿alarmÎÄ¼ş
+   82   3                  strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //ä½¿ç”¨å†…éƒ¨alarmæ–‡ä»¶
    83   3                  g_comval.g_alarm.location.disk = 'S';
    84   3                  g_Openparam.typeerror = 0;
    85   3                  g_Openparam.musicframeoffset = 0x0000;
@@ -100,7 +100,7 @@ stmt  level    source
    88   2          }
    89   1          else
    90   1          {
-   91   2              strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //Ê¹ÓÃÄÚ²¿alarmÎÄ¼ş
+   91   2              strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //ä½¿ç”¨å†…éƒ¨alarmæ–‡ä»¶
    92   2              g_comval.g_alarm.location.disk = 'S';
    93   2              g_Openparam.typeerror = 0;
    94   2              g_Openparam.musicframeoffset = 0x0000;
@@ -118,12 +118,12 @@ stmt  level    source
   106   1      }
   107          
   108          /********************************************************************************
-  109           * Description :²éÕÒ¸ùÄ¿Â¼ÏÂÊÇ·ñ´æÈëalarmÎÄ¼ş¼Ğ£¬Èç¹û´æÔÚÔò¿´ÀïÃæÊÇ·ñ´æÈë¿É²¥·Å¸èÇú¡£
+  109           * Description :æŸ¥æ‰¾æ ¹ç›®å½•ä¸‹æ˜¯å¦å­˜å…¥alarmæ–‡ä»¶å¤¹ï¼Œå¦‚æœå­˜åœ¨åˆ™çœ‹é‡Œé¢æ˜¯å¦å­˜å…¥å¯æ’­æ”¾æ­Œæ›²ã€‚
   110           *
   111           * Arguments  :
   112           *
   113           * Returns     :
-  114           *            ÎŞ
+  114           *            æ— 
   115           * Notes       :
   116          
   117           *
@@ -145,7 +145,7 @@ stmt  level    source
   131   2              ClearWatchDog();
   132   2              if (FS_Dir(file_name, ExtNext, dir_type, 1) != 0)
   133   2              {
-  134   3                  //¶ÔÓÚexfatÎÄ¼şÏµÍ³£¬ĞèÒª»ñÈ¡³¤Ãû£¬È»ºóÔÙ¸ú×ª»»³É¶ÌÃû½øĞĞ±È½Ï
+  134   3                  //å¯¹äºexfatæ–‡ä»¶ç³»ç»Ÿï¼Œéœ€è¦è·å–é•¿åï¼Œç„¶åå†è·Ÿè½¬æ¢æˆçŸ­åè¿›è¡Œæ¯”è¾ƒ
   135   3                  if (file_name[11] == 0xfe)
   136   3                  {
   137   4                      NameBuf[0] = 0x20;

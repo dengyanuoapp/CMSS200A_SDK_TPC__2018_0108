@@ -4,31 +4,31 @@
 #include "codec.h"
 #include "typeext.h"
 
-void    encInit(void);                       //encoder³õÊ¼»¯º¯Êı
+void    encInit(void);                       //encoderåˆå§‹åŒ–å‡½æ•°
 
-void    encStart(void);                     //¿ªÊ¼±àÂëº¯Êı
+void    encStart(void);                     //å¼€å§‹ç¼–ç å‡½æ•°
 
-uchar    encGetBitstream(void);             //»ñµÃ±àÂëºóµÄÒôÆµÊı¾İ£¬¾ßÌåÊı¾İ·ÅÔÚÏàÓ¦µÄbufferÖĞ
+uchar    encGetBitstream(void);             //è·å¾—ç¼–ç åçš„éŸ³é¢‘æ•°æ®ï¼Œå…·ä½“æ•°æ®æ”¾åœ¨ç›¸åº”çš„bufferä¸­
 
-void    encPause(void);                    //ÔİÍ£Â¼Òô×Ó³ÌĞò
+void    encPause(void);                    //æš‚åœå½•éŸ³å­ç¨‹åº
 
 void    encStop(void);
 
-void    encContinue(void);                 //¼ÌĞøÂ¼Òô×Ó³ÌĞò
+void    encContinue(void);                 //ç»§ç»­å½•éŸ³å­ç¨‹åº
 
-void    encExit(void);                     //ÍË³ö´¦Àí×Ó³ÌĞò
+void    encExit(void);                     //é€€å‡ºå¤„ç†å­ç¨‹åº
 
 #ifndef PC
 
 //#pragma ROM(large)
-extern void    encTimerIntSub(void);              //timerÖĞ¶Ï´¦Àí×Ó³ÌĞò
-extern void    encAudioIntSub(void);                //ÒôÆµÖĞ¶Ï´¦Àí×Ó³ÌĞò
+extern void    encTimerIntSub(void);              //timerä¸­æ–­å¤„ç†å­ç¨‹åº
+extern void    encAudioIntSub(void);                //éŸ³é¢‘ä¸­æ–­å¤„ç†å­ç¨‹åº
 //extern void    encDMAIntSub(void);
 //#pragma ROM(huge)
 
 #else
-extern void    encTimerIntSub(void);              //timerÖĞ¶Ï´¦Àí×Ó³ÌĞò
-extern void    encAudioIntSub(void);                //ÒôÆµÖĞ¶Ï´¦Àí×Ó³ÌĞò
+extern void    encTimerIntSub(void);              //timerä¸­æ–­å¤„ç†å­ç¨‹åº
+extern void    encAudioIntSub(void);                //éŸ³é¢‘ä¸­æ–­å¤„ç†å­ç¨‹åº
 #endif
 extern encControlInfor_t g_encControlInfor;
 extern encWriteFilePara_t g_encWriteFilePara;

@@ -30,7 +30,7 @@ SD_FILE *m_de_TTS_Fp;
 SD_FILE *info_TTS_Fp;
 //Open_param_t *m_deTTSOpenparam;
 play_status_t  TTSplay_status;
-BYTE *m_deTTSDataBuffer;//[512];//½âÂëÊ±ÓÃµÄBUFFER
+BYTE *m_deTTSDataBuffer;//[512];//è§£ç æ—¶ç”¨çš„BUFFER
 
 uint32  m_deTTSOldDspIntAddrSav;
 uint32  m_deTTSOldDmaIntAddrSav;
@@ -76,7 +76,7 @@ uint8 m_deTTSRead_Data(uchar readFileDirection, uint32 position)
     position = position;
     readFileDirection = readFileDirection;
 
-    //¶Ïµã¼ÇÂ¼µÄÊÇ½âÂë¹ýµÄÐÅÏ¢
+    //æ–­ç‚¹è®°å½•çš„æ˜¯è§£ç è¿‡çš„ä¿¡æ¯
     //    if ((TTSplay_status.status == PLAYING_REACH_END) || (TTSplay_status.status == PLAYING_ERROR) ||
     //            (TTSplay_status.status == PLAYING_REACH_HEAD))
     //    {
@@ -179,12 +179,12 @@ bool tts_info_set(void)
 
     if ((*pbuf >= (unsigned char)0x80) && (tts_lib_flag != 0))
     {
-        //Ã¿¸öºº×Ö»úÄÚÂëµÄµÚÒ»¸ö×Ö½Ú·¶Î§½éÓÚ0xB0~ 0xF7Ö®¼ä¾ÍOKÁË£¬×ª»»³ÉÇøÎ»Âë¾ÍÊÇ0~71£¨Ê®½øÖÆ£©
+        //æ¯ä¸ªæ±‰å­—æœºå†…ç çš„ç¬¬ä¸€ä¸ªå­—èŠ‚èŒƒå›´ä»‹äºŽ0xB0~ 0xF7ä¹‹é—´å°±OKäº†ï¼Œè½¬æ¢æˆåŒºä½ç å°±æ˜¯0~71ï¼ˆåè¿›åˆ¶ï¼‰
         if((*pbuf > (unsigned char)0xAF) && (*pbuf < (unsigned char)0xF8))
         {
             qu = (str_buff[str_ptr] & (unsigned char)0x7F) - 0x30;
             wei = (str_buff[str_ptr + 1] & (unsigned char)0x7F) - 32 - 1;
-            //TTSË÷Òý±íÍ·Êý¾Ý½á¹¹,Õ¼¾Ý32byte,reserved 24byte
+            //TTSç´¢å¼•è¡¨å¤´æ•°æ®ç»“æž„,å æ®32byte,reserved 24byte
             offset = 0x20 + (qu * 94 + wei) * sizeof(tts_pos_t);
             str_ptr += 2;
             find_multitone_tag = 1;
@@ -228,7 +228,7 @@ re_get_struct:
         goto re_get_struct;
     }
 
-    //¶àÒô×Ö´¦Àí
+    //å¤šéŸ³å­—å¤„ç†
     if((find_multitone_tag == 1) && (tts_pos_tmp.multi_offset != 0xffff))
     {
         deTTSApointerSave = citiao_offset + (sizeof(tts_pos_t) - 2) * \

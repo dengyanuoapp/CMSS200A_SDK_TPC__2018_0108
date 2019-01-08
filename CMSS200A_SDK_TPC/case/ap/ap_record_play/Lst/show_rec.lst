@@ -36,7 +36,7 @@ stmt  level    source
    26          
    27          /*
    28           ********************************************************************************
-   29           * Description : Â¼ÒôUI  ½çÃæÏÔÊ¾
+   29           * Description : å½•éŸ³UI  ç•Œé¢æ˜¾ç¤º
    30           *
    31           * Arguments   : NULL
    32           *
@@ -54,7 +54,7 @@ stmt  level    source
    44   1          LEDDisplay(LED_PLAY, 0xff, tmp);
    45   1          LEDDisplay(LED_PAUSE, 0xff, !tmp);
    46   1      
-   47   1          /*  ÏÔÊ¾Â¼ÒôÄ¿±ê´æ´¢½éÖÊ */
+   47   1          /*  æ˜¾ç¤ºå½•éŸ³ç›®æ ‡å­˜å‚¨ä»‹è´¨ */
    48   1          if(g_record_vars.location.disk == 'M')
    49   1          {
    50   2              LEDDisplay(LED_USB, 0xff, 0);
@@ -87,9 +87,9 @@ stmt  level    source
    75          
    76          /*
    77           ********************************************************************************
-   78           * Description : ÏÔÊ¾µ±Ç°µÄÂ¼ÒôÊ±¼ä
+   78           * Description : æ˜¾ç¤ºå½“å‰çš„å½•éŸ³æ—¶é—´
    79           *
-   80           * Arguments   : mode   Ë¢ĞÂÄ£Ê½  0--Ö»Ë¢µ±Ç°Ê±¼ä   1--Ë¢µ±Ç°Ê±¼äºÍÊ£Óà¿ÉÂ¼Ê±¼ä
+   80           * Arguments   : mode   åˆ·æ–°æ¨¡å¼  0--åªåˆ·å½“å‰æ—¶é—´   1--åˆ·å½“å‰æ—¶é—´å’Œå‰©ä½™å¯å½•æ—¶é—´
    81           *
    82           * Returns     :  NULL
    83           *
@@ -99,10 +99,10 @@ stmt  level    source
    87           */
    88          uint8 time_draw(uint8 mode)
    89          {
-   90   1          uint32 nowtime_l; /* »ñÈ¡µ±Ç°µÄÊ±¼äµÄ32Î»±äÁ¿ */
-   91   1          time_t nowtime_s; /* »ñÈ¡µ±Ç°µÄÊ±¼äµÄ½á¹¹ */
+   90   1          uint32 nowtime_l; /* è·å–å½“å‰çš„æ—¶é—´çš„32ä½å˜é‡ */
+   91   1          time_t nowtime_s; /* è·å–å½“å‰çš„æ—¶é—´çš„ç»“æ„ */
    92   1      
-   93   1          /* ÏÔÊ¾µ±Ç°Â¼ÒôµÄÊ±¼ä */
+   93   1          /* æ˜¾ç¤ºå½“å‰å½•éŸ³çš„æ—¶é—´ */
    94   1          recSendCommand(MC_GETTIME, (void *) &nowtime_s);
    95   1          g_rec_time.hour = nowtime_s.hour;
    96   1          g_rec_time.minute = nowtime_s.minute;
@@ -123,7 +123,7 @@ stmt  level    source
   111   1          LEDDisplay(LED_COL, 0xff, 1);
   112   1          return NULL;
   113   1      }
-  114          //ÇĞ»»Â¼Òô×´Ì¬
+  114          //åˆ‡æ¢å½•éŸ³çŠ¶æ€
   115          uint8 change_rec_status(void)
   116          {
   117   1          uint8 retval = NULL;
@@ -137,7 +137,7 @@ stmt  level    source
 C251 COMPILER V4.55,  show_rec                                                             23/05/16  10:42:43  PAGE 3   
 
   125   2              rec_status = rec_pause;
-  126   2              recSendCommand(MC_GETTIME, (void *) &g_rec_time); //È¡ÏÖÔÚÊ±¼ä
+  126   2              recSendCommand(MC_GETTIME, (void *) &g_rec_time); //å–ç°åœ¨æ—¶é—´
   127   2              recSendCommand(MC_PAUSE, 0);
   128   2              SetCurUI_Type(RecPause_UI);
   129   2          }
@@ -155,7 +155,7 @@ stmt  level    source
   141   1          return retval;
   142   1      }
   143          
-  144          //Í£Ö¹Â¼Òô£¬²¢±£´æÎÄ¼ş
+  144          //åœæ­¢å½•éŸ³ï¼Œå¹¶ä¿å­˜æ–‡ä»¶
   145          void stop_rec(uint8 get_status)
   146          {
   147   1          uint16 i = 0;
@@ -174,7 +174,7 @@ stmt  level    source
   160   2              {
   161   3                  i++;
   162   3                  recSendCommand(MC_GETSTATUS, (void *) &rec_stat);
-  163   3                  //µ±Â¼ÒôÍ£Ö¹ºó£¬Ö»ÓĞµÈµ½½ÓÊÜµ½µÄÏûÏ¢ÎªstopÊ±£¬²ÅÄÜµ÷ÓÃclose£¬·ñÔòÎÄ¼ş±£´æ²»³É¹¦
+  163   3                  //å½“å½•éŸ³åœæ­¢åï¼Œåªæœ‰ç­‰åˆ°æ¥å—åˆ°çš„æ¶ˆæ¯ä¸ºstopæ—¶ï¼Œæ‰èƒ½è°ƒç”¨closeï¼Œå¦åˆ™æ–‡ä»¶ä¿å­˜ä¸æˆåŠŸ
   164   3                  if ((rec_stat.status == RECORDING_STOP) || (i >= 2000))
   165   3                  {
   166   4                      break;
@@ -185,7 +185,7 @@ stmt  level    source
   171   4                  }
   172   3              }
   173   2          }
-  174   1          recSendCommand(MC_CLOSE, 0); //¹Ø±ÕÂ¼Òô
+  174   1          recSendCommand(MC_CLOSE, 0); //å…³é—­å½•éŸ³
   175   1          rec_status = rec_stop;
   176   1      }
   177          
@@ -198,7 +198,7 @@ stmt  level    source
   184   2              return NULL;
   185   2          }
   186   1          mc_result = wavrProceed();
-  187   1          if (mc_result == WRITE_ONE) //ÒÑĞ´Ò»¸öpage
+  187   1          if (mc_result == WRITE_ONE) //å·²å†™ä¸€ä¸ªpage
   188   1          {
   189   2              if(pitch_write_flag)
   190   2              {
@@ -212,7 +212,7 @@ stmt  level    source
   196   4                  }
   197   3              }
   198   2          }
-  199   1          else if (mc_result == WRITE_WRONG) //ÖÂÃü´íÎó
+  199   1          else if (mc_result == WRITE_WRONG) //è‡´å‘½é”™è¯¯
   200   1          {
   201   2              while (ap_get_message() != NULL)
   202   2              {
@@ -265,14 +265,14 @@ stmt  level    source
   249          
   250          /*
   251           ********************************************************************************
-  252           * Description : Â¼Òô½çÃæÏÔÊ¾
+  252           * Description : å½•éŸ³ç•Œé¢æ˜¾ç¤º
   253           *
   254           * Arguments   : NULL
   255           *
-  256           * Returns     : ½á¹ûÏûÏ¢»ò0
+  256           * Returns     : ç»“æœæ¶ˆæ¯æˆ–0
 C251 COMPILER V4.55,  show_rec                                                             23/05/16  10:42:43  PAGE 5   
 
-  257           RESULT_USER_STOP    //ÓÃ»§°´¼ü½áÊø
+  257           RESULT_USER_STOP    //ç”¨æˆ·æŒ‰é”®ç»“æŸ
   258           *
   259           * Notes       :
   260           *
@@ -304,7 +304,7 @@ stmt  level    source
   286   2              EnableAIN(AD_FM);
   287   2              SetAINGain(g_record_vars.rec_InputGain / 2, 0 );
   288   2          }
-  289   1          LoadPitchLevel(16);     //ÉèÖÃÊıÖµ´Ó0-16,±äµ÷Ğ§¹ûÖğ½¥ÔöÇ¿
+  289   1          LoadPitchLevel(16);     //è®¾ç½®æ•°å€¼ä»0-16,å˜è°ƒæ•ˆæœé€æ¸å¢å¼º
   290   1          while (1)
   291   1          {
   292   2              result = change_rec_status();

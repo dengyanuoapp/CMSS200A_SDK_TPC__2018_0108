@@ -40,13 +40,13 @@ stmt  level    source
    29          Open_param_t *m_deOpenparam;
    30          uint32 deApointerSave;
    31          uint32 deBpointerSave;
-   32          uint32 deBreakPointSave; //��ǰ�ļ��ϵ�ĵ�ַ���棬һ������Ϊ��λ��m_read_date����
-   33          decBreakPointInfor_t m_breakPointInfo;//ֻ����һ�ζϵ���Ϣ������A��
-   34          uint32 deFilepages;//��ǰ�����ļ���ҳ��
+   32          uint32 deBreakPointSave; //当前文件断点的地址保存，一个扇区为单位，m_read_date更新
+   33          decBreakPointInfor_t m_breakPointInfo;//只保存一次断点信息，例如A点
+   34          uint32 deFilepages;//当前播放文件总页数
    35          BYTE m_backupmode;
    36          play_status_t play_status;
-   37          BYTE *m_deDataBuffer; //[512];//����ʱ�õ�BUFFER
-   38          uint32 m_deOldDspIntAddrSav;//����ɵ�INT��ַ
+   37          BYTE *m_deDataBuffer; //[512];//解码时用的BUFFER
+   38          uint32 m_deOldDspIntAddrSav;//保存旧的INT地址
    39          uint32 m_deOldDmaIntAddrSav;
    40          uint8 m_decTimer_Sav;
    41          time_t m_Totaltimelength;
@@ -59,8 +59,8 @@ stmt  level    source
    48          #define ONE_PAGE_BITNUM 9
    49          
    50          #ifdef FASTFORWARDBACKWARD
-               #define MOVE_FORWARD_MORE_PAGE_FLAG 0x91  //  ���ڼ��ٿ��
-               #define MOVE_BACKWARD_MORE_PAGE_FLAG  0xa2 // ���ڼ��ٿ��
+               #define MOVE_FORWARD_MORE_PAGE_FLAG 0x91  //  用于加速快进
+               #define MOVE_BACKWARD_MORE_PAGE_FLAG  0xa2 // 用于加速快进
                #endif
    54          
    55          
@@ -95,7 +95,7 @@ stmt  level    source
    80   1          //CLEAR_WATCHDOG_MIDWARE();
    81   1          ClearWatchDog();
    82   1      
-   83   1          //�ϵ��¼���ǽ��������Ϣ
+   83   1          //断点记录的是解码过的信息
    84   1          if ((play_status.status == PLAYING_REACH_END) || (play_status.status == PLAYING_ERROR) ||
    85   1                  (play_status.status == PLAYING_REACH_HEAD))
    86   1          {
@@ -117,8 +117,8 @@ stmt  level    source
   102   1      #ifdef FASTFORWARDBACKWARD
                    else if(readFileDirection == MOVE_BACKWARD_MORE_PAGE_FLAG)
                    {
-                       result = FS_FSeek(16, FS_SEEK_BFROMCUR, m_deFileHandle);        //�������Ҫ�������޸�������Ŀ�����ڼ���
-             -����˿��ˡ���ǰseek 2n��������׼����n������
+                       result = FS_FSeek(16, FS_SEEK_BFROMCUR, m_deFileHandle);        //如果有需要，可以修改扇区数目，便于加速
+             -快进退快退。往前seek 2n个扇区，准备读n个扇区
                    }
                #endif
   108   1          else if (RANDOM_CHOOSE_ONE_PAGE_FLAG == readFileDirection)
@@ -163,26 +163,26 @@ stmt  level    source
   145   1          {
   146   2          case AB_FLAG_DEAL_AB_PROCESS:
   147   2          {
-  148   3              if (play_status.status == PLAYING_WAIT_B) //�Ѿ�����B����߳������ȴ�stop����
+  148   3              if (play_status.status == PLAYING_WAIT_B) //已经到达B点或者超过，等待stop命令
   149   3              {
   150   4                  break;
   151   4              }
   152   3      
-  153   3              if ((play_status.status == PLAYING_AB) && (deBreakPointSave >= deBpointerSave))//�ŵ�B��
+  153   3              if ((play_status.status == PLAYING_AB) && (deBreakPointSave >= deBpointerSave))//放到B点
   154   3              {
-  155   4                  if (FALSE != m_deABok_sav) //�����ٲ�����
+  155   4                  if (FALSE != m_deABok_sav) //不用再播放了
   156   4                  {
-  157   5                      //������,��B��
+  157   5                      //次数到,清B点
   158   5                      m_deABok_sav = FALSE;
   159   5                      play_status.status = PLAYING_PLAYING;
   160   5                      g_decControlInfor.ABSetFlag = AB_CLEAR;
   161   5                      g_decControlInfor.PlayMode = PLAY_MODE_NORMAL; //not need
-  162   5                      //play_status.signal = SIGNAL_CLEAR_B;//֪ͨABҪ��B��
+  162   5                      //play_status.signal = SIGNAL_CLEAR_B;//通知AB要清B点
   163   5                      play_status.signal = 0;//modify by wuyueqian 2010-4-3
   164   5                  }
   165   4                  else
   166   4                  {
-  167   5                      //����δ��,֪ͨAP�ص�A��
+  167   5                      //次数未到,通知AP回到A点
   168   5                      play_status.status = PLAYING_WAIT_B;
   169   5                      play_status.signal = SIGNAL_REACH_B;
   170   5                  }
@@ -190,10 +190,10 @@ stmt  level    source
   172   3              break;
   173   3          }
   174   2      
-  175   2          case AB_FLAG_SET_A: //������A���ab flagΪ0��������AB���������B��Ҳ��ú�ſ�ʼAB���Ŵ���
+  175   2          case AB_FLAG_SET_A: //设置完A点后ab flag为0，不进行AB处理，需等B点也设好后才开始AB播放处理
   176   2          {
   177   3              deApointerSave = deBreakPointSave;
-  178   3              g_decControlInfor.ABSetFlag = AB_CLEAR;//��ʵ��AB_FLAG_SET_A�ͷ�0XFF�Ϳ�����
+  178   3              g_decControlInfor.ABSetFlag = AB_CLEAR;//其实非AB_FLAG_SET_A和非0XFF就可以了
   179   3              memcpy(&m_breakPointInfo, &g_decBreakPointInfor, sizeof(decBreakPointInfor_t));
   180   3              break;
   181   3          }
@@ -204,9 +204,9 @@ stmt  level    source
   186   3              play_status.signal = SIGNAL_REACH_B;
 C251 COMPILER V4.55,  basal_de_RD                                                          13/12/18  16:27:20  PAGE 4   
 
-  187   3              play_status.status = PLAYING_WAIT_B; //ֻ�����m_deRead_Data��������Ч��StopBPlay������PLAYING_
+  187   3              play_status.status = PLAYING_WAIT_B; //只在这个m_deRead_Data函数中有效，StopBPlay后出变成PLAYING_
              -WAIT_A
-  188   3              g_decControlInfor.ABSetFlag = AB_FLAG_DEAL_AB_PROCESS; //�Ժ����Ƿ�B��
+  188   3              g_decControlInfor.ABSetFlag = AB_FLAG_DEAL_AB_PROCESS; //以后检测是否到B点
   189   3              break;
   190   3          }
   191   2      
@@ -220,8 +220,8 @@ stmt  level    source
                    if((readFileDirection == MOVE_FORWARD_MORE_PAGE_FLAG) || (readFileDirection == MOVE_BACKWARD_MORE_PAG
              -E_FLAG))
                    {
-                       result = FS_FRead(m_deDataBuffer, 8, m_deFileHandle);   //�������Ҫ�������޸�������Ŀ�����ڼ��ٿ�
-             -��˿��ˣ�ÿ�ζ�n������
+                       result = FS_FRead(m_deDataBuffer, 8, m_deFileHandle);   //如果有需要，可以修改扇区数目，便于加速快
+             -丝焱耍看味羘个扇区
                    }
                    else
                    {
@@ -243,20 +243,20 @@ stmt  level    source
   220   1      }
   221          
   222          /*  FS_GetInfo()
-  223           *����
-  224           ��ȡ�ļ�ϵͳ������Ϣ
-  225           *����
-  226           *����
-  227           char status��������Ϣ
-  228           1   ���̶�д����
-  229           2   ����д����
-  230           3   ����δ��ʽ��
-  231           4   �ļ����������ļ��߽�,Ŀ¼��������Ŀ¼�߽�
-  232           5   �ļ�������Ŀ���ļ�,Ŀ¼������Ŀ¼�����
-  233           6   ��ʾ�ļ�����ʱû�д��̿ռ�,����д���ݻ�����չĿ¼
-  234           ��ʾĿ¼����ʱû�д��̿ռ�,������չĿ¼,�½���Ŀ¼
-  235           7   �ļ�����ʱ��Ŀ¼Ŀ¼����
-  236           8   ɾ��Ŀ¼ʱ����,��ʾɾ����Ŀ¼�ǿ�
+  223           *描述
+  224           获取文件系统出错信息
+  225           *参数
+  226           *返回
+  227           char status：出错信息
+  228           1   磁盘读写错误
+  229           2   磁盘写保护
+  230           3   磁盘未格式化
+  231           4   文件操作超出文件边界,目录操作超出目录边界
+  232           5   文件操作的目标文件,目录操作的目录项不存在
+  233           6   表示文件操作时没有磁盘空间,不能写数据或者扩展目录
+  234           表示目录操作时没有磁盘空间,不能扩展目录,新建子目录
+  235           7   文件操作时根目录目录项满
+  236           8   删除目录时返回,表示删除的目录非空
   237           */
   238          
   239          void GetFSErrorTYPE(void)

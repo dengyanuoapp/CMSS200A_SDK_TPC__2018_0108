@@ -80,14 +80,14 @@ void IR_Interrupt(void)
     tmp_ir_sta = IR_STA;
     IR_STA |= 0x08; //clear irq pending
     key_data = IR_KDC; //read key data value
-    //½ÓÊÜµ½´íÎóµÄ°´¼üÂë
+    //æ¥å—åˆ°é”™è¯¯çš„æŒ‰é”®ç 
     if ((tmp_ir_sta & 0x02) != 0)
     {
         IR_STA |= 0x0B;//clear error msg,clear irq pending
         SFR_BANK = sfr_bak;
         return;
     }
-    //½ÓÊÜµ½ÖØ¸´ÂëÊ±£¬Ö±½ÓÓÃ¾ÉÂëÖµ
+    //æ¥å—åˆ°é‡å¤ç æ—¶ï¼Œç›´æ¥ç”¨æ—§ç å€¼
     if ((tmp_ir_sta & 0x01) != 0)
     {
         //        IR_STA |= 0x09;          //clear repeat flag,clear irq pending

@@ -54,9 +54,9 @@
 #define IIC_SDA_REG        GPIOGDAT
 #define IIC_SDA_BIT        0xef
 
-/*write_buffer[0]=0x5 value,write_buffer[1]=0x6 value,ÓÃÓÚÉèÖÃFM·¢ÉäÆµÂÊ*/
-/*write_buffer[2]=0x0a value,ÓÃÓÚÉèÖÃFM·¢Éä¹¦ÂÊ*/
-/*write_buffer[3]=0x0c value,ÓÃÓÚÉèÖÃFM*/
+/*write_buffer[0]=0x5 value,write_buffer[1]=0x6 value,ç”¨äºè®¾ç½®FMå‘å°„é¢‘ç‡*/
+/*write_buffer[2]=0x0a value,ç”¨äºè®¾ç½®FMå‘å°„åŠŸç‡*/
+/*write_buffer[3]=0x0c value,ç”¨äºè®¾ç½®FM*/
 
 #pragma name(FM_TX_DATA)
 
@@ -76,7 +76,7 @@ void IIC_SendAck(bool k);
 
 #pragma renamecode(AP_FM_TX)
 
-void FM_TX_init(void) /*½«gpio_c0/c1ÉèÖÃ×÷Îªgpio£¬²¢ÇÒÊ¹ÄÜoutput,Ê¹ÓÃÆäËûgpioÄ£Äâi2c£¬ÒÀ´Ë½øĞĞĞŞ¸Ä*/
+void FM_TX_init(void) /*å°†gpio_c0/c1è®¾ç½®ä½œä¸ºgpioï¼Œå¹¶ä¸”ä½¿èƒ½output,ä½¿ç”¨å…¶ä»–gpioæ¨¡æ‹Ÿi2cï¼Œä¾æ­¤è¿›è¡Œä¿®æ”¹*/
 {
     uint8 sfr_bak;
 
@@ -120,7 +120,7 @@ void FM_TX_init(void) /*½«gpio_c0/c1ÉèÖÃ×÷Îªgpio£¬²¢ÇÒÊ¹ÄÜoutput,Ê¹ÓÃÆäËûgpioÄ£Ä
     FM_TX_Write_Data(19, 0x0000);
 
     SFR_BANK = sfr_bak;
-    //enable_interrupt(); //¿ªÖĞ¶Ï
+    //enable_interrupt(); //å¼€ä¸­æ–­
 
 }
 
@@ -133,13 +133,13 @@ void FM_TX_Write_Data(uint8 Reg, uint16 Reg_val) /*/AS6300 send data according t
     addr = ((Reg) << 1) | 0x80;
     IIC_Start();
     ack = IIC_WriteByte(addr);
-    /*Èç¹ûack=0£¬Ìí¼ÓÏÔÊ¾¡°Ó²¼ş´íÎó¡±*/
+    /*å¦‚æœack=0ï¼Œæ·»åŠ æ˜¾ç¤ºâ€œç¡¬ä»¶é”™è¯¯â€*/
 
     ack |= IIC_WriteByte(Reg_val >> 8);
-    /*Èç¹ûack=0£¬Ìí¼ÓÏÔÊ¾¡°Ó²¼ş´íÎó¡±*/
+    /*å¦‚æœack=0ï¼Œæ·»åŠ æ˜¾ç¤ºâ€œç¡¬ä»¶é”™è¯¯â€*/
 
     ack |= IIC_WriteByte(Reg_val & 0xff);
-    /*Èç¹ûack=0£¬Ìí¼ÓÏÔÊ¾¡°Ó²¼ş´íÎó¡±*/
+    /*å¦‚æœack=0ï¼Œæ·»åŠ æ˜¾ç¤ºâ€œç¡¬ä»¶é”™è¯¯â€*/
 
     IIC_Stop();
     //IIC_SCL_Low;
@@ -163,7 +163,7 @@ uint16 FM_TX_Read_Data(uint8 Reg) /*AS6300 read data according to Reg*/
     return temp;
 }
 
-void FM_TX_Set_Powc(uint8 Powc) /*set as6300 output power,´Ó0¡«15¼¶¿ÉÑ¡*/
+void FM_TX_Set_Powc(uint8 Powc) /*set as6300 output power,ä»0ï½15çº§å¯é€‰*/
 {
     uint16 temp;
 
@@ -197,7 +197,7 @@ void FM_TX_Set_Freq(uint16 frq)
 
     SFR_BANK = sfr_bak;
 
-    //enable_interrupt(); //¿ªÖĞ¶Ï
+    //enable_interrupt(); //å¼€ä¸­æ–­
 }
 
 //void FM_TX_Read_Freq(void)
@@ -219,26 +219,26 @@ void IIC_Start(void) /*IIC start command*/
 {
     //	      IIC_SCL_High;
     //	      IIC_Delay(IIC_Delay_Time);
-    IIC_SDA_High; /*·¢ËÍÆğÊ¼Ìõ¼şµÄÊı¾İĞÅºÅ*/
+    IIC_SDA_High; /*å‘é€èµ·å§‹æ¡ä»¶çš„æ•°æ®ä¿¡å·*/
     IIC_Delay(IIC_Delay_Time);
-    IIC_SCL_High; /*ÆğÊ¼Ìõ¼ş½¨Á¢Ê±¼ä´óÓÚ4.7us,ÑÓÊ±*/
+    IIC_SCL_High; /*èµ·å§‹æ¡ä»¶å»ºç«‹æ—¶é—´å¤§äº4.7us,å»¶æ—¶*/
 
     IIC_Delay(IIC_Delay_Time);
-    IIC_SDA_Low; /*·¢ËÍÆğÊ¼ĞÅºÅ*//* ÆğÊ¼Ìõ¼şËø¶¨Ê±¼ä´óÓÚ4¦Ìs*/
+    IIC_SDA_Low; /*å‘é€èµ·å§‹ä¿¡å·*//* èµ·å§‹æ¡ä»¶é”å®šæ—¶é—´å¤§äº4Î¼s*/
 
     IIC_Delay(IIC_Delay_Time);
-    IIC_SCL_Low; /*Ç¯×¡IIC×ÜÏß£¬SCLÎªµÍµçÆ½£¬×¼±¸·¢ËÍ»ò½ÓÊÕÊı¾İ */
+    IIC_SCL_Low; /*é’³ä½IICæ€»çº¿ï¼ŒSCLä¸ºä½ç”µå¹³ï¼Œå‡†å¤‡å‘é€æˆ–æ¥æ”¶æ•°æ® */
     IIC_Delay(IIC_Delay_Time);
 }
 
 void IIC_Stop(void) /*IIC stop command*/
 {
-    IIC_SDA_Low; /*·¢ËÍ½áÊøÌõ¼şµÄÊı¾İĞÅºÅ*/
-    /*·¢ËÍ½áÊøÌõ¼şµÄÊ±ÖÓĞÅºÅ*/
+    IIC_SDA_Low; /*å‘é€ç»“æŸæ¡ä»¶çš„æ•°æ®ä¿¡å·*/
+    /*å‘é€ç»“æŸæ¡ä»¶çš„æ—¶é’Ÿä¿¡å·*/
     IIC_Delay(IIC_Delay_Time);
-    IIC_SCL_High; /*½áÊøÌõ¼ş½¨Á¢Ê±¼ä´óÓÚ4¦Ìs*/
+    IIC_SCL_High; /*ç»“æŸæ¡ä»¶å»ºç«‹æ—¶é—´å¤§äº4Î¼s*/
     IIC_Delay(IIC_Delay_Time);
-    IIC_SDA_High; /*·¢ËÍIIC×ÜÏß½áÊøĞÅºÅ*/
+    IIC_SDA_High; /*å‘é€IICæ€»çº¿ç»“æŸä¿¡å·*/
     IIC_Delay(IIC_Delay_Time);
 }
 
@@ -248,7 +248,7 @@ void IIC_Delay(uint16 t)
         t--;
 }
 
-uint8 IIC_WriteByte(uint8 c) /*IIC send a byte data, return ack signal(0:ÎŞÓ¦´ğ£¬1:ÓĞÓ¦´ğ)*/
+uint8 IIC_WriteByte(uint8 c) /*IIC send a byte data, return ack signal(0:æ— åº”ç­”ï¼Œ1:æœ‰åº”ç­”)*/
 {
     uint8 ack, i;
 
@@ -273,9 +273,9 @@ uint8 IIC_WriteByte(uint8 c) /*IIC send a byte data, return ack signal(0:ÎŞÓ¦´ğ£
     IIC_SDA_INPUT_EN;
     IIC_SDA_OUTPUT_DIS;
     IIC_Delay(IIC_Delay_Time);
-    IIC_SCL_High; /*ÖÆÔìµÚ9¸öi2cÊ±ÖÓ*/
+    IIC_SCL_High; /*åˆ¶é€ ç¬¬9ä¸ªi2cæ—¶é’Ÿ*/
     IIC_Delay(IIC_Delay_Time);
-    if (IIC_SDA_REG & IIC_SDA_BIT) /*ÅĞ¶ÏÊÇ·ñ½ÓÊÕµ½Ó¦´ğĞÅºÅ*/
+    if (IIC_SDA_REG & IIC_SDA_BIT) /*åˆ¤æ–­æ˜¯å¦æ¥æ”¶åˆ°åº”ç­”ä¿¡å·*/
     {
         ack = 0;
     }

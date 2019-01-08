@@ -19,38 +19,38 @@
 #include "actapi.h"
 
 //vm address
-//ÏµÍ³²ÎÊıÇø
-#define         VM_KERNEL       	0x0000      //·ÖÅä0x40
-#define         VM_AP_FWCFG       0x0040        //·ÖÅä0x140
-#define         VM_AP_AMV           0x0180       //·ÖÅä0x80
+//ç³»ç»Ÿå‚æ•°åŒº
+#define         VM_KERNEL       	0x0000      //åˆ†é…0x40
+#define         VM_AP_FWCFG       0x0040        //åˆ†é…0x140
+#define         VM_AP_AMV           0x0180       //åˆ†é…0x80
 
-#define         VM_SYSTEM       	0x0200   //·ÖÅä0x80
-#define         VM_AP_RECORD    0x0280  //·ÖÅä0x80
-#define         VM_AP_MUSIC_CARD	0x0300   //·ÖÅä0x80
-#define         VM_AP_MUSIC_HOST    0x0380  //·ÖÅä0x80	
-#define         VM_AP_MUSIC_COMMON  0x400    //·ÖÅä0x80
+#define         VM_SYSTEM       	0x0200   //åˆ†é…0x80
+#define         VM_AP_RECORD    0x0280  //åˆ†é…0x80
+#define         VM_AP_MUSIC_CARD	0x0300   //åˆ†é…0x80
+#define         VM_AP_MUSIC_HOST    0x0380  //åˆ†é…0x80	
+#define         VM_AP_MUSIC_COMMON  0x400    //åˆ†é…0x80
 
-#define         VM_EXFAT_INFO_UH       0x480        //·ÖÅä0x80
-#define         VM_EXFAT_INFO_CARD     	0x0500     //·ÖÅä0x80
-#define        VM_FAVI_HEAD      0x0580     //·ÖÅä0x80
+#define         VM_EXFAT_INFO_UH       0x480        //åˆ†é…0x80
+#define         VM_EXFAT_INFO_CARD     	0x0500     //åˆ†é…0x80
+#define        VM_FAVI_HEAD      0x0580     //åˆ†é…0x80
 
-#define         VM_AP_RADIO     	0x0600     //·ÖÅä0x100
-#define  	      VM_ALARM		0x0700     //·ÖÅä0x80
-#define         VM_PCSET_EQ       0x0780     //·ÖÅä0x80
+#define         VM_AP_RADIO     	0x0600     //åˆ†é…0x100
+#define  	      VM_ALARM		0x0700     //åˆ†é…0x80
+#define         VM_PCSET_EQ       0x0780     //åˆ†é…0x80
 
 
-#define			    VM_DIR_LIST				0x0800						//Ä¿Â¼ÁĞ±í5k
+#define			    VM_DIR_LIST				0x0800						//ç›®å½•åˆ—è¡¨5k
 #define         VM_FAVI_CARD      0x0800             // 2.5k
 #define         VM_FAVI_HOST      0x1200             // 2.5k
 #define         VM_PCSET_SRS      0x1200
 
 #define         VM_LYRIC        	0x1c00             // 6k
 
-//×¨ÃÅ¸øÎÄ¼şÏµÍ³Ê¹ÓÃ
+//ä¸“é—¨ç»™æ–‡ä»¶ç³»ç»Ÿä½¿ç”¨
 #define         VM_FSYS         	0x3400             // 2k
 
-#define			VM_SHUFFLE			0x3C00			//Ëæ»ú²¥·Å0x80
-//end--0x3400, Ê£Óà1k±¸ÓÃ
+#define			VM_SHUFFLE			0x3C00			//éšæœºæ’­æ”¾0x80
+//end--0x3400, å‰©ä½™1kå¤‡ç”¨
 
 
 #define APINO_VMRead      0x0000+API_VM_Base
@@ -62,7 +62,7 @@
 
 
 
-/*  ±ØĞë±£Ö¤BufAllocÓÚBufFreeÆ¥Åä£¬¶øÇÒÒ»Ò»¶ÔÓ¦£¬ÈçÍ¬Õ»µÄÊ¹ÓÃ
+/*  å¿…é¡»ä¿è¯BufAllocäºBufFreeåŒ¹é…ï¼Œè€Œä¸”ä¸€ä¸€å¯¹åº”ï¼Œå¦‚åŒæ ˆçš„ä½¿ç”¨
 //such as:
   right use:
        int    bufpoint0,bufpoint1;
@@ -91,21 +91,21 @@
 #define VMExpWrite(pbuf,address,len,page) 		API_VMExpWrite(APINO_VMExpWrite,pbuf,address,len,page )
 
 
-//¶ÁÈ¡Ö¸¶¨³¤¶ÈµÄÊı¾İ¡£
-//pbuf: ½ÓÊÜÊı¾İµÄBuffer Ö¸Õë¡£
-//Address: vram µØÖ·
-//Len[1~512]: ¶ÁÈ¡µÄ³¤¶È¡£
-//ÄÜ´Ózram»òuramÖĞ¶Á£¬Ò²ÄÜ´Óipm/idmÖĞ¶Á£¬ÓÉport05¾ö¶¨
-bool API_VMRead(uint8 cmd, void *pbuf, uint16 address, uint16 len);            //len: ×Ö½ÚÎªµ¥Î»
-bool API_VMExpRead(uint8 cmd, void *pbuf, uint32 address, uint16 len);        //len: ×Ö½ÚÎªµ¥Î»
+//è¯»å–æŒ‡å®šé•¿åº¦çš„æ•°æ®ã€‚
+//pbuf: æ¥å—æ•°æ®çš„Buffer æŒ‡é’ˆã€‚
+//Address: vram åœ°å€
+//Len[1~512]: è¯»å–çš„é•¿åº¦ã€‚
+//èƒ½ä»zramæˆ–uramä¸­è¯»ï¼Œä¹Ÿèƒ½ä»ipm/idmä¸­è¯»ï¼Œç”±port05å†³å®š
+bool API_VMRead(uint8 cmd, void *pbuf, uint16 address, uint16 len);            //len: å­—èŠ‚ä¸ºå•ä½
+bool API_VMExpRead(uint8 cmd, void *pbuf, uint32 address, uint16 len);        //len: å­—èŠ‚ä¸ºå•ä½
 
-//½«pbuf ÖĞµÄÊı¾İĞ´ÈëVRam, ¹Ì¶¨³¤¶ÈÎª512Byte¡£
-//pbuf: ½ÓÊÜÊı¾İµÄBuffer Ö¸Õë¡£
-//Address: vram µØÖ·
-//ÓÉÓÚVMWrite·Ç³£µÄÂı£¬Çë²»ÒªÆµ·±µÄµ÷ÓÃ£¬Ò»°ãÊÇÔÚapÍË³ö»ò¶ÔËÙ¶ÈÒªÇó²»¸ßµÄµØ·½Ê¹ÓÃ¡£
-//Ö»ÄÜ´Ózram»òuramÖĞĞ´£¬²»ÄÜ´Óipm/idmÖĞĞ´
+//å°†pbuf ä¸­çš„æ•°æ®å†™å…¥VRam, å›ºå®šé•¿åº¦ä¸º512Byteã€‚
+//pbuf: æ¥å—æ•°æ®çš„Buffer æŒ‡é’ˆã€‚
+//Address: vram åœ°å€
+//ç”±äºVMWriteéå¸¸çš„æ…¢ï¼Œè¯·ä¸è¦é¢‘ç¹çš„è°ƒç”¨ï¼Œä¸€èˆ¬æ˜¯åœ¨apé€€å‡ºæˆ–å¯¹é€Ÿåº¦è¦æ±‚ä¸é«˜çš„åœ°æ–¹ä½¿ç”¨ã€‚
+//åªèƒ½ä»zramæˆ–uramä¸­å†™ï¼Œä¸èƒ½ä»ipm/idmä¸­å†™
 bool API_VMWrite(uint8 cmd, void *pbuf, uint16 address, uint16 len);
-bool API_VMExpWrite(uint8 cmd, void *pbuf, uint32 address, uint16 len, int8 page );      //addressµ¥Î»ÎªBytes£¬len: ÉÈÇøÎªµ¥Î»
+bool API_VMExpWrite(uint8 cmd, void *pbuf, uint32 address, uint16 len, int8 page );      //addresså•ä½ä¸ºBytesï¼Œlen: æ‰‡åŒºä¸ºå•ä½
 
 #endif /* __C251__ */
 
@@ -115,7 +115,7 @@ bool API_VMExpWrite(uint8 cmd, void *pbuf, uint32 address, uint16 len, int8 page
 
 
 
-//¶¨Òå»ã±àµ÷ÓÃµÄºê
+//å®šä¹‰æ±‡ç¼–è°ƒç”¨çš„å®
 mVMRead			macro
 MOV R11, #APINO_VMRead
 ECALL     RSTSYSAPI

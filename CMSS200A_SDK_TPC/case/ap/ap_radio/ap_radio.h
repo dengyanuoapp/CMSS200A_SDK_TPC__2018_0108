@@ -24,183 +24,183 @@
 #include "ap_report.h"
 #include "eqtool.h"
 
-//Ó²¼ş×î´óÒôÁ¿
+//ç¡¬ä»¶æœ€å¤§éŸ³é‡
 #define  MAXVOLUME		    40
-//Ä¬ÈÏËÑÌ¨ÃÅÏŞ¶¨Òå
+//é»˜è®¤æœå°é—¨é™å®šä¹‰
 #define  SEARCHLEVEL        4
-//µçÌ¨ÁĞ±íÖĞÖ§³ÖµÄ×î´ó±£´æÊı
+//ç”µå°åˆ—è¡¨ä¸­æ”¯æŒçš„æœ€å¤§ä¿å­˜æ•°
 #define  MAX_STATION_COUNT  40
 
-/* ¸÷²¨¶ÎÆµÂÊ·¶Î§¶¨Òå,ÒÔ100khzÎªµ¥Î» */
+/* å„æ³¢æ®µé¢‘ç‡èŒƒå›´å®šä¹‰,ä»¥100khzä¸ºå•ä½ */
 #define  USFREQ_MAX         0x0438               //108000khz
 #define  USFREQ_MIN         0x036B               //87500khz
 #define  JPFREQ_MAX         0x0384               //90000khz
 #define  JPFREQ_MIN         0x02F8               //76000khz
-/* ³ÇÊĞµçÌ¨ÁĞ±íÆµÂÊ·¶Î§( ÖĞ¹ú ) */
+/* åŸå¸‚ç”µå°åˆ—è¡¨é¢‘ç‡èŒƒå›´( ä¸­å›½ ) */
 #define  CITYFREQ_MAX       0x0438             //108000khz
 #define  CITYFREQ_MIN       0x036B            //87500khz          0x036B = 875
 typedef enum
 {
-    FM_TO_RADIO = 0, //  0, ½øÈëFM,½øĞĞµçÌ¨ÊÕÌı
-    ALARM_TO_FM, //  1, Alarm½øÈëFM
+    FM_TO_RADIO = 0, //  0, è¿›å…¥FM,è¿›è¡Œç”µå°æ”¶å¬
+    ALARM_TO_FM, //  1, Alarmè¿›å…¥FM
     FM_TO_STANDBY,
-    //  2, Ê¹FM½øÈëStandby
+    //  2, ä½¿FMè¿›å…¥Standby
 } fm_param_e;
 
 typedef enum
 {
-    SEARCH_NULL = 0, //²»ËÑË÷
-    SEARCH_NEXT = 10, //next·½ÏòËÑË÷
-    SEARCH_LAST = 20, //last·½ÏòËÑË÷
+    SEARCH_NULL = 0, //ä¸æœç´¢
+    SEARCH_NEXT = 10, //nextæ–¹å‘æœç´¢
+    SEARCH_LAST = 20, //lastæ–¹å‘æœç´¢
     SEARCH_STOP = 50,
-    //ËÑË÷ÖÕÖ¹
-} FM_search_direct_e; //ÊÖ¶¯ËÑÌ¨(Ô´³ÌĞòÊÇÓÃ´ËÖµ£¬Ä¿Ç°²»ÖªµÀ×÷ÓÃ£¬ÏÈ±£Áô)
+    //æœç´¢ç»ˆæ­¢
+} FM_search_direct_e; //æ‰‹åŠ¨æœå°(æºç¨‹åºæ˜¯ç”¨æ­¤å€¼ï¼Œç›®å‰ä¸çŸ¥é“ä½œç”¨ï¼Œå…ˆä¿ç•™)
 
 
-/* RDS ¹¦ÄÜ¿ª¹ØÃ¶¾Ù */
+/* RDS åŠŸèƒ½å¼€å…³æšä¸¾ */
 typedef enum
 {
-    RDS_Close, //RDS ¹Ø
+    RDS_Close, //RDS å…³
     RDS_Open
-    //RDS ¿ª
+    //RDS å¼€
 } radio_RDS_e;
 
 typedef struct
 {
-    uint16 FM_CurrentFreq; //µ±Ç°ÆµÂÊ
-    FM_Audio_e FM_Stereo_Status; //0£¬Á¢ÌåÉù£»·Ç0£¬µ¥ÉùµÀ
+    uint16 FM_CurrentFreq; //å½“å‰é¢‘ç‡
+    FM_Audio_e FM_Stereo_Status; //0ï¼Œç«‹ä½“å£°ï¼›é0ï¼Œå•å£°é“
 } FMStatus_Tab_t;
 
-/* radio uiÅäÖÃ²ÎÊı */
+/* radio uié…ç½®å‚æ•° */
 typedef struct
 {
-    /* Ä§ÊõÊı*/
+    /* é­”æœ¯æ•°*/
     uint16 magic;
-    /* Ô¤ÉèÁĞ±í( ÆÕÍ¨Æµ¶Î)*/
+    /* é¢„è®¾åˆ—è¡¨( æ™®é€šé¢‘æ®µ)*/
     uint16 fmstation_us[MAX_STATION_COUNT];
-    /* Ô¤ÉèÁĞ±í( ÈÕ±¾Æµ¶Î)*/
+    /* é¢„è®¾åˆ—è¡¨( æ—¥æœ¬é¢‘æ®µ)*/
     uint16 fmstation_jp[MAX_STATION_COUNT];
-    /* µ±Ç°²¥·ÅµÄµçÌ¨ĞÅÏ¢*/
+    /* å½“å‰æ’­æ”¾çš„ç”µå°ä¿¡æ¯*/
     fm_status_t FMStatus;
-    /* µ±Ç°²¥·Å²¨¶Î, Band_MAX ±íÊ¾µ±Ç°²¥·ÅÎª³ÇÊĞµçÌ¨*/
+    /* å½“å‰æ’­æ”¾æ³¢æ®µ, Band_MAX è¡¨ç¤ºå½“å‰æ’­æ”¾ä¸ºåŸå¸‚ç”µå°*/
     radio_band_e band_mode;
-    /* ÊÇ·ñÊ¹ÄÜRDS¹¦ÄÜ¿ª¹Ø */
+    /* æ˜¯å¦ä½¿èƒ½RDSåŠŸèƒ½å¼€å…³ */
     radio_RDS_e RDS_fun;
 } radio_config_t;
 
-/* radio ³ÇÊĞµçÌ¨½á¹¹ */
+/* radio åŸå¸‚ç”µå°ç»“æ„ */
 typedef struct
 {
-    /* µ±Ç°³ÇÊĞµçÌ¨Æµµã*/
+    /* å½“å‰åŸå¸‚ç”µå°é¢‘ç‚¹*/
     uint16 fmstation_city;
-    /* µ±Ç°²¥·ÅµÄ³ÇÊĞµçÌ¨Ãû³Æ */
+    /* å½“å‰æ’­æ”¾çš„åŸå¸‚ç”µå°åç§° */
     char station_name[40];
 } radio_citylist_t;
 
-/* FM²Ëµ¥Ïî	 */
+/* FMèœå•é¡¹	 */
 typedef enum
 {
-    MENU_SAVE, /* ±£´æµçÌ¨*/
-    MENU_RECORD, /* µçÌ¨Â¼Òô*/
-    MENU_DELETE, /* É¾³ıµçÌ¨*/
-    MENU_DELETE_ALL, /* É¾³ıÈ«²¿*/
-    MENU_AUTO_SEARCH, /* ×Ô¶¯ËÑÌ¨*/
-    MENU_NORMAL_BAND, /* ÆÕÍ¨Æµ¶Î*/
-    MENU_JAPAN_BAND, /* ÈÕ±¾Æµ¶Î*/
-    MENU_RDS, /* RDS ¹¦ÄÜ*/
+    MENU_SAVE, /* ä¿å­˜ç”µå°*/
+    MENU_RECORD, /* ç”µå°å½•éŸ³*/
+    MENU_DELETE, /* åˆ é™¤ç”µå°*/
+    MENU_DELETE_ALL, /* åˆ é™¤å…¨éƒ¨*/
+    MENU_AUTO_SEARCH, /* è‡ªåŠ¨æœå°*/
+    MENU_NORMAL_BAND, /* æ™®é€šé¢‘æ®µ*/
+    MENU_JAPAN_BAND, /* æ—¥æœ¬é¢‘æ®µ*/
+    MENU_RDS, /* RDS åŠŸèƒ½*/
 
     MENU_FM_RECORD, //for FM Record by ccm
 
-    MENU_EXIT, /* ÍË³ö*/
+    MENU_EXIT, /* é€€å‡º*/
 
     MENU_COUNT,
-    //FM²Ëµ¥ÏîÊıÄ¿
+    //FMèœå•é¡¹æ•°ç›®
 } radio_menu_e;
 
-/* ²Ëµ¥º¯ÊıÖ¸ÕëÀàĞÍ */
+/* èœå•å‡½æ•°æŒ‡é’ˆç±»å‹ */
 typedef uint16 (*pfunc_menu)(uint16 *);
 
-/* ²Ëµ¥º¯ÊıÖ¸Õë×é³ÉµÄ½á¹¹Ìå */
+/* èœå•å‡½æ•°æŒ‡é’ˆç»„æˆçš„ç»“æ„ä½“ */
 typedef struct
 {
-    pfunc_menu menu_save; /* ±£´æµçÌ¨*/
-    pfunc_menu menu_record; /* µçÌ¨Â¼Òô*/
-    pfunc_menu menu_delete; /* É¾³ıµçÌ¨*/
-    pfunc_menu menu_delete_all; /* É¾³ıÈ«²¿*/
-    pfunc_menu menu_auto_search; /* ×Ô¶¯ËÑÌ¨*/
-    pfunc_menu menu_normal_band; /* ÆÕÍ¨Æµ¶Î*/
-    pfunc_menu menu_japan_band; /* ÈÕ±¾Æµ¶Î*/
-    pfunc_menu menu_rds; /* RDS ¹¦ÄÜ*/
+    pfunc_menu menu_save; /* ä¿å­˜ç”µå°*/
+    pfunc_menu menu_record; /* ç”µå°å½•éŸ³*/
+    pfunc_menu menu_delete; /* åˆ é™¤ç”µå°*/
+    pfunc_menu menu_delete_all; /* åˆ é™¤å…¨éƒ¨*/
+    pfunc_menu menu_auto_search; /* è‡ªåŠ¨æœå°*/
+    pfunc_menu menu_normal_band; /* æ™®é€šé¢‘æ®µ*/
+    pfunc_menu menu_japan_band; /* æ—¥æœ¬é¢‘æ®µ*/
+    pfunc_menu menu_rds; /* RDS åŠŸèƒ½*/
     pfunc_menu menu_fm_record; //for FM Record by ccm
-    pfunc_menu menu_exit; /* ÍË³ö*/
+    pfunc_menu menu_exit; /* é€€å‡º*/
 } radio_menufunc_t;
 
-/* FMÃüÁîº¯ÊıÖ¸ÕëÀàĞÍ */
+/* FMå‘½ä»¤å‡½æ•°æŒ‡é’ˆç±»å‹ */
 typedef uint8 (*pfunc_cmd)(void *, void *);
 
-/* FMÃüÁîÑ¡Ïî */
+/* FMå‘½ä»¤é€‰é¡¹ */
 typedef enum
 {
-    /* FM ÖĞ¼ä²ãÃüÁîºê, ²¿·ÖÉæ¼°µ½µ÷ÓÃFMÇı¶¯½Ó¿Ú */
-    FM_OPEN = 0, //°²×°fmÇı¶¯, ½øĞĞÄ£×é³õÊ¼»¯
-    FM_CLOSE, //Ä£×é½øÈëstandby, ²¢Ğ¶ÔØfmÇı¶¯
-    FM_HARDWARE, //FM Ó²¼şÏà¹ØÉèÖÃ
-    FM_SETFREQ, //ÉèÖÃµ¥¸öÆµµã²¥·Å
-    FM_MUTE, //FM¾²Òô»ò½â³ı¾²Òô
-    FM_SETBAND, //ÉèÖÃ²¨¶Î
-    FM_SETTH, //ÉèÖÃËÑÌ¨ÃÅÏŞ
-    FM_SEARCH, //ÉèÖÃÈí¼şËÑÌ¨
-    FM_SEEK, //Æô¶¯seek (Ó²¼şËÑÌ¨)
-    FM_GETSEEKFLAG, //»ñÈ¡seek×´Ì¬
-    FM_BREAKSEEK, //ÍË³öseek
+    /* FM ä¸­é—´å±‚å‘½ä»¤å®, éƒ¨åˆ†æ¶‰åŠåˆ°è°ƒç”¨FMé©±åŠ¨æ¥å£ */
+    FM_OPEN = 0, //å®‰è£…fmé©±åŠ¨, è¿›è¡Œæ¨¡ç»„åˆå§‹åŒ–
+    FM_CLOSE, //æ¨¡ç»„è¿›å…¥standby, å¹¶å¸è½½fmé©±åŠ¨
+    FM_HARDWARE, //FM ç¡¬ä»¶ç›¸å…³è®¾ç½®
+    FM_SETFREQ, //è®¾ç½®å•ä¸ªé¢‘ç‚¹æ’­æ”¾
+    FM_MUTE, //FMé™éŸ³æˆ–è§£é™¤é™éŸ³
+    FM_SETBAND, //è®¾ç½®æ³¢æ®µ
+    FM_SETTH, //è®¾ç½®æœå°é—¨é™
+    FM_SEARCH, //è®¾ç½®è½¯ä»¶æœå°
+    FM_SEEK, //å¯åŠ¨seek (ç¡¬ä»¶æœå°)
+    FM_GETSEEKFLAG, //è·å–seekçŠ¶æ€
+    FM_BREAKSEEK, //é€€å‡ºseek
 
-    FM_GETFREQ, //»ñÈ¡µ±Ç°ÆµÂÊÖµ
-    FM_GETINTENSITY, //»ñÈ¡µ±Ç°µçÌ¨ĞÅºÅÇ¿¶È
-    FM_GETSTATUS, //»ñÈ¡µ±Ç°µçÌ¨×´Ì¬
+    FM_GETFREQ, //è·å–å½“å‰é¢‘ç‡å€¼
+    FM_GETINTENSITY, //è·å–å½“å‰ç”µå°ä¿¡å·å¼ºåº¦
+    FM_GETSTATUS, //è·å–å½“å‰ç”µå°çŠ¶æ€
 
-    //ÖĞ¼äÂß¼­²ã:ÓëFMÇı¶¯ÎŞ¹Ø
-    FM_MID_PLAY, //²¥·ÅµçÌ¨
-    FM_MID_SAVE, //±£´æµ±Ç°µçÌ¨
-    FM_MID_SAVESTATION, //±£´æµ±Ç°µçÌ¨¶ÔÓ¦µÄµçÌ¨±íÏîºÅ¡£
-    FM_MID_FINDSTATION, //²éÕÒµ±Ç°µçÌ¨¶ÔÓ¦µÄµçÌ¨±íÏîºÅ¡£
-    FM_MID_LOADFREQ, //¸ù¾İµçÌ¨±íÏîºÅ¼ÓÔØÆµÂÊ¡£
-    FM_MID_RESTORE, //»¹Ô­µ±Ç°µçÌ¨
-    FM_MID_TURN, //»»Ì¨
-    FM_MID_DELETE, //É¾³ıµ±Ç°µçÌ¨
-    FM_MID_DELALL, //É¾³ıÈ«²¿µçÌ¨
-    FM_MID_SELCITYINIT, //È·¶¨ËùÑ¡³ÇÊĞµÄµÚÒ»¸ö³ÇÊĞµçÌ¨
-    FM_MID_CITYSWITCH, //ÔÚËùÑ¡³ÇÊĞÖĞÉÏÏÂÇĞ»»³ÇÊĞµçÌ¨
+    //ä¸­é—´é€»è¾‘å±‚:ä¸FMé©±åŠ¨æ— å…³
+    FM_MID_PLAY, //æ’­æ”¾ç”µå°
+    FM_MID_SAVE, //ä¿å­˜å½“å‰ç”µå°
+    FM_MID_SAVESTATION, //ä¿å­˜å½“å‰ç”µå°å¯¹åº”çš„ç”µå°è¡¨é¡¹å·ã€‚
+    FM_MID_FINDSTATION, //æŸ¥æ‰¾å½“å‰ç”µå°å¯¹åº”çš„ç”µå°è¡¨é¡¹å·ã€‚
+    FM_MID_LOADFREQ, //æ ¹æ®ç”µå°è¡¨é¡¹å·åŠ è½½é¢‘ç‡ã€‚
+    FM_MID_RESTORE, //è¿˜åŸå½“å‰ç”µå°
+    FM_MID_TURN, //æ¢å°
+    FM_MID_DELETE, //åˆ é™¤å½“å‰ç”µå°
+    FM_MID_DELALL, //åˆ é™¤å…¨éƒ¨ç”µå°
+    FM_MID_SELCITYINIT, //ç¡®å®šæ‰€é€‰åŸå¸‚çš„ç¬¬ä¸€ä¸ªåŸå¸‚ç”µå°
+    FM_MID_CITYSWITCH, //åœ¨æ‰€é€‰åŸå¸‚ä¸­ä¸Šä¸‹åˆ‡æ¢åŸå¸‚ç”µå°
 
-    FM_MID_SETVOLUME, //ÉèÖÃÉùÒô
-    FM_MID_STEPGRID, //µçÌ¨ÆµÂÊÎ¢µ÷£¬ÒÔ100KHZÎª²½½ø
+    FM_MID_SETVOLUME, //è®¾ç½®å£°éŸ³
+    FM_MID_STEPGRID, //ç”µå°é¢‘ç‡å¾®è°ƒï¼Œä»¥100KHZä¸ºæ­¥è¿›
 
     CMD_COUNT,
-    //FMÃüÁîÊıÄ¿
+    //FMå‘½ä»¤æ•°ç›®
 } radio_cmd_e;
 
-/* Fm µÄ³ÌĞòÊı¾İÖ¸Õë×é³É ½á¹¹Ìå */
+/* Fm çš„ç¨‹åºæ•°æ®æŒ‡é’ˆç»„æˆ ç»“æ„ä½“ */
 typedef struct
 {
-    uint16 *param1; //µçÌ¨±íµØÖ·Ö¸Õë£¬20¸ö£¨USÄ£Ê½£©/20¸ö£¨JapanÄ£Ê½£©
-    uint16 *param2; //µ±Ç°µçÌ¨ĞÅÏ¢µÄµØÖ·Ö¸Õë
+    uint16 *param1; //ç”µå°è¡¨åœ°å€æŒ‡é’ˆï¼Œ20ä¸ªï¼ˆUSæ¨¡å¼ï¼‰/20ä¸ªï¼ˆJapanæ¨¡å¼ï¼‰
+    uint16 *param2; //å½“å‰ç”µå°ä¿¡æ¯çš„åœ°å€æŒ‡é’ˆ
 } FMRADIO_param_t;
 
-/* Êı¾İÉùÃ÷ */
+/* æ•°æ®å£°æ˜ */
 //main.c
-extern radio_config_t g_radio_config; //radio ui µÄÅäÖÃÏîĞÅÏ¢
-extern uint8 EnterFlag; //Ó¦ÓÃ½øÈëÄ£Ê½. 0xff--Ö»ÊÇÎªÊ¹FMÄ£×é½øÈëstandby
-extern uint8 AutoTabNum; //×Ô¶¯ËÑÌ¨¹ı³ÌÖĞ,µ±Ç°ËùËÑµçÌ¨µÄµçÌ¨ºÅ
-extern fm_status_t g_FMStatus; //ËÑÌ¨¹ı³ÌÖĞ»ñÈ¡µÄ×´Ì¬
-extern uint8 seekflag; //Ó²¼şËÑÌ¨±ê¼Ç
-extern radio_citylist_t g_city_station; //radio ³ÇÊĞµçÌ¨ÁĞ±í½á¹¹ĞÅÏ¢
-extern uint16 *pfreq_play; //Ö¸Ïòµ±Ç°Ëù²¥·ÅµÄµçÌ¨ÁĞ±í±íÊ×
-extern radio_RDS_e use_RDS; //RDS¹Ø±Õ´ò¿ª×´Ì¬
-extern fm_status_t FMStatusUS; //USµçÌ¨ĞÅÏ¢Ôİ´æ,8 bytes
-extern fm_status_t FMStatusJP; //JapanµçÌ¨ĞÅÏ¢Ôİ´æ,8bytes
-extern FMRADIO_param_t radio_param; //µ±Ç°µçÌ¨ĞÅÏ¢
-extern uint8 flag_r; //ËÑÌ¨ÊÇ·ñËÑµ½µÚÒ»¸öÌ¨Ö®ºó·µ»Ø±êÖ¾Î»
+extern radio_config_t g_radio_config; //radio ui çš„é…ç½®é¡¹ä¿¡æ¯
+extern uint8 EnterFlag; //åº”ç”¨è¿›å…¥æ¨¡å¼. 0xff--åªæ˜¯ä¸ºä½¿FMæ¨¡ç»„è¿›å…¥standby
+extern uint8 AutoTabNum; //è‡ªåŠ¨æœå°è¿‡ç¨‹ä¸­,å½“å‰æ‰€æœç”µå°çš„ç”µå°å·
+extern fm_status_t g_FMStatus; //æœå°è¿‡ç¨‹ä¸­è·å–çš„çŠ¶æ€
+extern uint8 seekflag; //ç¡¬ä»¶æœå°æ ‡è®°
+extern radio_citylist_t g_city_station; //radio åŸå¸‚ç”µå°åˆ—è¡¨ç»“æ„ä¿¡æ¯
+extern uint16 *pfreq_play; //æŒ‡å‘å½“å‰æ‰€æ’­æ”¾çš„ç”µå°åˆ—è¡¨è¡¨é¦–
+extern radio_RDS_e use_RDS; //RDSå…³é—­æ‰“å¼€çŠ¶æ€
+extern fm_status_t FMStatusUS; //USç”µå°ä¿¡æ¯æš‚å­˜,8 bytes
+extern fm_status_t FMStatusJP; //Japanç”µå°ä¿¡æ¯æš‚å­˜,8bytes
+extern FMRADIO_param_t radio_param; //å½“å‰ç”µå°ä¿¡æ¯
+extern uint8 flag_r; //æœå°æ˜¯å¦æœåˆ°ç¬¬ä¸€ä¸ªå°ä¹‹åè¿”å›æ ‡å¿—ä½
 
-//´ÓVRAMÖĞ¶Á³öµÄEQ,SRS²ÎÊı±í£¬Í¨¹ıEQ¹¤¾ßÉèÖÃ
+//ä»VRAMä¸­è¯»å‡ºçš„EQ,SRSå‚æ•°è¡¨ï¼Œé€šè¿‡EQå·¥å…·è®¾ç½®
 extern EQ_VM_t g_eq_para;
 
 extern int8 AuCodecRun;
@@ -214,7 +214,7 @@ extern uint32 m_decSpdifddrSav;
 extern int8 last_SetenceFlag;
 
 #ifdef AP_RADIO_REPORT_EN
-extern char report_buf[16]; //´æÖî²¥±¨Êı¾İµÄbuffer
+extern char report_buf[16]; //å­˜è¯¸æ’­æŠ¥æ•°æ®çš„buffer
 #endif
 
 //basal_fmradio.c
@@ -228,16 +228,16 @@ void FMexit(uint16 result);
 uint16 drawBandSwitch(void);
 
 /* sub function */
-extern uint16 fm_menu_save(uint16 *arg);  /* ±£´æµçÌ¨*/
-extern uint16 fm_menu_record(uint16 *arg);  /* µçÌ¨Â¼Òô*/
-extern uint16 fm_menu_delete(uint16 *arg);  /* É¾³ıµçÌ¨*/
-extern uint16 fm_menu_delete_all(uint16 *arg);  /* É¾³ıÈ«²¿*/
-extern uint16 fm_menu_auto_search(uint16 *arg);  /* ×Ô¶¯ËÑÌ¨*/
-extern uint16 fm_menu_normal_band(uint16 *arg);  /* ÆÕÍ¨Æµ¶Î*/
-extern uint16 fm_menu_japan_band(uint16 *arg);  /* ÈÕ±¾Æµ¶Î*/
-extern uint16 fm_menu_rds(uint16 *arg);  /* RDS ¹¦ÄÜ*/
+extern uint16 fm_menu_save(uint16 *arg);  /* ä¿å­˜ç”µå°*/
+extern uint16 fm_menu_record(uint16 *arg);  /* ç”µå°å½•éŸ³*/
+extern uint16 fm_menu_delete(uint16 *arg);  /* åˆ é™¤ç”µå°*/
+extern uint16 fm_menu_delete_all(uint16 *arg);  /* åˆ é™¤å…¨éƒ¨*/
+extern uint16 fm_menu_auto_search(uint16 *arg);  /* è‡ªåŠ¨æœå°*/
+extern uint16 fm_menu_normal_band(uint16 *arg);  /* æ™®é€šé¢‘æ®µ*/
+extern uint16 fm_menu_japan_band(uint16 *arg);  /* æ—¥æœ¬é¢‘æ®µ*/
+extern uint16 fm_menu_rds(uint16 *arg);  /* RDS åŠŸèƒ½*/
 extern uint16 fm_menu_fm_record(uint16 *arg);  //for FM Record by ccm
-extern uint16 fm_menu_exit(uint16 *arg);  /* ÍË³ö */
+extern uint16 fm_menu_exit(uint16 *arg);  /* é€€å‡º */
 
 /* display.c */
 void RefreshMainScreen(void);

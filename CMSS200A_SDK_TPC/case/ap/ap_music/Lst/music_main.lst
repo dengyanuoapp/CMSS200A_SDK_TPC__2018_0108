@@ -25,43 +25,43 @@ stmt  level    source
    15          #include "ap_music.h"
    16          
    17          #pragma name(AP_MAIN)
-   18          /*³£Á¿¶Î¶¨Òå*/
-   19          uint8 g_TagInfoBuf[92];//ÓÃÓÚ·ÅTAGĞÅÏ¢µÄBUF
-   20          uint16 g_musicamount = 0;//µ±Ç°Ä¿Â¼¸èÇú×ÜÊı
-   21          uint16 g_musicsequence = 0;//µ±Ç°¸èÇúĞòºÅ
-   22          /*È«¾ÖÊı¾İ¶Î¶¨Òå*/
-   23          bool g_PAOpenFlag = FALSE; //±êÖ¾PAµÄ¿ª¹Ø×´Ì¬
-   24          bool Read_VMflag = TRUE;//FALSE:²»¶ÁVM ,TRUE:¶ÁVM
-   25          music_vars_t g_music_vars;//±¾APµÄ¹«¹²±äÁ¿
-   26          file_location_t CurUselocation;//µ±Ç°ÕıÔÚÊ¹ÓÃµÄlocationĞÅÏ¢
+   18          /*å¸¸é‡æ®µå®šä¹‰*/
+   19          uint8 g_TagInfoBuf[92];//ç”¨äºæ”¾TAGä¿¡æ¯çš„BUF
+   20          uint16 g_musicamount = 0;//å½“å‰ç›®å½•æ­Œæ›²æ€»æ•°
+   21          uint16 g_musicsequence = 0;//å½“å‰æ­Œæ›²åºå·
+   22          /*å…¨å±€æ•°æ®æ®µå®šä¹‰*/
+   23          bool g_PAOpenFlag = FALSE; //æ ‡å¿—PAçš„å¼€å…³çŠ¶æ€
+   24          bool Read_VMflag = TRUE;//FALSE:ä¸è¯»VM ,TRUE:è¯»VM
+   25          music_vars_t g_music_vars;//æœ¬APçš„å…¬å…±å˜é‡
+   26          file_location_t CurUselocation;//å½“å‰æ­£åœ¨ä½¿ç”¨çš„locationä¿¡æ¯
    27          Open_param_t g_Openparam;
-   28          Play_status_t PlayStatus = StopSta; //Í£Ö¹×´Ì¬
-   29          Play_status_t prev_PlayStatus = StopSta; //ÉÏÒ»´ÎµÄ²¥·Å×´Ì¬
+   28          Play_status_t PlayStatus = StopSta; //åœæ­¢çŠ¶æ€
+   29          Play_status_t prev_PlayStatus = StopSta; //ä¸Šä¸€æ¬¡çš„æ’­æ”¾çŠ¶æ€
    30          
-   31          Music_type_t g_currentMusicType = Music_NON;//±êÖ¾µ±Ç°ÒôÀÖµÄÀàĞÍ(mp3/wma/asf/wmv)
+   31          Music_type_t g_currentMusicType = Music_NON;//æ ‡å¿—å½“å‰éŸ³ä¹çš„ç±»å‹(mp3/wma/asf/wmv)
    32          
-   33          uint8 FF_flag;//µ±Ç°´¦Àí¿ì½ø×´Ì¬±ê¼Ç
-   34          uint8 get_fileinfo_flag;//ÊÇ·ñĞèÒª»ñÈ¡ÎÄ¼şĞÅÏ¢±êÖ¾
-   35          uint8 auto_switch_device_flag;//×Ô¶¯ÇĞ»»´ÅÅÌ±êÖ¾
-   36          uint8 no_device_flag;//ÎŞ´ÅÅÌ»ò´ÅÅÌÎŞÎÄ¼ş±êÖ¾
-   37          uint16 dir_no;//µ±Ç°Ä¿Â¼ĞòºÅ
-   38          uint8 scan_flag = TRUE;//ÊÇ·ñĞèÒªÉ¨ÃèÈ«ÅÌ±êÖ¾
-   39          //¼ÇÂ¼ÉÏÒ»´ÎµÄ°´¼ü£¬Ö÷ÒªÊÇÇø·ÖÉÏÒ»´ÎÊÇnext»¹ÊÇprev,ÒÔ
-   40          //±ãÔÚÇĞ»»ÉÏÒ»ÇúÓöµ½·Ç·¨ÎÄ¼şÊ±¿ÉÒÔ¼ÌĞøÏòÉÏÇĞ»»£¬¶ø²»ÊÇ¼ÌĞøÇĞ»»µ½ÏÂÒ»Ê×
+   33          uint8 FF_flag;//å½“å‰å¤„ç†å¿«è¿›çŠ¶æ€æ ‡è®°
+   34          uint8 get_fileinfo_flag;//æ˜¯å¦éœ€è¦è·å–æ–‡ä»¶ä¿¡æ¯æ ‡å¿—
+   35          uint8 auto_switch_device_flag;//è‡ªåŠ¨åˆ‡æ¢ç£ç›˜æ ‡å¿—
+   36          uint8 no_device_flag;//æ— ç£ç›˜æˆ–ç£ç›˜æ— æ–‡ä»¶æ ‡å¿—
+   37          uint16 dir_no;//å½“å‰ç›®å½•åºå·
+   38          uint8 scan_flag = TRUE;//æ˜¯å¦éœ€è¦æ‰«æå…¨ç›˜æ ‡å¿—
+   39          //è®°å½•ä¸Šä¸€æ¬¡çš„æŒ‰é”®ï¼Œä¸»è¦æ˜¯åŒºåˆ†ä¸Šä¸€æ¬¡æ˜¯nextè¿˜æ˜¯prev,ä»¥
+   40          //ä¾¿åœ¨åˆ‡æ¢ä¸Šä¸€æ›²é‡åˆ°éæ³•æ–‡ä»¶æ—¶å¯ä»¥ç»§ç»­å‘ä¸Šåˆ‡æ¢ï¼Œè€Œä¸æ˜¯ç»§ç»­åˆ‡æ¢åˆ°ä¸‹ä¸€é¦–
    41          uint8 prev_key_direc = Key_Next;
-   42          uint8 micin_status;//micÊÇ·ñ²åÈë×´Ì¬¡£0-²»´æÔÚmic.1-micÒÑ¾­²å×Å
-   43          uint16 err_music_count;//³ö´í¸èÇú¼ÆÊı
-   44          uint16 max_music_err = MAX_ERR_MUSIC_NUM; //×î´ó¸èÇú³ö´íÊı
-   45          uint8 g_power_flag = 0;//ÊÇ·ñÍ»È»¶Ïµç±êÖ¾
-   46          uint8 first_init = TRUE;//¿¨ºÍuÅÌÇĞ»»Çé¿ö£¬·ÀÖ¹¿¨ºÍuÅÌ¶¼Ã»ÎÄ¼şÊ±½øÈë²»¶ÏÇĞ»»×´Ì¬
+   42          uint8 micin_status;//micæ˜¯å¦æ’å…¥çŠ¶æ€ã€‚0-ä¸å­˜åœ¨mic.1-micå·²ç»æ’ç€
+   43          uint16 err_music_count;//å‡ºé”™æ­Œæ›²è®¡æ•°
+   44          uint16 max_music_err = MAX_ERR_MUSIC_NUM; //æœ€å¤§æ­Œæ›²å‡ºé”™æ•°
+   45          uint8 g_power_flag = 0;//æ˜¯å¦çªç„¶æ–­ç”µæ ‡å¿—
+   46          uint8 first_init = TRUE;//å¡å’Œuç›˜åˆ‡æ¢æƒ…å†µï¼Œé˜²æ­¢å¡å’Œuç›˜éƒ½æ²¡æ–‡ä»¶æ—¶è¿›å…¥ä¸æ–­åˆ‡æ¢çŠ¶æ€
    47          
-   48          uint8 disk_char[MAX_DISK_NUM] = //´æ´¢ÅÌ·ûĞÅÏ¢,·Ö±ğÎªuÅÌ£¬¿¨ÅÌ£¬¿¨base
+   48          uint8 disk_char[MAX_DISK_NUM] = //å­˜å‚¨ç›˜ç¬¦ä¿¡æ¯,åˆ†åˆ«ä¸ºuç›˜ï¼Œå¡ç›˜ï¼Œå¡base
    49          { 'U', 'H', 'C' };
    50          uint8 load_str[5] =
    51          { "LOAD" };
    52          uint8 err_str[5] =
    53          { "ERRZ" };
-   54          uint8  support_fav = 0;          //ÊÇ·ñÖ§³ÖÊÕ²Ø¼Ğ,Ä¬ÈÏ²»Ö§³Ö
+   54          uint8  support_fav = 0;          //æ˜¯å¦æ”¯æŒæ”¶è—å¤¹,é»˜è®¤ä¸æ”¯æŒ
    55          EQ_VM_t g_eq_para;
    56          
    57          //for analog mic
@@ -81,7 +81,7 @@ stmt  level    source
    69   1          int16 main_result;
    70   1          bool card_exist = FALSE, uhost_exist = FALSE;
    71   1          auto_switch_device_flag = 1;
-   72   1          /* ¶ÁÈë¹«¹²±äÁ¿ */
+   72   1          /* è¯»å…¥å…¬å…±å˜é‡ */
    73   1          read_var();
    74   1          read_VM();
    75   1          //    SetPAVolume(g_comval.volume);
@@ -98,7 +98,7 @@ stmt  level    source
    86   2          }
    87   1          if (param == RESULT_MUSIC_CPLAY)
    88   1          {
-   89   2              /* Ñ¡Ôñ¿¨ÅÌ²¥·Å */
+   89   2              /* é€‰æ‹©å¡ç›˜æ’­æ”¾ */
    90   2              if (DRV_DetectUD(1) == 0x20)
    91   2              {
    92   3                  CurUselocation.disk = disk_char[1];
@@ -114,7 +114,7 @@ stmt  level    source
   102   2          }
   103   1          else
   104   1          {
-  105   2              /* Ñ¡ÔñUÅÌ²¥·Å */
+  105   2              /* é€‰æ‹©Uç›˜æ’­æ”¾ */
   106   2              if (USBH_Check_Udisk())
   107   2              {
   108   3                  CurUselocation.disk = disk_char[0];
@@ -132,15 +132,15 @@ stmt  level    source
   120   1      
   121   1          CurUselocation.fselTotal = 0;
   122   1          CurUselocation.ID3buffer = g_TagInfoBuf;
-  123   1          g_Openparam.filename = CurUselocation.filename;//ÎÄ¼şÃûµØÖ·
-  124   1          g_Openparam.BreakPTSave = &g_music_vars.BreakPTSave;//±¸·İ²ÎÊıµØÖ·
+  123   1          g_Openparam.filename = CurUselocation.filename;//æ–‡ä»¶ååœ°å€
+  124   1          g_Openparam.BreakPTSave = &g_music_vars.BreakPTSave;//å¤‡ä»½å‚æ•°åœ°å€
 C251 COMPILER V4.55,  music_main                                                           23/05/16  10:41:52  PAGE 3   
 
-  125   1          g_Openparam.typeerror = 0;//Ä¬ÈÏÎªÕı³£¸ñÊ½ÎÄ¼ş
+  125   1          g_Openparam.typeerror = 0;//é»˜è®¤ä¸ºæ­£å¸¸æ ¼å¼æ–‡ä»¶
   126   1          g_Openparam.SoftVolumeMax = 0;
   127   1          g_Openparam.FadeInTime = 0x03;
   128   1      
-  129   1          g_music_vars.fselmod = FSEL_TYPE_COMMONDIR;//Ã¿´Î½øÈë¶¼ÊÇÉèÎªÄ¿Â¼Ñ¡ÔñÆ÷
+  129   1          g_music_vars.fselmod = FSEL_TYPE_COMMONDIR;//æ¯æ¬¡è¿›å…¥éƒ½æ˜¯è®¾ä¸ºç›®å½•é€‰æ‹©å™¨
   130   1          LEDClearScreen();
   131   1          LEDPuts(NUMBER1, load_str, 1);
   132   1          if (InitFileSelector() == 0)
@@ -153,18 +153,18 @@ stmt  level    source
   139   1          else
   140   1          {
   141   2              PlayStatus = StopSta;
-  142   2              need_draw = TRUE;/* ĞèÒª»­screen */
+  142   2              need_draw = TRUE;/* éœ€è¦ç”»screen */
   143   2              get_fileinfo_flag = TRUE;
   144   2          }
   145   1          // OpenPA();
   146   1          //  openDAC();
   147   1          //    SetPAVolume_LR(g_comval.volume, g_comval.volume);
   148   1          // init_mic_in_gpio();
-  149   1          //ÏÈ¹ıÂËËùÓĞµÄÏûÏ¢£¬ÒÔÃâ¼ì²âµ½²»±ØÒªµÄÏûÏ¢
+  149   1          //å…ˆè¿‡æ»¤æ‰€æœ‰çš„æ¶ˆæ¯ï¼Œä»¥å…æ£€æµ‹åˆ°ä¸å¿…è¦çš„æ¶ˆæ¯
   150   1          while (ap_get_message() != NULL)
   151   1          {
   152   2          };
-  153   1          main_result = (uint16) ui_play();// =============> ½øÈë½çÃæ
+  153   1          main_result = (uint16) ui_play();// =============> è¿›å…¥ç•Œé¢
   154   1          stop_music_play(TRUE);
   155   1          write_poweroff_flag(0);
   156   1          if(mute_flag != 0)
@@ -199,7 +199,7 @@ stmt  level    source
   185           ********************************************************************************
   186           *             void read_var(void)
   187           *
-  188           * Description : ¶ÁÏµÍ³±äÁ¿ºÍap¾Ö²¿±äÁ¿
+  188           * Description : è¯»ç³»ç»Ÿå˜é‡å’Œapå±€éƒ¨å˜é‡
   189           *
   190           * Arguments   : void
 C251 COMPILER V4.55,  music_main                                                           23/05/16  10:41:52  PAGE 4   
@@ -231,7 +231,7 @@ stmt  level    source
   215           ********************************************************************************
   216           *             void read_var(void)
   217           *
-  218           * Description : ¶ÁmusicÓ¦ÓÃÏµÍ³±äÁ¿
+  218           * Description : è¯»musicåº”ç”¨ç³»ç»Ÿå˜é‡
   219           *
   220           * Arguments   : void
   221           *
@@ -283,9 +283,9 @@ stmt  level    source
   265   1      
   266   1          if (!g_PAOpenFlag)
   267   1          {
-  268   2              g_PAOpenFlag = TRUE;//±êÖ¾PAÒÑ´ò¿ª
+  268   2              g_PAOpenFlag = TRUE;//æ ‡å¿—PAå·²æ‰“å¼€
   269   2      
-  270   2              pa.pa_in.dacin = 1;//Ä¬ÈÏ
+  270   2              pa.pa_in.dacin = 1;//é»˜è®¤
   271   2              pa.pa_in.micin = 1;
   272   2              pa.volume = g_comval.volume;
   273   2              pa.reserve[0] = g_comval.volume;
@@ -297,7 +297,7 @@ stmt  level    source
   279          {
   280   1          dac_t dacattr;
   281   1          dacattr.dacselect = 0;
-  282   1          dacattr.rate = FS_44K1;//Ä¬ÈÏ
+  282   1          dacattr.rate = FS_44K1;//é»˜è®¤
   283   1          EnableDAC(&dacattr);
   284   1      }
   285          /*

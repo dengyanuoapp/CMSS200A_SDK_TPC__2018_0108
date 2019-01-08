@@ -117,8 +117,8 @@ stmt  level    source
   103   1      }
   104          
   105          /*************************************************************************
-  106           * SdStopCommand Í£Ö¹²¥·Å
-  107           *1 g_decReadFilePara.ReadFilePagesÔÚdma hookÖĞ±»¸³Öµ = deSdBreakPointSave
+  106           * SdStopCommand åœæ­¢æ’­æ”¾
+  107           *1 g_decReadFilePara.ReadFilePagesåœ¨dma hookä¸­è¢«èµ‹å€¼ = deSdBreakPointSave
   108           ****************************************************************************/
   109          
   110          bool TTSStopCommand(void *param)

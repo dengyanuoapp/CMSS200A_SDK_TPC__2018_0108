@@ -23,7 +23,7 @@
 #define WORLD_DATE    0
 #define CHINA_DATE    1
 
-//¶¨ÒåapiºÅ
+//å®šä¹‰apiå·
 #define APINO_TM_SetTimer         0x0000+API_TM_Base
 #define APINO_TM_KillTimer        0x0001+API_TM_Base
 #define APINO_TM_SetClock         0x0002+API_TM_Base
@@ -40,15 +40,15 @@
 
 
 //#ifdef     USE_EXTERNAL_RTC
-//    #define API_TM_GetGWTime_RTCIC  0x000c + API_UI_Base     //·ÅÔÚÏÔÊ¾Çı¶¯
-//    #define API_TM_GetGWDate_RTCIC  0x100c + API_UI_Base     //·ÅÔÚÏÔÊ¾Çı¶¯
-//    #define API_TM_getcurtime       0x200c + API_UI_Base     //·ÅÔÚÏÔÊ¾Çı¶¯
+//    #define API_TM_GetGWTime_RTCIC  0x000c + API_UI_Base     //æ”¾åœ¨æ˜¾ç¤ºé©±åŠ¨
+//    #define API_TM_GetGWDate_RTCIC  0x100c + API_UI_Base     //æ”¾åœ¨æ˜¾ç¤ºé©±åŠ¨
+//    #define API_TM_getcurtime       0x200c + API_UI_Base     //æ”¾åœ¨æ˜¾ç¤ºé©±åŠ¨
 //
-//    #define API_TM_SetGWTime_RTCIC  0x000d + API_UI_Base     //·ÅÔÚÏÔÊ¾Çı¶¯
-//    #define API_TM_SetGWDate_RTCIC  0x100d + API_UI_Base    //·ÅÔÚÏÔÊ¾Çı¶¯
+//    #define API_TM_SetGWTime_RTCIC  0x000d + API_UI_Base     //æ”¾åœ¨æ˜¾ç¤ºé©±åŠ¨
+//    #define API_TM_SetGWDate_RTCIC  0x100d + API_UI_Base    //æ”¾åœ¨æ˜¾ç¤ºé©±åŠ¨
 //
-//    #define API_Ertc_HT1380_AllGet  0x000e + API_UI_Base     //·ÅÔÚÏÔÊ¾Çı¶¯
-//    #define API_Ertc_HT1380_AllSet  0x100e + API_UI_Base     //·ÅÔÚÏÔÊ¾Çı¶¯
+//    #define API_Ertc_HT1380_AllGet  0x000e + API_UI_Base     //æ”¾åœ¨æ˜¾ç¤ºé©±åŠ¨
+//    #define API_Ertc_HT1380_AllSet  0x100e + API_UI_Base     //æ”¾åœ¨æ˜¾ç¤ºé©±åŠ¨
 //#endif
 
 
@@ -85,26 +85,26 @@ typedef struct
 #define TM_Delay100uS(uscnt)			API_TM_Delay100uS(APINO_TM_DelayuS,uscnt)
 
 
-//timerµÄÖÜÆÚÎª1ms
-// timersubÊÇtimerÏìÓ¦º¯ÊıÈë¿ÚµØÖ·£¬´Ë´¦¶¨ÒåÎªintÊÇÎªÁË·½±ãcµÄ·Çbankµ÷ÓÃ
+//timerçš„å‘¨æœŸä¸º1ms
+// timersubæ˜¯timerå“åº”å‡½æ•°å…¥å£åœ°å€ï¼Œæ­¤å¤„å®šä¹‰ä¸ºintæ˜¯ä¸ºäº†æ–¹ä¾¿cçš„ébankè°ƒç”¨
 uint8 API_TM_SetTimer(uint8 cmd, uint32 timersub, int8 period);
-// É±µôtimer±ØĞëÌá¹©timerºÅ
+// æ€æ‰timerå¿…é¡»æä¾›timerå·
 bool API_TM_KillTimer(uint8 cmd, int8 timerno);
 
-//clockµÄÖÜÆÚÎª0.5S,
-// clocksubÊÇclockÏìÓ¦º¯ÊıÈë¿ÚµØÖ·£¬´Ë´¦¶¨ÒåÎªintÊÇÎªÁË·½±ãcµÄ·Çbankµ÷ÓÃ
+//clockçš„å‘¨æœŸä¸º0.5S,
+// clocksubæ˜¯clockå“åº”å‡½æ•°å…¥å£åœ°å€ï¼Œæ­¤å¤„å®šä¹‰ä¸ºintæ˜¯ä¸ºäº†æ–¹ä¾¿cçš„ébankè°ƒç”¨
 uint8 API_TM_SetClock(uint8 cmd, uint32 clocksub, int8 period);
-// É±µôclock±ØĞëÌá¹©clockºÅ
+// æ€æ‰clockå¿…é¡»æä¾›clockå·
 bool API_TM_KillClock(uint8 cmd, int8 clockno);
 
-//ÉèÖÃAlarm ÖĞ¶ÏµÄÊ±¼ä
+//è®¾ç½®Alarm ä¸­æ–­çš„æ—¶é—´
 void API_TM_SetAlarmTime(uint8 cmd, time_t *time);
 
-//Ê±¼äÎª24Ğ¡Ê±ÖÆ
+//æ—¶é—´ä¸º24å°æ—¶åˆ¶
 bool API_TM_SetTime(uint8 cmd, time_t *time);
 bool API_TM_GetTime(uint8 cmd, time_t *time);
 
-//type must equ. 0 means ¹«Àú¸ñÊ½
+//type must equ. 0 means å…¬å†æ ¼å¼
 bool API_TM_SetDate(uint8 cmd, date_t *date);
 bool API_TM_GetDate(uint8 cmd, date_t *date);
 
@@ -119,11 +119,11 @@ uint32 sTM_ChangetoStdSec(time_t *time, date_t *date);
 
 #ifdef __A251__
 //*****************************************************
-//´Ë´¦ºêµÄµ÷ÓÃÈë¿Ú²ÎÊı²Î¿¼cÔ­ĞÍ
+//æ­¤å¤„å®çš„è°ƒç”¨å…¥å£å‚æ•°å‚è€ƒcåŸå‹
 
 
 
-//¶¨Òåºê
+//å®šä¹‰å®
 mTM_SetTimer       macro
 MOV 				 R11, #APINO_TM_SetTimer
 ECALL  		RSTSYSAPI

@@ -24,9 +24,9 @@ stmt  level    source
    13           * \brief    .
    14           * \author   dengtaiping
    15           * \par      GENERAL DESCRIPTION:
-   16           *               usb、AUDIO等模块初始化
+   16           *               usb銆丄UDIO绛夋ā鍧楀垵濮嬪寲
    17           * \par      EXTERNALIZED FUNCTIONS:
-   18           *               这里描述调用到外面的模块
+   18           *               杩欓噷鎻忚堪璋冪敤鍒板闈㈢殑妯″潡
    19           *
    20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
    21           *
@@ -120,9 +120,9 @@ stmt  level    source
   107   1          clear_fir_rds_ram();
   108   1          DAC_CH0_SR_CTL = (DAC_CH0_SR_CTL&0xf8)|SrcType;
   109   1      
-  110   1          //DAC_CH0_SRFT_CTL1 = 0x24; //48M配置不会断音
+  110   1          //DAC_CH0_SRFT_CTL1 = 0x24; //48M閰嶇疆涓嶄細鏂煶
   111   1          //DAC_CH0_SRFT_CTL2 = 0x00;
-  112   1          DAC_CH0_SRFT_CTL1 = 0x20;  //52M配置不会断音
+  112   1          DAC_CH0_SRFT_CTL1 = 0x20;  //52M閰嶇疆涓嶄細鏂煶
   113   1          DAC_CH0_SRFT_CTL2 = 0x00;
   114   1         
   115   1          DAC_CH0_SRFT_CTL3 = 0x20;
@@ -166,7 +166,7 @@ stmt  level    source
   151          /******************************************************************************/
   152          /*!
   153           * \par  Description:
-  154           *     ADC、DAC init.
+  154           *     ADC銆丏AC init.
   155           * \param[in]    none.
   156           * \param[out]   none.
   157           * \return       none
@@ -298,7 +298,7 @@ stmt  level    source
   279   1          DAC_ANALOG0 |= 0x10;
   280   1          PA_APCTL |= 0x02;
   281   1          DAC_ANALOG0 &= 0xf7;
-  282   1          DDV_CTL0 |= 0x10;    //全能直驱
+  282   1          DDV_CTL0 |= 0x10;    //鍏ㄨ兘鐩撮┍
   283   1      //      DDV_CTL0 = 0xf7;
   284   1          pa_volume_bak = PA_VOLUME;
   285   1          PA_VOLUME = 0x06;
@@ -328,7 +328,7 @@ stmt  level    source
   309          /*
   310           ********************************************************************************
   311           *                           OTG_PHY_Setting
-  312           * Description : USB PHY设置
+  312           * Description : USB PHY璁剧疆
   313           * Arguments   : d: address; e: value.
   314           * Returns     : none
   315           * Notes       : FPGA version, Just for GL6005 PHY setting.
@@ -410,10 +410,10 @@ stmt  level    source
 
   388   1          muram_addr = MemBankCtl & 0x08; //save MURAM_ADDR
   389   1          MemBankCtl |= 0x08;
-  390   1          MEMCLKENCTL0 |= 0xcb;//0x8b; //enable pcmram、fir_rds_ram、uram 、fir_mpx_ram clock
+  390   1          MEMCLKENCTL0 |= 0xcb;//0x8b; //enable pcmram銆乫ir_rds_ram銆乽ram 銆乫ir_mpx_ram clock
   391   1          MEMCLKSELCTL0 &= 0x3c; //0xfc; //link fir_mpx_ram to cpu clock
   392   1          MEMCLKSELCTL1 &= 0x70;
-  393   1          MEMCLKSELCTL1 |= 0x87;//0x80;//0x03;//0x84;//0x87;//0x8c;//link fir_rds_ram、uram to uram_clock,  lin
+  393   1          MEMCLKSELCTL1 |= 0x87;//0x80;//0x03;//0x84;//0x87;//0x8c;//link fir_rds_ram銆乽ram to uram_clock,  lin
              -k pcmram to cpu clock
   394   1          CLKENCTL1 |= 0x40; //enable usb clock
   395   1          CLKENCTL2 |= 0x20; //enable dma clock

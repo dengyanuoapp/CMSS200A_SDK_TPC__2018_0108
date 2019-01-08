@@ -13,9 +13,9 @@
  * \brief
  * \author   wanghaijing
  * \par      GENERAL DESCRIPTION:
- *               ÕâÀï¶ÔÎÄ¼ş½øĞĞÃèÊö
+ *               è¿™é‡Œå¯¹æ–‡ä»¶è¿›è¡Œæè¿°
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
  *
@@ -106,9 +106,9 @@ const uint8 dac_vol[MAX_VOl_NUM] =
 };
 
 usound_param ud_param =
-//{SAMPLE_96K, SAMPLE_48K, BIT_DEPTH16}; //ÏÂ´«98k, ÉÏ´«48k, Î»Éî24
-//{SAMPLE_96K, SAMPLE_48K, BIT_DEPTH24}; //ÏÂ´«98k, ÉÏ´«48k, Î»Éî24
-{SAMPLE_48K,SAMPLE_48K,BIT_DEPTH24}; //ÏÂ´«48k, ÉÏ´«48k, Î»Éî16
+//{SAMPLE_96K, SAMPLE_48K, BIT_DEPTH16}; //ä¸‹ä¼ 98k, ä¸Šä¼ 48k, ä½æ·±24
+//{SAMPLE_96K, SAMPLE_48K, BIT_DEPTH24}; //ä¸‹ä¼ 98k, ä¸Šä¼ 48k, ä½æ·±24
+{SAMPLE_48K,SAMPLE_48K,BIT_DEPTH24}; //ä¸‹ä¼ 48k, ä¸Šä¼ 48k, ä½æ·±16
 
 int16 main(int16 para)
 {
@@ -123,7 +123,7 @@ int16 main(int16 para)
     g_PAOpenFlag = 0x00;
     //    LEDClearScreen();
     //    LEDPuts(NUMBER1, p_device_name, 1);
-    //×¢Ïú¿¨²å°Î¼ì²â¶¨Ê±Æ÷, ±ÜÃâÔÓÒô
+    //æ³¨é”€å¡æ’æ‹”æ£€æµ‹å®šæ—¶å™¨, é¿å…æ‚éŸ³
     //CardSetParam(0x01, 100, CARD_UNDEC);
 
     read_var();
@@ -138,15 +138,15 @@ int16 main(int16 para)
 //    TM_DelayMS(200);
 
 start_check_usound:
-    if(usound_init(&ud_param) == 0)  //AP³õÊ¼»¯
+    if(usound_init(&ud_param) == 0)  //APåˆå§‹åŒ–
     {
         usound_exit();
         //        DisablePA();
-        //ÖØĞÂ¹Ò¿¨²å°Î¼ì²â¶¨Ê±Æ÷
+        //é‡æ–°æŒ‚å¡æ’æ‹”æ£€æµ‹å®šæ—¶å™¨
         //CardSetParam(0x01, 100, CARD_DEC);
         return RESULT_NULL;//RESULT_MUSIC;
     }
-    // ChangeVolume();	 //ÉèÖÃÄ¬ÈÏÒôÁ¿Öµ
+    // ChangeVolume();	 //è®¾ç½®é»˜è®¤éŸ³é‡å€¼
 //	SetPAVolume_LR(dac_vol[g_comval.volume], dac_vol[g_comval.volume]);
     OutPutVolume(g_comval.volume);
     //~~~~~~~~~~~~~~~~~~~~~
@@ -157,14 +157,14 @@ start_check_usound:
 	TM_KillTimer(key_timer_id);
     usound_exit();
     //  DisablePA();
-    VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval)); //»ØĞ´ÒôÁ¿ÖµµÈĞÅÏ¢
+    VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval)); //å›å†™éŸ³é‡å€¼ç­‰ä¿¡æ¯
     VMWrite(&g_record_vars, VM_AP_AMV, sizeof(record_vars_t));
 
 	if(g_result==RESULT_MAIN)
 	{
 		goto start_check_usound;
 	}
-    //ÖØĞÂ¹Ò¿¨²å°Î¼ì²â¶¨Ê±Æ÷
+    //é‡æ–°æŒ‚å¡æ’æ‹”æ£€æµ‹å®šæ—¶å™¨
     //CardSetParam(0x01, 100, CARD_DEC);
     if(g_result != RESULT_STANDBY)
     {
@@ -202,7 +202,7 @@ void read_var(void)
     result = VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval));
     //ASSERT(result);
 
-    //Usound Â¼ÒôËùÓÃVRAMÇø
+    //Usound å½•éŸ³æ‰€ç”¨VRAMåŒº
     result = VMRead(&g_record_vars, VM_AP_AMV, sizeof(g_record_vars));
     if ((FALSE == result) || (g_record_vars.maigc != MAGIC_RECORD))
     {
@@ -251,9 +251,9 @@ void us_open_pa(void)
 
 /*===========================================
  functions: OutPutVolume(int vol)
- input:    int vol: ÒªÊä³öµÄÒôÁ¿
+ input:    int vol: è¦è¾“å‡ºçš„éŸ³é‡
  output:  void
- ¹¦ÄÜ£º °ÑÒôÁ¿ÖµËÍµ½IO¿Ú£¬
+ åŠŸèƒ½ï¼š æŠŠéŸ³é‡å€¼é€åˆ°IOå£ï¼Œ
  ============================================*/
 void OutPutVolume(uint8 vol)
 {

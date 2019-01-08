@@ -16,14 +16,14 @@ key_init{RPrefix}:
 	ORL     R11,#0a0h  
 	mov     PMUADC_CTL,	R11			 //enable LRADC1,ADC FREQUENCY 128Hz
 	nop		
-	LCALL	delay					//enable LRADC1ºóÐèÒªµÈ´ý×î³¤10ms²ÅÄÜ¶Á³öÕýÈ·µÄÊý¾Ý£¬·ñÔò¿ÉÄÜÊÇÈ«0¡£
+	LCALL	delay					//enable LRADC1åŽéœ€è¦ç­‰å¾…æœ€é•¿10msæ‰èƒ½è¯»å‡ºæ­£ç¡®çš„æ•°æ®ï¼Œå¦åˆ™å¯èƒ½æ˜¯å…¨0ã€‚
    
 	MOV		SFR_BANK, #BANK_PMU
 	MOV		R11,	SYSTEM_CTL_RTCVDD		
 	ANL		R11,	#0x3f
-	MOV		SYSTEM_CTL_RTCVDD,	R11			//ÉèÖÃplay°´¼üÊ±¼ä=2S
+	MOV		SYSTEM_CTL_RTCVDD,	R11			//è®¾ç½®playæŒ‰é”®æ—¶é—´=2S
 
- 	MOV		WR6,#WORD0(key_scan{RPrefix})	//ÉèÖÃRTCÖÐ¶Ïº¯ÊýÈë¿Ú 
+ 	MOV		WR6,#WORD0(key_scan{RPrefix})	//è®¾ç½®RTCä¸­æ–­å‡½æ•°å…¥å£ 
     MOV		R11,#02h
     mTM_SetTimer 
     MOV		R11,#01h

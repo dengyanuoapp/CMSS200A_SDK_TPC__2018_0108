@@ -21,25 +21,25 @@
 #include  "ui_res.h"
 #include "actos.h"
 
-//¶¨Òå´íÎóĞÅÏ¢¿òÏÔÊ¾Î»ÖÃ
+//å®šä¹‰é”™è¯¯ä¿¡æ¯æ¡†æ˜¾ç¤ºä½ç½®
 #define PIC_MESSAGEBOX_X   9
 #define PIC_MESSAGEBOX_Y  38
 
 #define PIC_CARDERR_X      9
 #define PIC_CARDERR_Y     32
-// ¶¨ÒåÃ¿Ò»ÖÖÀàĞÍµÄ×î´óÎÄ¼şÀ©Õ¹ÃûµÄ¸öÊı
+// å®šä¹‰æ¯ä¸€ç§ç±»å‹çš„æœ€å¤§æ–‡ä»¶æ‰©å±•åçš„ä¸ªæ•°
 #define  MUSIC_EXT_COUNT        4
 #define  VOICE_EXT_COUNT        2
 #define  DSC_EXT_COUNT            2
 #define  NEW_MAX_FILE_NUM        999
 
-// LCDÆÁÓĞ¹ØµÄ¶¨Òå
-// LCD·Ö±æÂÊµÄ¶¨Òå, ËùÓĞ¿Ø¼şµÄ²¼¾ÖÓÉÒÔÏÂÁ½¸ö²ÎÊıÈ·¶¨
-// ¶¨ÒåÆÁÄ»µÄ¸ß¶ÈºÍ¿í¶È.
+// LCDå±æœ‰å…³çš„å®šä¹‰
+// LCDåˆ†è¾¨ç‡çš„å®šä¹‰, æ‰€æœ‰æ§ä»¶çš„å¸ƒå±€ç”±ä»¥ä¸‹ä¸¤ä¸ªå‚æ•°ç¡®å®š
+// å®šä¹‰å±å¹•çš„é«˜åº¦å’Œå®½åº¦.
 #define  LCD_WIDTH            Display_Length
 #define  LCD_HIGH             Display_Height
 
-// ×Ö¿â,ÏÔÊ¾¸ß¶ÈµÄ¶¨Òå
+// å­—åº“,æ˜¾ç¤ºé«˜åº¦çš„å®šä¹‰
 #define  CN_CHAR_WIDTH            16
 //#define  LARGE_CHAR_HEIGHT        16
 //#define  LARGE_CHAR_WIDTH        8
@@ -47,15 +47,15 @@
 //#define  CHAR_WIDTH                 6
 //#define        TCHAR_WIDTH        8
 
-// ¶¨ÒåÖĞÓ¢ÎÄĞĞµÄ¸ß¶È
+// å®šä¹‰ä¸­è‹±æ–‡è¡Œçš„é«˜åº¦
 #define  ROW_EN_HEIGHT            10
 #define  ROW_CN_HEIGHT            18
 
-// ×ÖÌåÈ«Í¸Ã÷
+// å­—ä½“å…¨é€æ˜
 #define  CLARITY            0xff
 #define  NOCLARITY            0x0
 
-// ²Ëµ¥Í·¿Ø¼şÓĞ¹ØµÄ¶¨Òå
+// èœå•å¤´æ§ä»¶æœ‰å…³çš„å®šä¹‰
 typedef struct
 {
     uint16 title;
@@ -63,46 +63,46 @@ typedef struct
     uint8 menu_grade[3]; // "1-1-1"
 } menuhead_t;
 
-//ÏÂÃæ²ÎÊıÓÃ define
-#define  MENU_HEAD_HIGH        19          //²Ëµ¥Í·¿Ø¼şµÄ¸ß¶È
-#define  MENU_HEAD_WIDTH       LCD_WIDTH  //²Ëµ¥Í·¿Ø¼şµÄ¿í¶È
-#define  MENU_HEAD_S_POS_X     255        //×Ö·û´®ÆğÊ¼×ø±ê
+//ä¸‹é¢å‚æ•°ç”¨ define
+#define  MENU_HEAD_HIGH        19          //èœå•å¤´æ§ä»¶çš„é«˜åº¦
+#define  MENU_HEAD_WIDTH       LCD_WIDTH  //èœå•å¤´æ§ä»¶çš„å®½åº¦
+#define  MENU_HEAD_S_POS_X     255        //å­—ç¬¦ä¸²èµ·å§‹åæ ‡
 #define  MENU_HEAD_S_POS_Y     130
-#define  MENU_HEAD_G_POS_Y     ((MENU_HEAD_HIGH-CHAR_HEIGHT-1)/2) // ²Ëµ¥¼¶±ğ×ø±ê
-//´íÎó±¨¾¯¿ò¿Ø¼ş
-#define  MSG_WIDTH            100    // ¸ÃÖµ±ØĞëĞ¡ÓÚLCD_WIDTH, ´óÓÚ80
-#define  MSG_HIGH             60    //¸ÃÖµ±ØĞëĞ¡ÓÚLCD_HIGH, ´óÓÚ30
+#define  MENU_HEAD_G_POS_Y     ((MENU_HEAD_HIGH-CHAR_HEIGHT-1)/2) // èœå•çº§åˆ«åæ ‡
+//é”™è¯¯æŠ¥è­¦æ¡†æ§ä»¶
+#define  MSG_WIDTH            100    // è¯¥å€¼å¿…é¡»å°äºLCD_WIDTH, å¤§äº80
+#define  MSG_HIGH             60    //è¯¥å€¼å¿…é¡»å°äºLCD_HIGH, å¤§äº30
 #define  MSG_POS_X            ((LCD_WIDTH - MSG_WIDTH)/2)
 #define  MSG_POS_Y            ((LCD_HIGH - MSG_HIGH)/2)
 #define  MSG_RIGHT            (MSG_POS_X + MSG_WIDTH)
 #define  MSG_BOTTOM           (MSG_POS_Y + MSG_HIGH)
 #define  MSG_STR_Y            ((LCD_HIGH - 12)/2)
-//#define  menuhead_high_def        19        // ²Ëµ¥Í·¿Ø¼şµÄ¸ß¶È
-//#define  menuhead_width_def        LCD_WIDTH      // ²Ëµ¥Í·¿Ø¼şµÄ¿í¶È
-#define  MENUHEAD_S_POS_X_DEF        255        // ×Ö·û´®ÆğÊ¼×ø±ê
+//#define  menuhead_high_def        19        // èœå•å¤´æ§ä»¶çš„é«˜åº¦
+//#define  menuhead_width_def        LCD_WIDTH      // èœå•å¤´æ§ä»¶çš„å®½åº¦
+#define  MENUHEAD_S_POS_X_DEF        255        // å­—ç¬¦ä¸²èµ·å§‹åæ ‡
 #define  MENUHEAD_S_POS_Y_DEF        110
-//#define  menuhead_g_pox_y_def        ((menuhead_high_def - CHAR_HEIGHT - 1) / 2)    // ²Ëµ¥¼¶±ğ×ø±ê
-// ´íÎó±¨¾¯¿ò¿Ø¼ş
+//#define  menuhead_g_pox_y_def        ((menuhead_high_def - CHAR_HEIGHT - 1) / 2)    // èœå•çº§åˆ«åæ ‡
+// é”™è¯¯æŠ¥è­¦æ¡†æ§ä»¶
 
-//#define  msg_width_def            100    // ¸ÃÖµ±ØĞëĞ¡ÓÚLCD_WIDTH, ´óÓÚ80
-//#define  msg_high_def            60    //¸ÃÖµ±ØĞëĞ¡ÓÚLCD_HIGH, ´óÓÚ30
+//#define  msg_width_def            100    // è¯¥å€¼å¿…é¡»å°äºLCD_WIDTH, å¤§äº80
+//#define  msg_high_def            60    //è¯¥å€¼å¿…é¡»å°äºLCD_HIGH, å¤§äº30
 //#define  msg_pox_x_def            ((LCD_WIDTH - msg_width_def) / 2)
 //#define  msg_pox_y_def            ((LCD_HIGH - msg_high_def) / 2)
 //#define  msg_right_def            (msg_pox_x_def + msg_width_def)
 //#define  msg_bottom_def            (msg_pox_y_def + msg_high_def)
 //#define  msg_str_y_def            (LCD_HIGH-12) / 2
 
-//ÆÕÍ¨²Ëµ¥¿Ø¼ş(Ò»¼¶)
+//æ™®é€šèœå•æ§ä»¶(ä¸€çº§)
 /*
 typedef struct
 {
-    uint16 total; //×Ü¹²ÓĞ¼¸¸öitem
-    uint16 active; //»î¶¯×´Ì¬µÄ±àºÅ
-    const uint16 *title; //×Ö·û´®id Êı×é
+    uint16 total; //æ€»å…±æœ‰å‡ ä¸ªitem
+    uint16 active; //æ´»åŠ¨çŠ¶æ€çš„ç¼–å·
+    const uint16 *title; //å­—ç¬¦ä¸²id æ•°ç»„
     uint8 grade[3];
 } function_menu_t;
 */
-//ÏÂÃæ²ÎÊıÓÃ define
+//ä¸‹é¢å‚æ•°ç”¨ define
 #define  MENU_PTR_X_DEF  0
 #define  MENU_STR_X_DEF       20
 #define  MENU_BCK_X_DEF       0    //menu_str_x_def-4
@@ -110,14 +110,14 @@ typedef struct
 //#define  menu_ASCIIlength    12
 #define  MENU_HEAD_X_DEF       0
 #define  MENU_HEAD_Y_DEF       128
-//ÏÂÃæ²ÎÊıÓÃ define
+//ä¸‹é¢å‚æ•°ç”¨ define
 #define  MENU_PTR_X         10
 #define  MENU_STR_X         32
 #define  MENU_BCK_X         9    //menu_str_x_def-4
 //#define  MENU_BCK_WIDTH     76
 #define  MENU_ASCII_LENGTH  12
 
-//½ø¶ÈÌõ¿Ø¼ş
+//è¿›åº¦æ¡æ§ä»¶
 
 typedef struct
 {
@@ -127,37 +127,37 @@ typedef struct
     uint16 value;
 } progress_t;
 
-//ÏÂÃæ²ÎÊıÓÃ define
-#define  PROGRESS_HEIGHT     10      //»¬¶¯¸ËµÄ¸ß¶ÈÏóËØ¸öÊı
+//ä¸‹é¢å‚æ•°ç”¨ define
+#define  PROGRESS_HEIGHT     10      //æ»‘åŠ¨æ†çš„é«˜åº¦è±¡ç´ ä¸ªæ•°
 #define  PROGRESS_WIDTH      (LCD_WIDTH / 4 * 3)
 #define  PROGRESS_POS_Y      6
 
-//»¬¶¯¸Ë¿Ø¼ş
+//æ»‘åŠ¨æ†æ§ä»¶
 typedef struct
 {
     int16 min;
     int16 max;
     int16 value;
-    uint16 step; //²½³¤,Ã¿´Î+/-µÄÖµ
-    uint8 check_disk; //ÊÇ·ñĞèÒª´¦Àí¿¨»òuÅÌÏûÏ¢±ê¼Ç
+    uint16 step; //æ­¥é•¿,æ¯æ¬¡+/-çš„å€¼
+    uint8 check_disk; //æ˜¯å¦éœ€è¦å¤„ç†å¡æˆ–uç›˜æ¶ˆæ¯æ ‡è®°
 } slider_t;
 
-//ºá»¬¶¯¸ËÏÂÃæ²ÎÊıÓÃ define
-//#define  slider_high_def              19          //¶¨Òå»¬¶¯¸ËµÄ¸ß¶ÈÏóËØ¸öÊı
+//æ¨ªæ»‘åŠ¨æ†ä¸‹é¢å‚æ•°ç”¨ define
+//#define  slider_high_def              19          //å®šä¹‰æ»‘åŠ¨æ†çš„é«˜åº¦è±¡ç´ ä¸ªæ•°
 #define  SLIDER_WIDTH_DEF           120-28
 #define  SLIDER_POX_X_DEF           14
 #define  SLIDER_POX_Y_DEF           44
 #define  SLIDER_CURSOR_Y_DEF      44
 
-// Êú»¬¶¯¸Ë
+// ç«–æ»‘åŠ¨æ†
 //#define  slider_pic_width_def        76
 //#define  slider_pic_height_def       60
 
-//ÏÂÃæ²ÎÊıÓÃ define
+//ä¸‹é¢å‚æ•°ç”¨ define
 //#define  list_str_x_def       4
 //#define  list_str_y_def        (LCD_HIGH-18)
 
-// ÎÄ¼şä¯ÀÂÆ÷
+// æ–‡ä»¶æµç¼†å™¨
 //#define  explorer_head_str_x_def        2
 //#define  explorer_head_str_y_def    112
 #define  EXPLORER_PIC_X_DEF             0
@@ -166,15 +166,15 @@ typedef struct
 #define  EXPLORER_ROW_COUNT_DEF         5
 //#define  explorer_str_len_def        ((LCD_WIDTH - explorer_str_x_def) / (LARGE_CHAR_WIDTH * 2) * 2)
 
-// ÎÄ¼şä¯ÀÂÉ¾³ıÆ÷µÄÀàĞÍ
-#define     EXPLORE_ALL            1    // º¬ÓĞÖ¸¶¨ÎÄ¼şÀàĞÍµÄÒ»¼¶Ä¿Â¼ºÍÎÄ¼ş.
-#define     EXPLORE_DIR            2    // º¬ÓĞÖ¸¶¨ÎÄ¼şÀàĞÍµÄÒ»¼¶Ä¿Â¼
-#define     EXPLORE_FILE        3    // ¸ùÄ¿Â¼ÏÂÖ¸¶¨ÎÄ¼şÀàĞÍµÄÎÄ¼ş
-#define     SEL_DIR_ONLY        4    // ËùÓĞÒ»¼¶Ä¿Â¼
-#define            DEL_JPG        8        // É¾³ıÍ¼ÏóÎÄ¼ş
-#define            DEL_MUSIC        9        // É¾³ıÒôÀÖÎÄ¼ş
-#define            DEL_VOICE        10        // É¾³ıÂ¼ÒôÎÄ¼ş
-#define            DEL_ALL            11    // É¾³ıËùÓĞÎÄ¼ş.
+// æ–‡ä»¶æµç¼†åˆ é™¤å™¨çš„ç±»å‹
+#define     EXPLORE_ALL            1    // å«æœ‰æŒ‡å®šæ–‡ä»¶ç±»å‹çš„ä¸€çº§ç›®å½•å’Œæ–‡ä»¶.
+#define     EXPLORE_DIR            2    // å«æœ‰æŒ‡å®šæ–‡ä»¶ç±»å‹çš„ä¸€çº§ç›®å½•
+#define     EXPLORE_FILE        3    // æ ¹ç›®å½•ä¸‹æŒ‡å®šæ–‡ä»¶ç±»å‹çš„æ–‡ä»¶
+#define     SEL_DIR_ONLY        4    // æ‰€æœ‰ä¸€çº§ç›®å½•
+#define            DEL_JPG        8        // åˆ é™¤å›¾è±¡æ–‡ä»¶
+#define            DEL_MUSIC        9        // åˆ é™¤éŸ³ä¹æ–‡ä»¶
+#define            DEL_VOICE        10        // åˆ é™¤å½•éŸ³æ–‡ä»¶
+#define            DEL_ALL            11    // åˆ é™¤æ‰€æœ‰æ–‡ä»¶.
 #define        DEL_TXT        12
 #define        DEL_AMV        13    //delete amv file
 // Picture def change
@@ -184,25 +184,25 @@ typedef struct
 {
     //region_t region;
     const uint16 *strid;
-    uint16 total; //²Ëµ¥Ñ¡Ïî¸öÊı
-    uint16 active; //»î¶¯Ïî
-    uint16 headid; //²Ëµ¥±êÌâid
+    uint16 total; //èœå•é€‰é¡¹ä¸ªæ•°
+    uint16 active; //æ´»åŠ¨é¡¹
+    uint16 headid; //èœå•æ ‡é¢˜id
 } pop_up_list_t;
 
 uint16 ui_popup_list(pop_up_list_t *list,  void(*callback)(uint16 value));
-//³É¹¦·µ»Ø0
-// ´íÎó»òºöÂÔ·µ»Ø RESULT_IGNORE
-// ÆäËüÖµÊÇÈÈ¼ü
+//æˆåŠŸè¿”å›0
+// é”™è¯¯æˆ–å¿½ç•¥è¿”å› RESULT_IGNORE
+// å…¶å®ƒå€¼æ˜¯çƒ­é”®
 
-uint16 ui_err_msg(uint16 msgID);//ÏÔÊ¾ºó´ı5Ãë»ò°´ÈÎÒâ¼üÍË³ö
-uint16 ui_show_msg(uint16 msgID);//ÏÔÊ¾ĞÅÏ¢ºóÂíÉÏÍË³ö
-//³É¹¦·µ»Ø0
-// ÆäËüÖµÊÇÈÈ¼ü
+uint16 ui_err_msg(uint16 msgID);//æ˜¾ç¤ºåå¾…5ç§’æˆ–æŒ‰ä»»æ„é”®é€€å‡º
+uint16 ui_show_msg(uint16 msgID);//æ˜¾ç¤ºä¿¡æ¯åé©¬ä¸Šé€€å‡º
+//æˆåŠŸè¿”å›0
+// å…¶å®ƒå€¼æ˜¯çƒ­é”®
 
 //uint16 ui_menu(function_menu_t *menu , const void(*callback)(uint16 value));
-//³É¹¦·µ»Ø0
-// ´íÎó»òºöÂÔ·µ»Ø RESULT_IGNORE
-// ÆäËüÖµÊÇÈÈ¼ü
+//æˆåŠŸè¿”å›0
+// é”™è¯¯æˆ–å¿½ç•¥è¿”å› RESULT_IGNORE
+// å…¶å®ƒå€¼æ˜¯çƒ­é”®
 //uint16 ui_menu2(function_menu_t *menu , const void(*callback)(uint16 value));
 
 
@@ -211,22 +211,22 @@ extern uint16 ui_show_progress(const progress_t *progress);
 
 //int ui_filelist(file_location_t *location, int type, int string_id);
 //int ui_explore(file_location_t *location, int type, int string_id);
-// ÎÄ¼şÂ·¾¶Ö±½Ó·ÅÔÚ locationÀïÃæ
-// ÈçÓĞÈÈ¼ü£¬Ôò·µ»ØÈÈ¼üµÄÖµ
-// ³É¹¦·µ»Ø0
-// ´íÎó»òºöÂÔ·µ»Ø RESULT_IGNORE
+// æ–‡ä»¶è·¯å¾„ç›´æ¥æ”¾åœ¨ locationé‡Œé¢
+// å¦‚æœ‰çƒ­é”®ï¼Œåˆ™è¿”å›çƒ­é”®çš„å€¼
+// æˆåŠŸè¿”å›0
+// é”™è¯¯æˆ–å¿½ç•¥è¿”å› RESULT_IGNORE
 
 
-// ÏÂÃæÊÇÈ«¾Ö±äÁ¿µÄ¶¨Òå
+// ä¸‹é¢æ˜¯å…¨å±€å˜é‡çš„å®šä¹‰
 //extern uint8 file_name[12];
 //extern uint8 dir_name[30];
-//¹öÆÁ²ÎÊı
-//extern uint8 *str_pt;        //×Ö·û´®µ±Ç°Ö¸Õë
-//extern uint8 *strhead_pt;   //×Ö´®Ê×Ö·¼ÇÂ¼
+//æ»šå±å‚æ•°
+//extern uint8 *str_pt;        //å­—ç¬¦ä¸²å½“å‰æŒ‡é’ˆ
+//extern uint8 *strhead_pt;   //å­—ä¸²é¦–å€è®°å½•
 //extern uint8 scroll_cnt;
 
 
-// ÏÂÃæÊÇ¸÷¸ö¿Ø¼şµÄ×Óº¯ÊıµÄ¶¨Òå
+// ä¸‹é¢æ˜¯å„ä¸ªæ§ä»¶çš„å­å‡½æ•°çš„å®šä¹‰
 uint16 rm_dir_from_buf(uint16 n);
 extern uint8 read_idm_data(uint8 *name, uint16 count);
 extern uint8 write_idm_data(uint8 *name, uint16 count);

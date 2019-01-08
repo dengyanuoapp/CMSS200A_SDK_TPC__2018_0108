@@ -6,7 +6,7 @@
  *        (c) Copyright, Actions Co,Ld.
  *             All Right Reserved
  *        History Record:
- 1.È¥µôË¢ĞÂ±³¾°ÏÔÊ¾£¬Ïû³ıËÑÌ¨Ê±µÄ½çÃæÉÁË¸¸Ğ, by Mars,2008-04-15
+ 1.å»æ‰åˆ·æ–°èƒŒæ™¯æ˜¾ç¤ºï¼Œæ¶ˆé™¤æœå°æ—¶çš„ç•Œé¢é—ªçƒæ„Ÿ, by Mars,2008-04-15
  *******************************************************************************
  */
 
@@ -21,7 +21,7 @@ void SaveStation(void);
  ********************************************************************************
  *             void ShowStationCount(uint16 count)
  *
- * Description : ÏÔÊ¾µçÌ¨ºÅ.
+ * Description : æ˜¾ç¤ºç”µå°å·.
  *
  * Arguments   :
  *
@@ -53,7 +53,7 @@ void ShowStationCount(uint8 count)
  ********************************************************************************
  *             void ShowFreqInFM2()
  *
- * Description : ÏÔÊ¾È«×Ô¶¯ËÑÌ¨½çÃæ---ÏÔÊ¾Æµµã
+ * Description : æ˜¾ç¤ºå…¨è‡ªåŠ¨æœå°ç•Œé¢---æ˜¾ç¤ºé¢‘ç‚¹
  *
  * Arguments   :
  *
@@ -90,11 +90,11 @@ void ShowFreqInFM2(void)
  ********************************************************************************
  *             bool Search_Show2(FM_direct_e Direct)
  *
- * Description : ËÑË÷ÏÂÒ»¸öÔÚµçÌ¨±íÖĞÃ»ÓĞµÄĞÂµçÌ¨.
+ * Description : æœç´¢ä¸‹ä¸€ä¸ªåœ¨ç”µå°è¡¨ä¸­æ²¡æœ‰çš„æ–°ç”µå°.
  *
- * Arguments   : Direct,Next»òLastËÑË÷.
+ * Arguments   : Direct,Nextæˆ–Lastæœç´¢.
  *
- * Returns     : TRUE:ËÑµ½ÏÂÒ»¸öĞÂµçÌ¨,FALSE:Ã»ÓĞËÑµ½.
+ * Returns     : TRUE:æœåˆ°ä¸‹ä¸€ä¸ªæ–°ç”µå°,FALSE:æ²¡æœ‰æœåˆ°.
  *
  * Notes       :
  *
@@ -110,7 +110,7 @@ bool Search_Show2(FM_direct_e Direct)
     fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
 
     Search_Flag = fmSendCommand(FM_SEARCH, (void *) &g_FMStatus, (void *) Direct);
-    if (Search_Flag) //ËÑÌ¨³É¹¦ºó£¬MUTEÊÍ·Å
+    if (Search_Flag) //æœå°æˆåŠŸåï¼ŒMUTEé‡Šæ”¾
     {
         AutoTabNum++;
         ShowStationCount(AutoTabNum);
@@ -145,11 +145,11 @@ bool Search_Show2(FM_direct_e Direct)
  ********************************************************************************
  *             bool RestartSearch(uint8 level)
  *
- * Description : ÉèÖÃÃÅÏŞÖµ,ÖØĞÂ¿ªÊ¼ËÑË÷.
+ * Description : è®¾ç½®é—¨é™å€¼,é‡æ–°å¼€å§‹æœç´¢.
  *
- * Arguments   : ÃÅÏŞÖµ
+ * Arguments   : é—¨é™å€¼
  *
- * Returns     : TRUE:¼ÌĞøËÑË÷,FALSE:ÖĞ¶ÏËÑË÷,Õı³£½áÊø.
+ * Returns     : TRUE:ç»§ç»­æœç´¢,FALSE:ä¸­æ–­æœç´¢,æ­£å¸¸ç»“æŸ.
  *
  * Notes       :
  *
@@ -162,7 +162,7 @@ bool RestartSearch(uint8 level)
     {
         return FALSE;
     }
-    fmSendCommand(FM_OPEN, level, NULL); //ÖØĞÂÉèÖÃËÑË÷ÃÅÏŞÖµ£¬¿ªÊ¼ÖØĞÂËÑË÷
+    fmSendCommand(FM_OPEN, level, NULL); //é‡æ–°è®¾ç½®æœç´¢é—¨é™å€¼ï¼Œå¼€å§‹é‡æ–°æœç´¢
 
 #ifndef HARDWARE_SEEK
     fmSendCommand(FM_MID_RESTORE, & radio_param, NULL);
@@ -175,12 +175,12 @@ bool RestartSearch(uint8 level)
  ********************************************************************************
  *             uint16 AutoSearchHandle(uint8 Direct)
  *
- * Description : È«×Ô¶¯ËÑË÷
+ * Description : å…¨è‡ªåŠ¨æœç´¢
  *
- * Arguments   : Direct,Next»òLastËÑË÷.
+ * Arguments   : Direct,Nextæˆ–Lastæœç´¢.
  *
- * Returns     : Èç¹ûÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø½á¹ûÏûÏ¢
- Èç¹ûÃ»ÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø0
+ * Returns     : å¦‚æœæœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›ç»“æœæ¶ˆæ¯
+ å¦‚æœæ²¡æœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›0
  *
  * Notes       :
  *
@@ -197,12 +197,12 @@ uint16 AutoSearchHandle(uint8 Direct)
 
     flag_r = 0;
     AutoTabNum = 0;
-    memset(m_FMStationTab, 0, sizeof(uint16) * MAX_STATION_COUNT); //³õÊ¼»¯AutoSearchËùÓÃÊı×é
+    memset(m_FMStationTab, 0, sizeof(uint16) * MAX_STATION_COUNT); //åˆå§‹åŒ–AutoSearchæ‰€ç”¨æ•°ç»„
 
     g_FMStatus.station = 0;
     g_FMStatus.station_count = 0;
-    backup_freq = g_FMStatus.freq; //±¸·İµ±Ç°Æµµã
-    // USÆµ¶Î
+    backup_freq = g_FMStatus.freq; //å¤‡ä»½å½“å‰é¢‘ç‚¹
+    // USé¢‘æ®µ
     if (g_radio_config.band_mode == Bank_US_Europe)
     {
         if (Direct == SEARCH_NEXT)
@@ -216,7 +216,7 @@ uint16 AutoSearchHandle(uint8 Direct)
             end_freq = USFREQ_MIN;
         }
     }
-    // JPÆµ¶Î
+    // JPé¢‘æ®µ
     else
     {
         if (Direct == SEARCH_NEXT)
@@ -231,13 +231,13 @@ uint16 AutoSearchHandle(uint8 Direct)
         }
     }
 
-    fmSendCommand(FM_MID_SAVE, &radio_param, NULL); //Çå¿Õg_radio_configÖĞµÄÊı¾İ
+    fmSendCommand(FM_MID_SAVE, &radio_param, NULL); //æ¸…ç©ºg_radio_configä¸­çš„æ•°æ®
     charge_pump_onoff(0);
     while (loop)//while(1)
     {
         if (Direct != SEARCH_NULL)
         {
-            if (Direct == SEARCH_NEXT) //NEXTËÑË÷´¦Àí
+            if (Direct == SEARCH_NEXT) //NEXTæœç´¢å¤„ç†
             {
                 g_FMStatus.freq += 1;
                 if ((g_FMStatus.freq >= USFREQ_MAX) && (g_radio_config.band_mode == Bank_US_Europe))
@@ -254,7 +254,7 @@ uint16 AutoSearchHandle(uint8 Direct)
                     break;
                 }
             }
-            else if (Direct == SEARCH_LAST) //LASTËÑË÷´¦Àí
+            else if (Direct == SEARCH_LAST) //LASTæœç´¢å¤„ç†
             {
                 g_FMStatus.freq -= 1;
                 if ((g_FMStatus.freq <= USFREQ_MIN) && (g_radio_config.band_mode == Bank_US_Europe))
@@ -279,7 +279,7 @@ uint16 AutoSearchHandle(uint8 Direct)
                 //  return 0;
             }
         }
-        if (AutoTabNum >= MAX_STATION_COUNT) //ÒÑËÑµ½MAX_STATION_COUNT¸öµçÌ¨,Õı³£ÍË³ö.
+        if (AutoTabNum >= MAX_STATION_COUNT) //å·²æœåˆ°MAX_STATION_COUNTä¸ªç”µå°,æ­£å¸¸é€€å‡º.
         {
             loop = FALSE;
         }
@@ -288,10 +288,10 @@ uint16 AutoSearchHandle(uint8 Direct)
             key = ap_get_message();
             switch (key)
             {
-            case AP_KEY_NEXT | AP_KEY_UP: //NEXTËÑË÷Ê±°´NEXT¼ü£¬Í£Ö¹ËÑË÷
+            case AP_KEY_NEXT | AP_KEY_UP: //NEXTæœç´¢æ—¶æŒ‰NEXTé”®ï¼Œåœæ­¢æœç´¢
                 break;
 
-            case AP_KEY_PREV | AP_KEY_UP: //LASTËÑË÷Ê±°´LAST¼ü£¬Í£Ö¹ËÑË÷
+            case AP_KEY_PREV | AP_KEY_UP: //LASTæœç´¢æ—¶æŒ‰LASTé”®ï¼Œåœæ­¢æœç´¢
                 break;
 
             case AP_KEY_PLAY | AP_KEY_UP:
@@ -313,7 +313,7 @@ uint16 AutoSearchHandle(uint8 Direct)
             case AP_MSG_USB_PLUGIN:
                 break;
 
-            default: //ÈÈ¼ü´¦Àí
+            default: //çƒ­é”®å¤„ç†
                 result = ap_handle_hotkey(key);
                 break;
             }
@@ -324,9 +324,9 @@ uint16 AutoSearchHandle(uint8 Direct)
         }
     }
     charge_pump_onoff(1);
-    if (g_FMStatus.station_count > 0x00) // ÅĞ¶ÏÊÇ·ñËÑË÷µ½µçÌ¨
+    if (g_FMStatus.station_count > 0x00) // åˆ¤æ–­æ˜¯å¦æœç´¢åˆ°ç”µå°
     {
-        /* Ìø×ªµ½µÚÒ»¸öµçÌ¨ */
+        /* è·³è½¬åˆ°ç¬¬ä¸€ä¸ªç”µå° */
         g_FMStatus.freq = m_FMStationTab[0];
         fmSendCommand(FM_SETFREQ, (void *) g_FMStatus.freq, NULL);
         fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
@@ -340,9 +340,9 @@ uint16 AutoSearchHandle(uint8 Direct)
         fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
         fmSendCommand(FM_MID_SAVE, &radio_param, NULL);
     }
-    while (ap_get_message() != AP_KEY_NULL) //Çå³ı×Ô¶¯ËÑÌ¨¹ı³ÌÖĞµÄÏûÏ¢
+    while (ap_get_message() != AP_KEY_NULL) //æ¸…é™¤è‡ªåŠ¨æœå°è¿‡ç¨‹ä¸­çš„æ¶ˆæ¯
     {
-        ClearWatchDog(); //Çå¿ÕÏûÏ¢³Ø
+        ClearWatchDog(); //æ¸…ç©ºæ¶ˆæ¯æ± 
     }
     return result;
 }
@@ -351,7 +351,7 @@ uint16 AutoSearchHandle(uint8 Direct)
  ********************************************************************************
  *             void SaveStation(void)
  *
- * Description : ±£´æËÑË÷µ½µÄµçÌ¨
+ * Description : ä¿å­˜æœç´¢åˆ°çš„ç”µå°
  *
  * Arguments   :
  *
@@ -366,13 +366,13 @@ void SaveStation(void)
 {
     uint8 i;
     uint16 k;
-    fmSendCommand(MC_GETFREQ, (uint16) & k); // ±£´æµçÌ¨
+    fmSendCommand(MC_GETFREQ, (uint16) & k); // ä¿å­˜ç”µå°
     //FMAutoTab[AutoTabNum] = k;
     AutoTabNum++;
     SequenceFreqlist(FMAutoTab, k, AutoTabNum);
     for (i = AutoTabNum; i < 30; i++)
     {
-        if (radio_param.param1[i] == k) // É¾³ıÖØ¸´µÄµçÌ¨.
+        if (radio_param.param1[i] == k) // åˆ é™¤é‡å¤çš„ç”µå°.
 
         {
             radio_param.param1[i] = 0;

@@ -22,7 +22,7 @@ extern uint8 ap_id[MAX_AP_NUM];
 extern bool with_fm;
 extern vm_cfg_t g_modifyval;
 
-extern char report_buf[16]; //存诸播报数据的buffer
+extern char report_buf[16]; //瀛樿鎾姤鏁版嵁鐨刡uffer
 extern info_report_t info;
 
 uint16 near USBDevice(int16 State);

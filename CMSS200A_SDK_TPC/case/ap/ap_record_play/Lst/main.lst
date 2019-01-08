@@ -26,93 +26,93 @@ stmt  level    source
    16          #define DISK_C 0
    17          #define DISK_H 1
    18          
-   19          /********************³£Á¿¶¨Òå***********************/
+   19          /********************å¸¸é‡å®šä¹‰***********************/
    20          
-   21          /******************È«¾Ö±äÁ¿¶¨Òå*********************/
+   21          /******************å…¨å±€å˜é‡å®šä¹‰*********************/
    22          
-   23          //±£ÁôÏî
+   23          //ä¿ç•™é¡¹
    24          //uint8 DiskFlag = 0;
    25          //uint16 near g_rec_event = 0;
    26          
    27          bool show_time = TRUE;
    28          
-   29          /*  µ±Ç°Ä¿Â¼ÏÂÂ¼ÒôÎÄ¼ş×Ü¸öÊı*/
+   29          /*  å½“å‰ç›®å½•ä¸‹å½•éŸ³æ–‡ä»¶æ€»ä¸ªæ•°*/
    30          uint8 near g_file_num;
    31          
-   32          /* ¿ÉÂ¼×ÜÃëÊı*/
+   32          /* å¯å½•æ€»ç§’æ•°*/
    33          uint32 total_sec = 0;
    34          
-   35          /* ÅäÖÃµÄ¿ÉÂ¼ÉÈÇøÊı */
+   35          /* é…ç½®çš„å¯å½•æ‰‡åŒºæ•° */
    36          uint32 total_space_setting = 0;
    37          
-   38          /* µ¥´Î½øÈëÂ¼Òô£¬ÀÛ¼ÆÒÑÂ¼ÉÈÇøÊı */
+   38          /* å•æ¬¡è¿›å…¥å½•éŸ³ï¼Œç´¯è®¡å·²å½•æ‰‡åŒºæ•° */
    39          uint32 total_space_used = 0;
    40          
-   41          /* µ¥¸öÎÄ¼şµÄÉÈÇøÊı */
+   41          /* å•ä¸ªæ–‡ä»¶çš„æ‰‡åŒºæ•° */
    42          uint32 onefile_space = 0;
    43          uint16 near g_rec_event = 0;
    44          
-   45          uint32 near g_free_space; //Ê£Óà´ÅÅÌ¿Õ¼ä//remaining disk space
+   45          uint32 near g_free_space; //å‰©ä½™ç£ç›˜ç©ºé—´//remaining disk space
    46          
-   47          /* µ±Ç°Â¼ÒôÎÄ¼şµÄpageÊı*/
+   47          /* å½“å‰å½•éŸ³æ–‡ä»¶çš„pageæ•°*/
    48          //uint8 near g_total_time[11]; //000:00:00
    49          uint8 near g_now_time[10]; //000:00:00
    50          uint8 near g_file_name_time[16]; //"WAV001 04/01/01"
    51          
-   52          /* µ±Ç°Â¼Òô±ÈÌØÂÊASCILL , ÓÃÓÚÏÔÊ¾*/
+   52          /* å½“å‰å½•éŸ³æ¯”ç‰¹ç‡ASCILL , ç”¨äºæ˜¾ç¤º*/
    53          uint8 near currentBitrate[4];
    54          
    55          record_vars_t near g_record_vars;
-   56          //uint8 near g_rec_from; //µ±Ç°µÄÂ¼ÒôÔ´ by ccm
+   56          //uint8 near g_rec_from; //å½“å‰çš„å½•éŸ³æº by ccm
    57          
-   58          /*  ¿ÉÂ¼Òô×ÜÊ±¼ä*/
+   58          /*  å¯å½•éŸ³æ€»æ—¶é—´*/
 C251 COMPILER V4.55,  main                                                                 23/05/16  10:42:43  PAGE 2   
 
    59          time_t_ext near g_total_time;
-   60          /*  ÊµÊ±ÏÔÊ¾Â¼ÒôµÄÊ±¼ä*/
+   60          /*  å®æ—¶æ˜¾ç¤ºå½•éŸ³çš„æ—¶é—´*/
    61          time_t near g_rec_time;
-   62          /* Â¼Òô×´Ì¬*/
+   62          /* å½•éŸ³çŠ¶æ€*/
    63          wav_rec_status_t rec_stat;
    64          
    65          //resource_t inputSelect =
    66          //{ 0 };
    67          
-   68          /* Â¼Òô²ÎÊı½á¹¹*/
+   68          /* å½•éŸ³å‚æ•°ç»“æ„*/
    69          audio_format_t Rec_format;
    70          //bool unicodeFlagofFolder;
    71          
-   72          /* ÊÇ·ñFM  Â¼Òô*/
+   72          /* æ˜¯å¦FM  å½•éŸ³*/
    73          bool isFmRecord;
-   74          /* ¿Õ¼äÊÇ·ñÒÑÂú*/
+   74          /* ç©ºé—´æ˜¯å¦å·²æ»¡*/
    75          bool overflag;
    76          uint8 avrEnableSave;
    77          //ap_inputSelect_e inputSelSave;
    78          
    79          //uint8 dir_name[30];
    80          
-   81          /* Â¼Òô±ÈÌØÂÊ*/
+   81          /* å½•éŸ³æ¯”ç‰¹ç‡*/
    82          ap_bitrate_e rec_bitrate;
-   83          /* Â¼Òô²ÉÑùÂÊ*/
+   83          /* å½•éŸ³é‡‡æ ·ç‡*/
    84          ap_samplerate_e Rec_Fsrate;
-   85          /* Â¼ÒôÍ¨µÀÊı*/
+   85          /* å½•éŸ³é€šé“æ•°*/
    86          channelnum_t rec_channel;
-   87          /* Ö¸Ïòµ±Ç°Ä¬ÈÏÂ¼ÒôÄ¿Â¼*/
+   87          /* æŒ‡å‘å½“å‰é»˜è®¤å½•éŸ³ç›®å½•*/
    88          const uint8 *g_dir_voice;
    89          
-   90          /* ´ÅÅÌ×´Ì¬bitmap */
+   90          /* ç£ç›˜çŠ¶æ€bitmap */
    91          uint8 g_DiskStateFlag = 0;
    92          
-   93          /* ÊÇ·ñĞèÒªÈ¡Ê£ÓàÈİÁ¿ */
+   93          /* æ˜¯å¦éœ€è¦å–å‰©ä½™å®¹é‡ */
    94          bool need_fetch_space;
    95          
    96          bool card_exist = FALSE;
    97          bool UDisk_exist = FALSE;
-   98          uint8 rec_status;//µ±Ç°Â¼Òô×´Ì¬¡£0-Í£Ö¹×´Ì¬;1-Â¼Òô×´Ì¬;2-ÔİÍ£×´Ì¬
-   99          uint8 need_change_rec_status;//ÊÇ·ñĞèÒª×ª»»Â¼Òô×´Ì¬±êÖ¾
+   98          uint8 rec_status;//å½“å‰å½•éŸ³çŠ¶æ€ã€‚0-åœæ­¢çŠ¶æ€;1-å½•éŸ³çŠ¶æ€;2-æš‚åœçŠ¶æ€
+   99          uint8 need_change_rec_status;//æ˜¯å¦éœ€è¦è½¬æ¢å½•éŸ³çŠ¶æ€æ ‡å¿—
   100          
-  101          //ÄÜÁ¿¼ì²âÅäÖÃÖµ
-  102          uint32 Mval = 200000;//ãĞÖµ£¬½¨ÒéÖµ1024
-  103          uint32 Mblock = 38;//½¨ÒéÖµ60£¬½Ó½ü1Ãë  Mblock=(time*256000/8)/512
+  101          //èƒ½é‡æ£€æµ‹é…ç½®å€¼
+  102          uint32 Mval = 200000;//é˜ˆå€¼ï¼Œå»ºè®®å€¼1024
+  103          uint32 Mblock = 38;//å»ºè®®å€¼60ï¼Œæ¥è¿‘1ç§’  Mblock=(time*256000/8)/512
   104          
   105          uint8 g_disk_char[MAX_DISK_NUM] =
   106          { 'U', 'H', 'M'};
@@ -129,7 +129,7 @@ stmt  level    source
   117          
   118          /*
   119           ********************************************************************************
-  120           * Description : Ê¹ÄÜDAC
+  120           * Description : ä½¿èƒ½DAC
   121           *
   122           * Arguments   : NULL
   123           *
@@ -145,14 +145,14 @@ stmt  level    source
   131          {
   132   1          dac_t dacattr;
   133   1          dacattr.dacselect = 0;
-  134   1          dacattr.rate = FS_44K1;//Ä¬ÈÏ
+  134   1          dacattr.rate = FS_44K1;//é»˜è®¤
   135   1          EnableDAC(&dacattr);
   136   1      
   137   1      }
   138          
   139          /*
   140           ********************************************************************************
-  141           * Description : ¹Ø±ÕÂ¼ÒôÍ¨µÀ
+  141           * Description : å…³é—­å½•éŸ³é€šé“
   142           *
   143           * Arguments   : NULL
   144           *
@@ -172,7 +172,7 @@ stmt  level    source
   158          
   159          /*
   160           ********************************************************************************
-  161           * Description : Record Ó¦ÓÃ²ÎÊı³õÊ¼»¯
+  161           * Description : Record åº”ç”¨å‚æ•°åˆå§‹åŒ–
   162           *
   163           * Arguments   : NULL
   164           *
@@ -191,7 +191,7 @@ stmt  level    source
   177   2              memset(&g_record_vars, 0, sizeof(g_record_vars));
   178   2              g_record_vars.maigc = MAGIC_RECORD;
   179   2              g_record_vars.location.disk = 0;
-  180   2              g_record_vars.rec_source = AP_MICIN;        //Ä¬ÈÏÑ¡ÔñMICÂ¼Òô
+  180   2              g_record_vars.rec_source = AP_MICIN;        //é»˜è®¤é€‰æ‹©MICå½•éŸ³
   181   2      
   182   2              g_record_vars.rec_type = RECORD_FILE_TYPE_WAV;
   183   2              g_record_vars.rec_encode = ENCODE_WAV_PCM;
@@ -211,17 +211,17 @@ stmt  level    source
   195          
   196          /*
   197           ********************************************************************************
-  198           * Description : Record Ó¦ÓÃÈë¿ÚÖ÷º¯Êı
+  198           * Description : Record åº”ç”¨å…¥å£ä¸»å‡½æ•°
   199           *
   200           * Arguments   :
   201           param:
-  202           0, ²»×Ô¶¯¿ªÊ¼Â¼Òô
-  203           1, ×Ô¶¯¿ªÊ¼Â¼Òô
-  204           RESULT_FMREC_NOSTART,  FMÂ¼Òô,   ²»×Ô¶¯¿ªÊ¼
-  205           RESULT_FMREC_START,  FMÂ¼Òô, ×Ô¶¯¿ªÊ¼
+  202           0, ä¸è‡ªåŠ¨å¼€å§‹å½•éŸ³
+  203           1, è‡ªåŠ¨å¼€å§‹å½•éŸ³
+  204           RESULT_FMREC_NOSTART,  FMå½•éŸ³,   ä¸è‡ªåŠ¨å¼€å§‹
+  205           RESULT_FMREC_START,  FMå½•éŸ³, è‡ªåŠ¨å¼€å§‹
   206           *
   207           *
-  208           * Returns     : ½á¹ûÏûÏ¢»ò0
+  208           * Returns     : ç»“æœæ¶ˆæ¯æˆ–0
   209           *
   210           * Notes       :
   211           *
@@ -243,7 +243,7 @@ stmt  level    source
   227   1          LEDClearScreen();
   228   1          LEDPuts(NUMBER2, rec_str, 1);
   229   1      
-  230   1          /* ÅäÖÃÖ»Ö§³ÖNOR FLASH */
+  230   1          /* é…ç½®åªæ”¯æŒNOR FLASH */
   231   1          if(g_comval.SuppNorRec == 1)
   232   1          {
   233   2              g_record_vars.location.disk = 'M';
@@ -260,7 +260,7 @@ stmt  level    source
   244   3              }
   245   2          }
   246   1      
-  247   1          /* Ã»ÓĞÉè±¸ */
+  247   1          /* æ²¡æœ‰è®¾å¤‡ */
   248   1          if(g_record_vars.location.disk == 0)
   249   1          {
   250   2              LEDPuts(NUMBER1, nodevice_str, 1);

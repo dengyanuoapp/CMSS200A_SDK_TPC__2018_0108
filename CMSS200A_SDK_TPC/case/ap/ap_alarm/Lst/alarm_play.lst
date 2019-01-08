@@ -25,16 +25,16 @@ stmt  level    source
    15          #include "ap_common.h"
    16          #include "ui_alarm.h"
    17          
-   18          #define PLAYING_TIME   360  //3·ÖÖÓ
-   19          #define PAUSE_TIME      600//5·ÖÖÓ
-   20          #define MAX_PLAY_TIME 3//×îºó²¥·Å´ÎÊı
+   18          #define PLAYING_TIME   360  //3åˆ†é’Ÿ
+   19          #define PAUSE_TIME      600//5åˆ†é’Ÿ
+   20          #define MAX_PLAY_TIME 3//æœ€åæ’­æ”¾æ¬¡æ•°
    21          #pragma name(ALARM_UI_PLY)
    22          #define ALARMExtNum  6
    23          extern uint8 key;
    24          extern uint8 playing_flag;
    25          extern uint8 need_draw;
    26          extern Music_type_a g_currentMusicType;
-   27          extern uint8 g_TagInfoBuf[92];//ÓÃÓÚ·ÅTAGĞÅÏ¢µÄBUF
+   27          extern uint8 g_TagInfoBuf[92];//ç”¨äºæ”¾TAGä¿¡æ¯çš„BUF
    28          const uint8 Extalarmstr[ALARMExtNum][4] =
    29          {
    30              "MP1", "MP2", "MP3", "WMA", /*"ASF",*/
@@ -73,7 +73,7 @@ stmt  level    source
    61          bool AlarmMusicpSendCommand_bank(BYTE cmd, void *param)
    62          {
    63   1          bool result = FALSE;
-   64   1          //¸ù¾İ²»Í¬µÄÒôÀÖÀàĞÍ·¢²»Í¬µÄÃüÁî
+   64   1          //æ ¹æ®ä¸åŒçš„éŸ³ä¹ç±»å‹å‘ä¸åŒçš„å‘½ä»¤
    65   1          ClearWatchDog();
    66   1          switch (cmd)
    67   1          {
@@ -147,7 +147,7 @@ stmt  level    source
   133   1          return Music_NON;
   134   1      }
   135          
-  136          /* »ñÈ¡Ê×Ö¡Æ«ÒÆ, ±ÜÃâ½«ÎÄ¼şÍ·Ò²½øĞĞ½âÂë, ²úÉúÔÓÒô */
+  136          /* è·å–é¦–å¸§åç§», é¿å…å°†æ–‡ä»¶å¤´ä¹Ÿè¿›è¡Œè§£ç , äº§ç”Ÿæ‚éŸ³ */
   137          void AlarmGetInfo(void)
   138          {
   139   1          ID3Info_t ID3;
@@ -266,7 +266,7 @@ stmt  level    source
   249   4                      playing_count++;
   250   4                      if (playing_flag == 1)
   251   4                      {
-  252   5                          //Èç¹ûÔİÍ£Çé¿öÏÂ£¬Ôò5·ÖÖÓºó¼ÌĞø²¥·Å
+  252   5                          //å¦‚æœæš‚åœæƒ…å†µä¸‹ï¼Œåˆ™5åˆ†é’Ÿåç»§ç»­æ’­æ”¾
   253   5                          if (playing_count >= PAUSE_TIME)
   254   5                          {
   255   6                              playing_flag = 0;
@@ -276,7 +276,7 @@ stmt  level    source
   257   5                      }
   258   4                      else
   259   4                      {
-  260   5                          //²¥·Å×´Ì¬ÏÂ£¬ÃÅÁåÏì3·ÖÖÓºó×Ô¶¯ÍË³ö
+  260   5                          //æ’­æ”¾çŠ¶æ€ä¸‹ï¼Œé—¨é“ƒå“3åˆ†é’Ÿåè‡ªåŠ¨é€€å‡º
   261   5                          if (playing_count >= PLAYING_TIME)
   262   5                          {
   263   6                              playing_count = 0;
@@ -323,7 +323,7 @@ stmt  level    source
   304   4                  }
   305   3                  break;
   306   3              case AP_KEY_PLAY | AP_KEY_UP:
-  307   3              case AP_KEY_MODE | AP_KEY_UP: //È¡ÏûÍË³ö
+  307   3              case AP_KEY_MODE | AP_KEY_UP: //å–æ¶ˆé€€å‡º
   308   3              case AP_KEY_MODE | AP_KEY_LONG:
   309   3                  retval = RESULT_MAIN;
   310   3                  break;
@@ -376,7 +376,7 @@ stmt  level    source
   355   3                  if (status_buf.status == PLAYING_REACH_END)
   356   3                  {
   357   4                      alarm_stop(type);
-  358   4                      //Èç¹ûÃÅÁå²»×ã3·ÖÖÓÊ±£¬Ôò¼ÌĞø´ÓÍ·¿ªÊ¼²¥·Å£¬Ö±µ½3·ÖÖÓÊ±¼äµ½
+  358   4                      //å¦‚æœé—¨é“ƒä¸è¶³3åˆ†é’Ÿæ—¶ï¼Œåˆ™ç»§ç»­ä»å¤´å¼€å§‹æ’­æ”¾ï¼Œç›´åˆ°3åˆ†é’Ÿæ—¶é—´åˆ°
   359   4                      if (playing_count < PLAYING_TIME)
   360   4                      {
   361   5                          playing_flag = 0;

@@ -24,20 +24,20 @@
 
 //#define  DISPLAY_BUFFER_ADDR     0x5800
 
-#define  Color_BLACK_def     0x00000000//ºÚ 
-#define  Color_WHITE_def     0x0000ffff//°× 
-#define  Color_RED_def       0x0000f800//ºì 
-//#define  Color_YELLOW_def    0x0000fff2//»Æ
-#define  Color_YELLOW_def    0x0000e748//»Æ 
-#define  Color_GREEN_def     0x000007e0//ÂÌ 
-#define  Color_BULE_def      0x0000001f//À¶ 
-#define  Color_BULE1_def     0x0000753E//ÉîÀ¶ 
-#define  Color_BULE2_def     0x0000335f//Ç³À¶ 
-#define  Color_MENU_def      0x0000fcc0//³È 
-#define  Color_CYAN_def      0x00008cc1//Çà 
-#define  Color_SAVE_def      0x0000ed80//±£´æ±³¾° 
+#define  Color_BLACK_def     0x00000000//é»‘ 
+#define  Color_WHITE_def     0x0000ffff//ç™½ 
+#define  Color_RED_def       0x0000f800//çº¢ 
+//#define  Color_YELLOW_def    0x0000fff2//é»„
+#define  Color_YELLOW_def    0x0000e748//é»„ 
+#define  Color_GREEN_def     0x000007e0//ç»¿ 
+#define  Color_BULE_def      0x0000001f//è“ 
+#define  Color_BULE1_def     0x0000753E//æ·±è“ 
+#define  Color_BULE2_def     0x0000335f//æµ…è“ 
+#define  Color_MENU_def      0x0000fcc0//æ©™ 
+#define  Color_CYAN_def      0x00008cc1//é’ 
+#define  Color_SAVE_def      0x0000ed80//ä¿å­˜èƒŒæ™¯ 
 
-#define  Color_MUSIC_def     0x00007eaf //0x000014bf//ÒôÀÖÄ£Ê½ÏÂµÄ±³¾°
+#define  Color_MUSIC_def     0x00007eaf //0x000014bf//éŸ³ä¹æ¨¡å¼ä¸‹çš„èƒŒæ™¯
 #define  Color_MUSIC_def1    0x0000092d
 #define  Color_MENU_BAR      0x0000a2a0
 #define  Color_MENU_GRD      0x0000efbf
@@ -51,9 +51,9 @@
 #define  Color_FM_def1       0x0000D759
 
 
-//ÏÂÃæ¸ù¾İ windows »­±ÊÁĞ³öÈçÏÂÑÕÉ«±í
-// Color_tab0106_def ÖĞµÄ 01±íÊ¾±íÖĞµÚ1ĞĞ£¬06±íÊ¾µÚ6ÁĞ
-// ¿É²ÎÕÕ windows »­±ÊµÄÉ«±í
+//ä¸‹é¢æ ¹æ® windows ç”»ç¬”åˆ—å‡ºå¦‚ä¸‹é¢œè‰²è¡¨
+// Color_tab0106_def ä¸­çš„ 01è¡¨ç¤ºè¡¨ä¸­ç¬¬1è¡Œï¼Œ06è¡¨ç¤ºç¬¬6åˆ—
+// å¯å‚ç…§ windows ç”»ç¬”çš„è‰²è¡¨
 #define  Color_tab0101_def   Color_BLACK_def
 #define  Color_tab0102_def   0x00008410
 #define  Color_tab0103_def   0x00008000
@@ -83,8 +83,8 @@
 #define  Color_tab0213_def   0x0000f810
 #define  Color_tab0214_def   0x0000fc08
 
-/*²Ëµ¥¹ö¶¯±³¾°ÑÕÉ« */
-#define Color_BULE_Scroll_def  0x0000001f//ÉîÀ¶ 
+/*èœå•æ»šåŠ¨èƒŒæ™¯é¢œè‰² */
+#define Color_BULE_Scroll_def  0x0000001f//æ·±è“ 
 
 #define SCROLL_REGION_X        30 //45    //30
 #define SCROLL_REGION_Y       110
@@ -92,7 +92,7 @@
 #define SCROLL_REGION_HEIGHT   16
 
 //#define FirstSectionCode    0xa1
-#define DisplayBufLen       1024//ÏÔÊ¾»º³åÇøµÄ´óĞ¡ 
+#define DisplayBufLen       1024//æ˜¾ç¤ºç¼“å†²åŒºçš„å¤§å° 
 
 #define ASCIIDISCODE        0x80
 #define FirstSectionCode    0xa1
@@ -139,7 +139,7 @@
 #define Lcd_widthoffset 1
 #define Lcd_heightoffset 2
 
-//¶¨ÒåÈı¸öË¢ÆÁÏà¹ØbufµÄRAM±êºÅ
+//å®šä¹‰ä¸‰ä¸ªåˆ·å±ç›¸å…³bufçš„RAMæ ‡å·
 #define LCD_RAM_INDEX      0
 #define JPEG_RAM_INDEX     1
 #define MURAM1L_RAM_INDEX  2
@@ -226,24 +226,24 @@
 #define NUM_D  13
 #define NUM_E  14
 #define NUM_F  15
-#define NUM_G  16//ÎŞÓÃ
+#define NUM_G  16//æ— ç”¨
 #define NUM_H  17
 #define NUM_I  18
 #define NUM_J  19
-#define NUM_K  20//ÎŞÓÃ
+#define NUM_K  20//æ— ç”¨
 #define NUM_L  21
-#define NUM_M  22//ÎŞÓÃ
+#define NUM_M  22//æ— ç”¨
 #define NUM_N  23
 #define NUM_O  24
 #define NUM_P  25
 #define NUM_Q  26
 #define NUM_R  27
 #define NUM_S  28
-#define NUM_T  29//ÎŞÓÃ
+#define NUM_T  29//æ— ç”¨
 #define NUM_U  30
-#define NUM_V  31//ÎŞÓÃ
-#define NUM_W  32//ÎŞÓÃ
-#define NUM_X  33//ÎŞÓÃ
+#define NUM_V  31//æ— ç”¨
+#define NUM_W  32//æ— ç”¨
+#define NUM_X  33//æ— ç”¨
 #define NUM_Y  34
 
 #define NUMBER1 S1
@@ -253,16 +253,16 @@
 
 typedef struct
 {
-    COLORREF PenColor;      //»­±ÊºÍ×ÖÌåÑÕÉ«
-    COLORREF BackgdColor;   //±³¾°ÑÕÉ« !!
+    COLORREF PenColor;      //ç”»ç¬”å’Œå­—ä½“é¢œè‰²
+    COLORREF BackgdColor;   //èƒŒæ™¯é¢œè‰² !!
 } DC, *PDC;
 
 typedef struct
 {
-    uchar x;         //ÁĞÎ»ÖÃ
-    uchar y;         //ĞĞÎ»ÖÃ
-    uchar width;     //¿í¶È
-    uchar height;    //¸ß¶È
+    uchar x;         //åˆ—ä½ç½®
+    uchar y;         //è¡Œä½ç½®
+    uchar width;     //å®½åº¦
+    uchar height;    //é«˜åº¦
 } region_t;
 
 
@@ -273,75 +273,75 @@ typedef struct
     uint8 width;
     uint8 height;
 } lcm_size_t;
-//UI_lancfgÓÃÓÚ¶à¹úÓïÑÔ´¦Àí£¬Æä¶¨ÒåÈçÏÂ:
+//UI_lancfgç”¨äºå¤šå›½è¯­è¨€å¤„ç†ï¼Œå…¶å®šä¹‰å¦‚ä¸‹:
 typedef struct
 {
-    uint8 lang_id;//ÓïÖÖ
-    uint8 fontaddrindex;//¸ù¾İÓïÖÖ²éÕÒ×Ö¿âÎ»ÖÃĞ´Èë£¬¹©UIÇı¶¯µ÷ÓÃ
-    uint8 MBTaddrindex;//¸ù¾İÓïÖÖ²éÕÒ×Ö¿âÂë±íÎ»ÖÃĞ´Èë£¬¹©UIÇı¶¯µ÷ÓÃ
+    uint8 lang_id;//è¯­ç§
+    uint8 fontaddrindex;//æ ¹æ®è¯­ç§æŸ¥æ‰¾å­—åº“ä½ç½®å†™å…¥ï¼Œä¾›UIé©±åŠ¨è°ƒç”¨
+    uint8 MBTaddrindex;//æ ¹æ®è¯­ç§æŸ¥æ‰¾å­—åº“ç è¡¨ä½ç½®å†™å…¥ï¼Œä¾›UIé©±åŠ¨è°ƒç”¨
 } UI_lancfg;
 
 
 
 
 
-/**************************³ö´íÏûÏ¢********************************/
-#define  RESULT_PUTCHAR_OK            0//Õı³£Êä³ö 
-#define  RESULT_PUTCHAR_X_ERR         1//XÖá³¬³ö 
-#define  RESULT_PUTCHAR_Y_ERR         2//YÖá³¬³ö 
-#define  RESULT_PUTCHAR_OTHER_ERR     3//ÆäËû´í 
+/**************************å‡ºé”™æ¶ˆæ¯********************************/
+#define  RESULT_PUTCHAR_OK            0//æ­£å¸¸è¾“å‡º 
+#define  RESULT_PUTCHAR_X_ERR         1//Xè½´è¶…å‡º 
+#define  RESULT_PUTCHAR_Y_ERR         2//Yè½´è¶…å‡º 
+#define  RESULT_PUTCHAR_OTHER_ERR     3//å…¶ä»–é”™ 
 
-/**************************Êı¾İ´«ËÍÄ£Ê½¶¨Òå********************************/
-#define  NORTransMode_def  0    //ÓÃÆÕÍ¨µÄ´«ËÍÄ£Ê½ 
-#define  DMATransMode_def  1   //ÓÃDMA´«ËÍÄ£Ê½ 
+/**************************æ•°æ®ä¼ é€æ¨¡å¼å®šä¹‰********************************/
+#define  NORTransMode_def  0    //ç”¨æ™®é€šçš„ä¼ é€æ¨¡å¼ 
+#define  DMATransMode_def  1   //ç”¨DMAä¼ é€æ¨¡å¼ 
 
-/**************************standby mode ¶¨Òå********************************/
-#define  StandbyOFF_def   0     //¹ØÏÔÊ¾ÆÁ 
-#define  StandbyON_def    1    //¿ªÏÔÊ¾ÆÁ 
-#define  UNICODELANGUAGE  0x7f    //×Ö·û×ÊÔ´Îªunicode±àÂëÄ£Ê½  
-#define  NOUNICODELANGUAGE 0x7E      //ÄÚÂë×Ö·û×ÊÔ´Îªunicode±àÂëÄ£Ê½
+/**************************standby mode å®šä¹‰********************************/
+#define  StandbyOFF_def   0     //å…³æ˜¾ç¤ºå± 
+#define  StandbyON_def    1    //å¼€æ˜¾ç¤ºå± 
+#define  UNICODELANGUAGE  0x7f    //å­—ç¬¦èµ„æºä¸ºunicodeç¼–ç æ¨¡å¼  
+#define  NOUNICODELANGUAGE 0x7E      //å†…ç å­—ç¬¦èµ„æºä¸ºunicodeç¼–ç æ¨¡å¼
 #define UNICODEARABICDONTJOIN 3
 #define ISNARABICDONTJOIN  4
 
 //for arabic ligature
 #define  ARABICHASJOIN    -2
-#define  ARABICHASNOJOIN     -3      // arabic Ã»ÓĞÁ¬Ğ´´¦ÀíµÄ±êÖ¾
+#define  ARABICHASNOJOIN     -3      // arabic æ²¡æœ‰è¿å†™å¤„ç†çš„æ ‡å¿—
 #define  COMBOX_RES           0      //
 #define  MB_RES               1      //
 
-/**************************ÓÃÍ¼·½ÏòÄ£Ê½¶¨Òå********************************/
-#define  DrawModeH_def      0  //ºáÏòÓÅÏÈ 
-#define  DrawModeV_def      1  //×İÏòÓÅÏÈ   
-#define  DrawModeHPic_def   2  //¿´Í¼ºáÏòÄ£Ê½ 
-#define  DrawModeVPic_def   3  //¿´Í¼×İÏòÄ£Ê½ 
-#define  DrawModeAvi_def    4  //AVIÄ£Ê½ 
+/**************************ç”¨å›¾æ–¹å‘æ¨¡å¼å®šä¹‰********************************/
+#define  DrawModeH_def      0  //æ¨ªå‘ä¼˜å…ˆ 
+#define  DrawModeV_def      1  //çºµå‘ä¼˜å…ˆ   
+#define  DrawModeHPic_def   2  //çœ‹å›¾æ¨ªå‘æ¨¡å¼ 
+#define  DrawModeVPic_def   3  //çœ‹å›¾çºµå‘æ¨¡å¼ 
+#define  DrawModeAvi_def    4  //AVIæ¨¡å¼ 
 #define  DrawModeJpg_def    5
 #define  DrawModeBMP_def    6
 
-/**************************¹öÆÁÄ£Ê½µÄ¶¨Òå********************************/
-//#define  SCMFull_def    0    //È«ÆÁ¹öÄ£Ê½
-//#define  SCMUp_def      1    //ÉÏÆÁ¹öÄ£Ê½
-//#define  SCMDown_def    2     //ÏÂÆÁ¹öÄ£Ê½
-//#define  SCMMid_def     3    //ÖĞ¼ä¹öÄ£Ê½
+/**************************æ»šå±æ¨¡å¼çš„å®šä¹‰********************************/
+//#define  SCMFull_def    0    //å…¨å±æ»šæ¨¡å¼
+//#define  SCMUp_def      1    //ä¸Šå±æ»šæ¨¡å¼
+//#define  SCMDown_def    2     //ä¸‹å±æ»šæ¨¡å¼
+//#define  SCMMid_def     3    //ä¸­é—´æ»šæ¨¡å¼
 
-/**************************×Ö·ûµÄµãÕóÄ£Ê½********************************/
+/**************************å­—ç¬¦çš„ç‚¹é˜µæ¨¡å¼********************************/
 //#ifdef   UNICODE_SUPPORT
-#define  UnicodeMode      0    //16*16µãÕóÄ£Ê½ 
-#define  PicDisMode       1    //Í¼ĞÎÏÔÊ¾Ä£Ê½ 
+#define  UnicodeMode      0    //16*16ç‚¹é˜µæ¨¡å¼ 
+#define  PicDisMode       1    //å›¾å½¢æ˜¾ç¤ºæ¨¡å¼ 
 
 
-/**************************¶¨Òå3dĞ§¹û********************************/
-#define  D3Normalframe_def  0 //Ö»¼Ó±ß¿ò 
-#define  D3KeyUp_def        1 //Í»³öĞ§¹û 
-#define  D3KeyDown_def      2 //°¼½øĞ§¹û 
+/**************************å®šä¹‰3dæ•ˆæœ********************************/
+#define  D3Normalframe_def  0 //åªåŠ è¾¹æ¡† 
+#define  D3KeyUp_def        1 //çªå‡ºæ•ˆæœ 
+#define  D3KeyDown_def      2 //å‡¹è¿›æ•ˆæœ 
 
-/**************************¶¨Òå3dÍ¼±êĞ§¹ûÑÕÉ«********************************/
-#define  FaceLightColor_def  Color_tab0202_def   //Ïò¹â±ßµÄÑÕÉ« 
-#define  BackLightColor_def  Color_tab0102_def   //±³¹â±ßµÄÑÕÉ« 
-#define  SelectedColor_def   Color_BLACK_def     //±»Ñ¡ÖĞÍ¼Æ¬µÄ±ß¿òÑÕÉ« 
+/**************************å®šä¹‰3då›¾æ ‡æ•ˆæœé¢œè‰²********************************/
+#define  FaceLightColor_def  Color_tab0202_def   //å‘å…‰è¾¹çš„é¢œè‰² 
+#define  BackLightColor_def  Color_tab0102_def   //èƒŒå…‰è¾¹çš„é¢œè‰² 
+#define  SelectedColor_def   Color_BLACK_def     //è¢«é€‰ä¸­å›¾ç‰‡çš„è¾¹æ¡†é¢œè‰² 
 
 
-/**************************¶¨ÒåUNICODE×Ö·û SIZE*****************************/
+/**************************å®šä¹‰UNICODEå­—ç¬¦ SIZE*****************************/
 #define UNICODE_HEIGHT_DEF     16
 #define UNICODE_WIDTH_DEF      16
 #define PUT_UNCHAR       1
@@ -353,7 +353,7 @@ typedef struct
 //api no for case
 
 
-/***************************ledÇı¶¯API½Ó¿Ú******************************/
+/***************************ledé©±åŠ¨APIæ¥å£******************************/
 #define APINO_LEDInit     0x0
 #define APINO_LEDExit    0x01
 #define APINO_LEDDisplay 0x02

@@ -8,7 +8,7 @@ set pspdir=%cd%\..\..\psp_rel\uv2\prj
 
 
 :::::::::::::::::::::::::::::::::::::::
-:: »ñÈ¡UV3Ä¿Â¼
+:: è·å–UV3ç›®å½•
 :::::::::::::::::::::::::::::::::::::::
 @echo checking UV3 dir ......
 @echo off
@@ -20,7 +20,7 @@ echo UV3DIR=%UV3DIR%
 @echo cleaning OPT ......
 
 :::::::::::::::::::::::::::::::::::::::
-:: ÇåÀíOPTÎÄ¼ş
+:: æ¸…ç†OPTæ–‡ä»¶
 :::::::::::::::::::::::::::::::::::::::
  
 cd %prjdir1%
@@ -36,7 +36,7 @@ if exist "%workDir%\buildlist.log" del %workDir%\buildlist.log
 
 
 :::::::::::::::::::::::::::::::::::::::
-:: ÒÀ´Î±àÒë
+:: ä¾æ¬¡ç¼–è¯‘
 :::::::::::::::::::::::::::::::::::::::
 @echo building psp......
 for /f "tokens=*" %%a in (%workDir%\buildpsplist.txt) do (
@@ -58,7 +58,7 @@ del %workDir%\.tmpout
 )
 cd %workDir% 
 :::::::::::::::::::::::::::::::::::::::
-:: ¼ì²é½á¹û
+:: æ£€æŸ¥ç»“æœ
 :::::::::::::::::::::::::::::::::::::::
 @echo check result ......
 @echo off

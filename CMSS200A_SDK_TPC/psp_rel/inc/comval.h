@@ -21,7 +21,7 @@
 
 
 
-//ÒÔÏÂmagicÓÃÓÚÅĞ¶ÏvmÀïµÄÊı¾İÊÇ·ñºÏ·¨,uint16 ÀàĞÍ
+//ä»¥ä¸‹magicç”¨äºåˆ¤æ–­vmé‡Œçš„æ•°æ®æ˜¯å¦åˆæ³•,uint16 ç±»å‹
 #define MAGIC_KVAL              0xdeed
 #define MAGIC_COMVAL            0xdead
 #define MAGIC_MUSIC             0xbeef
@@ -40,29 +40,29 @@
 #define    MAGIC_CFG        0x55aa        //for modify information
 //language id
 #ifdef PC
-#define LAN_ID_SCHINESE        0           //ÖĞÎÄ¼òÌå
-#define LAN_ID_TCHINESE        2           //ÖĞÎÄ·±Ìå
+#define LAN_ID_SCHINESE        0           //ä¸­æ–‡ç®€ä½“
+#define LAN_ID_TCHINESE        2           //ä¸­æ–‡ç¹ä½“
 #endif
-//#define LAN_ID_ENGLISH         1           //Ó¢ÎÄ
-//#define LAN_ID_TCHINESE        2           //ÖĞÎÄ·±Ìå
-//#define LAN_ID_JAPANESE        3           //ÈÕÎÄ
-//#define LAN_ID_KOREAN         4            //º«ÎÄ
-//#define LAN_ID_RUSSIAN         5            //¶íÂŞË¹Óï
-//#define LAN_ID_RABBINIC        6           //Î÷²®À³ÎÄ
-//#define LAN_ID_THAI                7            //Ì©¹úÓï
-//#define LAN_ID_FRENCH             8           //·¨Óï
-//#define LAN_ID_GERMANY           9          //µÂ¹úÓï
-//#define LAN_ID_ITALIAN             10          //Òâ´óÀûÓï
-//#define LAN_ID_DUTCH              11          //ºÉÀ¼Óï
-//#define LAN_ID_PORTUGUESE        12          //ÆÏÌÑÑÀÓï
-//#define LAN_ID_SPANISH             13         //Î÷°àÑÀÓï
-//#define LAN_ID_SWEDISH            14         //ÈğµäÓï
-//#define LAN_ID_CZECHISH           15        //½İ¿ËÓï
-//#define LAN_ID_POLAND             16         //²¨À¼Óï
-//#define LAN_ID_FINNISH             17        //·ÒÀ¼Óï
-//#define LAN_ID_DENISH              18         //µ¤ÂóÓï
-//#define LAN_ID_HUNGARIAN         19         //ĞÙÑÀÀûÓï
-//#define LAN_ID_SLOVAKIAN         20         //Ë¹Âå·¥¿ËÓï
+//#define LAN_ID_ENGLISH         1           //è‹±æ–‡
+//#define LAN_ID_TCHINESE        2           //ä¸­æ–‡ç¹ä½“
+//#define LAN_ID_JAPANESE        3           //æ—¥æ–‡
+//#define LAN_ID_KOREAN         4            //éŸ©æ–‡
+//#define LAN_ID_RUSSIAN         5            //ä¿„ç½—æ–¯è¯­
+//#define LAN_ID_RABBINIC        6           //è¥¿ä¼¯è±æ–‡
+//#define LAN_ID_THAI                7            //æ³°å›½è¯­
+//#define LAN_ID_FRENCH             8           //æ³•è¯­
+//#define LAN_ID_GERMANY           9          //å¾·å›½è¯­
+//#define LAN_ID_ITALIAN             10          //æ„å¤§åˆ©è¯­
+//#define LAN_ID_DUTCH              11          //è·å…°è¯­
+//#define LAN_ID_PORTUGUESE        12          //è‘¡è„ç‰™è¯­
+//#define LAN_ID_SPANISH             13         //è¥¿ç­ç‰™è¯­
+//#define LAN_ID_SWEDISH            14         //ç‘å…¸è¯­
+//#define LAN_ID_CZECHISH           15        //æ·å…‹è¯­
+//#define LAN_ID_POLAND             16         //æ³¢å…°è¯­
+//#define LAN_ID_FINNISH             17        //èŠ¬å…°è¯­
+//#define LAN_ID_DENISH              18         //ä¸¹éº¦è¯­
+//#define LAN_ID_HUNGARIAN         19         //åŒˆç‰™åˆ©è¯­
+//#define LAN_ID_SLOVAKIAN         20         //æ–¯æ´›ä¼å…‹è¯­
 //batt type
 #define BATT_TYPE_ALKALINE    0
 #define BATT_TYPE_NIH        1
@@ -71,17 +71,17 @@
 #ifdef __C251__
 
 //************************************
-//ÏµÍ³¹«¹²±äÁ¿¶¨Òå
+//ç³»ç»Ÿå…¬å…±å˜é‡å®šä¹‰
 //************************************
 typedef struct
 {
     //magic
     uint16 magic;    //"KVAL"
-    //ÏµÍ³ÆğÊ¼Ê±¼ä(°ëÃëÎªµ¥Î»)
-    //ÏµÍ³µ±Ç°µÄÊ±¼äµÈÓÚÏµÍ³ÆğÊ¼Ê±¼ä¼ÓÏµÍ³time counterµÄÊ±¼ä
+    //ç³»ç»Ÿèµ·å§‹æ—¶é—´(åŠç§’ä¸ºå•ä½)
+    //ç³»ç»Ÿå½“å‰çš„æ—¶é—´ç­‰äºç³»ç»Ÿèµ·å§‹æ—¶é—´åŠ ç³»ç»Ÿtime counterçš„æ—¶é—´
     uint32 systemtime;
     uint32 gwtime;
-    int8  rtcresetflag;//Ä¬ÈÏÎªÕı³££¬rtcresetflag=0x00£¬Èç¹ûrtcµôµçrtcresetflag=0x55
+    int8  rtcresetflag;//é»˜è®¤ä¸ºæ­£å¸¸ï¼Œrtcresetflag=0x00ï¼Œå¦‚æœrtcæ‰ç”µrtcresetflag=0x55
 } kval_t;
 
 typedef struct
@@ -89,51 +89,51 @@ typedef struct
     //magic
     uint16 magic;
 
-    //ÏµÍ³ÆğÊ¼Ê±¼ä(°ëÃëÎªµ¥Î»)
-    //ÏµÍ³µ±Ç°µÄÊ±¼äµÈÓÚÏµÍ³ÆğÊ¼Ê±¼ä¼ÓÏµÍ³time counterµÄÊ±¼ä
+    //ç³»ç»Ÿèµ·å§‹æ—¶é—´(åŠç§’ä¸ºå•ä½)
+    //ç³»ç»Ÿå½“å‰çš„æ—¶é—´ç­‰äºç³»ç»Ÿèµ·å§‹æ—¶é—´åŠ ç³»ç»Ÿtime counterçš„æ—¶é—´
     uint32 systemtime;
-    //ÏµÍ³Ê±¼ä±ÈÂÊ
+    //ç³»ç»Ÿæ—¶é—´æ¯”ç‡
     uint16  reserve1;
     //int16 RTCRate;
 
-    //¶Ô±È¶ÈÑ¡Ôñ6~21
+    //å¯¹æ¯”åº¦é€‰æ‹©6~21
     uint8 DisplayContrast;
 
-    //±³¾°µÆÁÁÊ±¼ä,Ä¬ÈÏÖµÎª0ah=5Ãë
+    //èƒŒæ™¯ç¯äº®æ—¶é—´,é»˜è®¤å€¼ä¸º0ah=5ç§’
     uint8 LightTime;
 
-    //standby¶¨Ê±
+    //standbyå®šæ—¶
     uint8 StandbyTime;
 
-    //sleep¶¨Ê±
+    //sleepå®šæ—¶
     uint8 SleepTime;
 
-    //½çÃæÓïÑÔ, ¼òÌå:0, Ó¢ÎÄ:1, ·±Ìå:2
+    //ç•Œé¢è¯­è¨€, ç®€ä½“:0, è‹±æ–‡:1, ç¹ä½“:2
     int8 langid;
 
-    //¸´¶ÁÄ£Ê½
+    //å¤è¯»æ¨¡å¼
     uint8 ReplayMode;
 
-    //Áª»úÄ£Ê½
+    //è”æœºæ¨¡å¼
     uint8 OnlineMode;
 
     uint8 BatteryType;                       //modify by gongee 2004-05-24 09:21
     uint8 FMBuildInFlag;                     //add battery select and fm select flag
 
-    //Â¼ÒôÀàĞÍ,0:ÓïÑÔÂ¼Òô(V-Record),1:ÒôÀÖÂ¼Òô(M-Record). add by ccm 2004-06-08
+    //å½•éŸ³ç±»å‹,0:è¯­è¨€å½•éŸ³(V-Record),1:éŸ³ä¹å½•éŸ³(M-Record). add by ccm 2004-06-08
     uint8 RecordType;
 
-    //±³¹âµÆÑÕÉ«  7Color BackLight. For s2 by ccm
+    //èƒŒå…‰ç¯é¢œè‰²  7Color BackLight. For s2 by ccm
     uint8 BLightColor;
 
-    //bit0~bit1: UdiskĞòÁĞºÅÖ§³Ö:0:no sn; 1:unified sn; 2:random sn;
-    //bit4: UdiskÈÏÖ¤Ä£Ê½Ö§³Ö: 1:½øÈëUdiskÈÏÖ¤Ä£Ê½,Æô¶¯Ê±¼ä¼Ó¿ì,Ö§³ÖsuspendºÍresumeµÈUSBÈÏÖ¤¹¦ÄÜ
+    //bit0~bit1: Udiskåºåˆ—å·æ”¯æŒ:0:no sn; 1:unified sn; 2:random sn;
+    //bit4: Udiskè®¤è¯æ¨¡å¼æ”¯æŒ: 1:è¿›å…¥Udiskè®¤è¯æ¨¡å¼,å¯åŠ¨æ—¶é—´åŠ å¿«,æ”¯æŒsuspendå’Œresumeç­‰USBè®¤è¯åŠŸèƒ½
     int8 udisk_setting;
 
-    uint8 Lightmode;	//0: ±ä°µÄ£Ê½ 1: ±äºÚÄ£Ê½
-    uint8 SuppCard;      //Ö§³Ö¿¨Ñ¡Ôñ  0:²»Ö§³Ö  1:Ö§³Ö
+    uint8 Lightmode;	//0: å˜æš—æ¨¡å¼ 1: å˜é»‘æ¨¡å¼
+    uint8 SuppCard;      //æ”¯æŒå¡é€‰æ‹©  0:ä¸æ”¯æŒ  1:æ”¯æŒ
 
-    uint8 MTPFormatType; //ÔÚMTPÏÂ¸ñÊ½»¯´ÅÅÌÀàĞÍÑ¡Ôñ  0:FAT16  1:FAT32
+    uint8 MTPFormatType; //åœ¨MTPä¸‹æ ¼å¼åŒ–ç£ç›˜ç±»å‹é€‰æ‹©  0:FAT16  1:FAT32
 
 
     uint8 FMTag;
@@ -142,27 +142,27 @@ typedef struct
     //        int8 attenuation_flag;
     //        int16  auto_switchoff_time;
 
-    uint8 SuppKeyTone;           //Ö§³Ö°´¼üÒô
+    uint8 SuppKeyTone;           //æ”¯æŒæŒ‰é”®éŸ³
     uint8 KeyTone;				//add by mzh 2007.3.14 0: no key tone 1:have key tone
-    uint8  BackLightMax;  //±³¹â×î´óÁÁ¶Èµ÷½Ú
-    uint8  BackLightDef;  //Ä¬ÈÏ±³¹âÁÁ¶È
+    uint8  BackLightMax;  //èƒŒå…‰æœ€å¤§äº®åº¦è°ƒèŠ‚
+    uint8  BackLightDef;  //é»˜è®¤èƒŒå…‰äº®åº¦
 
-    uint8  VolumeMax;    //ÒôÁ¿×î´ó¼¶Êıµ÷½Ú
-    uint8 VolumeDef;    //Ä¬ÈÏÒôÁ¿Öµ
-    uint8 ClassDFlag;   //DÀà¹¦·ÅÖ§³Ö
-    uint8 EarphoneFlag; //¶ú»úÖ±ÇıÖ§³Ö
+    uint8  VolumeMax;    //éŸ³é‡æœ€å¤§çº§æ•°è°ƒèŠ‚
+    uint8 VolumeDef;    //é»˜è®¤éŸ³é‡å€¼
+    uint8 ClassDFlag;   //Dç±»åŠŸæ”¾æ”¯æŒ
+    uint8 EarphoneFlag; //è€³æœºç›´é©±æ”¯æŒ
     uint8 RecordGain;
     uint8 RecordTime_max;
-    uint8 volume; //µ±Ç°ÒôÁ¿Êµ¼ÊÖµ
-    uint8 vol_display; //µ±Ç°ÒôÁ¿ÏÔÊ¾Öµ
-    uint8  SuppTTS;     //ÊÇ·ñÖ§³ÖTTS
-    uint8  tts_fun;       //tts²¥±¨¹¦ÄÜ¿ª¹Ø
-    uint8  SuppNorRec;   //NorÂ¼ÒôÖ§³Ö
-    uint8  SuppMuscFav;    //ÒôÀÖÊÕ²Ø¼ĞÖ§³Ö
+    uint8 volume; //å½“å‰éŸ³é‡å®é™…å€¼
+    uint8 vol_display; //å½“å‰éŸ³é‡æ˜¾ç¤ºå€¼
+    uint8  SuppTTS;     //æ˜¯å¦æ”¯æŒTTS
+    uint8  tts_fun;       //ttsæ’­æŠ¥åŠŸèƒ½å¼€å…³
+    uint8  SuppNorRec;   //Norå½•éŸ³æ”¯æŒ
+    uint8  SuppMuscFav;    //éŸ³ä¹æ”¶è—å¤¹æ”¯æŒ
     //        int8 reserve[32-30];
 } comval_t;
 
-//³õÊ¼»¯ comval  µÄºê
+//åˆå§‹åŒ– comval  çš„å®
 #define COMVAL_INIT(val) \
 do{ \
         (val).DisplayContrast = 11; \

@@ -25,7 +25,7 @@
 #include "stringH.h"
 
 #define     MAX_DISK_NUM    3
-//event, 1~8 ÏµÍ³±£Áô, 9~16 ÓÃ»§Ê¹ÓÃ
+//event, 1~8 ç³»ç»Ÿä¿ç•™, 9~16 ç”¨æˆ·ä½¿ç”¨
 #define        AP_EVENT_MAIN        0x0001
 #define        AP_EVENT_STANDBY    0x0002
 #define        AP_EVENT_RECORD        0x0004
@@ -47,22 +47,22 @@
 
 //main ap startup ap id
 #define        RESULT_NULL         0
-#define        RESULT_MUSIC        1             //ÒôÀÖ
-#define        RESULT_MOVIE        7            //µçÓ°
-#define        RESULT_REC_NOSTART  2            //Â¼Òô
-#define        RESULT_CLOCK        8            //Ê±¼äÏÔÊ¾
-#define        RESULT_RADIO        3            //FMÊÕÒô
-#define        RESULT_USBTEST     6            //ÓëPCÍ¨ĞÅ
-#define        RESULT_SYSTEM       4          //ÏµÍ³ÉèÖÃ
-#define        RESULT_READER       12            //µç×ÓÊé
-#define        RESULT_GAME         9           //ÓÎÏ·
-#define        RESULT_TELBOOK      10            //µç»°±¾
-#define        RESULT_BROWSER      11         //ÎÄ¼şä¯ÀÀ
-#define        RESULT_CALENDAR     5         //ÈÕÀú
+#define        RESULT_MUSIC        1             //éŸ³ä¹
+#define        RESULT_MOVIE        7            //ç”µå½±
+#define        RESULT_REC_NOSTART  2            //å½•éŸ³
+#define        RESULT_CLOCK        8            //æ—¶é—´æ˜¾ç¤º
+#define        RESULT_RADIO        3            //FMæ”¶éŸ³
+#define        RESULT_USBTEST     6            //ä¸PCé€šä¿¡
+#define        RESULT_SYSTEM       4          //ç³»ç»Ÿè®¾ç½®
+#define        RESULT_READER       12            //ç”µå­ä¹¦
+#define        RESULT_GAME         9           //æ¸¸æˆ
+#define        RESULT_TELBOOK      10            //ç”µè¯æœ¬
+#define        RESULT_BROWSER      11         //æ–‡ä»¶æµè§ˆ
+#define        RESULT_CALENDAR     5         //æ—¥å†
 #define        RESULT_LINEIN       13         //LINEIN
-#define        RESULT_DATAEXCH 14         //Êı¾İ½»»¥
-//14 - 19Ô¤ÁôÎªĞÂÔöµÄAPµÄ½á¹ûÏûÏ¢
-#define        RESULT_RECORD        20      //Â¼ÒôÈÈ¼üÏûÏ¢
+#define        RESULT_DATAEXCH 14         //æ•°æ®äº¤äº’
+//14 - 19é¢„ç•™ä¸ºæ–°å¢çš„APçš„ç»“æœæ¶ˆæ¯
+#define        RESULT_RECORD        20      //å½•éŸ³çƒ­é”®æ¶ˆæ¯
 #define        RESULT_TESTER        21
 #define        RESULT_STANDBY       22
 #define        RESULT_UPGRADE       23
@@ -92,9 +92,9 @@
 #define        RESULT_VIEW_PLAY         45
 
 //return message id
-#define        RESULT_REDRAW         46    //½çÃæĞèÒªÖØ»­
-#define        RESULT_POWERON        47    //´Óstandby·µ»Ø
-#define        RESULT_IGNORE         48    //¿Ø¼şÈ¡ÏûÑ¡Ôñ
+#define        RESULT_REDRAW         46    //ç•Œé¢éœ€è¦é‡ç”»
+#define        RESULT_POWERON        47    //ä»standbyè¿”å›
+#define        RESULT_IGNORE         48    //æ§ä»¶å–æ¶ˆé€‰æ‹©
 #define        RESULT_SD_IN          49
 #define        RESULT_SD_OUT         50
 #define        RESULT_SYSTEM_ADFU       51
@@ -104,7 +104,7 @@
 #define        RESULT_TIMER             55
 #define        RESULT_FMRECORD_POWERON  56
 #define        RESULT_ALARM_POWERON     57
-#define        RESULT_ALARM             58   //ÄÖÖÓ
+#define        RESULT_ALARM             58   //é—¹é’Ÿ
 #define        RESULT_RETURN_TO_MAIN    59
 #define        RESULT_AUTO_BACK         60
 #define        RESULT_UHOST_OUT         61
@@ -112,7 +112,7 @@
 #define        RESULT_MUSIC_UPLAY       63
 #define	    RESULT_ALARMFM		    64
 
-//user define£¬Ô¤Áô15¸ö
+//user defineï¼Œé¢„ç•™15ä¸ª
 #define        RESULT_USER1             65
 
 #define        USB_disk                 67
@@ -134,7 +134,7 @@
 #define        AP_MSG_RTC                    0xb8
 #define        AP_MSG_STANDBY                0xb9
 #define        AP_MSG_WAIT_TIMEOUT           0xba
-#define        AP_MSG_FORCE_STANDBY          0xbb    //Ç¿ÖÆ¹Ø»ú
+#define        AP_MSG_FORCE_STANDBY          0xbb    //å¼ºåˆ¶å…³æœº
 #define 	   AP_MSG_UH_IN					 MSG_UH_IN
 #define  	   AP_MSG_UH_OUT				 MSG_UH_OUT
 #define		   AP_MSG_FM					 0xbc
@@ -150,14 +150,14 @@
 #define        MSG_USB_STICK_FLAG            0xca
 #define        AP_MSG_USB_PLUGIN_FLAG        0xcb
 
-#define MAX_AP_NUM    4         //µ±Ç°×î´óµÄÓ¦ÓÃ¸öÊı
+#define MAX_AP_NUM    4         //å½“å‰æœ€å¤§çš„åº”ç”¨ä¸ªæ•°
 
 #define MIC_IN_GPIO_INPUT GPIOCINEN
 #define MIC_IN_GPIO_OUTPUT GPIOCOUTEN
 #define MIC_IN_GPIO_DAT  GPIOCDAT
 #define MIC_IN_GPIO_NUM  4
 
-//ÓÃÓÚpaµçÔ´¿ª¹Ø
+//ç”¨äºpaç”µæºå¼€å…³
 #define PA_POWER_GPIO_OUTPUT GPIOBOUTEN
 #define PA_POWER_GPIO_DAT GPIOBDAT
 #define PA_POWER_GPIO_NUM    7
@@ -166,60 +166,60 @@
 typedef struct
 {
     uint8 magic[4]; //'R', 'U', '2', 0x19
-    uint16 counts; //×ÊÔ´µÄ¸öÊı
+    uint16 counts; //èµ„æºçš„ä¸ªæ•°
 } res_head_t; //6 uint8s
 
 
-/*×ÊÔ´ÀàĞÍË÷Òı±íµÄÊı¾İ½á¹¹*/
+/*èµ„æºç±»å‹ç´¢å¼•è¡¨çš„æ•°æ®ç»“æ„*/
 typedef struct
 {
-    uint32 dwOffset; //×ÊÔ´ÄÚÈİË÷Òı±íµÄÆ«ÒÆ
-    uint16 wCount; //×ÊÔ´ÀàĞÍ×ÜÊı
+    uint32 dwOffset; //èµ„æºå†…å®¹ç´¢å¼•è¡¨çš„åç§»
+    uint16 wCount; //èµ„æºç±»å‹æ€»æ•°
     uint8 bItemType; //'P'--PIC Table,'S'--String Table,'X' -- XML File
     uint8 type;
 } res_entry_t;
 
-/*×ÊÔ´ÄÚÈİĞÅÏ¢Ë÷ÒıµÄÊı¾İ½á¹¹*/
+/*èµ„æºå†…å®¹ä¿¡æ¯ç´¢å¼•çš„æ•°æ®ç»“æ„*/
 typedef struct
 {
-    uint32 dwOffset; //Í¼Æ¬Êı¾İÇøÔÚÎÄ¼şÄÚÆ«ÒÆ,4 uint8s
-    uint32 dwLength; //×ÊÔ´³¤¶È, ×î´ó 4G£¬4 uint8s
-    uint8 bType; //×ÊÔ´ÀàĞÍ,0x01--language string ,0x02--PIC
-    uint16 wWidth; //ÈôÊÇÍ¼Æ¬£¬Ôò´ú±íÍ¼Æ¬¿í£¬ÈôÊÇ×Ö·û´®£¬Ôò´ú±íID×ÜÊı
-    uint16 wHeight; //ÈôÊÇÍ¼Æ¬£¬Ôò´ú±íÍ¼Æ¬³¤£¬ÈôÊÇ×Ö·û´®£¬Ôò´ú±í¸ÃÓïÑÔµÄID.
+    uint32 dwOffset; //å›¾ç‰‡æ•°æ®åŒºåœ¨æ–‡ä»¶å†…åç§»,4 uint8s
+    uint32 dwLength; //èµ„æºé•¿åº¦, æœ€å¤§ 4Gï¼Œ4 uint8s
+    uint8 bType; //èµ„æºç±»å‹,0x01--language string ,0x02--PIC
+    uint16 wWidth; //è‹¥æ˜¯å›¾ç‰‡ï¼Œåˆ™ä»£è¡¨å›¾ç‰‡å®½ï¼Œè‹¥æ˜¯å­—ç¬¦ä¸²ï¼Œåˆ™ä»£è¡¨IDæ€»æ•°
+    uint16 wHeight; //è‹¥æ˜¯å›¾ç‰‡ï¼Œåˆ™ä»£è¡¨å›¾ç‰‡é•¿ï¼Œè‹¥æ˜¯å­—ç¬¦ä¸²ï¼Œåˆ™ä»£è¡¨è¯¥è¯­è¨€çš„ID.
 } res_infor_t; //13 uint8s
 
 
-/*¶à¹úÓïÑÔ×ÊÔ´IDË÷Òı±íµÄÊı¾İ½á¹¹*/
+/*å¤šå›½è¯­è¨€èµ„æºIDç´¢å¼•è¡¨çš„æ•°æ®ç»“æ„*/
 typedef struct
 {
-    uint32 dwOffset; // ×Ö·ûIDºÅ¶ÔÓ¦×Ö·û´®±àÂëÔÚÎÄ¼şÄÚµÄÆ«ÒÆ
-    uint16 dwLength; //  ×Ö·û´®³¤¶È.¼´unicode±àÂë×Ö·û´®µÄ×Ö½ÚÊı
+    uint32 dwOffset; // å­—ç¬¦IDå·å¯¹åº”å­—ç¬¦ä¸²ç¼–ç åœ¨æ–‡ä»¶å†…çš„åç§»
+    uint16 dwLength; //  å­—ç¬¦ä¸²é•¿åº¦.å³unicodeç¼–ç å­—ç¬¦ä¸²çš„å­—èŠ‚æ•°
 } res_langid_entry_t; // 6 uint8s
 
 typedef struct
 {
-    uint8 filetype; //ÎÄ¼şÀàĞÍ 0-- Ä¿Â¼  1  ÎÄ¼ş
+    uint8 filetype; //æ–‡ä»¶ç±»å‹ 0-- ç›®å½•  1  æ–‡ä»¶
     char name[12];
     int32 DirEntry;
 } file_record_m;
 
 typedef struct
 {
-    uint16 total; //×Ü¹²ÓĞ¼¸¸öitem
-    uint16 active; //»î¶¯×´Ì¬µÄ±àºÅ
-    const uint16 *string; //×Ö·û´®id Êı×é
-    uint8 check_disk; //ÊÇ·ñĞèÒª´¦Àí¿¨»òuÅÌÏûÏ¢±ê¼Ç
+    uint16 total; //æ€»å…±æœ‰å‡ ä¸ªitem
+    uint16 active; //æ´»åŠ¨çŠ¶æ€çš„ç¼–å·
+    const uint16 *string; //å­—ç¬¦ä¸²id æ•°ç»„
+    uint8 check_disk; //æ˜¯å¦éœ€è¦å¤„ç†å¡æˆ–uç›˜æ¶ˆæ¯æ ‡è®°
 } function_menu_t;
 
 typedef struct
 {
-    uint16 top; //²Ëµ¥ÏîµÄ×î¶¥Ïî
-    uint16 bottom; //²Ëµ¥ÏîµÄ×îµ×Ïî
-    uint16 active; //²Ëµ¥ÏîµÄ¼¤»îÏî
-    uint16 old_active;//²Ëµ¥Ïî¾ÉµÄ¼¤»îÏî
-    uint16 total; //×ÜµÄ²Ëµ¥Ïî
-    uint16 cur_group; //µ±Ç°²Ëµ¥ÏîËù´¦µÄ×é
+    uint16 top; //èœå•é¡¹çš„æœ€é¡¶é¡¹
+    uint16 bottom; //èœå•é¡¹çš„æœ€åº•é¡¹
+    uint16 active; //èœå•é¡¹çš„æ¿€æ´»é¡¹
+    uint16 old_active;//èœå•é¡¹æ—§çš„æ¿€æ´»é¡¹
+    uint16 total; //æ€»çš„èœå•é¡¹
+    uint16 cur_group; //å½“å‰èœå•é¡¹æ‰€å¤„çš„ç»„
 } menu_list_t;
 
 typedef struct
@@ -232,17 +232,17 @@ typedef struct
 } browser_vars_t;
 typedef struct
 {
-    uint16 TotalNum; //ÁĞ±íÃû³Æ
-    uint32 ClusterNO; //ÁĞ±í¸öÊı
-    uint8 DirNO[8]; //ÁĞ±íÎ»ÖÃ
+    uint16 TotalNum; //åˆ—è¡¨åç§°
+    uint32 ClusterNO; //åˆ—è¡¨ä¸ªæ•°
+    uint8 DirNO[8]; //åˆ—è¡¨ä½ç½®
     uint16 DirLayer;
 } music_playlist;
 typedef enum
 {
-    Key_None, //ÎŞ·½Ïò
-    Key_Next, //ÍùºóµÄ·½Ïò
+    Key_None, //æ— æ–¹å‘
+    Key_Next, //å¾€åçš„æ–¹å‘
     Key_Prev
-    //ÍùÇ°µÄ·½Ïò
+    //å¾€å‰çš„æ–¹å‘
 } Sel_Directory_t;
 
 typedef enum
@@ -251,7 +251,7 @@ typedef enum
     MIC_IN, //mic
     USB_IN,
     MAX_TYPE
-    //ÍùÇ°µÄ·½Ïò
+    //å¾€å‰çš„æ–¹å‘
 } Plug_Device_t;
 
 typedef enum
@@ -263,28 +263,28 @@ typedef enum
 
 typedef enum
 {
-    Music_UI, //ÒôÀÖ²¥·Å½çÃæ
-    Volume_UI,//ÒôÁ¿µ÷Õû½çÃæ
-    FileNo_UI,//ÎÄ¼şĞòºÅ½çÃæ
-    Digital_UI, //Êı×Öµã¸è½çÃæ
-    EQ_UI, //EQÉèÖÃ½çÃæ£¨·ÇµãÕóÆÁÓĞ¹Ø£©
-    Repeat_UI, //Ñ­»·Ä£Ê½½çÃæ£¨·ÇµãÕóÆÁÓĞ¹Ø£©
-    DIRNAME_UI, //Ä¿Â¼ÃûÏÔÊ¾½çÃæ
-    STANDBY_UI, //¶¨Ê±¹Ø»úÉèÖÃ½çÃæ
-    NODEVICE_UI, //ÎŞÉè±¸½çÃæ
-    Clock_UI, //ÈÕÆÚ½çÃæ
-    TimeSet_UI, //Ê±¼äÉèÖÃ½çÃæ
-    AlarmSet_UI,//ÄÖÖÓÉèÖÃ½çÃæ
-    Linein_UI,//LINEIN½çÃæ
-    RecStop_UI,//Â¼ÒôÍ£Ö¹½çÃæ
-    RecOn_UI,//ÕıÔÚÂ¼Òô½çÃæ
-    RecPause_UI,//Â¼ÒôÔİÍ£½çÃæ
+    Music_UI, //éŸ³ä¹æ’­æ”¾ç•Œé¢
+    Volume_UI,//éŸ³é‡è°ƒæ•´ç•Œé¢
+    FileNo_UI,//æ–‡ä»¶åºå·ç•Œé¢
+    Digital_UI, //æ•°å­—ç‚¹æ­Œç•Œé¢
+    EQ_UI, //EQè®¾ç½®ç•Œé¢ï¼ˆéç‚¹é˜µå±æœ‰å…³ï¼‰
+    Repeat_UI, //å¾ªç¯æ¨¡å¼ç•Œé¢ï¼ˆéç‚¹é˜µå±æœ‰å…³ï¼‰
+    DIRNAME_UI, //ç›®å½•åæ˜¾ç¤ºç•Œé¢
+    STANDBY_UI, //å®šæ—¶å…³æœºè®¾ç½®ç•Œé¢
+    NODEVICE_UI, //æ— è®¾å¤‡ç•Œé¢
+    Clock_UI, //æ—¥æœŸç•Œé¢
+    TimeSet_UI, //æ—¶é—´è®¾ç½®ç•Œé¢
+    AlarmSet_UI,//é—¹é’Ÿè®¾ç½®ç•Œé¢
+    Linein_UI,//LINEINç•Œé¢
+    RecStop_UI,//å½•éŸ³åœæ­¢ç•Œé¢
+    RecOn_UI,//æ­£åœ¨å½•éŸ³ç•Œé¢
+    RecPause_UI,//å½•éŸ³æš‚åœç•Œé¢
     LowPower_UI,
-    FMFreq_UI,//FMÏÔÊ¾Æµµã½çÃæ
-    FMChannel_UI,//FMÏÔÊ¾µ±Ç°µçÌ¨ºÅ½çÃæ
-    FMInputFreq_UI,//ÊäÈëFMÆµµã½çÃæ
-    FMAutoSearch_UI,//×Ô¶¯ËÑÌ¨½çÃæ
-    FMManualSearch_UI,//ÊÖ¶¯ËÑÌ¨½çÃæ
+    FMFreq_UI,//FMæ˜¾ç¤ºé¢‘ç‚¹ç•Œé¢
+    FMChannel_UI,//FMæ˜¾ç¤ºå½“å‰ç”µå°å·ç•Œé¢
+    FMInputFreq_UI,//è¾“å…¥FMé¢‘ç‚¹ç•Œé¢
+    FMAutoSearch_UI,//è‡ªåŠ¨æœå°ç•Œé¢
+    FMManualSearch_UI,//æ‰‹åŠ¨æœå°ç•Œé¢
     MaxUI_type
 } UI_Type_t;
 
@@ -292,76 +292,76 @@ typedef struct
 {
     //magic
     uint16 magic;
-    //sleep¶¨Ê±
+    //sleepå®šæ—¶
     uint8 SleepTime;
     uint8 FMBuildInFlag; //add battery select and fm select flag
 
-    //Â¼ÒôÀàĞÍ,0:ÓïÑÔÂ¼Òô(V-Record),1:ÒôÀÖÂ¼Òô(M-Record). add by ccm 2004-06-08
+    //å½•éŸ³ç±»å‹,0:è¯­è¨€å½•éŸ³(V-Record),1:éŸ³ä¹å½•éŸ³(M-Record). add by ccm 2004-06-08
     uint8 RecordType;
-    //bit0~bit1: UdiskĞòÁĞºÅÖ§³Ö:0:no sn; 1:unified sn; 2:random sn;
-    //bit4: UdiskÈÏÖ¤Ä£Ê½Ö§³Ö: 1:½øÈëUdiskÈÏÖ¤Ä£Ê½,Æô¶¯Ê±¼ä¼Ó¿ì,Ö§³ÖsuspendºÍresumeµÈUSBÈÏÖ¤¹¦ÄÜ
+    //bit0~bit1: Udiskåºåˆ—å·æ”¯æŒ:0:no sn; 1:unified sn; 2:random sn;
+    //bit4: Udiskè®¤è¯æ¨¡å¼æ”¯æŒ: 1:è¿›å…¥Udiskè®¤è¯æ¨¡å¼,å¯åŠ¨æ—¶é—´åŠ å¿«,æ”¯æŒsuspendå’Œresumeç­‰USBè®¤è¯åŠŸèƒ½
     int8 udisk_setting;
 
-    uint8 SuppKeyTone; //Ö§³Ö°´¼üÒô
+    uint8 SuppKeyTone; //æ”¯æŒæŒ‰é”®éŸ³
     uint8 KeyTone; //add by mzh 2007.3.14 0: no key tone 1:have key tone
-    uint8 ap_result;//µ±Ç°ÕıÔÚÊ¹ÓÃµÄapÖµ
-    uint8 VolumeMax; //ÒôÁ¿×î´ó¼¶Êıµ÷½Ú
-    uint8 VolumeDef; //Ä¬ÈÏÒôÁ¿Öµ
-    uint8 Mute_flag; //¾²Òô±êÖ¾
-    eq_t eq_type; // EQÄ£Ê½
+    uint8 ap_result;//å½“å‰æ­£åœ¨ä½¿ç”¨çš„apå€¼
+    uint8 VolumeMax; //éŸ³é‡æœ€å¤§çº§æ•°è°ƒèŠ‚
+    uint8 VolumeDef; //é»˜è®¤éŸ³é‡å€¼
+    uint8 Mute_flag; //é™éŸ³æ ‡å¿—
+    eq_t eq_type; // EQæ¨¡å¼
     uint8 RecordGain;
-    uint8 RecordTime_max;//Â¼ÖÆµ½¿¨»òuÅÌÉÏµÄÂ¼Òô×î³¤Ê±¼ä(µ¥Î»ÎªĞ¡Ê±h)
-    uint8 Nor_RecordTime_max;//Â¼ÖÆµ½norÉÏµÄÂ¼Òô×î³¤Ê±¼ä(µ¥Î»ÎªÃëS)
-    uint8 volume; //µ±Ç°ÒôÁ¿Êµ¼ÊÖµ
-    uint8 vol_display; //µ±Ç°ÒôÁ¿ÏÔÊ¾Öµ
-    uint8 SuppTTS; //ÊÇ·ñÖ§³ÖTTS
-    uint8 SuppNorRec;     // NorÂ¼Òô¹¦ÄÜÖ§³Ö   0£¬ ²»Ö§³Ö   1£¬ Ö§³Ö
+    uint8 RecordTime_max;//å½•åˆ¶åˆ°å¡æˆ–uç›˜ä¸Šçš„å½•éŸ³æœ€é•¿æ—¶é—´(å•ä½ä¸ºå°æ—¶h)
+    uint8 Nor_RecordTime_max;//å½•åˆ¶åˆ°norä¸Šçš„å½•éŸ³æœ€é•¿æ—¶é—´(å•ä½ä¸ºç§’S)
+    uint8 volume; //å½“å‰éŸ³é‡å®é™…å€¼
+    uint8 vol_display; //å½“å‰éŸ³é‡æ˜¾ç¤ºå€¼
+    uint8 SuppTTS; //æ˜¯å¦æ”¯æŒTTS
+    uint8 SuppNorRec;     // Norå½•éŸ³åŠŸèƒ½æ”¯æŒ   0ï¼Œ ä¸æ”¯æŒ   1ï¼Œ æ”¯æŒ
     alarm_vars_t g_alarm;
     //        int8 reserve[32-30];
 } ap_comval_t;
 
-extern uint16 g_standby_time; //×Ô¶¯¹Ø»úÊ±¼ä,0.5ÃëÎªµ¥Î»
-extern uint16 g_rtc_counter; //rtc ÏûÏ¢¼ÆÊı
-extern uint8 usbplugflag; //USB²åÈë¼ì²â
-extern uint16 key_count; //µ±Ç°°´¼üÏûÏ¢·¢ÉúµÄ´ÎÊı
-extern uint8 key_value; //µ±Ç°°´¼üµÄÖµ
-extern uint16 lowPower_counter;//ÌáÊ¾µÍµçÏûÏ¢µÄ´ÎÊı
+extern uint16 g_standby_time; //è‡ªåŠ¨å…³æœºæ—¶é—´,0.5ç§’ä¸ºå•ä½
+extern uint16 g_rtc_counter; //rtc æ¶ˆæ¯è®¡æ•°
+extern uint8 usbplugflag; //USBæ’å…¥æ£€æµ‹
+extern uint16 key_count; //å½“å‰æŒ‰é”®æ¶ˆæ¯å‘ç”Ÿçš„æ¬¡æ•°
+extern uint8 key_value; //å½“å‰æŒ‰é”®çš„å€¼
+extern uint16 lowPower_counter;//æç¤ºä½ç”µæ¶ˆæ¯çš„æ¬¡æ•°
 
-extern uint8 file_name[12]; //´æ·ÅÎÄ¼ş¶ÌÃûÊı×Ö
+extern uint8 file_name[12]; //å­˜æ”¾æ–‡ä»¶çŸ­åæ•°å­—
 
 
 extern int8 alarmtimerflag;
 extern uint8 longkey_flag;
-extern uint8 ap_result;//µ±Ç°Ëù±¸·İµ½apÖµ
-extern uint8 power_on_flag;//¼ì²âÊÇ·ñÎªÓ²¿ª¹Ø½øÈëstandby±êÖ¾
-extern uint8 mic_on_flag;//mic ¿ª¹Ø´ò¿ª±êÖ¾
-extern uint8 usb_on_flag;//¼ì²âusbÏßÊÇ·ñ²å×Å±êÊ¶¡£0:usbÏßÒÑ°Îµô£¬1:usbÏß²å×Å
+extern uint8 ap_result;//å½“å‰æ‰€å¤‡ä»½åˆ°apå€¼
+extern uint8 power_on_flag;//æ£€æµ‹æ˜¯å¦ä¸ºç¡¬å¼€å…³è¿›å…¥standbyæ ‡å¿—
+extern uint8 mic_on_flag;//mic å¼€å…³æ‰“å¼€æ ‡å¿—
+extern uint8 usb_on_flag;//æ£€æµ‹usbçº¿æ˜¯å¦æ’ç€æ ‡è¯†ã€‚0:usbçº¿å·²æ‹”æ‰ï¼Œ1:usbçº¿æ’ç€
 
 extern char temp_buffer[9];
 extern time_t time;
-extern date_t date;//ÈÕÆÚ½á¹¹Ìå
+extern date_t date;//æ—¥æœŸç»“æ„ä½“
 extern time_t tmp_time;
 extern uint8 set_what;
 extern uint8 show_what;
-extern uint8 DigitalCount; //µ±Ç°Êı×Ö½¡µÄ¸öÊı
-extern uint8 DigitalBuf[4]; //´æ´¢Êı×Ö¼ü¼ü¶ÔÓ¦µÄÊı×Ö
-extern uint8 show_ui_flag;//ÉèÖÃÏî¿ªÊ¼ÉÁ¶¯±êÖ¾
-extern uint8 show_count;//¿ªÊ¼ÉèÖÃÏîÉÁ¶¯µÄ¼ÆËã
+extern uint8 DigitalCount; //å½“å‰æ•°å­—å¥çš„ä¸ªæ•°
+extern uint8 DigitalBuf[4]; //å­˜å‚¨æ•°å­—é”®é”®å¯¹åº”çš„æ•°å­—
+extern uint8 show_ui_flag;//è®¾ç½®é¡¹å¼€å§‹é—ªåŠ¨æ ‡å¿—
+extern uint8 show_count;//å¼€å§‹è®¾ç½®é¡¹é—ªåŠ¨çš„è®¡ç®—
 extern uint8 CurUI_Type;
 extern uint8 need_draw;
 extern alarm_vars_t g_alarm;
-extern ap_comval_t g_comval; //ÏµÍ³±äÁ¿,ap²»ÄÜ¸ü¸Ä
+extern ap_comval_t g_comval; //ç³»ç»Ÿå˜é‡,apä¸èƒ½æ›´æ”¹
 extern uint8 mute_flag;
 
 extern BOOL need_draw;
-extern uint8 linein_status; //lineinÏß´æÔÚ×´Ì¬¡£0-Ã»ÓĞ²åÉÏlineinÏß£¬1-lineinÏß²å×Å
-extern uint8 holdkey_flag;//°´¼ü³¤°´±ê¼Ç
-extern uint8 lowpower_count;//½ÓÊÜµ½µÍµçµÄ¼ÆÊı
+extern uint8 linein_status; //lineinçº¿å­˜åœ¨çŠ¶æ€ã€‚0-æ²¡æœ‰æ’ä¸Šlineinçº¿ï¼Œ1-lineinçº¿æ’ç€
+extern uint8 holdkey_flag;//æŒ‰é”®é•¿æŒ‰æ ‡è®°
+extern uint8 lowpower_count;//æ¥å—åˆ°ä½ç”µçš„è®¡æ•°
 extern uint8 standby_time[6];
 //extern uint8 insert_msg[MAX_TYPE];
 //extern uint8 pull_out_msg[MAX_TYPE];
 
-/***MessageÏà¹Ø******/
+/***Messageç›¸å…³******/
 uint8 ap_get_message(void);
 uint8 ap_handle_hotkey(uint8 key);
 uint8 ap_handle_hotkey_core(uint8 key);
@@ -377,7 +377,7 @@ void close_usb_phyctrol(void);
 
 extern uint8 ap_sleep(uint16 half_sec);
 void itoa(uint16 src_int, uint8 *pbuf);
-/*Êı×Ö×ª»»Îª10½øÖÆ×Ö·û*/
+/*æ•°å­—è½¬æ¢ä¸º10è¿›åˆ¶å­—ç¬¦*/
 extern uint8 *itoa1(uint8 i, uint8 *buf);
 extern uint8 *itoa2(uint8 i, uint8 *buf);
 extern uint8 *itoa3(uint16 i, uint8 *buf);

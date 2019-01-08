@@ -36,7 +36,7 @@ stmt  level    source
    25          #pragma name(MW_BS_AD_CMD2)
    26          
    27          extern HANDLE m_deFileHandle;
-   28          extern Open_param_t *m_deOpenparam; //²ÎÊı±íµØÖ·
+   28          extern Open_param_t *m_deOpenparam; //å‚æ•°è¡¨åœ°å€
    29          
    30          extern uint32 deApointerSave;
    31          extern uint32 deBpointerSave;
@@ -58,12 +58,12 @@ stmt  level    source
    47   1          m_deOpenparam->BreakPTSave->ApointSave = deApointerSave;
    48   1          m_deOpenparam->BreakPTSave->BpointSave = deBpointerSave;
    49   1          m_deOpenparam->BreakPTSave->breakPT = deBreakPointSave;
-   50   1          if (m_backupmode == 0)//¶ÏµãĞø²¥±¸·İ
+   50   1          if (m_backupmode == 0)//æ–­ç‚¹ç»­æ’­å¤‡ä»½
    51   1          {
    52   2              memcpy(&(m_deOpenparam->BreakPTSave->breakPointInfor), &g_decBreakPointInfor, sizeof(decBreakPoin
              -tInfor_t));
    53   2          }
-   54   1          else//AB ¸´¶Á¹ı³ÌÖĞµÄ¶Ïµã²»±£´æ£¬Ö»ÊÇ±£´æAµã£¬ÒÔºó¶ÏµãĞø²¥´ÓAµã¿ªÊ¼
+   54   1          else//AB å¤è¯»è¿‡ç¨‹ä¸­çš„æ–­ç‚¹ä¸ä¿å­˜ï¼Œåªæ˜¯ä¿å­˜Aç‚¹ï¼Œä»¥åæ–­ç‚¹ç»­æ’­ä»Aç‚¹å¼€å§‹
    55   1          {
    56   2              memcpy(&(m_deOpenparam->BreakPTSave->breakPointInfor), &m_breakPointInfo, sizeof(decBreakPointInf
 C251 COMPILER V4.55,  basal_de_c                                                           13/12/18  16:27:19  PAGE 2   
@@ -87,7 +87,7 @@ stmt  level    source
    71   1          else if((uint8) param == Hard_Break_open)
    72   1          {
    73   2              get_bpt_from_rdm();
-   74   2              deBreakPointSave         = m_breakPointInfo.BreakPointAddr / 0x200;       //×Ö½ÚÆ«ÒÆ×ªÉÈÇøÆ«ÒÆ
+   74   2              deBreakPointSave         = m_breakPointInfo.BreakPointAddr / 0x200;       //å­—èŠ‚åç§»è½¬æ‰‡åŒºåç§»
    75   2          }
    76   1          return TRUE;
    77   1      }
@@ -97,7 +97,7 @@ stmt  level    source
    81   1          g_decControlInfor.PlayMode = PLAY_MODE_BREAK;
    82   1          memcpy(&g_decBreakPointInfor, &m_breakPointInfo, sizeof(decBreakPointInfor_t));
    83   1          FS_FSeek(0, FS_SEEK_FFROMSTART, m_deFileHandle);
-   84   1          decInit();//¼ÆËãÊ±¼ä²»µ­Èë
+   84   1          decInit();//è®¡ç®—æ—¶é—´ä¸æ·¡å…¥
    85   1          decstart();
    86   1          return TRUE;
    87   1      }

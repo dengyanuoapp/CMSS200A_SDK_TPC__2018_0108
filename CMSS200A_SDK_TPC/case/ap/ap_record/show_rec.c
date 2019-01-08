@@ -22,7 +22,7 @@ uint8 deal_recoding_status(void);
 
 /*
  ********************************************************************************
- * Description : Â¼ÒôUI  ½çÃæÏÔÊ¾
+ * Description : å½•éŸ³UI  ç•Œé¢æ˜¾ç¤º
  *
  * Arguments   : NULL
  *
@@ -44,7 +44,7 @@ void ui_draw(void)
         LEDDisplay(LED_PAUSE, 0xff, 0);
         LEDDisplay(LED_PLAY, 0xff, 1);
     }
-    /*  ÏÔÊ¾Â¼ÒôÄ¿±ê´æ´¢½éÖÊ*/
+    /*  æ˜¾ç¤ºå½•éŸ³ç›®æ ‡å­˜å‚¨ä»‹è´¨*/
     if (g_record_vars.location.disk == g_disk_char[1])
     {
         LEDDisplay(LED_USB, 0xff, 0);
@@ -73,9 +73,9 @@ void ui_draw(void)
 
 /*
  ********************************************************************************
- * Description : ÏÔÊ¾µ±Ç°µÄÂ¼ÒôÊ±¼ä
+ * Description : æ˜¾ç¤ºå½“å‰çš„å½•éŸ³æ—¶é—´
  *
- * Arguments   : mode   Ë¢ĞÂÄ£Ê½  0--Ö»Ë¢µ±Ç°Ê±¼ä   1--Ë¢µ±Ç°Ê±¼äºÍÊ£Óà¿ÉÂ¼Ê±¼ä
+ * Arguments   : mode   åˆ·æ–°æ¨¡å¼  0--åªåˆ·å½“å‰æ—¶é—´   1--åˆ·å½“å‰æ—¶é—´å’Œå‰©ä½™å¯å½•æ—¶é—´
  *
  * Returns     :  NULL
  *
@@ -85,10 +85,10 @@ void ui_draw(void)
  */
 uint8 time_draw(uint8 mode)
 {
-    uint32 nowtime_l; /* »ñÈ¡µ±Ç°µÄÊ±¼äµÄ32Î»±äÁ¿ */
-    time_t nowtime_s; /* »ñÈ¡µ±Ç°µÄÊ±¼äµÄ½á¹¹ */
+    uint32 nowtime_l; /* è·å–å½“å‰çš„æ—¶é—´çš„32ä½å˜é‡ */
+    time_t nowtime_s; /* è·å–å½“å‰çš„æ—¶é—´çš„ç»“æ„ */
 
-    /* ÏÔÊ¾µ±Ç°Â¼ÒôµÄÊ±¼ä */
+    /* æ˜¾ç¤ºå½“å‰å½•éŸ³çš„æ—¶é—´ */
     recSendCommand(MC_GETTIME, (void *) &nowtime_s);
     g_rec_time.hour = nowtime_s.hour;
     g_rec_time.minute = nowtime_s.minute;
@@ -110,7 +110,7 @@ uint8 time_draw(uint8 mode)
     LEDDisplay(LED_COL, 0xff, 1);
     return NULL;
 }
-//ÇĞ»»Â¼Òô×´Ì¬
+//åˆ‡æ¢å½•éŸ³çŠ¶æ€
 uint8 change_rec_status(void)
 {
     uint8 retval = NULL;
@@ -122,7 +122,7 @@ uint8 change_rec_status(void)
     if (rec_status == rec_start)
     {
         rec_status = rec_pause;
-        recSendCommand(MC_GETTIME, (void *) &g_rec_time); //È¡ÏÖÔÚÊ±¼ä
+        recSendCommand(MC_GETTIME, (void *) &g_rec_time); //å–ç°åœ¨æ—¶é—´
         recSendCommand(MC_PAUSE, 0);
         SetCurUI_Type(RecPause_UI);
 
@@ -157,7 +157,7 @@ void deal_play_msg(void)
     }
     need_change_rec_status = TRUE;
 }
-//Í£Ö¹Â¼Òô£¬²¢±£´æÎÄ¼ş
+//åœæ­¢å½•éŸ³ï¼Œå¹¶ä¿å­˜æ–‡ä»¶
 void stop_rec(uint8 get_status)
 {
     uint16 i = 0;
@@ -177,7 +177,7 @@ void stop_rec(uint8 get_status)
 
             i++;
             recSendCommand(MC_GETSTATUS, (void *) &rec_stat);
-            //µ±Â¼ÒôÍ£Ö¹ºó£¬Ö»ÓĞµÈµ½½ÓÊÜµ½µÄÏûÏ¢ÎªstopÊ±£¬²ÅÄÜµ÷ÓÃclose£¬·ñÔòÎÄ¼ş±£´æ²»³É¹¦
+            //å½“å½•éŸ³åœæ­¢åï¼Œåªæœ‰ç­‰åˆ°æ¥å—åˆ°çš„æ¶ˆæ¯ä¸ºstopæ—¶ï¼Œæ‰èƒ½è°ƒç”¨closeï¼Œå¦åˆ™æ–‡ä»¶ä¿å­˜ä¸æˆåŠŸ
             if ((rec_stat.status == RECORDING_STOP) || (i >= 2000))
             {
                 break;
@@ -188,7 +188,7 @@ void stop_rec(uint8 get_status)
             }
         }
     }
-    recSendCommand(MC_CLOSE, 0); //¹Ø±ÕÂ¼Òô
+    recSendCommand(MC_CLOSE, 0); //å…³é—­å½•éŸ³
     rec_status = rec_stop;
     if (g_record_vars.rec_type == RECORD_FILE_TYPE_MP2)
     {
@@ -252,7 +252,7 @@ uint8 deal_recoding_status(void)
         return NULL;
     }
     mc_result = wavrProceed();
-    if (mc_result == WRITE_ONE) //ÒÑĞ´Ò»¸öpage
+    if (mc_result == WRITE_ONE) //å·²å†™ä¸€ä¸ªpage
     {
         g_file_size++;
         g_free_space--;
@@ -268,7 +268,7 @@ uint8 deal_recoding_status(void)
             }
         }
     }
-    else if (mc_result == WRITE_WRONG) //ÖÂÃü´íÎó
+    else if (mc_result == WRITE_WRONG) //è‡´å‘½é”™è¯¯
     {
         while (ap_get_message() != NULL)
         {
@@ -292,12 +292,12 @@ uint8 deal_recoding_status(void)
 
 /*
  ********************************************************************************
- * Description : Â¼Òô½çÃæÏÔÊ¾
+ * Description : å½•éŸ³ç•Œé¢æ˜¾ç¤º
  *
  * Arguments   : NULL
  *
- * Returns     : ½á¹ûÏûÏ¢»ò0
- RESULT_USER_STOP    //ÓÃ»§°´¼ü½áÊø
+ * Returns     : ç»“æœæ¶ˆæ¯æˆ–0
+ RESULT_USER_STOP    //ç”¨æˆ·æŒ‰é”®ç»“æŸ
  *
  * Notes       :
  *
@@ -386,7 +386,7 @@ uint8 show_rec(void)
                     return result;
                 }
 #if defined(RECORD_AP)
-                //´¦ÀíTTS²¥±¨Ê±¿¨»òuÅÌ°Î³öÃ»ÓĞ¼°Ê±´¦ÀíµÄÇé¿ö
+                //å¤„ç†TTSæ’­æŠ¥æ—¶å¡æˆ–uç›˜æ‹”å‡ºæ²¡æœ‰åŠæ—¶å¤„ç†çš„æƒ…å†µ
                 if(result == AP_MSG_SD_OUT || result == AP_MSG_UH_OUT)
                 {
                     result = deal_mode_msg();
@@ -480,7 +480,7 @@ uint8 deal_report_result(uint8 retval)
     }
     else if(retval == RESULT_SD_OUT)
     {
-        //Ô­ÏÈÂ¼Òôµ½¿¨ÖĞ£¬²¥±¨Ê±°Î³ö¿¨
+        //åŸå…ˆå½•éŸ³åˆ°å¡ä¸­ï¼Œæ’­æŠ¥æ—¶æ‹”å‡ºå¡
         if (g_record_vars.location.disk == g_disk_char[1])
         {
             if(deal_mode_msg() != NULL)
@@ -492,7 +492,7 @@ uint8 deal_report_result(uint8 retval)
     }
     else if(retval == RESULT_UHOST_OUT)
     {
-        //Ô­ÏÈÂ¼Òôµ½UÅÌÖĞ£¬²¥±¨Ê±°Î³öuÅÌ
+        //åŸå…ˆå½•éŸ³åˆ°Uç›˜ä¸­ï¼Œæ’­æŠ¥æ—¶æ‹”å‡ºuç›˜
         if (g_record_vars.location.disk == g_disk_char[0])
         {
             if(deal_mode_msg() != NULL)
@@ -505,7 +505,7 @@ uint8 deal_report_result(uint8 retval)
 #if 0
     else if(retval == AP_MSG_UH_IN)
     {
-        //Ô­ÏÈÂ¼Òôµ½UÅÌÖĞ£¬²¥±¨Ê±°Î³öuÅÌÔÙ²åÉÏuÅÌ
+        //åŸå…ˆå½•éŸ³åˆ°Uç›˜ä¸­ï¼Œæ’­æŠ¥æ—¶æ‹”å‡ºuç›˜å†æ’ä¸Šuç›˜
         if (g_record_vars.location.disk == g_disk_char[0])
         {
             if (USBH_Check_Udisk())
@@ -524,7 +524,7 @@ uint8 deal_report_result(uint8 retval)
     }
     else if(retval == AP_MSG_SD_IN)
     {
-        //Ô­ÏÈÂ¼Òôµ½¿¨ÅÌÖĞ£¬²¥±¨Ê±°Î³ö¿¨ÔÙ²åÉÏ¿¨
+        //åŸå…ˆå½•éŸ³åˆ°å¡ç›˜ä¸­ï¼Œæ’­æŠ¥æ—¶æ‹”å‡ºå¡å†æ’ä¸Šå¡
         if (g_record_vars.location.disk == g_disk_char[1])
         {
             if (DRV_DetectUD(1) == 0x20)

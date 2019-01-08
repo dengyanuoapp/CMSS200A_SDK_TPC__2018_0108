@@ -17,7 +17,7 @@ stmt  level    source
     6           *        (c) Copyright, Actions Co,Ld.
     7           *             All Right Reserved
     8           *       History Record:
-    9           *         1.Ω‚æˆ◊‘∂ØÀ—Ã® ± ˝◊÷…¡À∏µƒŒ Ã‚£¨by Mars£¨2008-04-15
+    9           *         1.Ëß£ÂÜ≥Ëá™Âä®ÊêúÂè∞Êó∂Êï∞Â≠óÈó™ÁÉÅÁöÑÈóÆÈ¢òÔºåby MarsÔºå2008-04-15
    10           *******************************************************************************
    11           */
    12          
@@ -27,19 +27,19 @@ stmt  level    source
    16          
    17          extern fm_status_t g_FMStatus;
    18          
-   19          void ShowFreqInFM(void); //FM÷˜ΩÁ√Êœ‘ æ
-   20          bool Search_Show(FM_direct_e Direct); //◊‘∂ØÀ—Ã® ±µƒœ‘ æ
+   19          void ShowFreqInFM(void); //FM‰∏ªÁïåÈù¢ÊòæÁ§∫
+   20          bool Search_Show(FM_direct_e Direct); //Ëá™Âä®ÊêúÂè∞Êó∂ÁöÑÊòæÁ§∫
    21          
    22          /*
    23           ********************************************************************************
    24           *             uint16 SearchHandle(uint8 Direct)
    25           *
-   26           * Description :  ÷∂ØÀ—Ã®
+   26           * Description : ÊâãÂä®ÊêúÂè∞
    27           *
-   28           * Arguments   :    Direct,NextªÚLastÀ—À˜.
+   28           * Arguments   :    Direct,NextÊàñLastÊêúÁ¥¢.
    29           *
-   30           * Returns     :        »Áπ˚”–ø… ∂±µƒ»»º¸œ˚œ¢,  ∑µªÿΩ·π˚œ˚œ¢
-   31           »Áπ˚√ª”–ø… ∂±µƒ»»º¸œ˚œ¢,  ∑µªÿ0
+   30           * Returns     :        Â¶ÇÊûúÊúâÂèØËØÜÂà´ÁöÑÁÉ≠ÈîÆÊ∂àÊÅØ,  ËøîÂõûÁªìÊûúÊ∂àÊÅØ
+   31           Â¶ÇÊûúÊ≤°ÊúâÂèØËØÜÂà´ÁöÑÁÉ≠ÈîÆÊ∂àÊÅØ,  ËøîÂõû0
    32           *
    33           * Notes       :
    34           *
@@ -49,16 +49,16 @@ stmt  level    source
    38          {
    39   1          uint16 result = 0;
    40   1          uint16 key;
-   41   1          uint16 start_freq;//∆ º∆µµ„
+   41   1          uint16 start_freq;//Ëµ∑ÂßãÈ¢ëÁÇπ
    42   1          flag_r = 1;
-   43   1          //∆ º∆µµ„
+   43   1          //Ëµ∑ÂßãÈ¢ëÁÇπ
    44   1          start_freq = g_FMStatus.freq;
    45   1          charge_pump_onoff(0);
    46   1          while (1)
    47   1          {
    48   2              if (Direct != SEARCH_NULL)
    49   2              {
-   50   3                  if (Direct == SEARCH_NEXT) //NEXTÀ—À˜¥¶¿Ì
+   50   3                  if (Direct == SEARCH_NEXT) //NEXTÊêúÁ¥¢Â§ÑÁêÜ
    51   3                  {
    52   4                      g_FMStatus.freq += 1;
    53   4                      if ((g_FMStatus.freq >= USFREQ_MAX) && (g_radio_config.band_mode == Bank_US_Europe))
@@ -82,7 +82,7 @@ stmt  level    source
    69   5                          break;
    70   5                      }
    71   4                  }
-   72   3                  else if (Direct == SEARCH_LAST) //LASTÀ—À˜¥¶¿Ì
+   72   3                  else if (Direct == SEARCH_LAST) //LASTÊêúÁ¥¢Â§ÑÁêÜ
    73   3                  {
    74   4                      g_FMStatus.freq -= 1;
    75   4                      if ((g_FMStatus.freq <= USFREQ_MIN) && (g_radio_config.band_mode == Bank_US_Europe))
@@ -118,11 +118,11 @@ stmt  level    source
   105   3                  //do nothing
   106   3                  break;
   107   3      
-  108   3              case AP_KEY_NEXT | AP_KEY_UP: //NEXTÀ—À˜ ±∞¥NEXTº¸£¨Õ£÷πÀ—À˜
+  108   3              case AP_KEY_NEXT | AP_KEY_UP: //NEXTÊêúÁ¥¢Êó∂ÊåâNEXTÈîÆÔºåÂÅúÊ≠¢ÊêúÁ¥¢
   109   3                  Direct = SEARCH_STOP;
   110   3                  break;
   111   3      
-  112   3              case AP_KEY_PREV | AP_KEY_UP: //LASTÀ—À˜ ±∞¥LASTº¸£¨Õ£÷πÀ—À˜
+  112   3              case AP_KEY_PREV | AP_KEY_UP: //LASTÊêúÁ¥¢Êó∂ÊåâLASTÈîÆÔºåÂÅúÊ≠¢ÊêúÁ¥¢
   113   3                  Direct = SEARCH_STOP;
   114   3                  break;
   115   3      
@@ -144,7 +144,7 @@ stmt  level    source
   129   3              case AP_MSG_USB_PLUGIN:
   130   3                  result = 0;
   131   3                  break;
-  132   3              default: //»»º¸¥¶¿Ì
+  132   3              default: //ÁÉ≠ÈîÆÂ§ÑÁêÜ
   133   3                  result = ap_handle_hotkey(key);
   134   3                  break;
   135   3              }
@@ -154,9 +154,9 @@ stmt  level    source
   139   3              }
   140   2          }
   141   1          charge_pump_onoff(1);
-  142   1          while (ap_get_message() != AP_KEY_NULL) //«Â≥˝◊‘∂ØÀ—Ã®π˝≥Ã÷–µƒœ˚œ¢
+  142   1          while (ap_get_message() != AP_KEY_NULL) //Ê∏ÖÈô§Ëá™Âä®ÊêúÂè∞ËøáÁ®ã‰∏≠ÁöÑÊ∂àÊÅØ
   143   1          {
-  144   2              ClearWatchDog(); //«Âø’œ˚œ¢≥ÿ
+  144   2              ClearWatchDog(); //Ê∏ÖÁ©∫Ê∂àÊÅØÊ±†
   145   2          }
   146   1          return result;
   147   1      }
@@ -165,11 +165,11 @@ stmt  level    source
   150           ********************************************************************************
   151           *             bool Search_Show(FM_direct_e Direct)
   152           *
-  153           * Description : À—À˜œ¬“ª∏ˆ‘⁄µÁÃ®±Ì÷–√ª”–µƒ–¬µÁÃ®.
+  153           * Description : ÊêúÁ¥¢‰∏ã‰∏Ä‰∏™Âú®ÁîµÂè∞Ë°®‰∏≠Ê≤°ÊúâÁöÑÊñ∞ÁîµÂè∞.
   154           *
-  155           * Arguments   : Direct,NextªÚLastÀ—À˜.
+  155           * Arguments   : Direct,NextÊàñLastÊêúÁ¥¢.
   156           *
-  157           * Returns     : TRUE:À—µΩœ¬“ª∏ˆ–¬µÁÃ®,FALSE:√ª”–À—µΩ.
+  157           * Returns     : TRUE:ÊêúÂà∞‰∏ã‰∏Ä‰∏™Êñ∞ÁîµÂè∞,FALSE:Ê≤°ÊúâÊêúÂà∞.
   158           *
   159           * Notes       :
   160           *
@@ -185,7 +185,7 @@ stmt  level    source
   170   1          fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
   171   1      
   172   1          Search_Flag = fmSendCommand(FM_SEARCH, (void *) &g_FMStatus, (void *) Direct);
-  173   1          if (Search_Flag) //À—Ã®≥…π¶∫Û£¨±£¥ÊµÁÃ®
+  173   1          if (Search_Flag) //ÊêúÂè∞ÊàêÂäüÂêéÔºå‰øùÂ≠òÁîµÂè∞
   174   1          {
   175   2              fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
   176   2              if (fmSendCommand(FM_MID_SAVESTATION, NULL, NULL) != FALSE)
@@ -211,7 +211,7 @@ stmt  level    source
   194           ********************************************************************************
   195           *             void ShowFreqInFM()
   196           *
-  197           * Description : œ‘ æµÁÃ® ’Ã˝ΩÁ√Ê
+  197           * Description : ÊòæÁ§∫ÁîµÂè∞Êî∂Âê¨ÁïåÈù¢
   198           *
   199           * Arguments   :
   200           *

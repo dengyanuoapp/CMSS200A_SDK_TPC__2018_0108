@@ -82,13 +82,13 @@ void Hdrv_SetLED(void)
     sfr_bak = SFR_BANK;
     //set BANK_CMU_RMU
     SFR_BANK = BANK_CMU_RMU;
-    //enable LCD & SEG LCD clock,Ä£¿éÊ±ÖÓÊ¹ÄÜ
+    //enable LCD & SEG LCD clock,æ¨¡å—æ—¶é’Ÿä½¿èƒ½
     CLKENCTL2 |= 0x10;
-    // touch key controller reset,Ä£¿éreset
+    // touch key controller reset,æ¨¡å—reset
     MRCR3 &= 0xFD;
     MRCR3 |= 0x02;
 
-    //select LED &SEG LCD clock,Ä£¿éÊ±ÖÓÉèÖÃ
+    //select LED &SEG LCD clock,æ¨¡å—æ—¶é’Ÿè®¾ç½®
     LED_SEGLCDCLKCTL &= 0xF0;
     LED_SEGLCDCLKCTL |= 0x03;
     SFR_BANK = sfr_bak;
@@ -98,7 +98,7 @@ void Hdrv_SetLED(void)
 ///*    void Hdrv_HardInit(void);
 //** FUNCTION:     Hdrv_HardInit
 //**
-//** Description:  ³õÊ¼»¯LCMµÄÓ²¼şÉè±¸
+//** Description:  åˆå§‹åŒ–LCMçš„ç¡¬ä»¶è®¾å¤‡
 //**
 //**  input
 //**     none
@@ -116,21 +116,21 @@ void Hdrv_HardInit(void)
     //select lcd segment and com
     Hdrv_SetMfpToEmif();
     SFR_BANK = BANK_LCD;
-    //lcd_ledÄ£Ê½Ñ¡Ôñ
+    //lcd_ledæ¨¡å¼é€‰æ‹©
     LCD_MODE = LCD_MODE & (~0x7) | 0x07;
-    //´ò¿ªsegment
+    //æ‰“å¼€segment
     LCD_MODE |= 0x80;
-    //Êä³öÊ¹ÓÃ
+    //è¾“å‡ºä½¿ç”¨
     LCD_MODE |= 0x10;
     SFR_BANK = BANK_GPIO;
 #if 1
-    //Ê¹ÓÃÊı×Ö²¿·ÖµãLEDµÆ
-    //½µµÍÇı¶¯¹¦ÄÜ£¬Ò²ÊÇ¾Í¸Ä±äIO¿ÚµÄÇı¶¯µÈ¼¶
+    //ä½¿ç”¨æ•°å­—éƒ¨åˆ†ç‚¹LEDç¯
+    //é™ä½é©±åŠ¨åŠŸèƒ½ï¼Œä¹Ÿæ˜¯å°±æ”¹å˜IOå£çš„é©±åŠ¨ç­‰çº§
     //    PADDRV0=0x0;
     //    PADDRV1=0x0;
     LED_SEG_BIAS_EN &= 0xF7;
 #else
-    //Ê¹ÓÃºãÁ÷Ô´µãÁÁLEDµÆ
+    //ä½¿ç”¨æ’æµæºç‚¹äº®LEDç¯
     LED_SEG_BIAS_EN &= 0xF8;
     LED_SEG_BIAS_EN |= 0x0C;
     LED_SEG_RC_EN = 0x7f;

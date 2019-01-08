@@ -32,65 +32,65 @@ stmt  level    source
    21          
    22          #pragma renamecode(MW_EH_ID31)
    23          
-   24          #define ID3_COUNT 3 //ĞèÒª²éÕÒµÄFrameIDÊı(°üÀ¨±êÌâ£¬×÷Õß£¬×¨¼­)
+   24          #define ID3_COUNT 3 //éœ€è¦æŸ¥æ‰¾çš„FrameIDæ•°(åŒ…æ‹¬æ ‡é¢˜ï¼Œä½œè€…ï¼Œä¸“è¾‘)
    25          /*
    26           *********************************************************
-   27           1) "RTENC"         :±àÂëÕß      2) "TRCK"        :Òô¹ì
-   28           3) "TPE1"          :Ñİ³ªÕß      4) "TIT2"        :±êÌâ
-   29           5) "TALB"          :×¨¼­        6) "TYER"        :Äê´ú
-   30           7) "TMED"          :Ã½ÌåÀàĞÍ    8) "TCOM"        :×÷Çú¼Ò
-   31           9) "COMM"          :×¢ÊÍ       10) "CON"         :Á÷ÅÉ
-   32           11) "TOPE"          :Ô­´´Õß     12) "TCOP"        :°æÈ¨
+   27           1) "RTENC"         :ç¼–ç è€…      2) "TRCK"        :éŸ³è½¨
+   28           3) "TPE1"          :æ¼”å”±è€…      4) "TIT2"        :æ ‡é¢˜
+   29           5) "TALB"          :ä¸“è¾‘        6) "TYER"        :å¹´ä»£
+   30           7) "TMED"          :åª’ä½“ç±»å‹    8) "TCOM"        :ä½œæ›²å®¶
+   31           9) "COMM"          :æ³¨é‡Š       10) "CON"         :æµæ´¾
+   32           11) "TOPE"          :åŸåˆ›è€…     12) "TCOP"        :ç‰ˆæƒ
    33           13) "WXXX"          :URL
    34           *********************************************************
    35           */
    36          
    37          typedef struct
    38          {
-   39              char Header[3];/*±ØĞëÎª"ID3"·ñÔòÈÏÎª±êÇ©²»´æÔÚ*/
-   40              BYTE Ver;/*°æ±¾ºÅ;ID3V2.3¾Í¼ÇÂ¼03,ID3V2.4¾Í¼ÇÂ¼04*/
-   41              BYTE Revision;/*¸±°æ±¾ºÅ;´Ë°æ±¾¼ÇÂ¼Îª00*/
-   42              char Flag;/*´æ·Å±êÖ¾µÄ×Ö½Ú£¬Õâ¸ö°æ±¾Ö»¶¨ÒåÁËÈıÎ»*/
-   43              char Size[4];/*±êÇ©´óĞ¡£¬°üÀ¨±êÇ©Í·µÄ10¸ö×Ö½ÚºÍËùÓĞµÄ±êÇ©Ö¡µÄ´óĞ¡*/
-   44          } ID3_10_header;//ID3V2.*±êÇ©Í·(Ç°10byte)
+   39              char Header[3];/*å¿…é¡»ä¸º"ID3"å¦åˆ™è®¤ä¸ºæ ‡ç­¾ä¸å­˜åœ¨*/
+   40              BYTE Ver;/*ç‰ˆæœ¬å·;ID3V2.3å°±è®°å½•03,ID3V2.4å°±è®°å½•04*/
+   41              BYTE Revision;/*å‰¯ç‰ˆæœ¬å·;æ­¤ç‰ˆæœ¬è®°å½•ä¸º00*/
+   42              char Flag;/*å­˜æ”¾æ ‡å¿—çš„å­—èŠ‚ï¼Œè¿™ä¸ªç‰ˆæœ¬åªå®šä¹‰äº†ä¸‰ä½*/
+   43              char Size[4];/*æ ‡ç­¾å¤§å°ï¼ŒåŒ…æ‹¬æ ‡ç­¾å¤´çš„10ä¸ªå­—èŠ‚å’Œæ‰€æœ‰çš„æ ‡ç­¾å¸§çš„å¤§å°*/
+   44          } ID3_10_header;//ID3V2.*æ ‡ç­¾å¤´(å‰10byte)
    45          
    46          typedef struct
    47          {
-   48              BYTE bytes_of_header;//²»Í¬ID3°æ±¾Frame HeaderËùÕ¼×Ö½ÚÊı
-   49              BYTE bytes_of_title;//²»Í¬ID3°æ±¾Frame HeaderÖĞFrameIDËùÕ¼×Ö½ÚÊı
-   50              BYTE bytes_of_framesize;//²»Í¬ID3°æ±¾Frame HeaderÖĞÖ¡³¤ËùÕ¼×Ö½ÚÊı
-   51              char *id3table;//²»Í¬ID3°æ±¾¶ÔÓ¦µÄĞèÒª²éÕÒµÄFrameID Table
-   52              BYTE id3tablesize;//¶ÔÓ¦FrameID TableµÄ³ß´ç
+   48              BYTE bytes_of_header;//ä¸åŒID3ç‰ˆæœ¬Frame Headeræ‰€å å­—èŠ‚æ•°
+   49              BYTE bytes_of_title;//ä¸åŒID3ç‰ˆæœ¬Frame Headerä¸­FrameIDæ‰€å å­—èŠ‚æ•°
+   50              BYTE bytes_of_framesize;//ä¸åŒID3ç‰ˆæœ¬Frame Headerä¸­å¸§é•¿æ‰€å å­—èŠ‚æ•°
+   51              char *id3table;//ä¸åŒID3ç‰ˆæœ¬å¯¹åº”çš„éœ€è¦æŸ¥æ‰¾çš„FrameID Table
+   52              BYTE id3tablesize;//å¯¹åº”FrameID Tableçš„å°ºå¯¸
    53          } ID3_Version_Info;//
    54          
    55          typedef struct
    56          {
-   57              char FrameID[4]; /*ÓÃËÄ¸ö×Ö·û±êÊ¶Ò»¸öÖ¡£¬ËµÃ÷ÆäÄÚÈİ£¬ÉÔºóÓĞ³£ÓÃµÄ±êÊ¶¶ÔÕÕ±í*/
+   57              char FrameID[4]; /*ç”¨å››ä¸ªå­—ç¬¦æ ‡è¯†ä¸€ä¸ªå¸§ï¼Œè¯´æ˜å…¶å†…å®¹ï¼Œç¨åæœ‰å¸¸ç”¨çš„æ ‡è¯†å¯¹ç…§è¡¨*/
 C251 COMPILER V4.55,  enhanced_tag1                                                        13/12/18  16:27:42  PAGE 2   
 
-   58              char Size[4]; /*Ö¡ÄÚÈİµÄ´óĞ¡£¬²»°üÀ¨Ö¡Í·£¬²»µÃĞ¡ÓÚ1*/
-   59              char Flags[2];/*´æ·Å±êÖ¾£¬Ö»¶¨ÒåÁË6Î»*/
-   60              //char encodetype;//frame  ±àÂëÀà±ğ
+   58              char Size[4]; /*å¸§å†…å®¹çš„å¤§å°ï¼Œä¸åŒ…æ‹¬å¸§å¤´ï¼Œä¸å¾—å°äº1*/
+   59              char Flags[2];/*å­˜æ”¾æ ‡å¿—ï¼Œåªå®šä¹‰äº†6ä½*/
+   60              //char encodetype;//frame  ç¼–ç ç±»åˆ«
    61          } ID3_2_3_HEADER;
    62          
    63          typedef struct
    64          {
-   65              char FrameID[3]; /*ÓÃËÄ¸ö×Ö·û±êÊ¶Ò»¸öÖ¡£¬ËµÃ÷ÆäÄÚÈİ*/
-   66              char Size[3]; /*Ö¡ÄÚÈİµÄ´óĞ¡£¬²»°üÀ¨Ö¡Í·£¬²»µÃĞ¡ÓÚ1*/
-   67              //    char encodetype; //frame  ±àÂëÀà±ğ
+   65              char FrameID[3]; /*ç”¨å››ä¸ªå­—ç¬¦æ ‡è¯†ä¸€ä¸ªå¸§ï¼Œè¯´æ˜å…¶å†…å®¹*/
+   66              char Size[3]; /*å¸§å†…å®¹çš„å¤§å°ï¼Œä¸åŒ…æ‹¬å¸§å¤´ï¼Œä¸å¾—å°äº1*/
+   67              //    char encodetype; //frame  ç¼–ç ç±»åˆ«
    68          } ID3_2_2_HEADER;
    69          
    70          typedef struct
    71          {
-   72              uchar savelen; // FrameID±£´æµÄ×î³¤³¤¶È
-   73              char *saveaddr; // FrameID±£´æµØÖ·
+   72              uchar savelen; // FrameIDä¿å­˜çš„æœ€é•¿é•¿åº¦
+   73              char *saveaddr; // FrameIDä¿å­˜åœ°å€
    74          } ID3SaveItem;
    75          
    76          extern char *TempBuf;
    77          uint8 karaoke_flag;
    78          uint8 actrec_flag;
-   79          const char ID3TitleTable_v2_3[] = "TIT2TPE1TALB";// ID3V2.3ĞèÒª²éÕÒµÄFrameID Table
-   80          const char ID3TitleTable_v2_2[] = "TT2TP1TAL"; // ID3V2.2ĞèÒª²éÕÒµÄFrameID Table
+   79          const char ID3TitleTable_v2_3[] = "TIT2TPE1TALB";// ID3V2.3éœ€è¦æŸ¥æ‰¾çš„FrameID Table
+   80          const char ID3TitleTable_v2_2[] = "TT2TP1TAL"; // ID3V2.2éœ€è¦æŸ¥æ‰¾çš„FrameID Table
    81          
    82          const char COMM_NAME[] = "COMM";
    83          const char k123_name[] = "k123";
@@ -112,31 +112,31 @@ stmt  level    source
    99                  sizeof(ID3TitleTable_v2_2)
   100              }
   101          };
-  102          ID3SaveItem *pId3Save;//FrameID´æ´¢Î»ÖÃ
-  103          ID3Info_t *pID3InfoStart;//ap²ãÌá¹©µÄ´æ´¢½á¹¹
+  102          ID3SaveItem *pId3Save;//FrameIDå­˜å‚¨ä½ç½®
+  103          ID3Info_t *pID3InfoStart;//apå±‚æä¾›çš„å­˜å‚¨ç»“æ„
   104          ID3_10_header far id3h;
-  105          int far bufindex;//µ±Ç°TempBufÎ´´¦Àí×Ö·ûµÄË÷Òı
-  106          int far findcount;//³É¹¦²éÕÒµ½µÄFrameIDÊı
-  107          dword far filepos;//µ±Ç°ÎÄ¼şµÄ¾«È·Ö¸Õë
-  108          static dword far framepos;//µ±Ç°FrameµÄµØÖ·
-  109          static dword far framesize;//µ±Ç°FrameµÄsize(²»°üÀ¨±àÂëÀàĞÍÎ»)
+  105          int far bufindex;//å½“å‰TempBufæœªå¤„ç†å­—ç¬¦çš„ç´¢å¼•
+  106          int far findcount;//æˆåŠŸæŸ¥æ‰¾åˆ°çš„FrameIDæ•°
+  107          dword far filepos;//å½“å‰æ–‡ä»¶çš„ç²¾ç¡®æŒ‡é’ˆ
+  108          static dword far framepos;//å½“å‰Frameçš„åœ°å€
+  109          static dword far framesize;//å½“å‰Frameçš„size(ä¸åŒ…æ‹¬ç¼–ç ç±»å‹ä½)
   110          HANDLE far TagHandle;
-  111          BYTE far AvailFlag[ID3_COUNT];//ÓĞĞ§FrameID²éÕÒµÇ¼Ç±í
-  112          BYTE far curversion;//µ±Ç°ID3°æ±¾
+  111          BYTE far AvailFlag[ID3_COUNT];//æœ‰æ•ˆFrameIDæŸ¥æ‰¾ç™»è®°è¡¨
+  112          BYTE far curversion;//å½“å‰ID3ç‰ˆæœ¬
   113          char *TempBuf; //read file buffer
   114          
   115          /********************************************************************************
-  116           * Description : ¼ì²éÊÇ·ñÊÇÓĞĞ§µÄ´ı²éÕÒframeID(title)
+  116           * Description : æ£€æŸ¥æ˜¯å¦æ˜¯æœ‰æ•ˆçš„å¾…æŸ¥æ‰¾frameID(title)
   117           *
   118           * Arguments  :
-  119           *             pid3header : Frame Header ÆäÍ·ËÄ¸ö×Ö½ÚÊÇframeId£¬¼ì²âËüÊÇ·ñ ÎÒÃÇËùÒªÕÒµÄid
-  120           ÒªµÄIDÊÇ  ID3TitleTable_v2_3[] = "TIT2TPE1TALB"£¬Ã¿¸öËÄ¸ö×Ö½Úbytes_of_title
-  121           AvailFlag[0]¶ÔÓ¦×Å"TIT2"
+  119           *             pid3header : Frame Header å…¶å¤´å››ä¸ªå­—èŠ‚æ˜¯frameIdï¼Œæ£€æµ‹å®ƒæ˜¯å¦ æˆ‘ä»¬æ‰€è¦æ‰¾çš„id
+  120           è¦çš„IDæ˜¯  ID3TitleTable_v2_3[] = "TIT2TPE1TALB"ï¼Œæ¯ä¸ªå››ä¸ªå­—èŠ‚bytes_of_title
+  121           AvailFlag[0]å¯¹åº”ç€"TIT2"
   122           * Returns     :
-  123           *            TRUE: ÓĞĞ§,
+  123           *            TRUE: æœ‰æ•ˆ,
 C251 COMPILER V4.55,  enhanced_tag1                                                        13/12/18  16:27:42  PAGE 3   
 
-  124           *            FALSE: ÎŞĞ§.
+  124           *            FALSE: æ— æ•ˆ.
   125           * Notes       :
   126           *
   127           ********************************************************************************/
@@ -161,33 +161,33 @@ stmt  level    source
   146   2              i++;
   147   2          }
   148   1      
-  149   1          //Ã»ÕÒµ½ÎÒÃÇËùÒªµÄID
+  149   1          //æ²¡æ‰¾åˆ°æˆ‘ä»¬æ‰€è¦çš„ID
   150   1          if ((j < ID3ver[curversion].bytes_of_title) || ((i % ID3ver[curversion].bytes_of_title) != 0))
   151   1          {
   152   2              return 0;
   153   2          }
   154   1      
   155   1          index = (i / ID3ver[curversion].bytes_of_title) - 1;
-  156   1          if (AvailFlag[index] == 1)//Ö®Ç°ÒÑ¾­ÓĞÁË£¬»¹³öÏÖÒ»Ìõ£¬²»¼ÇÂ¼
+  156   1          if (AvailFlag[index] == 1)//ä¹‹å‰å·²ç»æœ‰äº†ï¼Œè¿˜å‡ºç°ä¸€æ¡ï¼Œä¸è®°å½•
   157   1          {
   158   2              return 0;
   159   2          }
   160   1      
-  161   1          AvailFlag[index] = 1;//¼ÇÂ¼ÕÒµ½µÄ±êÇ©
+  161   1          AvailFlag[index] = 1;//è®°å½•æ‰¾åˆ°çš„æ ‡ç­¾
   162   1      
-  163   1          pId3Save = (ID3SaveItem *) pID3InfoStart + index; //ÉèÖÃ½«Òª±£´æµÄµØÖ·
+  163   1          pId3Save = (ID3SaveItem *) pID3InfoStart + index; //è®¾ç½®å°†è¦ä¿å­˜çš„åœ°å€
   164   1      
   165   1          return TRUE;
   166   1      }
   167          
   168          /********************************************************************************
-  169           * Description : ´¦ÀíFrame Header£¬¼ÆËãFrame size
+  169           * Description : å¤„ç†Frame Headerï¼Œè®¡ç®—Frame size
   170           *
   171           * Arguments  :
   172           *             pid3header : Frame Header
   173           * Returns     :
-  174           *            TRUE: ³É¹¦,
-  175           *            FALSE: Ê§°Ü.
+  174           *            TRUE: æˆåŠŸ,
+  175           *            FALSE: å¤±è´¥.
   176           * Notes       :
   177           *
   178           ********************************************************************************/
@@ -223,13 +223,13 @@ stmt  level    source
   206   1      }
   207          
   208          /********************************************************************************
-  209           * Description : ¾«È·ÎÄ¼ş¶ÁÈ¡³õÊ¼»¯
+  209           * Description : ç²¾ç¡®æ–‡ä»¶è¯»å–åˆå§‹åŒ–
   210           *
   211           * Arguments  :
   212           *
   213           * Returns     :
-  214           *            TRUE: ³É¹¦,
-  215           *            FALSE: Ê§°Ü.
+  214           *            TRUE: æˆåŠŸ,
+  215           *            FALSE: å¤±è´¥.
   216           * Notes       :
   217           *
   218           ********************************************************************************/
@@ -239,18 +239,18 @@ stmt  level    source
   222   1          bufindex = 0;
   223   1          filepos = 0;
   224   1      
-  225   1          FS_FRead(TempBuf, 1, TagHandle); //¶ÁÒ»PAGEÊı¾İ
+  225   1          FS_FRead(TempBuf, 1, TagHandle); //è¯»ä¸€PAGEæ•°æ®
   226   1          return TRUE;
   227   1      }
   228          
   229          /********************************************************************************
-  230           * Description : ¾«È·ÎÄ¼ş¶ÁÈ¡SEEK
+  230           * Description : ç²¾ç¡®æ–‡ä»¶è¯»å–SEEK
   231           *
   232           * Arguments  :
-  233           *             fpos:´ÓÎÄ¼şÍ·seekµÄ×Ö½ÚÆ«ÒÆÁ¿
+  233           *             fpos:ä»æ–‡ä»¶å¤´seekçš„å­—èŠ‚åç§»é‡
   234           * Returns     :
-  235           *            TRUE: ³É¹¦,
-  236           *            FALSE: Ê§°Ü.
+  235           *            TRUE: æˆåŠŸ,
+  236           *            FALSE: å¤±è´¥.
   237           * Notes       :
   238           *
   239           ********************************************************************************/
@@ -285,14 +285,14 @@ stmt  level    source
   266   1      }
   267          
   268          /********************************************************************************
-  269           * Description : ¾«È·ÎÄ¼ş¶ÁÈ¡READ
+  269           * Description : ç²¾ç¡®æ–‡ä»¶è¯»å–READ
   270           *
   271           * Arguments  :
-  272           *             databuf:¶ÁÈ¡ÎÄ¼şÊı¾İµÄbuf
-  273           *             length:¶ÁÈ¡µÄ³¤¶È£¬×Ö½ÚÎªµ¥Î»
+  272           *             databuf:è¯»å–æ–‡ä»¶æ•°æ®çš„buf
+  273           *             length:è¯»å–çš„é•¿åº¦ï¼Œå­—èŠ‚ä¸ºå•ä½
   274           * Returns     :
-  275           *            TRUE: ³É¹¦,
-  276           *            FALSE: Ê§°Ü.
+  275           *            TRUE: æˆåŠŸ,
+  276           *            FALSE: å¤±è´¥.
   277           * Notes       :
   278           *
   279           ********************************************************************************/
@@ -302,7 +302,7 @@ stmt  level    source
   283   1          int i = 0;
   284   1          BOOL result;
   285   1      
-  286   1          //Ò»¸öÒ»¸ö×Ö½Ú¸´ÖÆ£¬¿ÉÒÔ½øĞĞÓÅ»¯
+  286   1          //ä¸€ä¸ªä¸€ä¸ªå­—èŠ‚å¤åˆ¶ï¼Œå¯ä»¥è¿›è¡Œä¼˜åŒ–
   287   1          ClearWatchDog();
   288   1          while ((bufindex < 512) && (i < length))
   289   1          {
@@ -311,7 +311,7 @@ stmt  level    source
   292   2              bufindex++;
   293   2              if (bufindex == 512)
   294   2              {
-  295   3                  //            result = FS_FSeek(1, 1, TagHandle); //µ±Ç°Î»ÖÃÏÈºóÆ«ÒÆÒ»Ò³ 512byte
+  295   3                  //            result = FS_FSeek(1, 1, TagHandle); //å½“å‰ä½ç½®å…ˆååç§»ä¸€é¡µ 512byte
   296   3                  //            if (result == 0)
   297   3                  //            {
   298   3                  //                return FALSE;
@@ -332,10 +332,10 @@ stmt  level    source
   313   1      }
   314          
   315          /********************************************************************************
-  316           * Description : ±£´æµ±Ç°Frame
+  316           * Description : ä¿å­˜å½“å‰Frame
   317           *
   318           * Arguments  :
-  319           *             len: FrameµÄÓĞĞ§³¤¶È  pId3Save->savelenÊÇ30£¬Ö®Ç°ÒÑ¾­ÉèÖÃÁËµÄ
+  319           *             len: Frameçš„æœ‰æ•ˆé•¿åº¦  pId3Save->savelenæ˜¯30ï¼Œä¹‹å‰å·²ç»è®¾ç½®äº†çš„
   320           * Returns     :
   321           *
 C251 COMPILER V4.55,  enhanced_tag1                                                        13/12/18  16:27:42  PAGE 6   
@@ -380,12 +380,12 @@ stmt  level    source
   359   1      }
   360          
   361          /********************************************************************************
-  362           * Description : Frame½âÎö
+  362           * Description : Frameè§£æ
   363           *
   364           * Arguments  :
   365           *
   366           * Returns     :
-  367           *            FrameµÄÕû³¤
+  367           *            Frameçš„æ•´é•¿
   368           * Notes       :
   369           *
   370           ********************************************************************************/
@@ -394,14 +394,14 @@ stmt  level    source
   373          {
   374   1          char id3header[12];
   375   1      
-  376   1          //»ñÈ¡Ò»¸öÍ·µ½id3header
+  376   1          //è·å–ä¸€ä¸ªå¤´åˆ°id3header
   377   1          FI_FRead(id3header, ID3ver[curversion].bytes_of_header);
   378   1          if ((id3header[0] == 0) && (id3header[1] == 0) && (id3header[2] == 0))
   379   1          {
   380   2              return 0;
   381   2          }
   382   1      
-  383   1          //´¦ÀíÒ»¸öÍ·£¬»ñµÃ¸ÃĞÅÏ¢Ö¡µÄ³¤¶È
+  383   1          //å¤„ç†ä¸€ä¸ªå¤´ï¼Œè·å¾—è¯¥ä¿¡æ¯å¸§çš„é•¿åº¦
   384   1          GetFrameSize(id3header);
   385   1      
   386   1          if (FALSE != IsAvailFrameID(id3header))
@@ -415,18 +415,18 @@ stmt  level    source
   392   1          {
   393   2              Check_Comm_Item(id3header);
   394   2          }
-  395   1          return framesize + ID3ver[curversion].bytes_of_header; //Ö¡³¤¼ÓÖ¡Í·³¤
+  395   1          return framesize + ID3ver[curversion].bytes_of_header; //å¸§é•¿åŠ å¸§å¤´é•¿
   396   1      }
   397          
   398          /********************************************************************************
-  399           * Description : ¶ÁÈ¡V2°æ±¾ID3 Tag
+  399           * Description : è¯»å–V2ç‰ˆæœ¬ID3 Tag
   400           *
   401           * Arguments  :
-  402           *             TagFileHandle:´ı´¦ÀíÎÄ¼ş¾ä±ú
-  403           *             pID3Info:ID3 Tag±£´æ½á¹¹ÌåÖ¸Õë
+  402           *             TagFileHandle:å¾…å¤„ç†æ–‡ä»¶å¥æŸ„
+  403           *             pID3Info:ID3 Tagä¿å­˜ç»“æ„ä½“æŒ‡é’ˆ
   404           * Returns     :
-  405           *            TRUE: ³É¹¦,
-  406           *            FALSE: Ê§°Ü.
+  405           *            TRUE: æˆåŠŸ,
+  406           *            FALSE: å¤±è´¥.
   407           * Notes       :
   408           *
   409           ********************************************************************************/
@@ -437,16 +437,16 @@ stmt  level    source
   414   1          dword whole_framesize;
   415   1      
   416   1          TagHandle = TagFileHandle;
-  417   1          pID3InfoStart = pID3Info;//ĞÅÏ¢Òş²Ø£¬pID3InfoÊÇ´«½øÀ´µÄ²ÎÊı£¬¶øpID3InfoStartµÈÍ¬£¬µ«ÆäÔÚTAGÄ£¿éÖĞÊÇÈ«
-             -¾Ö·ÃÎÊµÄ
+  417   1          pID3InfoStart = pID3Info;//ä¿¡æ¯éšè—ï¼ŒpID3Infoæ˜¯ä¼ è¿›æ¥çš„å‚æ•°ï¼Œè€ŒpID3InfoStartç­‰åŒï¼Œä½†å…¶åœ¨TAGæ¨¡å—ä¸­æ˜¯å…¨
+             -å±€è®¿é—®çš„
   418   1      
   419   1          findcount = 0;
   420   1          memset(AvailFlag, 0, sizeof(AvailFlag));
-  421   1          curversion = 0;//Ä¬ÈÏID3v2.3°æ±¾
+  421   1          curversion = 0;//é»˜è®¤ID3v2.3ç‰ˆæœ¬
   422   1      
   423   1          ClearWatchDog();
   424   1      
-  425   1          FI_FInit();//¶ÁÈ¡512byteµ½ TempBuf
+  425   1          FI_FInit();//è¯»å–512byteåˆ° TempBuf
   426   1          FI_FRead((char *) &id3h, sizeof(id3h));
   427   1      
   428   1          if ((id3h.Header[0] != 'I') || (id3h.Header[1] != 'D') || (id3h.Header[2] != '3'))
@@ -456,10 +456,10 @@ stmt  level    source
   432   1      
   433   1          if (id3h.Ver < 3)
   434   1          {
-  435   2              curversion = 1;//ID3v2.2°æ±¾
+  435   2              curversion = 1;//ID3v2.2ç‰ˆæœ¬
   436   2          }
   437   1      
-  438   1          //ID3SizeÊÇÕû¸öID3V2µÄ³¤¶È
+  438   1          //ID3Sizeæ˜¯æ•´ä¸ªID3V2çš„é•¿åº¦
   439   1          ID3Size = ((dword) (id3h.Size[0] & 0x7F) << 21) + ((dword) (id3h.Size[1] & 0x7F) << 14) + ((dword) (i
              -d3h.Size[2]
   440   1                    & 0x7F) << 7) + (dword) (id3h.Size[3] & 0x7F) + sizeof(id3h);
@@ -470,7 +470,7 @@ stmt  level    source
   445   1          {
   446   2              ClearWatchDog();
   447   2      
-  448   2              //whole_framesizeÒ»Ö¡µÄ³¤¶È
+  448   2              //whole_framesizeä¸€å¸§çš„é•¿åº¦
   449   2              whole_framesize = ParseFrame();
   450   2              if (whole_framesize == 0) //deal with the padding byte
   451   2              {
@@ -480,7 +480,7 @@ stmt  level    source
   453   3              }
   454   2              framepos += whole_framesize;
   455   2      
-  456   2              //SaveTagInfo ÀïÊ¹ÓÃµÄlen(×î´óÊÇ30)²»Ò»¶¨ÊÇframeSize £¬Òò´ËÒªÖØĞÂ¶ÔÆë
+  456   2              //SaveTagInfo é‡Œä½¿ç”¨çš„len(æœ€å¤§æ˜¯30)ä¸ä¸€å®šæ˜¯frameSize ï¼Œå› æ­¤è¦é‡æ–°å¯¹é½
   457   2              if (!FI_FSeek(framepos))
   458   2              {
   459   3                  break;

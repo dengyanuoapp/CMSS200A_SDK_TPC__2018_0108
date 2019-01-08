@@ -35,24 +35,24 @@ stmt  level    source
    24          
    25          SD_FILE *res_fp;
    26          region_t res_region;
-   27          uint8 ui_auto_select = FALSE; //ÊÇ·ñ×Ô¶¯È·ÈÏ
+   27          uint8 ui_auto_select = FALSE; //æ˜¯å¦è‡ªåŠ¨ç¡®è®¤
    28          uint32 pic_entry_offset;
    29          uint32 string_entry_offset;
    30          uint8 p_device_name[] = "USND";
-   31          uint8 g_light_time = 0; //¹Ø±³¹âÊ±¼ä,0.5ÃëÎªµ¥Î»
-   32          uint8 g_light_mode = 0; //¹ØÁÁ¶ÈÄ£Ê½£¬0£º±ä°µ£¬1£º±äºÚ
-   33          uint8 g_contrast_num = 0; //¶Ô±È¶È
-   34          uint16 g_sleep_time = 0; //Ë¯ÃßÊ±¼ä,0.5ÃëÎªµ¥Î»
-   35          uint16 g_standby_time = 0; //×Ô¶¯¹Ø»úÊ±¼ä,0.5ÃëÎªµ¥Î»
-   36          uint16 g_rtc_counter = 0; //rtc ÏûÏ¢¼ÆÊı
-   37          uint8 g_light_flag = TRUE;//±³¾°µÆ¿ª¹Ø±êÖ¾
-   38          uint8 g_charge_counter = 0; //¼ì²â³äµç×´Ì¬µÄ¼ÆÊıÆ÷£¬²åÉÏUSB¾Í¿ªÊ¼¼ì²âµÚÒ»´Î
-   39          uint16 g_low_counter = 0;//±¨µÍµç¼ÆÊıÆ÷
-   40          uint16 key_count = 0; //µ±Ç°°´¼üÏûÏ¢·¢ÉúµÄ´ÎÊı
-   41          uint8 key_value = Msg_KeyNull; //µ±Ç°°´¼üµÄÖµ
-   42          uint16 lowPower_counter = 0;//µÍµç·¢Éú´ÎÊı
-   43          uint8 file_name[12]; //´æ·ÅÎÄ¼ş¶ÌÃûÊı×Ö
-   44          uint8 cur_value = 0; //µ±Ç°µÄµç³ØµçÁ¿Öµ£¬Ö÷ÒªÓÃÓÚ³äµçÏÔÊ¾
+   31          uint8 g_light_time = 0; //å…³èƒŒå…‰æ—¶é—´,0.5ç§’ä¸ºå•ä½
+   32          uint8 g_light_mode = 0; //å…³äº®åº¦æ¨¡å¼ï¼Œ0ï¼šå˜æš—ï¼Œ1ï¼šå˜é»‘
+   33          uint8 g_contrast_num = 0; //å¯¹æ¯”åº¦
+   34          uint16 g_sleep_time = 0; //ç¡çœ æ—¶é—´,0.5ç§’ä¸ºå•ä½
+   35          uint16 g_standby_time = 0; //è‡ªåŠ¨å…³æœºæ—¶é—´,0.5ç§’ä¸ºå•ä½
+   36          uint16 g_rtc_counter = 0; //rtc æ¶ˆæ¯è®¡æ•°
+   37          uint8 g_light_flag = TRUE;//èƒŒæ™¯ç¯å¼€å…³æ ‡å¿—
+   38          uint8 g_charge_counter = 0; //æ£€æµ‹å……ç”µçŠ¶æ€çš„è®¡æ•°å™¨ï¼Œæ’ä¸ŠUSBå°±å¼€å§‹æ£€æµ‹ç¬¬ä¸€æ¬¡
+   39          uint16 g_low_counter = 0;//æŠ¥ä½ç”µè®¡æ•°å™¨
+   40          uint16 key_count = 0; //å½“å‰æŒ‰é”®æ¶ˆæ¯å‘ç”Ÿçš„æ¬¡æ•°
+   41          uint8 key_value = Msg_KeyNull; //å½“å‰æŒ‰é”®çš„å€¼
+   42          uint16 lowPower_counter = 0;//ä½ç”µå‘ç”Ÿæ¬¡æ•°
+   43          uint8 file_name[12]; //å­˜æ”¾æ–‡ä»¶çŸ­åæ•°å­—
+   44          uint8 cur_value = 0; //å½“å‰çš„ç”µæ± ç”µé‡å€¼ï¼Œä¸»è¦ç”¨äºå……ç”µæ˜¾ç¤º
    45          uint8 batvalue[5] =
    46          { 0x5c, 0x5f, 0x64, 0x69, 0x6e };
    47          uint8 double_key_flag = 0;
@@ -214,14 +214,14 @@ stmt  level    source
   197   1          int16 retval;
   198   1          BOOL Audioloop = 1;
   199   1      
-  200   1          //³õÊ¼»¯²»Ê¹ÄÜUSOUNDÂ¼Òô
+  200   1          //åˆå§‹åŒ–ä¸ä½¿èƒ½USOUNDå½•éŸ³
   201   1          urec_en = FALSE;
   202   1          memset(file_name, 0xff, 12);
   203   1          while (Audioloop != 0)
   204   1          {
   205   2              ClearWatchDog();
   206   2      
-  207   2              if (0x00 != (usb_state & 0x04)) //°ÎÏß´¦Àí
+  207   2              if (0x00 != (usb_state & 0x04)) //æ‹”çº¿å¤„ç†
   208   2              {
   209   3                  Audioloop = FALSE;
   210   3                  retval = RESULT_MAIN;
@@ -249,7 +249,7 @@ stmt  level    source
   232   2                      
   233   2              switch (key_v)
   234   2              {
-  235   3                  /* mode¼ü×÷ÎªusoundÂ¼ÒôÊ¹ÄÜ¼ü */
+  235   3                  /* modeé”®ä½œä¸ºusoundå½•éŸ³ä½¿èƒ½é”® */
   236   3                      case AP_MSG_WAIT_TIMEOUT:
   237   3                              if (key != 0)
   238   3                  {
@@ -258,7 +258,7 @@ stmt  level    source
   241   4                  }
   242   3                              break;
   243   3              case AP_KEY_MODE | AP_KEY_UP:
-  244   3                  //´ò¿ªUSOUNDÂ¼Òô
+  244   3                  //æ‰“å¼€USOUNDå½•éŸ³
   245   3                  key = 0;
   246   3                  //LEDClearScreen();
   247   3                  //LEDPuts(NUMBER1, p_device_name, 1);
@@ -281,7 +281,7 @@ stmt  level    source
   262   3                  need_draw = TRUE;
   263   3                  break;
   264   3      
-  265   3                  /* ³¤°´mode·µ»Ømain AP */
+  265   3                  /* é•¿æŒ‰modeè¿”å›main AP */
   266   3              case AP_KEY_MODE | AP_KEY_LONG:
   267   3                  longkey_flag = 1;
   268   3                  Audioloop = 0;
@@ -364,7 +364,7 @@ stmt  level    source
   343   3                  break;
   344   3      
   345   3      #ifdef FUN_SWITCH_KEY
-  346   3              case AP_KEY_FUNCTION | AP_KEY_UP: //Mode¼ü£¬UHost\Card\FM\USBÒôÏä °´ÏÂÑ­»·ÇĞ»»
+  346   3              case AP_KEY_FUNCTION | AP_KEY_UP: //Modeé”®ï¼ŒUHost\Card\FM\USBéŸ³ç®± æŒ‰ä¸‹å¾ªç¯åˆ‡æ¢
   347   3                  Audioloop = 0;
   348   3                  retval = RESULT_USBUDISK_PLAY;
   349   3                  break;
@@ -391,17 +391,17 @@ stmt  level    source
   370          void volume_callback(int16 Vol)
   371          {
   372   1      
-  373   1          //ÊµÊ±¸Ä±äÒôÁ¿µÄÖµ
+  373   1          //å®æ—¶æ”¹å˜éŸ³é‡çš„å€¼
   374   1          g_comval.volume = Vol; // (uint8) Vol * SOFTVOL_MAX / g_comval.VolumeMax;
   375   1          OutPutVolume(g_comval.volume);
   376   1      }
   377          /********************************************************************************
-  378           * Description : ´¦ÀíÒôÁ¿¼ü
+  378           * Description : å¤„ç†éŸ³é‡é”®
   379           *
   380           * Arguments  :
   381           *
   382           * Returns     :
-  383           *            ÎŞ
+  383           *            æ— 
   384           * Notes       :
   385           *
   386           ********************************************************************************/
@@ -438,12 +438,12 @@ stmt  level    source
   415          
   416          /*
   417           ********************************************************************************
-  418           * Description : ´¦ÀíÏµÍ³ÏûÏ¢, ·µ»Ø°´¼üÏûÏ¢, Í¬Ê±¸ºÔğ¿ª/¹Ø±³¹â
-  419           ap_get_message_core() µÄÈë¿Ú
+  418           * Description : å¤„ç†ç³»ç»Ÿæ¶ˆæ¯, è¿”å›æŒ‰é”®æ¶ˆæ¯, åŒæ—¶è´Ÿè´£å¼€/å…³èƒŒå…‰
+  419           ap_get_message_core() çš„å…¥å£
   420           *
   421           * Arguments   :
   422           *
-  423           * Returns     : ·µ»ØapÄÜ¹»Ê¶±ğµÄÏûÏ¢, Èç¹ûÃ»ÓĞÏµÍ³ÏûÏ¢, ·µ»Ø AP_KEY_NULL
+  423           * Returns     : è¿”å›apèƒ½å¤Ÿè¯†åˆ«çš„æ¶ˆæ¯, å¦‚æœæ²¡æœ‰ç³»ç»Ÿæ¶ˆæ¯, è¿”å› AP_KEY_NULL
   424           *
   425           * Notes       :
   426           ********************************************************************************
@@ -535,12 +535,12 @@ stmt  level    source
   510          
   511          /*
   512           ********************************************************************************
-  513           * Description : ´¦ÀíÈÈ¼üÏûÏ¢, ·µ»Ø½á¹ûÏûÏ¢
+  513           * Description : å¤„ç†çƒ­é”®æ¶ˆæ¯, è¿”å›ç»“æœæ¶ˆæ¯
   514           *
-  515           * Arguments   : key, °´¼üÏûÏ¢
+  515           * Arguments   : key, æŒ‰é”®æ¶ˆæ¯
   516           *
-  517           * Returns     : Èç¹ûÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø½á¹ûÏûÏ¢
-  518           Èç¹ûÃ»ÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø0
+  517           * Returns     : å¦‚æœæœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›ç»“æœæ¶ˆæ¯
+  518           å¦‚æœæ²¡æœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›0
   519           *
 C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 9   
 
@@ -557,20 +557,20 @@ stmt  level    source
                     }*/
                    switch (key)
                    {
-                   case AP_KEY_PLAY | AP_KEY_LONG: //³¤°´play·¢standby
-                   case AP_MSG_STANDBY: //×Ô¶¯¹Ø»ú                                                              
-                   case AP_MSG_FORCE_STANDBY: //Ê¹ÓÃÉÏÁ½¸ö»á±¨label duplicate
+                   case AP_KEY_PLAY | AP_KEY_LONG: //é•¿æŒ‰playå‘standby
+                   case AP_MSG_STANDBY: //è‡ªåŠ¨å…³æœº                                                              
+                   case AP_MSG_FORCE_STANDBY: //ä½¿ç”¨ä¸Šä¸¤ä¸ªä¼šæŠ¥label duplicate
                                long_key_flag=0;
                                break;
                        return RESULT_STANDBY;
                
-                   case AP_KEY_MODE | AP_KEY_LONG: //³¤°´menu½øÈëmain
+                   case AP_KEY_MODE | AP_KEY_LONG: //é•¿æŒ‰menuè¿›å…¥main
                        return RESULT_MAIN;
                
                    case RESULT_AUTO_BACK:
                        return RESULT_AUTO_BACK;
                
-                   case AP_KEY_AB | AP_KEY_UP: //½øÈëÂ¼Òô
+                   case AP_KEY_AB | AP_KEY_UP: //è¿›å…¥å½•éŸ³
                        return RESULT_RECORD;
                    case AP_MSG_SD_OUT:
                        //ui_show_CardOut();
@@ -580,13 +580,13 @@ stmt  level    source
                        return RESULT_REDRAW;
                
                        /*case AP_MSG_LOCK: //locked
-                        if (ui_run_realtime == TRUE) //ÊµÊ±Ä£Ê½²»ÏÔÊ¾lock
+                        if (ui_run_realtime == TRUE) //å®æ—¶æ¨¡å¼ä¸æ˜¾ç¤ºlock
                         {
                         return 0;
                         }
                         else
                         {
-                        ui_show_lock(1); //ÕâÀï²»´¦ÀíÈÈ¼ü,·ÀÖ¹Ç¶Ì×
+                        ui_show_lock(1); //è¿™é‡Œä¸å¤„ç†çƒ­é”®,é˜²æ­¢åµŒå¥—
                         return RESULT_REDRAW;
                         }*/
                #ifdef CHECKALARM
@@ -607,15 +607,15 @@ stmt  level    source
                
                /*
                 ********************************************************************************
-                * Description : ´¦ÀíÈÈ¼üÏûÏ¢, ·µ»Ø½á¹ûÏûÏ¢
-                ap_handle_hotkey_core() µÄÈë¿Ú
+                * Description : å¤„ç†çƒ­é”®æ¶ˆæ¯, è¿”å›ç»“æœæ¶ˆæ¯
+                ap_handle_hotkey_core() çš„å…¥å£
                 *
 C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 10  
 
-                * Arguments   : key, °´¼üÏûÏ¢
+                * Arguments   : key, æŒ‰é”®æ¶ˆæ¯
                 *
-                * Returns     : Èç¹ûÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø½á¹ûÏûÏ¢
-                Èç¹ûÃ»ÓĞ¿ÉÊ¶±ğµÄÈÈ¼üÏûÏ¢,  ·µ»Ø0
+                * Returns     : å¦‚æœæœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›ç»“æœæ¶ˆæ¯
+                å¦‚æœæ²¡æœ‰å¯è¯†åˆ«çš„çƒ­é”®æ¶ˆæ¯,  è¿”å›0
                 *
                 * Notes       :
                 *
@@ -641,13 +641,13 @@ stmt  level    source
   612   1          //StandbyScreen(OnOff);
   613   1      }
   614          /********************************************************************************
-  615           * Description : »ñÈ¡³äµçÆ÷µÄ×´Ì¬
+  615           * Description : è·å–å……ç”µå™¨çš„çŠ¶æ€
   616           *
   617           * Arguments  :
   618           *
   619           *
-  620           * Returns     :dpdm_status=0X80Îª³äµçÆ÷
-  621           *            ÎŞ
+  620           * Returns     :dpdm_status=0X80ä¸ºå……ç”µå™¨
+  621           *            æ— 
   622           * Notes       :
   623           *
   624           ********************************************************************************/
@@ -663,15 +663,15 @@ stmt  level    source
   634   1      }
   635          /*
   636           ********************************************************************************
-  637           * Description : ´¦ÀíÏµÍ³ÏûÏ¢, ·µ»Ø°´¼üÏûÏ¢, Í¬Ê±¸ºÔğ¿ª/¹Ø±³¹â
+  637           * Description : å¤„ç†ç³»ç»Ÿæ¶ˆæ¯, è¿”å›æŒ‰é”®æ¶ˆæ¯, åŒæ—¶è´Ÿè´£å¼€/å…³èƒŒå…‰
   638           *
-  639           * Arguments   : key, ÏµÍ³ÏûÏ¢
+  639           * Arguments   : key, ç³»ç»Ÿæ¶ˆæ¯
   640           *
-  641           * Returns     : ·µ»ØapÄÜ¹»Ê¶±ğµÄÏûÏ¢, Èç¹ûÃ»ÓĞÏµÍ³ÏûÏ¢, ·µ»Ø AP_KEY_NULL
+  641           * Returns     : è¿”å›apèƒ½å¤Ÿè¯†åˆ«çš„æ¶ˆæ¯, å¦‚æœæ²¡æœ‰ç³»ç»Ÿæ¶ˆæ¯, è¿”å› AP_KEY_NULL
   642           *
   643           * Notes       :
   644          
-  645           * °´¼üÊ±Ğò:
+  645           * æŒ‰é”®æ—¶åº:
   646           *  0.....1.2....1.5........... (s)
   647           *  key    long   hold    up    (>1.2s)
   648           *  key  up            (<1.2s)
@@ -684,17 +684,17 @@ stmt  level    source
   653           */
   654          uint8 ap_get_message_core(uint8 key)
   655          {
-  656   1          //    static WORD key_count=0;      //µ±Ç°°´¼üÏûÏ¢·¢ÉúµÄ´ÎÊı
-  657   1          //    static uint8 key_value = Msg_KeyNull;   //µ±Ç°°´¼üµÄÖµ
+  656   1          //    static WORD key_count=0;      //å½“å‰æŒ‰é”®æ¶ˆæ¯å‘ç”Ÿçš„æ¬¡æ•°
+  657   1          //    static uint8 key_value = Msg_KeyNull;   //å½“å‰æŒ‰é”®çš„å€¼
   658   1      #ifdef EAR_PROTECT
                    bool counter_flag = FALSE;
                #endif
   661   1          //    uint8 sfr_bak;
   662   1          uint8 sysOnOff = 0;
-  663   1          /*°´¼üÏûÏ¢ºÍÉÏ´ÎµÄÒ»ÑùÊ±µÄ´¦Àí*/
+  663   1          /*æŒ‰é”®æ¶ˆæ¯å’Œä¸Šæ¬¡çš„ä¸€æ ·æ—¶çš„å¤„ç†*/
   664   1          if (key == key_value)
   665   1          {
-  666   2              /*±³¹âÃ»¿ªÊ±£¬µÈÌ§Æğ¼ü¿ª±³¹â£¬ºöÂÔ°´¼ü*/
+  666   2              /*èƒŒå…‰æ²¡å¼€æ—¶ï¼Œç­‰æŠ¬èµ·é”®å¼€èƒŒå…‰ï¼Œå¿½ç•¥æŒ‰é”®*/
   667   2              g_rtc_counter = 0;
   668   2              key_count++;
   669   2              if (!g_light_flag)
@@ -709,15 +709,15 @@ stmt  level    source
   678   4                                      FF_Play_mode=double_key_flag;
   679   4                                      double_key_flag=0;
   680   4                                      long_key_flag = 1;
-  681   4                                      key = (uint8) (key | AP_KEY_LONG); //¡·1.2s,·¢Key holdÏûÏ¢ 
+  681   4                                      key = (uint8) (key | AP_KEY_LONG); //ã€‹1.2s,å‘Key holdæ¶ˆæ¯ 
   682   4                              //      prints("\n FF_Play");
   683   4                                      return key;
   684   4                  }
   685   3                      }
-  686   2              /*°´×¡°´¼üÊ±£¬320ms·¢ËÍÒ»´ÎÏàÍ¬°´¼üÏûÏ¢*/
+  686   2              /*æŒ‰ä½æŒ‰é”®æ—¶ï¼Œ320mså‘é€ä¸€æ¬¡ç›¸åŒæŒ‰é”®æ¶ˆæ¯*/
   687   2                      if (key_count >= 4)
   688   2              {
-  689   3                  key = (uint8) (key | AP_KEY_LONG); //¡·1.2s,·¢Key holdÏûÏ¢           
+  689   3                  key = (uint8) (key | AP_KEY_LONG); //ã€‹1.2s,å‘Key holdæ¶ˆæ¯           
   690   3                              long_key_flag = 1;
   691   3              }
   692   2              else
@@ -751,7 +751,7 @@ stmt  level    source
   718   3                              
   719   3                      }
   720   2                      
-  721   2              /*key_valueµÄÖÃĞè¸Ä±ä*/
+  721   2              /*key_valueçš„ç½®éœ€æ”¹å˜*/
   722   2                      if (key_value == AP_KEY_PLAY)
   723   2                      {
   724   3                              if (double_key_flag == 0)
@@ -773,9 +773,9 @@ stmt  level    source
   740   2              key_value = key;
   741   2              if (!g_light_flag)
   742   2              {
-  743   3                  Lightmodeset(TRUE);//¿ª±³¹â
+  743   3                  Lightmodeset(TRUE);//å¼€èƒŒå…‰
   744   3                  g_light_flag = TRUE;
-  745   3                  /*Êä³ö°´¼üÒô*/
+  745   3                  /*è¾“å‡ºæŒ‰é”®éŸ³*/
   746   3                  //Open_KeyTone(g_comval.KeyTone);
   747   3                  return NULL;
   748   3              }
@@ -803,16 +803,16 @@ stmt  level    source
   770   2      
   771   2              
   772   2      
-  773   2              /*2HZ¼ÆÊ±ÎŞ²Ù×÷·µ»Ø*/
+  773   2              /*2HZè®¡æ—¶æ— æ“ä½œè¿”å›*/
   774   2              if ((g_rtc_counter % 16) == 0)
   775   2              {
   776   3                  return AP_MSG_WAIT_TIMEOUT;
   777   3              }
   778   2      
-  779   2              /*AP´¦ÀíµÄ2HZÏûÏ¢*/
+  779   2              /*APå¤„ç†çš„2HZæ¶ˆæ¯*/
   780   2              if (key == MSG_RTC2HZ)
   781   2              {
-  782   3      #ifdef CHECKALARM        //ÔÚAP¹¤³ÌÀï¶¨Òå
+  782   3      #ifdef CHECKALARM        //åœ¨APå·¥ç¨‹é‡Œå®šä¹‰
                            if (alarmtimerflag == 1)
 C251 COMPILER V4.55,  usound_task                                                          13/12/18  16:28:55  PAGE 13  
 
@@ -834,7 +834,7 @@ stmt  level    source
                                    else
                                    {
                                        key = AP_MSG_ALARM;
-                                       Lightmodeset(TRUE);//¿ª¹Ø±³¹â£¨TRUE: ¿ª, FALSE:¹Ø£©
+                                       Lightmodeset(TRUE);//å¼€å…³èƒŒå…‰ï¼ˆTRUE: å¼€, FALSE:å…³ï¼‰
                                    }
                                }
                                else
@@ -848,7 +848,7 @@ stmt  level    source
                                            VMWrite(&g_comval, VM_SYSTEM);
                                        }
                                        key = AP_MSG_FM;
-                                       Lightmodeset(TRUE);//¿ª¹Ø±³¹â£¨TRUE: ¿ª, FALSE:¹Ø£©
+                                       Lightmodeset(TRUE);//å¼€å…³èƒŒå…‰ï¼ˆTRUE: å¼€, FALSE:å…³ï¼‰
                                    }
                                    else
                                    {
@@ -886,7 +886,7 @@ stmt  level    source
 
   850   3              }
   851   2      
-  852   2              /*³äµç¼ì²â2HZ¼ÆÊ±£¬Ã¿30s¼à²âÒ»´Î³äµç×´Ì¬*/
+  852   2              /*å……ç”µæ£€æµ‹2HZè®¡æ—¶ï¼Œæ¯30sç›‘æµ‹ä¸€æ¬¡å……ç”µçŠ¶æ€*/
   853   2              if (GetDC5VStatus() == 0x80)
   854   2              {
   855   3                  if (g_charge_counter == 60)
@@ -915,7 +915,7 @@ stmt  level    source
   878   2      
   879   2      #if 0
                    case MSG_LOW_POWER:
-                       /*ÏµÍ³µÍµçÏûÏ¢´¦ÀíÎªÇ¿ÖÆ¹Ø»ú*/
+                       /*ç³»ç»Ÿä½ç”µæ¶ˆæ¯å¤„ç†ä¸ºå¼ºåˆ¶å…³æœº*/
                        lowPower_counter++;
                        if (lowPower_counter >= 3)
                        {
@@ -940,11 +940,11 @@ stmt  level    source
   903   2              key = AP_KEY_NULL;
   904   2              break;
   905   2      
-  906   2          case MSG_SD_IN:/*²å¿¨×´Ì¬*/
+  906   2          case MSG_SD_IN:/*æ’å¡çŠ¶æ€*/
   907   2              key = AP_MSG_SD_IN;
   908   2              if (!g_light_flag)
   909   2              {
-  910   3                  Lightmodeset(TRUE);//¿ª±³¹â
+  910   3                  Lightmodeset(TRUE);//å¼€èƒŒå…‰
   911   3                  g_light_flag = TRUE;
   912   3                  g_rtc_counter = 0;
   913   3              }
@@ -956,7 +956,7 @@ stmt  level    source
                    case MSG_UH_IN:
                        if(!g_light_flag)
                        {
-                           Lightmodeset(TRUE);//¿ª±³¹â
+                           Lightmodeset(TRUE);//å¼€èƒŒå…‰
                            g_light_flag = TRUE;
                            g_rtc_counter = 0;
                        }
@@ -966,7 +966,7 @@ stmt  level    source
                    case MSG_UH_OUT:
                        if(!g_light_flag)
                        {
-                           Lightmodeset(TRUE);//¿ª±³¹â
+                           Lightmodeset(TRUE);//å¼€èƒŒå…‰
                            g_light_flag = TRUE;
                            g_rtc_counter = 0;
                        }
@@ -974,16 +974,16 @@ stmt  level    source
                        break;
                #endif
   937   2      
-  938   2          case MSG_SD_OUT:/*²¦¿¨×´Ì¬*/
+  938   2          case MSG_SD_OUT:/*æ‹¨å¡çŠ¶æ€*/
   939   2              key = AP_MSG_SD_OUT;
   940   2              break;  
-  941   2          default: /*ĞÂ°´¼ü´¦Àí*/
+  941   2          default: /*æ–°æŒ‰é”®å¤„ç†*/
   942   2              g_rtc_counter = 0;
   943   2              key_count = 1;
   944   2              key_value = key;
   945   2              if (!g_light_flag)
   946   2              {
-  947   3                  /*Èç±³µÆÃ»¿ª£¬²»´¦ÀíÏûÏ¢*/
+  947   3                  /*å¦‚èƒŒç¯æ²¡å¼€ï¼Œä¸å¤„ç†æ¶ˆæ¯*/
   948   3                  key_count = 0;
   949   3                  //g_rtc_counter = 0;
   950   3                  //return NULL;

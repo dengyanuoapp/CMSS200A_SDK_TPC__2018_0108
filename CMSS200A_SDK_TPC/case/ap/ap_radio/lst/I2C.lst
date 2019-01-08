@@ -139,7 +139,7 @@ stmt  level    source
   124           *******************************************************************************
   125           *             void IIC_Init(void)
   126           *
-  127           * Description : I2C³õÊ¼»¯
+  127           * Description : I2Cåˆå§‹åŒ–
   128           *
   129           * Arguments   :
   130          
@@ -151,7 +151,7 @@ stmt  level    source
   136           */
   137          void near IIC_Init(void)
   138          {
-  139   1          //Ê¹ÄÜÊä³ö,²¢½«Ê±ÖÓÏßºÍÊı¾İÏßÀ­¸ß
+  139   1          //ä½¿èƒ½è¾“å‡º,å¹¶å°†æ—¶é’Ÿçº¿å’Œæ•°æ®çº¿æ‹‰é«˜
   140   1          SetSDAOut();
   141   1          SetCLKOut();
   142   1          SetSDA_1_hold();
@@ -171,7 +171,7 @@ stmt  level    source
   156   1          SFR_SDA_OUT_EN &= ~(0x01 << SDA_PORT_NUM);
   157   1      
   158   1          SFR_BANK = sfr_bak;
-  159   1          //Disable Ê±ÖÓÏßºÍÊı¾İÏßµÄÊäÈë, Êä³ö
+  159   1          //Disable æ—¶é’Ÿçº¿å’Œæ•°æ®çº¿çš„è¾“å…¥, è¾“å‡º
   160   1          //    Reset_GPIO(I2CDAT, SDA_OUTPORT, SDA_OUTPORT_NUM);
   161   1          //    Reset_GPIO(I2CDAT, SDA_INPORT, SDA_INPORT_NUM);
   162   1          //    Reset_GPIO(I2CSCL, SCL_OUTPORT, SCL_OUTPORT_NUM);
@@ -179,8 +179,8 @@ stmt  level    source
   164   1      }
   165          
   166          /************************************************************************
-  167           * Description:  Ä£ÄâIIC  ×ÜÏßIIC ²Ù×÷ÑÓÊ±
-  168           * Input:   ÑÓÊ±Öµ
+  167           * Description:  æ¨¡æ‹ŸIIC  æ€»çº¿IIC æ“ä½œå»¶æ—¶
+  168           * Input:   å»¶æ—¶å€¼
   169           * Output: none
   170           * Note:
   171           *************************************************************************
@@ -191,7 +191,7 @@ stmt  level    source
   176   1      
   177   1          for (j = 0; j < delay; j++)
   178   1          {
-  179   2              //ÑÓÊ±º¯Êı
+  179   2              //å»¶æ—¶å‡½æ•°
   180   2              //;
   181   2          }
   182   1      }
@@ -200,7 +200,7 @@ stmt  level    source
   185           *******************************************************************************
   186           *             IIC_Start
   187           *
-  188           * Description :  Ä£ÄâIIC   Start  Á÷³Ì
+  188           * Description :  æ¨¡æ‹ŸIIC   Start  æµç¨‹
   189           *
 C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 4   
 
@@ -240,7 +240,7 @@ stmt  level    source
   223           *******************************************************************************
   224           *             IIC_Stop
   225           *
-  226           * Description :  Ä£ÄâIIC  Stop  Á÷³Ì
+  226           * Description :  æ¨¡æ‹ŸIIC  Stop  æµç¨‹
   227           *
   228           * Arguments   :
   229           *
@@ -277,15 +277,15 @@ stmt  level    source
   258           ******************************************************************************
   259           *             uint8 I2C_Trans_Bytes(uint8 *buf, uint8 length)
   260           *
-  261           * Description : ½«´æ·Åµ½*bufµØÖ·Àï³¤¶ÈÎªlengthµÄÊı¾İ·¢ËÍ³öÈ¥
+  261           * Description : å°†å­˜æ”¾åˆ°*bufåœ°å€é‡Œé•¿åº¦ä¸ºlengthçš„æ•°æ®å‘é€å‡ºå»
   262           *
-  263           * Arguments   : unsigned char *buf: Êı¾İ´æ·ÅµØÖ·
-  264           unsigned char length: Êı¾İ³¤¶È, ÒÔbyteÎªµ¥Î»
+  263           * Arguments   : unsigned char *buf: æ•°æ®å­˜æ”¾åœ°å€
+  264           unsigned char length: æ•°æ®é•¿åº¦, ä»¥byteä¸ºå•ä½
   265           *
-  266           * Returns     : FALSE: ·¢ËÍÊı¾İ½ÓÊÕµ½nack
-  267           TRUE: ·¢ËÍÊı¾İ½ÓÊÕµ½ack
+  266           * Returns     : FALSE: å‘é€æ•°æ®æ¥æ”¶åˆ°nack
+  267           TRUE: å‘é€æ•°æ®æ¥æ”¶åˆ°ack
   268           *
-  269           * Notes       : ÓÉÖ÷¿ØÏòI2C Éè±¸·¢ËÍÊı¾İ£¬½ÓÊÕÀ´×ÔÉè±¸µÄÏìÓ¦
+  269           * Notes       : ç”±ä¸»æ§å‘I2C è®¾å¤‡å‘é€æ•°æ®ï¼Œæ¥æ”¶æ¥è‡ªè®¾å¤‡çš„å“åº”
   270           *
   271           ********************************************************************************
   272           */
@@ -296,7 +296,7 @@ stmt  level    source
   277   1          IIC_Init();
   278   1      
   279   1          IIC_Start();
-  280   1          //·¢ËÍÊı¾İ
+  280   1          //å‘é€æ•°æ®
   281   1          do
   282   1          {
   283   2              IIC_WriteByte(*buf);
@@ -311,12 +311,12 @@ stmt  level    source
   292   1      
   293   1          if (length == 0)
   294   1          {
-  295   2              //È«²¿Êı¾İ·¢ËÍÍê³É, ³É¹¦
+  295   2              //å…¨éƒ¨æ•°æ®å‘é€å®Œæˆ, æˆåŠŸ
   296   2              ret = 1;
   297   2          }
   298   1          else
   299   1          {
-  300   2              //Î´·¢ËÍÍê³É, Ê§°Ü
+  300   2              //æœªå‘é€å®Œæˆ, å¤±è´¥
   301   2              ret = 0;
   302   2          }
   303   1          IIC_Stop();
@@ -330,14 +330,14 @@ stmt  level    source
   311           ******************************************************************************
   312           *             uint8 I2C_Recev_Bytes(uint8 *buf, uint8 address, uint8 length)
   313           *
-  314           * Description : ¶ÁÈ¡³¤¶Èlength
+  314           * Description : è¯»å–é•¿åº¦length
   315           *
-  316           * Arguments   : unsigned char *buf: Êı¾İ´æ·ÅµØÖ·
-  317           unsigned char address: slaveµØÖ·
-  318           *               unsigned char length: Êı¾İ³¤¶È,ÒÔbyteÎªµ¥Î»
+  316           * Arguments   : unsigned char *buf: æ•°æ®å­˜æ”¾åœ°å€
+  317           unsigned char address: slaveåœ°å€
+  318           *               unsigned char length: æ•°æ®é•¿åº¦,ä»¥byteä¸ºå•ä½
   319           *
-  320           * Returns     : FALSE: slave²»ÏìÓ¦
-  321           TRUE: ÊÕµ½Êı¾İ
+  320           * Returns     : FALSE: slaveä¸å“åº”
+  321           TRUE: æ”¶åˆ°æ•°æ®
 C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 6   
 
   322           *
@@ -355,7 +355,7 @@ stmt  level    source
   334   1          IIC_Init();
   335   1          IIC_Start();
   336   1      
-  337   1          //Ğ´Éè±¸µØÖ·
+  337   1          //å†™è®¾å¤‡åœ°å€
   338   1          IIC_WriteByte(0x20);
   339   1      
   340   1          if (!IIC_GetAck())
@@ -364,7 +364,7 @@ stmt  level    source
   343   2              goto recev_ret;
   344   2          }
   345   1      
-  346   1          IIC_WriteByte(Regaddress); //¶Á¼Ä´æÆ÷µØÖ·
+  346   1          IIC_WriteByte(Regaddress); //è¯»å¯„å­˜å™¨åœ°å€
   347   1          if (!IIC_GetAck())
   348   1          {
   349   2              ret = 0;
@@ -372,7 +372,7 @@ stmt  level    source
   351   2          }
   352   1      
   353   1          IIC_Start(); //restart
-  354   1          //¶ÁÉè±¸µØÖ·
+  354   1          //è¯»è®¾å¤‡åœ°å€
   355   1          IIC_WriteByte(0x21);
   356   1      
   357   1          if (!IIC_GetAck())
@@ -409,9 +409,9 @@ stmt  level    source
 C251 COMPILER V4.55,  I2C                                                                  23/05/16  10:42:15  PAGE 7   
 
   388           *
-  389           * Description : Ğ´1¸ö×Ö½ÚµÄÊı¾İµ½slave
+  389           * Description : å†™1ä¸ªå­—èŠ‚çš„æ•°æ®åˆ°slave
   390           *
-  391           * Arguments   : 1¸ö×Ö½ÚÊı¾İ
+  391           * Arguments   : 1ä¸ªå­—èŠ‚æ•°æ®
   392          
   393           *
   394           * Returns     : 1 ack; 0 nack
@@ -425,7 +425,7 @@ stmt  level    source
   402   1          uint8 i;
   403   1          for (i = 0; i < 8; i++)
   404   1          {
-  405   2              if (((dat << i) & 0x80) != 0) //¶ÔÓÚÒ»¸ö×Ö½Ú£¬´Ó¸ßbit µ½µÍbit ÒÀ´Î·¢ËÍ
+  405   2              if (((dat << i) & 0x80) != 0) //å¯¹äºä¸€ä¸ªå­—èŠ‚ï¼Œä»é«˜bit åˆ°ä½bit ä¾æ¬¡å‘é€
   406   2      
   407   2              {
   408   3                  //Set_GPIO(I2CDAT,SDA_DATAPORT, SDA_DATAPORT_NUM);             //data  pull up
@@ -448,12 +448,12 @@ stmt  level    source
   425           *******************************************************************************
   426           *             uint8 IIC_ReadByte(void)
   427           *
-  428           * Description : ¶ÁÈ¡1¸ö×Ö½ÚµÄÊı¾İ,²¢»Øack»òÕßnack¸øslave
+  428           * Description : è¯»å–1ä¸ªå­—èŠ‚çš„æ•°æ®,å¹¶å›ackæˆ–è€…nackç»™slave
   429           *
   430           * Arguments   : unsigned char ack: 1 ack; 0 nack
   431          
   432           *
-  433           * Returns     : ¶Áµ½µÄÊı¾İ
+  433           * Returns     : è¯»åˆ°çš„æ•°æ®
   434           *
   435           * Notes       :
   436           *
@@ -496,7 +496,7 @@ stmt  level    source
   471           *******************************************************************************
   472           *             void IIC_SendAck(uint8 ack)
   473           *
-  474           * Description : ·¢ËÍack»¹ÊÇnack
+  474           * Description : å‘é€ackè¿˜æ˜¯nack
   475           *
   476           * Arguments   : unsigned char ack: 1 noack; 0 ack
   477          
@@ -536,7 +536,7 @@ stmt  level    source
   511           *
   512           * Returns     :
   513           *
-  514           * Notes       :   »ñÈ¡´ÓÉè±¸¶Ë·¢ËÍ¹ıÀ´µÄÏìÓ¦ĞÅºÅAck  or  NAck
+  514           * Notes       :   è·å–ä»è®¾å¤‡ç«¯å‘é€è¿‡æ¥çš„å“åº”ä¿¡å·Ack  or  NAck
   515           *
   516           *******************************************************************************
   517           */

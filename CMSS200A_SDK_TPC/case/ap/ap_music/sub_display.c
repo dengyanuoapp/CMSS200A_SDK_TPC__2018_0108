@@ -118,7 +118,7 @@ void show_digital_ui(void)
  ********************************************************************************
  *           void RefreshMainScreen( void )
  *
- * Description : 主显示的刷新函数,只有有需要时,才调用此函数
+ * Description : 涓绘樉绀虹殑鍒锋柊鍑芥暟,鍙湁鏈夐渶瑕佹椂,鎵嶈皟鐢ㄦ鍑芥暟
  *
  * Arguments   : void
  *

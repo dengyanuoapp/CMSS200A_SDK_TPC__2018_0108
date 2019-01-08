@@ -124,7 +124,7 @@ BOOL near GetSDAIn(void)
  *******************************************************************************
  *             void IIC_Init(void)
  *
- * Description : I2C³õÊ¼»¯
+ * Description : I2Cåˆå§‹åŒ–
  *
  * Arguments   :
 
@@ -136,7 +136,7 @@ BOOL near GetSDAIn(void)
  */
 void near IIC_Init(void)
 {
-    //Ê¹ÄÜÊä³ö,²¢½«Ê±ÖÓÏßºÍÊı¾İÏßÀ­¸ß
+    //ä½¿èƒ½è¾“å‡º,å¹¶å°†æ—¶é’Ÿçº¿å’Œæ•°æ®çº¿æ‹‰é«˜
     SetSDAOut();
     SetCLKOut();
     SetSDA_1_hold();
@@ -156,7 +156,7 @@ void near IIC_Exit(void)
     SFR_SDA_OUT_EN &= ~(0x01 << SDA_PORT_NUM);
 
     SFR_BANK = sfr_bak;
-    //Disable Ê±ÖÓÏßºÍÊı¾İÏßµÄÊäÈë, Êä³ö
+    //Disable æ—¶é’Ÿçº¿å’Œæ•°æ®çº¿çš„è¾“å…¥, è¾“å‡º
     //    Reset_GPIO(I2CDAT, SDA_OUTPORT, SDA_OUTPORT_NUM);
     //    Reset_GPIO(I2CDAT, SDA_INPORT, SDA_INPORT_NUM);
     //    Reset_GPIO(I2CSCL, SCL_OUTPORT, SCL_OUTPORT_NUM);
@@ -164,8 +164,8 @@ void near IIC_Exit(void)
 }
 
 /************************************************************************
- * Description:  Ä£ÄâIIC  ×ÜÏßIIC ²Ù×÷ÑÓÊ±
- * Input:   ÑÓÊ±Öµ
+ * Description:  æ¨¡æ‹ŸIIC  æ€»çº¿IIC æ“ä½œå»¶æ—¶
+ * Input:   å»¶æ—¶å€¼
  * Output: none
  * Note:
  *************************************************************************
@@ -176,7 +176,7 @@ void near IIC_Delay(uint16 delay)
 
     for (j = 0; j < delay; j++)
     {
-        //ÑÓÊ±º¯Êı
+        //å»¶æ—¶å‡½æ•°
         //;
     }
 }
@@ -185,7 +185,7 @@ void near IIC_Delay(uint16 delay)
  *******************************************************************************
  *             IIC_Start
  *
- * Description :  Ä£ÄâIIC   Start  Á÷³Ì
+ * Description :  æ¨¡æ‹ŸIIC   Start  æµç¨‹
  *
  * Arguments   :
  *
@@ -223,7 +223,7 @@ void near IIC_Start(void) /*IIC start command*/
  *******************************************************************************
  *             IIC_Stop
  *
- * Description :  Ä£ÄâIIC  Stop  Á÷³Ì
+ * Description :  æ¨¡æ‹ŸIIC  Stop  æµç¨‹
  *
  * Arguments   :
  *
@@ -258,15 +258,15 @@ void near IIC_Stop(void) /*IIC stop command*/
  ******************************************************************************
  *             uint8 I2C_Trans_Bytes(uint8 *buf, uint8 length)
  *
- * Description : ½«´æ·Åµ½*bufµØÖ·Àï³¤¶ÈÎªlengthµÄÊı¾İ·¢ËÍ³öÈ¥
+ * Description : å°†å­˜æ”¾åˆ°*bufåœ°å€é‡Œé•¿åº¦ä¸ºlengthçš„æ•°æ®å‘é€å‡ºå»
  *
- * Arguments   : unsigned char *buf: Êı¾İ´æ·ÅµØÖ·
- unsigned char length: Êı¾İ³¤¶È, ÒÔbyteÎªµ¥Î»
+ * Arguments   : unsigned char *buf: æ•°æ®å­˜æ”¾åœ°å€
+ unsigned char length: æ•°æ®é•¿åº¦, ä»¥byteä¸ºå•ä½
  *
- * Returns     : FALSE: ·¢ËÍÊı¾İ½ÓÊÕµ½nack
- TRUE: ·¢ËÍÊı¾İ½ÓÊÕµ½ack
+ * Returns     : FALSE: å‘é€æ•°æ®æ¥æ”¶åˆ°nack
+ TRUE: å‘é€æ•°æ®æ¥æ”¶åˆ°ack
  *
- * Notes       : ÓÉÖ÷¿ØÏòI2C Éè±¸·¢ËÍÊı¾İ£¬½ÓÊÕÀ´×ÔÉè±¸µÄÏìÓ¦
+ * Notes       : ç”±ä¸»æ§å‘I2C è®¾å¤‡å‘é€æ•°æ®ï¼Œæ¥æ”¶æ¥è‡ªè®¾å¤‡çš„å“åº”
  *
  ********************************************************************************
  */
@@ -277,7 +277,7 @@ uint8 I2C_Trans_Bytes(uint8 *buf, uint8 length)
     IIC_Init();
 
     IIC_Start();
-    //·¢ËÍÊı¾İ
+    //å‘é€æ•°æ®
     do
     {
         IIC_WriteByte(*buf);
@@ -292,12 +292,12 @@ uint8 I2C_Trans_Bytes(uint8 *buf, uint8 length)
 
     if (length == 0)
     {
-        //È«²¿Êı¾İ·¢ËÍÍê³É, ³É¹¦
+        //å…¨éƒ¨æ•°æ®å‘é€å®Œæˆ, æˆåŠŸ
         ret = 1;
     }
     else
     {
-        //Î´·¢ËÍÍê³É, Ê§°Ü
+        //æœªå‘é€å®Œæˆ, å¤±è´¥
         ret = 0;
     }
     IIC_Stop();
@@ -311,14 +311,14 @@ uint8 I2C_Trans_Bytes(uint8 *buf, uint8 length)
  ******************************************************************************
  *             uint8 I2C_Recev_Bytes(uint8 *buf, uint8 address, uint8 length)
  *
- * Description : ¶ÁÈ¡³¤¶Èlength
+ * Description : è¯»å–é•¿åº¦length
  *
- * Arguments   : unsigned char *buf: Êı¾İ´æ·ÅµØÖ·
- unsigned char address: slaveµØÖ·
- *               unsigned char length: Êı¾İ³¤¶È,ÒÔbyteÎªµ¥Î»
+ * Arguments   : unsigned char *buf: æ•°æ®å­˜æ”¾åœ°å€
+ unsigned char address: slaveåœ°å€
+ *               unsigned char length: æ•°æ®é•¿åº¦,ä»¥byteä¸ºå•ä½
  *
- * Returns     : FALSE: slave²»ÏìÓ¦
- TRUE: ÊÕµ½Êı¾İ
+ * Returns     : FALSE: slaveä¸å“åº”
+ TRUE: æ”¶åˆ°æ•°æ®
  *
  * Notes       :
  *
@@ -334,7 +334,7 @@ uint8 I2C_Recev_Bytes(uint8 *buf, uint8 Regaddress, uint8 length)
     IIC_Init();
     IIC_Start();
 
-    //Ğ´Éè±¸µØÖ·
+    //å†™è®¾å¤‡åœ°å€
     IIC_WriteByte(0x20);
 
     if (!IIC_GetAck())
@@ -343,7 +343,7 @@ uint8 I2C_Recev_Bytes(uint8 *buf, uint8 Regaddress, uint8 length)
         goto recev_ret;
     }
 
-    IIC_WriteByte(Regaddress); //¶Á¼Ä´æÆ÷µØÖ·
+    IIC_WriteByte(Regaddress); //è¯»å¯„å­˜å™¨åœ°å€
     if (!IIC_GetAck())
     {
         ret = 0;
@@ -351,7 +351,7 @@ uint8 I2C_Recev_Bytes(uint8 *buf, uint8 Regaddress, uint8 length)
     }
 
     IIC_Start(); //restart
-    //¶ÁÉè±¸µØÖ·
+    //è¯»è®¾å¤‡åœ°å€
     IIC_WriteByte(0x21);
 
     if (!IIC_GetAck())
@@ -386,9 +386,9 @@ recev_ret:
  *******************************************************************************
  *             void IIC_WriteByte(uint8 dat)
  *
- * Description : Ğ´1¸ö×Ö½ÚµÄÊı¾İµ½slave
+ * Description : å†™1ä¸ªå­—èŠ‚çš„æ•°æ®åˆ°slave
  *
- * Arguments   : 1¸ö×Ö½ÚÊı¾İ
+ * Arguments   : 1ä¸ªå­—èŠ‚æ•°æ®
 
  *
  * Returns     : 1 ack; 0 nack
@@ -402,7 +402,7 @@ void near IIC_WriteByte(uint8 dat)
     uint8 i;
     for (i = 0; i < 8; i++)
     {
-        if (((dat << i) & 0x80) != 0) //¶ÔÓÚÒ»¸ö×Ö½Ú£¬´Ó¸ßbit µ½µÍbit ÒÀ´Î·¢ËÍ
+        if (((dat << i) & 0x80) != 0) //å¯¹äºä¸€ä¸ªå­—èŠ‚ï¼Œä»é«˜bit åˆ°ä½bit ä¾æ¬¡å‘é€
 
         {
             //Set_GPIO(I2CDAT,SDA_DATAPORT, SDA_DATAPORT_NUM);		   //data  pull up
@@ -425,12 +425,12 @@ void near IIC_WriteByte(uint8 dat)
  *******************************************************************************
  *             uint8 IIC_ReadByte(void)
  *
- * Description : ¶ÁÈ¡1¸ö×Ö½ÚµÄÊı¾İ,²¢»Øack»òÕßnack¸øslave
+ * Description : è¯»å–1ä¸ªå­—èŠ‚çš„æ•°æ®,å¹¶å›ackæˆ–è€…nackç»™slave
  *
  * Arguments   : unsigned char ack: 1 ack; 0 nack
 
  *
- * Returns     : ¶Áµ½µÄÊı¾İ
+ * Returns     : è¯»åˆ°çš„æ•°æ®
  *
  * Notes       :
  *
@@ -471,7 +471,7 @@ uint8 near IIC_ReadByte(void)
  *******************************************************************************
  *             void IIC_SendAck(uint8 ack)
  *
- * Description : ·¢ËÍack»¹ÊÇnack
+ * Description : å‘é€ackè¿˜æ˜¯nack
  *
  * Arguments   : unsigned char ack: 1 noack; 0 ack
 
@@ -511,7 +511,7 @@ void near IIC_SendAck(uint8 ack)
  *
  * Returns     :
  *
- * Notes       :   »ñÈ¡´ÓÉè±¸¶Ë·¢ËÍ¹ıÀ´µÄÏìÓ¦ĞÅºÅAck  or  NAck
+ * Notes       :   è·å–ä»è®¾å¤‡ç«¯å‘é€è¿‡æ¥çš„å“åº”ä¿¡å·Ack  or  NAck
  *
  *******************************************************************************
  */

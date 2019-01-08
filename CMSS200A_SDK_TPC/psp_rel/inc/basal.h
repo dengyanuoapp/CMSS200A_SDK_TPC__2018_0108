@@ -152,12 +152,12 @@ typedef enum
 
 typedef struct
 {
-    uchar status;//½âÂë×´Ì¬£¬0Õı³££¬·Ç0Òì³£
-    uchar signal; //ĞÅºÅÁ¿£¬0Ò»°ã×´Ì¬£¬2µ½´ïBµã£¬3Çå³şBµã
-    uchar volume;//ÒôÁ¿
-    time_t total_time;//¸èÇú×ÜÊ±¼ä
-    eq_t eq;//µ±Ç°EQ
-    signed char speed;//AK211XÓ²¼ş²»Ö§³Ö£¬±£Áô
+    uchar status;//è§£ç çŠ¶æ€ï¼Œ0æ­£å¸¸ï¼Œé0å¼‚å¸¸
+    uchar signal; //ä¿¡å·é‡ï¼Œ0ä¸€èˆ¬çŠ¶æ€ï¼Œ2åˆ°è¾¾Bç‚¹ï¼Œ3æ¸…æ¥šBç‚¹
+    uchar volume;//éŸ³é‡
+    time_t total_time;//æ­Œæ›²æ€»æ—¶é—´
+    eq_t eq;//å½“å‰EQ
+    signed char speed;//AK211Xç¡¬ä»¶ä¸æ”¯æŒï¼Œä¿ç•™
 } mp3_play_status_t;
 
 typedef mp3_play_status_t wma_play_status_t;
@@ -168,26 +168,26 @@ typedef mp3_play_status_t play_status_t;
 
 typedef struct
 {
-    BYTE switchflag;//¿ª¹ØÈçÏÂ¸÷Ïî(Îª1µÄÎ»±íÊ¾¶ÔÓ¦Ïî´ò¿ª£¬Îª0Ê±±íÊ¾¹Ø±Õ)
-    int RemainPlayCnt;//ÓàÏÂ¿É²¥·ÅµÄ´ÎÊı
-    int originalPlayCnt;//Ô­Ê¼¿É²¥·Å´ÎÊı
+    BYTE switchflag;//å¼€å…³å¦‚ä¸‹å„é¡¹(ä¸º1çš„ä½è¡¨ç¤ºå¯¹åº”é¡¹æ‰“å¼€ï¼Œä¸º0æ—¶è¡¨ç¤ºå…³é—­)
+    int RemainPlayCnt;//ä½™ä¸‹å¯æ’­æ”¾çš„æ¬¡æ•°
+    int originalPlayCnt;//åŸå§‹å¯æ’­æ”¾æ¬¡æ•°
 
-    date_t BeginDate;//¿ªÊ¼²¥·ÅÈÕÆÚ
+    date_t BeginDate;//å¼€å§‹æ’­æ”¾æ—¥æœŸ
     time_t BeginTime;
 
-    date_t ExpDate;//½ØÖ¹²¥·ÅÈÕÆÚ(2004-12-30)
+    date_t ExpDate;//æˆªæ­¢æ’­æ”¾æ—¥æœŸ(2004-12-30)
     time_t ExpTime;
 
-    int RemainTime;//(µÚÒ»´ÎÓÃ¹ıÖ®ºó»¹ÄÜÓÃµÄĞ¡Ê±Êı£¬¶ÔÍ¬Ò»Ê×¸èÊÇ¹Ì¶¨Öµ)
-    int RemainStoreTime;//ÓàÏÂ¿É´æ´¢µÄÊ±³¤    (ÌìÊı)//ÏÖÔÚ±£Áô´Ë½Ó¿Ú£¬µ«ÔİÊ±²»¼Ó
-    char DealOnClkBck;//0: Ê±ÖÓ»Øµ÷Ê±É¾³ı 1£ºÊ±ÖÓ»Øµ÷Ê§Ğ§
+    int RemainTime;//(ç¬¬ä¸€æ¬¡ç”¨è¿‡ä¹‹åè¿˜èƒ½ç”¨çš„å°æ—¶æ•°ï¼Œå¯¹åŒä¸€é¦–æ­Œæ˜¯å›ºå®šå€¼)
+    int RemainStoreTime;//ä½™ä¸‹å¯å­˜å‚¨çš„æ—¶é•¿    (å¤©æ•°)//ç°åœ¨ä¿ç•™æ­¤æ¥å£ï¼Œä½†æš‚æ—¶ä¸åŠ 
+    char DealOnClkBck;//0: æ—¶é’Ÿå›è°ƒæ—¶åˆ é™¤ 1ï¼šæ—¶é’Ÿå›è°ƒå¤±æ•ˆ
 } licensinf_t;
 
 typedef enum
 {
-    INF_NORMALWMA, //ÆÕÍ¨µÄWMA [0]
-    INF_DRMHVLICENSE, //ÊÇDRMÓĞlicense [1]
-    INF_DRMNOLICENSE //ÊÇDRMµ«ÎŞlicense [2]
+    INF_NORMALWMA, //æ™®é€šçš„WMA [0]
+    INF_DRMHVLICENSE, //æ˜¯DRMæœ‰license [1]
+    INF_DRMNOLICENSE //æ˜¯DRMä½†æ— license [2]
 } drm_mod_e;
 
 typedef struct
@@ -198,59 +198,59 @@ typedef struct
 
 typedef enum
 {
-    Nor_open, //´ÓÍ·¿ªÊ¼·Å
-    Nor_Break_open, //´ÓÉÏ´Î¶Ïµã¸ö¿ªÊ¼·Å
-    ABPlay_open, //»Ø¸´µ½ÉÏ´ÎµÄAB²¥·Å
-    Hard_Break_open //Ó²¼ş¶ÏµãĞø²¥
+    Nor_open, //ä»å¤´å¼€å§‹æ”¾
+    Nor_Break_open, //ä»ä¸Šæ¬¡æ–­ç‚¹ä¸ªå¼€å§‹æ”¾
+    ABPlay_open, //å›å¤åˆ°ä¸Šæ¬¡çš„ABæ’­æ”¾
+    Hard_Break_open //ç¡¬ä»¶æ–­ç‚¹ç»­æ’­
 } Open_mod_t;
 
 typedef enum
 {
-    ClrABPoint, //Çå³ıABµã,»Øµ½ÆÕÍ¨²¥·Å
-    SetAPoint, //Éè¶¨Aµã
-    SetBPoint, //Éè¶¨Bµã
-    ReturnApoint, //¼ä¸ôÍê»Øµ½Aµã
-    StopBPlay, //Í£Ö¹Bµã²¥·Å
-    ABFinished //AB´ÎÊıÍê
+    ClrABPoint, //æ¸…é™¤ABç‚¹,å›åˆ°æ™®é€šæ’­æ”¾
+    SetAPoint, //è®¾å®šAç‚¹
+    SetBPoint, //è®¾å®šBç‚¹
+    ReturnApoint, //é—´éš”å®Œå›åˆ°Aç‚¹
+    StopBPlay, //åœæ­¢Bç‚¹æ’­æ”¾
+    ABFinished //ABæ¬¡æ•°å®Œ
 } SetABMode_t;
 
 typedef struct
 {
-    uint32 BreakPointAddr; // ¶Ïµã¶ÔÓ¦µÄÎÄ¼şÎ»ÖÃ£¬µ¥Î»£ºbtye
-    uint32 PacketCnt; // ¶Ïµã¶ÔÓ¦µÄPacketÊıÄ¿
-    uint32 PacketSize; // ¶Ïµã¶ÔÓ¦µÄPacket´óĞ¡
-    uint8 SynHdrData1;//¶Ïµã¶ÔÓ¦µÄÍ¬²½ĞÅÏ¢1
-    uint8 SynHdrData2;//¶Ïµã¶ÔÓ¦µÄÍ¬²½ĞÅÏ¢2
-    uint16 CurBitrate; // ¶Ïµã¶ÔÓ¦µÄ±ÈÌØÂÊ
+    uint32 BreakPointAddr; // æ–­ç‚¹å¯¹åº”çš„æ–‡ä»¶ä½ç½®ï¼Œå•ä½ï¼šbtye
+    uint32 PacketCnt; // æ–­ç‚¹å¯¹åº”çš„Packetæ•°ç›®
+    uint32 PacketSize; // æ–­ç‚¹å¯¹åº”çš„Packetå¤§å°
+    uint8 SynHdrData1;//æ–­ç‚¹å¯¹åº”çš„åŒæ­¥ä¿¡æ¯1
+    uint8 SynHdrData2;//æ–­ç‚¹å¯¹åº”çš„åŒæ­¥ä¿¡æ¯2
+    uint16 CurBitrate; // æ–­ç‚¹å¯¹åº”çš„æ¯”ç‰¹ç‡
 } decBreakPointInfor_t;
 
 typedef struct
 {
-    uint32 breakPT;//¶ÏµãÎ»ÖÃ
-    uint32 ApointSave;//AµãÎ»ÖÃ
-    uint32 BpointSave;//BµãÎ»ÖÃ
+    uint32 breakPT;//æ–­ç‚¹ä½ç½®
+    uint32 ApointSave;//Aç‚¹ä½ç½®
+    uint32 BpointSave;//Bç‚¹ä½ç½®
     decBreakPointInfor_t breakPointInfor;
-    //BYTE breakPTTime[15];//MP3¶ÏµãÊ±¼ä
+    //BYTE breakPTTime[15];//MP3æ–­ç‚¹æ—¶é—´
 } breakPT_t;
 
 typedef struct
 {
-    uint8 *filename; //ÎÄ¼şÃûµØÖ·
-    breakPT_t *BreakPTSave; //¶Ïµã²ÎÊıµØÖ·
-    BYTE typeerror; //Òì³£ÎÄ¼ş¸ñÊ½ 0£º Õı³£ÎÄ¼ş£»1£ºÒì³£ÎÄ¼ş£¬Ö÷ÒªÓÃÓÚÒì³£ÎÄ¼şµÄÔ¤ÏÈÅĞ¶Ï
-    uint32 musicframeoffset; //mp3ÎÄ¼şµÚÒ»Ö¡ÆğÊ¼Î»ÖÃ
-    time_t musictotaltime; //mp3×ÜÊ±¼ä
-    uint8 FadeInTime; //ÉèÖÃµ­ÈëÊ±¼ä£¬0Îª²»Ö§³Öµ­Èë
-    uint8 SoftVolumeMax; //ÉèÖÃÊı×ÖÒôÁ¿×î´ó¼¶Êı£¬0Îª²ÉÓÃÓ²¼şÒôÁ¿
-    uint8 current_samplerate;             //µ±Ç°¸èÇúµÄ²ÉÑùÂÊĞÅÏ¢, khz, ¿¨À­okÓÃ, µ¥¶À·¢ÃüÁî»ñÈ¡
+    uint8 *filename; //æ–‡ä»¶ååœ°å€
+    breakPT_t *BreakPTSave; //æ–­ç‚¹å‚æ•°åœ°å€
+    BYTE typeerror; //å¼‚å¸¸æ–‡ä»¶æ ¼å¼ 0ï¼š æ­£å¸¸æ–‡ä»¶ï¼›1ï¼šå¼‚å¸¸æ–‡ä»¶ï¼Œä¸»è¦ç”¨äºå¼‚å¸¸æ–‡ä»¶çš„é¢„å…ˆåˆ¤æ–­
+    uint32 musicframeoffset; //mp3æ–‡ä»¶ç¬¬ä¸€å¸§èµ·å§‹ä½ç½®
+    time_t musictotaltime; //mp3æ€»æ—¶é—´
+    uint8 FadeInTime; //è®¾ç½®æ·¡å…¥æ—¶é—´ï¼Œ0ä¸ºä¸æ”¯æŒæ·¡å…¥
+    uint8 SoftVolumeMax; //è®¾ç½®æ•°å­—éŸ³é‡æœ€å¤§çº§æ•°ï¼Œ0ä¸ºé‡‡ç”¨ç¡¬ä»¶éŸ³é‡
+    uint8 current_samplerate;             //å½“å‰æ­Œæ›²çš„é‡‡æ ·ç‡ä¿¡æ¯, khz, å¡æ‹‰okç”¨, å•ç‹¬å‘å‘½ä»¤è·å–
 } Open_param_t;
 
 typedef struct
 {
-    uint8 bits;//²ÉÑù±ÈÌØÊı£¬±£Áô //char
-    uint8 sample_rate;//²ÉÑùÂÊË÷Òı   //char
-    uint8 channel;//Í¨µÀÊı  //char
-    uint8 bit_rate[4];//±ÈÌØÂÊ  //char
+    uint8 bits;//é‡‡æ ·æ¯”ç‰¹æ•°ï¼Œä¿ç•™ //char
+    uint8 sample_rate;//é‡‡æ ·ç‡ç´¢å¼•   //char
+    uint8 channel;//é€šé“æ•°  //char
+    uint8 bit_rate[4];//æ¯”ç‰¹ç‡  //char
 } audio_format_t;
 
 typedef struct
@@ -265,11 +265,11 @@ typedef struct
 typedef struct
 {
     uchar status; // (1:playing ; 2:pause ; 3(searching).
-    uint freq; //µ±Ç°µçÌ¨µÄÆµÂÊ¡£µ¥Î»Îª1k (×î¸ßÎ»ºãÎª1)
-    uchar station; //µ±Ç°µçÌ¨¶ÔÓ¦µÄµçÌ¨±íÏîºÅ¡£
-    uchar station_count; //µçÌ¨±íÖĞµÄ±£´æµçÌ¨Êı¡£
+    uint freq; //å½“å‰ç”µå°çš„é¢‘ç‡ã€‚å•ä½ä¸º1k (æœ€é«˜ä½æ’ä¸º1)
+    uchar station; //å½“å‰ç”µå°å¯¹åº”çš„ç”µå°è¡¨é¡¹å·ã€‚
+    uchar station_count; //ç”µå°è¡¨ä¸­çš„ä¿å­˜ç”µå°æ•°ã€‚
     uchar mode; //0 (US-Europe) /1 (Japan) ;?
-    uchar volume; //ÒôÁ¿¡£
+    uchar volume; //éŸ³é‡ã€‚
     uchar stereo_status;
     uchar vol_display;
 } fm_play_status_t;

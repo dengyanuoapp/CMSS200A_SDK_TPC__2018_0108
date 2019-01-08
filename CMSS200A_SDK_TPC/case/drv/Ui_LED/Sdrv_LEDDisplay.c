@@ -109,7 +109,7 @@ const uint8 numbershowval[NUMBER] =
 ///*
 //** FUNCTION:     Sdrv_LEDDisplay
 //**
-//** Description:  ÔÚËÄ¸ö8ÉÏÊä³öÒ»¶¨·¶Î§ÄÚµÄ×Ö·û£¬¾ßÌå¿ÉÒÔÏÔÊ¾µÄ×Ö·û¼ûdisplay.h
+//** Description:  åœ¨å››ä¸ª8ä¸Šè¾“å‡ºä¸€å®šèŒƒå›´å†…çš„å­—ç¬¦ï¼Œå…·ä½“å¯ä»¥æ˜¾ç¤ºçš„å­—ç¬¦è§display.h
 //**
 //**  input
 //**     addr: segment address
@@ -117,7 +117,7 @@ const uint8 numbershowval[NUMBER] =
 //**     type: signature it is show or hide
 //**
 //**  output
-//**     noneÈç¹ûÊä³öµÄ×Ö·û²»ÔÚ¿ÉÊä³ö·¶Î§ÄÚ£¬Ôò»á½«µ±Ç°µÄicomÃğµô
+//**     noneå¦‚æœè¾“å‡ºçš„å­—ç¬¦ä¸åœ¨å¯è¾“å‡ºèŒƒå›´å†…ï¼Œåˆ™ä¼šå°†å½“å‰çš„icomç­æ‰
 //********************************************************************************/
 
 void Sdrv_LEDPuts(uint8 api_no, uint8 addr, uint8 *str, uint8 type)
@@ -137,18 +137,18 @@ void Sdrv_LEDPuts(uint8 api_no, uint8 addr, uint8 *str, uint8 type)
         for (i = addr; i < 4; i++)
         {
             tmp_val = *str++;
-            if (tmp_val >= 0 && tmp_val <= 9)//´Ó0µ½9
+            if (tmp_val >= 0 && tmp_val <= 9)//ä»0åˆ°9
             {
             }
-            else if (tmp_val >= 0x30 && tmp_val <= 0x39)//´Ó'0'µ½'9'
+            else if (tmp_val >= 0x30 && tmp_val <= 0x39)//ä»'0'åˆ°'9'
             {
                 tmp_val = tmp_val - 0x30;
             }
-            else if (tmp_val >= 'A' && tmp_val < 'Z')//´Ó"A"µ½'U'
+            else if (tmp_val >= 'A' && tmp_val < 'Z')//ä»"A"åˆ°'U'
             {
                 tmp_val = tmp_val - 'A' + 10;
             }
-            else if (tmp_val >= 'a' && tmp_val < 'z')//´Ó'a'µ½'u'
+            else if (tmp_val >= 'a' && tmp_val < 'z')//ä»'a'åˆ°'u'
             {
                 tmp_val = tmp_val - 'a' + 10;
             }
@@ -168,7 +168,7 @@ void Sdrv_LEDPuts(uint8 api_no, uint8 addr, uint8 *str, uint8 type)
 ///*
 //** FUNCTION:     Sdrv_LEDDisplay
 //**
-//** Description:  ¸ù¾İÊäÈë£¬ÏÔÊ¾orÒş²Ø¶ÎÂëÆÁÉÏÏàÓ¦µÄsegment
+//** Description:  æ ¹æ®è¾“å…¥ï¼Œæ˜¾ç¤ºoréšè—æ®µç å±ä¸Šç›¸åº”çš„segment
 //**
 //**  input
 //**     addr: segment address

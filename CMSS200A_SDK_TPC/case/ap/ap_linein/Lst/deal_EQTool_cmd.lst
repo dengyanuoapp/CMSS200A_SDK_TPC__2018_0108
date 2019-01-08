@@ -31,7 +31,7 @@ stmt  level    source
    20          {
    21   1          if (buf == NULL)
    22   1          {
-   23   2              //¹Ø±ÕEQ
+   23   2              //å…³é—­EQ
    24   2              g_decControlInfor.EQFlag = 0x00;
    25   2              decEffectDeal();
    26   2          }
@@ -103,7 +103,7 @@ stmt  level    source
    90   1          else if (eqcmd == VOLUMESET)
    91   1          {
    92   2      
-   93   2              //add: Íâ¹ÒPAÒôÁ¿ÉèÖÃ
+   93   2              //add: å¤–æŒ‚PAéŸ³é‡è®¾ç½®
    94   2              usbtestcmd_p++;
    95   2              volume_callback(*usbtestcmd_p * 32 / 100);
    96   2              //}
@@ -116,9 +116,9 @@ stmt  level    source
   103   1          {
   104   2          }
   105   1      
-  106   1          //´¦ÀíÍêÃüÁî
+  106   1          //å¤„ç†å®Œå‘½ä»¤
   107   1          usbtestcmd_p = (uint8 *) USBTESTABUFFER;
-  108   1          *usbtestcmd_p = 0x00; //Çå³ıcmd
+  108   1          *usbtestcmd_p = 0x00; //æ¸…é™¤cmd
   109   1          *(usbtestcmd_p + 1) = status;
   110   1      
   111   1          return;

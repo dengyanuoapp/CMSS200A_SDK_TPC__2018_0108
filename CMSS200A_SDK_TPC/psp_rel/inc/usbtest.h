@@ -3,24 +3,24 @@
 
 #ifdef __C251__
 
-#define     USBTESTABUFFER  0x5e0  //0x5E0-0x5FF(¹²32×Ö½Ú)
+#define     USBTESTABUFFER  0x5e0  //0x5E0-0x5FF(å…±32å­—èŠ‚)
 
 typedef struct
 {
-    int8 LeftChannel80hz;		//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 LeftChannel200hz;  	//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 LeftChannel488hz;		//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 LeftChannel980hz;		//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 LeftChannel4khz;		//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 LeftChannel8khz;		//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 LeftChannel16khz;		//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 RightChannel80hz;		//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 RightChannel200hz;  	//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 RightChannel488hz;		//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 RightChannel980hz;	    //-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 RightChannel4khz;		//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 RightChannel8khz;		//-12db,-11db,¡­¡­¡­¡­.12db;
-    int8 RightChannel16khz;	    //-12db,-11db,¡­¡­¡­¡­.12db;
+    int8 LeftChannel80hz;		//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 LeftChannel200hz;  	//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 LeftChannel488hz;		//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 LeftChannel980hz;		//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 LeftChannel4khz;		//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 LeftChannel8khz;		//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 LeftChannel16khz;		//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 RightChannel80hz;		//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 RightChannel200hz;  	//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 RightChannel488hz;		//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 RightChannel980hz;	    //-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 RightChannel4khz;		//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 RightChannel8khz;		//-12db,-11db,â€¦â€¦â€¦â€¦.12db;
+    int8 RightChannel16khz;	    //-12db,-11db,â€¦â€¦â€¦â€¦.12db;
 } utest_eq_info_t;
 
 typedef struct
@@ -66,7 +66,7 @@ typedef struct
 {
     uint8 cmd;                  //EQSAVE=0x03
     uint8 status;               //0: OK 1:Not Ready 2:Fail 3:Not Support
-    uint8 EQMode;               //1:normal 2:Rock 3:Pop 4:Classic 5:Soft 6:Jazz 7:Dbb 8:×Ô¶¨Òå
+    uint8 EQMode;               //1:normal 2:Rock 3:Pop 4:Classic 5:Soft 6:Jazz 7:Dbb 8:è‡ªå®šä¹‰
     utest_eq_info_t eqinfo;
 } utest_eq_save_t;
 
@@ -81,7 +81,7 @@ typedef struct
 {
     uint8 cmd;                  //SRSSAVE=0x05
     uint8 status;               //0: OK 1:Not Ready 2:Fail 3:Not Support
-    uint8 SRSMode;              //1:music 2:movie 3:game 4:voice 5:×Ô¶¨Òå
+    uint8 SRSMode;              //1:music 2:movie 3:game 4:voice 5:è‡ªå®šä¹‰
     utest_srs_info_t srsinfo;
 } utest_srs_save_t;
 

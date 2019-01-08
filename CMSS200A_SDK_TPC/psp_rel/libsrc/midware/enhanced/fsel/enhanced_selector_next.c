@@ -27,8 +27,8 @@ extern int8 fselDiskLetter;
 extern int8 fselDirLayer; //dir  layer
 extern bool select_file_begin_flag;
 
-extern uint16 fselFileNoInDisk;// ÎÄ¼şÔÚÈ«ÅÌµÄĞòºÅ
-extern uint16 fselTotalInDisk;// È«ÅÌÎÄ¼ş×ÜÊı
+extern uint16 fselFileNoInDisk;// æ–‡ä»¶åœ¨å…¨ç›˜çš„åºå·
+extern uint16 fselTotalInDisk;// å…¨ç›˜æ–‡ä»¶æ€»æ•°
 extern uint16 CurDirFileNum;
 extern uint16 fselDirNoInDisk;
 extern uint16 fselTotalDir;
@@ -84,7 +84,7 @@ static uint8 GetExtSize(void)
 /********************************************************************************
  * Description : Get name buffer of current extend
  *
- * Arguments  :  »ñµÃ¸èÇúÀ©Õ¹Ãû
+ * Arguments  :  è·å¾—æ­Œæ›²æ‰©å±•å
  * Returns     :  the buffer of current file extend name
  * Notes       :     None
  *
@@ -114,8 +114,8 @@ static const uint8 *GetExtBuf(void)
  * Description : select the next file and get the file name
  *
  * Arguments   :
- * Returns     :ÎÄ¼ş³õÊ¼»¯Ê± fselFileNo = 0£»µ÷ÓÃSelectNext»ñµÃµÚÒ»¸öÎÄ¼şºó£¬fselFileNo = 1£»Òò´ËfselFileNo
- * Notes       : ±íÊ¾½«Òª¶ÁµÄÄÇ¸öÎÄ¼şĞòºÅ(´Ó0¿ªÊ¼)£¬Ã¿µ÷ÓÃÒ»´Îselect£¬fselFileNo¶¼»á¼Ó1
+ * Returns     :æ–‡ä»¶åˆå§‹åŒ–æ—¶ fselFileNo = 0ï¼›è°ƒç”¨SelectNextè·å¾—ç¬¬ä¸€ä¸ªæ–‡ä»¶åï¼ŒfselFileNo = 1ï¼›å› æ­¤fselFileNo
+ * Notes       : è¡¨ç¤ºå°†è¦è¯»çš„é‚£ä¸ªæ–‡ä»¶åºå·(ä»0å¼€å§‹)ï¼Œæ¯è°ƒç”¨ä¸€æ¬¡selectï¼ŒfselFileNoéƒ½ä¼šåŠ 1
  *
  *******************************************************************************
  */
@@ -124,7 +124,7 @@ bool SelectNext(uint8 *strFile)
     BYTE select_type;
     if (FALSE != select_file_begin_flag)
     {
-        select_type = FS_DIR_FILE;  //´ÓÄ¿Â¼Ê×¿ªÊ¼
+        select_type = FS_DIR_FILE;  //ä»ç›®å½•é¦–å¼€å§‹
     }
     else
     {
@@ -137,15 +137,15 @@ bool SelectNext(uint8 *strFile)
 /*
  *******************************************************************************
  * Description : Select the next directory of current select directory
- * Ñ¡ÔñÉÏÏÂÎÄ¼ş¼ĞµÄÊ±ºò fselDirno[fselDirlayer] != 0	,ÆäËûÇé¿öÊÇµÈÓÚ0µÄ
- * Arguments  : ½øÈëÏÂÒ»¸öÄ¿Â¼£¬²¢ĞŞ¸ÄfselDirNo[fselDirLayer]
+ * é€‰æ‹©ä¸Šä¸‹æ–‡ä»¶å¤¹çš„æ—¶å€™ fselDirno[fselDirlayer] != 0	,å…¶ä»–æƒ…å†µæ˜¯ç­‰äº0çš„
+ * Arguments  : è¿›å…¥ä¸‹ä¸€ä¸ªç›®å½•ï¼Œå¹¶ä¿®æ”¹fselDirNo[fselDirLayer]
  *                 strDir: Dos 8.3 directory name of the next.
  *
  * Returns     :
  *    TRUE:  success.
  *    FALSE: fail, detail info store in fselError.
  * Notes       :  None
- *ÕâÀïµÄÊµÏÖÊÇ²éÕÒÏÂÒ»¸öÄ¿Â¼Ê±¸ù¾İÄ¿Â¼Êı£¬Ã¿´Î¶¼´ÓµÚÒ»¸ö¿ªÊ¼dir£¬dirµ½ËùĞèµÄÄ¿Â¼ĞòºÅ£¬Ì«ÂıÁË
+ *è¿™é‡Œçš„å®ç°æ˜¯æŸ¥æ‰¾ä¸‹ä¸€ä¸ªç›®å½•æ—¶æ ¹æ®ç›®å½•æ•°ï¼Œæ¯æ¬¡éƒ½ä»ç¬¬ä¸€ä¸ªå¼€å§‹dirï¼Œdiråˆ°æ‰€éœ€çš„ç›®å½•åºå·ï¼Œå¤ªæ…¢äº†
  *******************************************************************************
  */
 bool fselNextDir(uint8 *strDir)
@@ -154,7 +154,7 @@ bool fselNextDir(uint8 *strDir)
 }
 
 /********************************************************************************
- * Description : »ñµÃµ±Ç°Ä¿Â¼µÄÄ³ÖÖÀàĞÍÎÄ¼şµÄ×ÜÊı
+ * Description : è·å¾—å½“å‰ç›®å½•çš„æŸç§ç±»å‹æ–‡ä»¶çš„æ€»æ•°
  * Arguments  :
  *            strDir: Dos 8.3 directory name
  *            bCheckValidDir: if check valid directory only
@@ -196,12 +196,12 @@ static uint16 ScanCurDir_FileNum(uint8 *strFile)
  * Returns     :
  TRUE: Successful
  FALSE: fail.
- * Notes       :  Ä¿Â¼Ê÷²éÕÒ,ÏÈ¼ì²é¸¸Ä¿Â¼ÔÙ¼ì²é×ÓÄ¿Â¼(×ÓÄ¿Â¼1 -- ×ÓÄ¿Â¼99)
+ * Notes       :  ç›®å½•æ ‘æŸ¥æ‰¾,å…ˆæ£€æŸ¥çˆ¶ç›®å½•å†æ£€æŸ¥å­ç›®å½•(å­ç›®å½•1 -- å­ç›®å½•99)
  *
  ********************************************************************************/
 bool SelectNext_8Layer(uint8 *strFile)
 {
-    //ÔÚµ±Ç°Ä¿Â¼ÏòÏÂÕÒÎÄ¼ş
+    //åœ¨å½“å‰ç›®å½•å‘ä¸‹æ‰¾æ–‡ä»¶
     char m_szTemp[12];
     fselError = 0;
 
@@ -210,29 +210,29 @@ bool SelectNext_8Layer(uint8 *strFile)
 CurrentDiragain:
         ClearWatchDog();
 
-        //Ñ°ÕÒ¸ÃÄ¿Â¼µÄµÚÒ»¸ö×ÓÎÄ¼ş¼Ğ
+        //å¯»æ‰¾è¯¥ç›®å½•çš„ç¬¬ä¸€ä¸ªå­æ–‡ä»¶å¤¹
         if (FALSE != FS_Dir(m_szTemp, IgnoreExtNext, FS_DIR_DIR, 1))
         {
             if(fselDirLayer < TOTALDIRLAYER)
             {
                 if (FALSE != FS_CD(FS_CD_SON))
                 {
-                    //½øÈë×ÓÎÄ¼ş¼Ğ£¬»ñµÃ¸Ã×ÓÎÄ¼ş¼ĞµÄ¸ÃÖÖÎÄ¼şÀàĞÍÊı
+                    //è¿›å…¥å­æ–‡ä»¶å¤¹ï¼Œè·å¾—è¯¥å­æ–‡ä»¶å¤¹çš„è¯¥ç§æ–‡ä»¶ç±»å‹æ•°
                     fselDirLayer++;
                     select_file_begin_flag = TRUE;
-                    // ¼ì²éµ±Ç°Ä¿Â¼ÊÇ·ñÓĞºÏÊÊµÄÎÄ¼ş.
+                    // æ£€æŸ¥å½“å‰ç›®å½•æ˜¯å¦æœ‰åˆé€‚çš„æ–‡ä»¶.
                     if (FALSE != SelectNext(strFile))
                     {
                         //fselError = 0;
                         fselDirNoInDisk++;
                         return TRUE;
                     }
-                    else //×ÓÄ¿Â¼ÏÂµÄ×ÓÄ¿Â¼Ñ­»·²éÕÒ
+                    else //å­ç›®å½•ä¸‹çš„å­ç›®å½•å¾ªç¯æŸ¥æ‰¾
                     {
                         goto CurrentDiragain;
                     }
                 }
-                else //³ö´íÁË
+                else //å‡ºé”™äº†
                 {
                     fselError = FSEL_ERR_OUTOF;
                     return FALSE;
@@ -243,12 +243,12 @@ CurrentDiragain:
                 goto ParentDiragainNext;
             }
         }
-        else //Èç¹ûÃ»ÓĞ×ÓÎÄ¼ş¼Ğ£¬ÔòÏòÉÏÌøÒ»²ã£¬Ñ°ÕÒµ±Ç°Ä¿Â¼µÄÏÂÒ»¸öÄ¿Â¼£¨Æ½¼¶Ñ°ÕÒ£©
+        else //å¦‚æœæ²¡æœ‰å­æ–‡ä»¶å¤¹ï¼Œåˆ™å‘ä¸Šè·³ä¸€å±‚ï¼Œå¯»æ‰¾å½“å‰ç›®å½•çš„ä¸‹ä¸€ä¸ªç›®å½•ï¼ˆå¹³çº§å¯»æ‰¾ï¼‰
         {
 ParentDiragainNext:
 
             ClearWatchDog();
-            if (FALSE != FS_DirParNext())//»Øµ½¸¸Ä¿Â¼µÄÏÂÒ»¸ö
+            if (FALSE != FS_DirParNext())//å›åˆ°çˆ¶ç›®å½•çš„ä¸‹ä¸€ä¸ª
             {
                 fselDirLayer--;
                 if (FALSE != fselNextDir(m_szTemp))
@@ -263,10 +263,10 @@ ParentDiragainNext:
                         fselDirNoInDisk++;
                         return TRUE;
                     }
-                    // ¼ì²é×ÓÄ¿Â¼.
+                    // æ£€æŸ¥å­ç›®å½•.
                     goto CurrentDiragain;
                 }
-                else //Æ½¼¶Ã»ÓĞÏÂÒ»¼¶Ä¿Â¼£¬µ½ÉÏ¼¶Ä¿Â¼
+                else //å¹³çº§æ²¡æœ‰ä¸‹ä¸€çº§ç›®å½•ï¼Œåˆ°ä¸Šçº§ç›®å½•
                 {
                     goto ParentDiragainNext;
                 }
@@ -285,7 +285,7 @@ ParentDiragainNext:
  *
  * Arguments  :
  *            strFile:  msdos 8.3  file name of next file
- * Returns     :true±íÊ¾³É¹¦£¬false±íÊ¾Ê§°Ü
+ * Returns     :trueè¡¨ç¤ºæˆåŠŸï¼Œfalseè¡¨ç¤ºå¤±è´¥
  *            TRUE: Successful
  *            FALSE: Fail, detail information in fselError
  * Notes       :  None
@@ -301,13 +301,13 @@ bool fselGetNext(uint8 *strFile)
 
     ClearWatchDog();
 
-    if((fselTotalInDisk == 0) && (fselMode != FSEL_ALL_SEQUENCE)) //·Ç³õÊ¼»¯±éÀúÊ±
+    if((fselTotalInDisk == 0) && (fselMode != FSEL_ALL_SEQUENCE)) //éåˆå§‹åŒ–éå†æ—¶
     {
         return FALSE;
     }
     switch (fselMode)
     {
-        //ÖØ¸´µ±Ç°Ò»¸öÎÄ¼ş
+        //é‡å¤å½“å‰ä¸€ä¸ªæ–‡ä»¶
     case FSEL_ALL_REPEATONE:
     {
         if (!FS_GetName(strFile, 0))
@@ -317,7 +317,7 @@ bool fselGetNext(uint8 *strFile)
         return TRUE;
     }
 
-    //µ±Ç°Ä¿Â¼ÏÂµÄËæ»ú²¥·Å
+    //å½“å‰ç›®å½•ä¸‹çš„éšæœºæ’­æ”¾
     case FSEL_ALL_RANDOM:
     {
 #ifdef _ACTIVE_SHUFFLE
@@ -335,7 +335,7 @@ bool fselGetNext(uint8 *strFile)
         return result;
     }
 
-    //ËùÓĞÎÄ¼şË³Ğò¶ÁÈ¡£¬²»ÖØ¸´
+    //æ‰€æœ‰æ–‡ä»¶é¡ºåºè¯»å–ï¼Œä¸é‡å¤
     case FSEL_ALL_SEQUENCE:
     {
         if (FALSE != SelectNext_8Layer(strFile))
@@ -356,7 +356,7 @@ bool fselGetNext(uint8 *strFile)
         }
     }
 
-    //ËùÓĞÎÄ¼şË³Ğò¶ÁÈ¡£¬ÖØ¸´
+    //æ‰€æœ‰æ–‡ä»¶é¡ºåºè¯»å–ï¼Œé‡å¤
     case FSEL_ALL_REPEATALL:
     {
         if(dir_list_flag == 0)
@@ -399,7 +399,7 @@ bool fselGetNext(uint8 *strFile)
                 }
                 if(FS_Dir(fileNameTmp, GetExtBuf(), FS_DIR_FILE, GetExtSize()))
                 {
-                    fselDirNoInDisk = 1;    //¸ùÄ¿Â¼ÓĞÎÄ¼ş£¬Ä¿Â¼ĞòºÅÏÈ¼Ó1
+                    fselDirNoInDisk = 1;    //æ ¹ç›®å½•æœ‰æ–‡ä»¶ï¼Œç›®å½•åºå·å…ˆåŠ 1
                 }
                 else
                 {
@@ -434,7 +434,7 @@ bool fselGetNext(uint8 *strFile)
         }
     }
 
-    //µ±Ç°Ä¿Â¼ÖØ¸´²¥·Å
+    //å½“å‰ç›®å½•é‡å¤æ’­æ”¾
     case FSEL_DIR_REPEATALL:
     {
         TempClusNo = FS_GetCurDir();
@@ -447,7 +447,7 @@ bool fselGetNext(uint8 *strFile)
         {
             fselFileNoInDisk++;
         }
-        else    //ÒÑ¾­µ½µ±Ç°Ä¿Â¼×îºóÒ»Ê×¸è£¬·µ»ØÄ¿Â¼Ê×¿ªÊ¼
+        else    //å·²ç»åˆ°å½“å‰ç›®å½•æœ€åä¸€é¦–æ­Œï¼Œè¿”å›ç›®å½•é¦–å¼€å§‹
         {
             if(!FS_Dir(strFile, GetExtBuf(), FS_DIR_FILE, GetExtSize()))
             {
@@ -480,15 +480,15 @@ bool fselGetFileByNoInDiskC (char *strFile, const uint16 Num)
     }
     else if (fselFileNoInDisk > Num)
     {
-        //¸ÃÌõ¼şÊÇÎªÁË½â¾öÊı×Öµã¸èÊ±£¬Èç¹ûÄ¿Â¼¹ı¶à£¬VRAM´æ·Å²»ÁËÄÇÃ´¶àÎÄ¼şĞÅÏ¢ºó
-        //Ñ¡ÔñÍ¨¹ıÍùÇ°ÍùºódirµÄ·½Ê½Ñ¡ÔñÑ¡ÔñÊ±£¬ÍùÇ°ÇĞ»»ÎÄ¼şÂıµÄÎÊÌâ¡£
+        //è¯¥æ¡ä»¶æ˜¯ä¸ºäº†è§£å†³æ•°å­—ç‚¹æ­Œæ—¶ï¼Œå¦‚æœç›®å½•è¿‡å¤šï¼ŒVRAMå­˜æ”¾ä¸äº†é‚£ä¹ˆå¤šæ–‡ä»¶ä¿¡æ¯å
+        //é€‰æ‹©é€šè¿‡å¾€å‰å¾€ådirçš„æ–¹å¼é€‰æ‹©é€‰æ‹©æ—¶ï¼Œå¾€å‰åˆ‡æ¢æ–‡ä»¶æ…¢çš„é—®é¢˜ã€‚
         if(dir_list_flag == 0)
         {
             fselDirLayer = 0;
             fselFileNoInDisk = 0;
             fselDirNoInDisk = 0;
-            CurDirClusNo = 0xfffffff0;  //³õÊ¼»¯ÎÄ¼ş²»¿ÉÄÜÊ¹ÓÃµÄ´ØºÅ
-            CurDirFileNum = 0;   //µ±Ç°Ä¿Â¼Ñ­»·²¥·ÅÊ±Ê¹ÓÃ
+            CurDirClusNo = 0xfffffff0;  //åˆå§‹åŒ–æ–‡ä»¶ä¸å¯èƒ½ä½¿ç”¨çš„ç°‡å·
+            CurDirFileNum = 0;   //å½“å‰ç›®å½•å¾ªç¯æ’­æ”¾æ—¶ä½¿ç”¨
             select_file_begin_flag = TRUE;
             if(FALSE == FS_CD(":"))
             {
@@ -496,7 +496,7 @@ bool fselGetFileByNoInDiskC (char *strFile, const uint16 Num)
             }
             if(FS_Dir(fileNameTmp, GetExtBuf(), FS_DIR_FILE, GetExtSize()))
             {
-                fselDirNoInDisk = 1;    //¸ùÄ¿Â¼ÓĞÎÄ¼ş£¬Ä¿Â¼ĞòºÅÏÈ¼Ó1
+                fselDirNoInDisk = 1;    //æ ¹ç›®å½•æœ‰æ–‡ä»¶ï¼Œç›®å½•åºå·å…ˆåŠ 1
             }
             else
             {
@@ -610,7 +610,7 @@ void get_total_num_from_list(file_location_t *location)
 /********************************************************************************
  * Description : Select the next folder file
  *
- * ÇĞ»»µ½ÆäËû´æÔÚ¸èÇúÎÄ¼şµÄÄ¿Â¼£¬¿ÉÄÜÊÇÆ½¼¶Ä¿Â¼»ò¸¸Ä¿Â¼»ò×ÓÄ¿Â¼
+ * åˆ‡æ¢åˆ°å…¶ä»–å­˜åœ¨æ­Œæ›²æ–‡ä»¶çš„ç›®å½•ï¼Œå¯èƒ½æ˜¯å¹³çº§ç›®å½•æˆ–çˆ¶ç›®å½•æˆ–å­ç›®å½•
  ********************************************************************************/
 bool fselGetNextFolder (uint8 *strFile)
 {

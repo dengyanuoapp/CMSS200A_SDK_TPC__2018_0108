@@ -23,9 +23,9 @@ stmt  level    source
    13           * \brief    .
    14           * \author   dengtaiping
    15           * \par      GENERAL DESCRIPTION:
-   16           *               usb¡¢AUDIOµÈÄ£¿é³õÊ¼»¯
+   16           *               usbã€AUDIOç­‰æ¨¡å—åˆå§‹åŒ–
    17           * \par      EXTERNALIZED FUNCTIONS:
-   18           *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+   18           *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
    19           *
    20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
    21           *
@@ -47,7 +47,7 @@ stmt  level    source
    37   2              {
    38   3                  
    39   3              }
-   40   2              //tx fifo Êı¾İ»¹Ã»·¢ËÍÍê±Ï£¬¼ÌĞø·¢ËÍ
+   40   2              //tx fifo æ•°æ®è¿˜æ²¡å‘é€å®Œæ¯•ï¼Œç»§ç»­å‘é€
    41   2              if(uart_fifo.putP!=0)
    42   2              {
    43   3                 uart_fifo.time_count++;
@@ -59,7 +59,7 @@ stmt  level    source
    49   3              }
    50   2              else
    51   2              {
-   52   3                  //Êı¾İ·¢ËÍÍêºó²ÅÖØĞÂÊ¹ÄÜrx 
+   52   3                  //æ•°æ®å‘é€å®Œåæ‰é‡æ–°ä½¿èƒ½rx 
    53   3                  UART_CTL |=1<<6;
    54   3                  uart_fifo.flags=0;
    55   3                  uart_fifo.used=0;
@@ -72,11 +72,11 @@ stmt  level    source
    60   2              return;
    61   2              
    62   2          }
-   63   1          //rx fifo·Ç¿ÕÊ±£¬½ÓÊÜµÚÒ»¸öÊı¾İ£¬È»ºó¹Ø±Õrx
+   63   1          //rx fifoéç©ºæ—¶ï¼Œæ¥å—ç¬¬ä¸€ä¸ªæ•°æ®ï¼Œç„¶åå…³é—­rx
    64   1          while ((UART_STA & 0x20) == 0)
    65   1              {
    66   2              uart_fifo.buf[0] = UART_RXDAT; 
-   67   2              //¹Ø±Õrx,ÒÔ·À¹ıÀ´µÄÊı¾İ¹ı³¤Ê±£¬ÇåµôµÚÒ»±Êºó£¬ºóÀ´ÓÖÀ´Êı¾İ£¬µ¼ÖÂtxµÄfifoÊı¾İÒì³£
+   67   2              //å…³é—­rx,ä»¥é˜²è¿‡æ¥çš„æ•°æ®è¿‡é•¿æ—¶ï¼Œæ¸…æ‰ç¬¬ä¸€ç¬”åï¼Œåæ¥åˆæ¥æ•°æ®ï¼Œå¯¼è‡´txçš„fifoæ•°æ®å¼‚å¸¸
    68   2              UART_CTL &=~(1<<6);
    69   2              UART_STA |=1<<1;
    70   2              while ((UART_STA & 0x20) == 0)

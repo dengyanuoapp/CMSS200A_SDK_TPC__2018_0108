@@ -13,9 +13,9 @@
  * \brief    .
  * \author   dengtaiping
  * \par      GENERAL DESCRIPTION:
- *               Ã¶¾Ù´úÂë
+ *               æšä¸¾ä»£ç 
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
  *
@@ -34,7 +34,7 @@
 /*!
  * \par  Description:
  *     count string lenth.
- * \param[in]    pstraddr:point to string¡¢strlgth:max lenth.
+ * \param[in]    pstraddr:point to stringã€strlgth:max lenth.
  * \param[out]   none.
  * \return       actual lenth
 
@@ -64,7 +64,7 @@ static uint8 count_string_charlngth(uint8 *pstraddr, uint8 strlgth)
 /*!
  * \par  Description:
  *     convert ascII code to unique code.
- * \param[in]    pstraddr:point to string¡¢strlgth:max lenth.
+ * \param[in]    pstraddr:point to stringã€strlgth:max lenth.
  * \param[out]   none.
  * \return       none
 
@@ -79,11 +79,11 @@ static void cnvrt_ascii_to_uni16(uint8 *pstraddr, uint8 strlgth)
     uint8 *data_p1;
     uint8 *data_p2;
 
-    //Êı×éµÄÏÂ±ê´Ó0¿ªÊ¼
+    //æ•°ç»„çš„ä¸‹æ ‡ä»0å¼€å§‹
     data_p1 = pstraddr + (strlgth - 1); //The last byte address
     data_p2 = pstraddr + (strlgth - 1) * 2 + 1; //the data address to be load
 
-    //µ±ASCIIÂë³¤¶ÈÎª0»ò1Ê±×÷ÏÂÃæµÄ×ª»»»á¸²¸ÇµØÖ·Ö¸ÏòmemoryÖ®Ç°µÄÊı¾İ
+    //å½“ASCIIç é•¿åº¦ä¸º0æˆ–1æ—¶ä½œä¸‹é¢çš„è½¬æ¢ä¼šè¦†ç›–åœ°å€æŒ‡å‘memoryä¹‹å‰çš„æ•°æ®
     while (strlgth != 0x00)
     {
         *data_p2 = 0x00;
@@ -100,7 +100,7 @@ static void cnvrt_ascii_to_uni16(uint8 *pstraddr, uint8 strlgth)
 /*!
  * \par  Description:
  *     data endian reverse.
- * \param[in]    pstraddr:point to data¡¢strlgth:max lenth.
+ * \param[in]    pstraddr:point to dataã€strlgth:max lenth.
  * \param[out]   none.
  * \return       none
 
@@ -129,7 +129,7 @@ void endian_reverse(uint8 *data_p, uint16 data_length)
 /*!
  * \par  Description:
  *     iso out token process.
- * \param[in]    pstraddr:point to string¡¢strlgth:max lenth.
+ * \param[in]    pstraddr:point to stringã€strlgth:max lenth.
  * \param[out]   none.
  * \return       actual lenth
 
@@ -201,7 +201,7 @@ void no_data_control(void)
 /*!
  * \par  Description:
  *     read endp0 data.
- * \param[in]    data_address:point to string¡¢data_length:actual lenth¡¢request_length£ºrequest length.
+ * \param[in]    data_address:point to stringã€data_length:actual lenthã€request_lengthï¼šrequest length.
  * \param[out]   none.
  * \return       none
 
@@ -262,7 +262,7 @@ void control_write(uint8 *data_address, uint8 data_length, uint8 request_length)
 /*!
  * \par  Description:
  *     write endp0 data.
- * \param[in]    data_address:point to string¡¢actul_dlen:actual lenth¡¢rqst_dlen£ºrequest length.
+ * \param[in]    data_address:point to stringã€actul_dlen:actual lenthã€rqst_dlenï¼šrequest length.
  * \param[out]   none.
  * \return       none
 
@@ -441,7 +441,7 @@ static void set_out_iso_ep(void)
     }
     EP2STADDRH = 0x03;//uram+fir_rds +pcm = 0x200 + 0xc0*2 + 0x1000
     EP2STADDRL = 0x80;
-    Out2ctrl_hcin2ctrl = 0x84; //single buff¡¢iso ep 192*1
+    Out2ctrl_hcin2ctrl = 0x84; //single buffã€iso ep 192*1
 
     EPRST = 0x02;
     EPRST = 0x22;
@@ -472,10 +472,10 @@ static void set_in_iso_ep(void)
     Hcout1maxpckh = 0x00;
     Hcout1maxpckl = 0x64; //100 byte
 
-    //²»ÄÜ´Ó0x0000µØÖ·¿ªÊ¼£¬ÒòÎªÄÇ¸öµØÖ·±»ÅäÖÃ³ÉÁËEP0,EP3 fifo
+    //ä¸èƒ½ä»0x0000åœ°å€å¼€å§‹ï¼Œå› ä¸ºé‚£ä¸ªåœ°å€è¢«é…ç½®æˆäº†EP0,EP3 fifo
     EP1STADDRH = 0x00;
     EP1STADDRL = 0xc0;
-    In1ctrl_hcout1ctrl = 0x86; //triple buff¡¢iso ep 320
+    In1ctrl_hcout1ctrl = 0x86; //triple buffã€iso ep 320
 
     EPRST = 0x01;
     EPRST = 0x21;
@@ -519,7 +519,7 @@ static void set_in_int_ep(void)
 /******************************************************************************/
 /*!
  * \par  Description:
- *     ÉèÖÃPAÒôÁ¿.
+ *     è®¾ç½®PAéŸ³é‡.
  * \param[in]    vol_val.
  * \param[out]   none.
  * \return       none
@@ -549,7 +549,7 @@ void set_pa_vol(uint8 vol_val)
 /******************************************************************************/
 /*!
  * \par  Description:
- *     ÉèÖÃADC op1 ÔöÒæ.
+ *     è®¾ç½®ADC op1 å¢ç›Š.
  * \param[in]    vol_gain.
  * \param[out]   none.
  * \return       none
@@ -973,11 +973,11 @@ void deal_setup(void)
 	            endian_reverse(p_temp, temp_count);
 			}
 		}
-		no_data_control();//¿ÉÄÜ»á·¢set clearfeatureµ½ep3in
+		no_data_control();//å¯èƒ½ä¼šå‘set clearfeatureåˆ°ep3in
 		break;
 	
     default:
-        no_data_control();//¿ÉÄÜ»á·¢set clearfeatureµ½ep3in
+        no_data_control();//å¯èƒ½ä¼šå‘set clearfeatureåˆ°ep3in
         break;
     }
     SFR_BANK = sfr_temp;

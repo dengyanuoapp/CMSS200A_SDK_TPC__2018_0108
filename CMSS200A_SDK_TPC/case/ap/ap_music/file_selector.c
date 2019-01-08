@@ -62,7 +62,7 @@ void read_breakpoint(void)
             return;
         }
         g_music_vars.MusicOpenMod = Hard_Break_open;
-        //Ӳ���ϵ���������ȡ�ϵ�ʱ������ʾ
+        //硬件断电后进来，获取断点时间再显示
         sfr_bak = SFR_BANK;
         SFR_BANK = 0x0c;
         g_music_vars.BreakPTDisTime.hour = RTCRDM19;
@@ -85,13 +85,13 @@ void read_breakpoint(void)
     }
 }
 /******************************************************************************
- ** ����: ��ʼ��C,U,H�̣�
- ** �ӿ�: static int InitFileSelector_sub(char disk)
- ** ����:
- ** �������: char disk,����Ҫ��ʼ�����̷���Ŀǰ֧�����֣�C�����̣�H���忨�̣�U�����U�̻��������
- **           ÿ��ֻ��ʼ��һ���̡�
- ** �������: 1���ɹ���0��ʧ��
- ** ʹ��˵��:�˺���ֻ�����ļ���InitFileSelector��StartFileSelector�������á�
+ ** 名字: 初始化C,U,H盘，
+ ** 接口: static int InitFileSelector_sub(char disk)
+ ** 描述:
+ ** 输入参数: char disk,输入要初始化的盘符。目前支持三种：C：主盘，H：插卡盘，U：外插U盘或读卡器。
+ **           每次只初始化一个盘。
+ ** 输出参数: 1：成功。0：失败
+ ** 使用说明:此函数只被本文件的InitFileSelector，StartFileSelector函数调用。
  ********************************************************************************/
 uint16 InitFileSelector_sub(char disk)
 {
@@ -128,13 +128,13 @@ file_init:
 }
 
 /******************************************************************************
- ** ����:  �ļ�ѡ������ʼ����������ʾ
- ** �ӿ�:  int InitFileSelector(void)
- ** ����:  ���ļ�ѡ������ʼ������Ч�����ϣ����Ҳ������򱨴��˳�
- ** �������: void
- ** �������: 0: û����Ч����,��ʼ��ʧ�ܣ�Ҫ���˳�AP
- 1: ����ɳ�ʼ���ļ�ѡ��������
- ** ʹ��˵��:
+ ** 名字:  文件选择器初始化及报错显示
+ ** 接口:  int InitFileSelector(void)
+ ** 描述:  把文件选择器初始化到有效的盘上，如找不到，则报错退出
+ ** 输入参数: void
+ ** 输出参数: 0: 没有有效的盘,初始化失败，要求退出AP
+ 1: 已完成初始化文件选择器动作
+ ** 使用说明:
  ********************************************************************************/
 uint16 InitFileSelector(void)
 {
@@ -146,12 +146,12 @@ uint16 InitFileSelector(void)
 }
 
 /******************************************************************************
- ** ����:
- ** �ӿ�:
- ** ����:
- ** �������:
- ** �������:
- ** ʹ��˵��: //ע���⺯�����ڳ�ʼ�����ļ�ѡ������set ��Ŀ¼����õ�
+ ** 名字:
+ ** 接口:
+ ** 描述:
+ ** 输入参数:
+ ** 输出参数:
+ ** 使用说明: //注，这函数是在初始化完文件选择器或set 完目录后调用的
  ********************************************************************************/
 uint16 StartFileSelector(void)
 {
@@ -167,14 +167,14 @@ uint16 StartFileSelector(void)
 
 }
 /******************************************************************************
- ** ����:
- ** �ӿ�: int UpdateFileSelector(void)
- ** ����: �����ļ�ѡ����
- ** �������: void
- ** �������:
- 0: ���²��ɹ���Ҫ�˳�AP
- 1: ���³ɹ����ѿ���
- ** ʹ��˵��:
+ ** 名字:
+ ** 接口: int UpdateFileSelector(void)
+ ** 描述: 更新文件选择器
+ ** 输入参数: void
+ ** 输出参数:
+ 0: 更新不成功，要退出AP
+ 1: 更新成功，已可用
+ ** 使用说明:
  ********************************************************************************/
 uint16 UpdateFileSelector(void)
 {
@@ -191,7 +191,7 @@ set_locastion:
     }
     if (fselError != FSEL_ERR_DISK)
     {
-        /* ��ͷ��ʼ���� */
+        /* 从头开始播放 */
         ClearTimePara();
         result = StartFileSelector();
     }
@@ -249,7 +249,7 @@ check_disk:
     }
     else
     {
-        //first_checkΪfalse,˵�����̻��ڣ����ܴ����Ѿ��𻵣����л�����ʾʱ�ӽ���
+        //first_check为false,说明磁盘还在，可能磁盘已经损坏，则切换到显示时钟界面
         if (first_check == FALSE)
         {
             no_device_flag = TRUE;
@@ -271,10 +271,10 @@ check_disk:
             {
                 retval = get_next_prev_music(Music_Prev, Auto_Sel);
             }
-            //��ǿ���ٰβ忨�ĳ���������������������򲥷��쳣������
+            //加强快速拔插卡的出错处理，以免出现死机或播放异常的问题
             if (retval == RESULT_UI_STOP)
             {
-                //���ٰβ忨��u�̺����û�����ü��л����̣���Ҫ���³�ʼ������
+                //快速拔插卡或u盘后，如果没有来得及切换磁盘，需要重新初始化磁盘
                 if (CurUselocation.disk == disk_char[1] && (DRV_DetectUD(1) == 0x20))
                 {
                 }
@@ -284,8 +284,8 @@ check_disk:
                 else
                 {
 
-                    //������Ҫ��Ϊ�˷�ֹ����u�̰γ��Ժ�û�м�ʱ��⵽
-                    //����u�̰γ���Ϣ���Ӷ�������ȡ���̶����ִ��������
+                    //这里主要是为了防止卡或u盘拔出以后，没有及时检测到
+                    //卡或u盘拔出消息，从而继续读取磁盘而出现错误的问题
                     first_check = FALSE;
                     goto check_disk;
                 }

@@ -13,9 +13,9 @@
  * \brief    .
  * \author   dengtaiping
  * \par      GENERAL DESCRIPTION:
- *               usb、AUDIO等模块初始化
+ *               usb銆丄UDIO绛夋ā鍧楀垵濮嬪寲
  * \par      EXTERNALIZED FUNCTIONS:
- *               这里描述调用到外面的模块
+ *               杩欓噷鎻忚堪璋冪敤鍒板闈㈢殑妯″潡
  *
  *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
  *
@@ -107,9 +107,9 @@ void src(uint8 SrcType)
     clear_fir_rds_ram();
     DAC_CH0_SR_CTL = (DAC_CH0_SR_CTL&0xf8)|SrcType;
 
-    //DAC_CH0_SRFT_CTL1 = 0x24; //48M配置不会断音
+    //DAC_CH0_SRFT_CTL1 = 0x24; //48M閰嶇疆涓嶄細鏂煶
     //DAC_CH0_SRFT_CTL2 = 0x00;
-    DAC_CH0_SRFT_CTL1 = 0x20;  //52M配置不会断音
+    DAC_CH0_SRFT_CTL1 = 0x20;  //52M閰嶇疆涓嶄細鏂煶
     DAC_CH0_SRFT_CTL2 = 0x00;
    
     DAC_CH0_SRFT_CTL3 = 0x20;
@@ -151,7 +151,7 @@ void set_dac_samplerate(uint8 nSampleRateIndex)
 /******************************************************************************/
 /*!
  * \par  Description:
- *     ADC、DAC init.
+ *     ADC銆丏AC init.
  * \param[in]    none.
  * \param[out]   none.
  * \return       none
@@ -279,7 +279,7 @@ void ADC_DAC_init(void)
     DAC_ANALOG0 |= 0x10;
     PA_APCTL |= 0x02;
     DAC_ANALOG0 &= 0xf7;
-    DDV_CTL0 |= 0x10;	 //全能直驱
+    DDV_CTL0 |= 0x10;	 //鍏ㄨ兘鐩撮┍
 //	DDV_CTL0 = 0xf7;
     pa_volume_bak = PA_VOLUME;
     PA_VOLUME = 0x06;
@@ -309,7 +309,7 @@ void ADC_DAC_init(void)
 /*
  ********************************************************************************
  *                           OTG_PHY_Setting
- * Description : USB PHY设置
+ * Description : USB PHY璁剧疆
  * Arguments   : d: address; e: value.
  * Returns     : none
  * Notes       : FPGA version, Just for GL6005 PHY setting.
@@ -387,10 +387,10 @@ uint8 usound_init(usound_param *pud_param)
     MRCR2 &= 0xf3;
     muram_addr = MemBankCtl & 0x08; //save MURAM_ADDR
     MemBankCtl |= 0x08;
-    MEMCLKENCTL0 |= 0xcb;//0x8b; //enable pcmram、fir_rds_ram、uram 、fir_mpx_ram clock
+    MEMCLKENCTL0 |= 0xcb;//0x8b; //enable pcmram銆乫ir_rds_ram銆乽ram 銆乫ir_mpx_ram clock
     MEMCLKSELCTL0 &= 0x3c; //0xfc; //link fir_mpx_ram to cpu clock
     MEMCLKSELCTL1 &= 0x70;
-    MEMCLKSELCTL1 |= 0x87;//0x80;//0x03;//0x84;//0x87;//0x8c;//link fir_rds_ram、uram to uram_clock,  link pcmram to cpu clock
+    MEMCLKSELCTL1 |= 0x87;//0x80;//0x03;//0x84;//0x87;//0x8c;//link fir_rds_ram銆乽ram to uram_clock,  link pcmram to cpu clock
     CLKENCTL1 |= 0x40; //enable usb clock
     CLKENCTL2 |= 0x20; //enable dma clock
 

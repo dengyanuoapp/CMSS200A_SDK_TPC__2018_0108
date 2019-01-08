@@ -107,14 +107,14 @@ stmt  level    source
    80   1          tmp_ir_sta = IR_STA;
    81   1          IR_STA |= 0x08; //clear irq pending
    82   1          key_data = IR_KDC; //read key data value
-   83   1          //½ÓÊÜµ½´íÎóµÄ°´¼üÂë
+   83   1          //æ¥å—åˆ°é”™è¯¯çš„æŒ‰é”®ç 
    84   1          if ((tmp_ir_sta & 0x02) != 0)
    85   1          {
    86   2              IR_STA |= 0x0B;//clear error msg,clear irq pending
    87   2              SFR_BANK = sfr_bak;
    88   2              return;
    89   2          }
-   90   1          //½ÓÊÜµ½ÖØ¸´ÂëÊ±£¬Ö±½ÓÓÃ¾ÉÂëÖµ
+   90   1          //æ¥å—åˆ°é‡å¤ç æ—¶ï¼Œç›´æ¥ç”¨æ—§ç å€¼
    91   1          if ((tmp_ir_sta & 0x01) != 0)
    92   1          {
    93   2              //        IR_STA |= 0x09;          //clear repeat flag,clear irq pending

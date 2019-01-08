@@ -10,3 +10,7 @@
 /date.now.txt
 
 /mobile/*.apk
+
+/[0-9a-z].txt
+/[0-9a-z].diff
+/[0-9a-z].bak

@@ -31,15 +31,15 @@ typedef  unsigned char byte;
 #define huge
 #define large
 
-// Ë«×Ö½Ú¸ßµÍÎ»½»»»
+// åŒå­—èŠ‚é«˜ä½ä½äº¤æ¢
 void SIM_ChgWordPC(unsigned char *p);
-// 4×Ö½Ú¸ßµÍÎ»½»»»
+// 4å­—èŠ‚é«˜ä½ä½äº¤æ¢
 void SIM_ChgLongPC(unsigned char *p);
 void SIM_Sleep(int millsec);
 
-// Unicode ×Ö·û´®¸ßµÍ×Ö½Ú½»»»
+// Unicode å­—ç¬¦ä¸²é«˜ä½å­—èŠ‚äº¤æ¢
 void SIM_ChgStrUni(unsigned char *pStr);
-// ASCII ×Ö·û´®¸ßµÍ×Ö½Ú½»»»
+// ASCII å­—ç¬¦ä¸²é«˜ä½å­—èŠ‚äº¤æ¢
 void SIM_ChgStrAsc(unsigned char *pStr);
 #else
 #define GET_REAL_ADDR

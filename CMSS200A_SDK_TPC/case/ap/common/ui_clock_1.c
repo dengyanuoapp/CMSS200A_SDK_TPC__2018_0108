@@ -15,7 +15,7 @@
 #include "ap_common.h"
 
 #pragma name(AP_CLOCK_1)
-const uint8 month_days[] = //Ò»Äê12¸öÔÂÃ¿¸öÔÂ¶ÔÓ¦µÄ»ù±¾ÌìÊı
+const uint8 month_days[] = //ä¸€å¹´12ä¸ªæœˆæ¯ä¸ªæœˆå¯¹åº”çš„åŸºæœ¬å¤©æ•°
 { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 void init_alarm_setting(void)
@@ -23,20 +23,20 @@ void init_alarm_setting(void)
     SetCurUI_Type(AlarmSet_UI);
     //    VMRead(&g_alarm, VM_ALARM, sizeof(alarm_vars_t));
     memcpy(&time, &g_comval.g_alarm.alarmTime, sizeof(time_t));
-    //ÄÖÖÓÉèÖÃÊ±£¬´ÓµÚ2Ïî¿ªÊ¼ÉèÖÃÒÔ±ãºÍÊ±¼äÉèÖÃÍ³Ò»
+    //é—¹é’Ÿè®¾ç½®æ—¶ï¼Œä»ç¬¬2é¡¹å¼€å§‹è®¾ç½®ä»¥ä¾¿å’Œæ—¶é—´è®¾ç½®ç»Ÿä¸€
     set_what = 2;
     longkey_flag = TRUE;
 }
 
 /********************************************************************************
- * Description : ½«BUFÖĞµÄÊıÖµ×ª»»³ÉÏÖÊµ¿ÉÓÃµÄÊı×Ö¡£
+ * Description : å°†BUFä¸­çš„æ•°å€¼è½¬æ¢æˆç°å®å¯ç”¨çš„æ•°å­—ã€‚
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
- ÀıÈç:DigitalCount=3,DigitalBuf[]={3,7,8},×ª»»³ÉÊµÏÖ¿ÉÄÜµÄÊı×Ö¾ÍÊÇDigitalNum=378£»
+ ä¾‹å¦‚:DigitalCount=3,DigitalBuf[]={3,7,8},è½¬æ¢æˆå®ç°å¯èƒ½çš„æ•°å­—å°±æ˜¯DigitalNum=378ï¼›
  *
  ********************************************************************************/
 uint16 DigitalSwitchToRealNum(void)
@@ -57,12 +57,12 @@ uint16 DigitalSwitchToRealNum(void)
 }
 
 /********************************************************************************
- * Description : ÊµÏÖÍ¨¹ıÊı×ÖÖµµ÷ÕûÈÕÆÚ£¬Ê±¼äµÄ¹¦ÄÜ
+ * Description : å®ç°é€šè¿‡æ•°å­—å€¼è°ƒæ•´æ—¥æœŸï¼Œæ—¶é—´çš„åŠŸèƒ½
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
 
  *
@@ -87,10 +87,10 @@ void DigitalAdjustTime(void)
         }
         break;
     case 2: //day
-        days = month_days[date.month - 1]; //±¾ÔÂÌìÊı
+        days = month_days[date.month - 1]; //æœ¬æœˆå¤©æ•°
         if (((date.year % 4) == 0) && (date.month == 2))
         {
-            days++; //ÈòÄê+1
+            days++; //é—°å¹´+1
         }
         if ((realNum <= days) && (realNum > 0))
         {
@@ -135,16 +135,16 @@ void deal_clock_next_prev(uint8 key)
     {
         g_comval.g_alarm.AlarmEnable = !g_comval.g_alarm.AlarmEnable;
     }
-    //ÉÏÏÂµ÷½ÚÄê·İ£¬ÈÕÆÚ£¬Ê±¼ä
+    //ä¸Šä¸‹è°ƒèŠ‚å¹´ä»½ï¼Œæ—¥æœŸï¼Œæ—¶é—´
     KeyAdjustTime(key);
 }
 /********************************************************************************
- * Description :¸ù¾İ°´¼üÖµÉÏÏÂµ÷Õûµ±Ç°µÄÈÕÆÚ»òÊ±¼ä
+ * Description :æ ¹æ®æŒ‰é”®å€¼ä¸Šä¸‹è°ƒæ•´å½“å‰çš„æ—¥æœŸæˆ–æ—¶é—´
  *
  * Arguments  :
- *           key£ºÏàÓ¦°´¼üÖµ
+ *           keyï¼šç›¸åº”æŒ‰é”®å€¼
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -176,10 +176,10 @@ void KeyAdjustTime(uint8 key)
             }
             break;
         case 2: //day
-            days = month_days[date.month - 1]; //±¾ÔÂÌìÊı
+            days = month_days[date.month - 1]; //æœ¬æœˆå¤©æ•°
             if (((date.year % 4) == 0) && (date.month == 2))
             {
-                days++; //ÈòÄê+1
+                days++; //é—°å¹´+1
             }
             if (date.day < days)
             {
@@ -239,10 +239,10 @@ void KeyAdjustTime(uint8 key)
             }
             break;
         case 2: //day
-            days = month_days[date.month - 1]; //±¾ÔÂÌìÊı
+            days = month_days[date.month - 1]; //æœ¬æœˆå¤©æ•°
             if (((date.year % 4) == 0) && (date.month == 2))
             {
-                days++; //ÈòÄê+1
+                days++; //é—°å¹´+1
             }
             if (date.day > 1)
             {
@@ -283,7 +283,7 @@ uint8 deal_clock_digital_key(uint8 key)
 {
     uint8 key_val;
     uint8 maxcount;
-    //¹â±êÍ£ÁôÔÚÄÖÖÓ¿ª¹ØÑ¡ÏîÊ±£¬°´Êı×Ö¼üÎŞĞ§
+    //å…‰æ ‡åœç•™åœ¨é—¹é’Ÿå¼€å…³é€‰é¡¹æ—¶ï¼ŒæŒ‰æ•°å­—é”®æ— æ•ˆ
     if (CurUI_Type == Clock_UI)
     {
         return NULL;
@@ -294,11 +294,11 @@ uint8 deal_clock_digital_key(uint8 key)
         return NULL;
     }
 
-    if (set_what == 0) //Äê·İÕ¼ËÄÎ»ÏÔÊ¾
+    if (set_what == 0) //å¹´ä»½å å››ä½æ˜¾ç¤º
     {
         maxcount = 4;
     }
-    else //ÔÂ£¬ÈÕ£¬Ê±£¬·Ö£¬ÃëÕ¼Á½Î»ÏÔÊ¾
+    else //æœˆï¼Œæ—¥ï¼Œæ—¶ï¼Œåˆ†ï¼Œç§’å ä¸¤ä½æ˜¾ç¤º
     {
         maxcount = 2;
     }
@@ -306,7 +306,7 @@ uint8 deal_clock_digital_key(uint8 key)
     {
         SetCurUI_Type(CurUI_Type);
     }
-    key_val = (key & ~AP_KEY_UP) - AP_KEY_NUM0;//½«Êı×Ö°´¼üÏûÏ¢×ª»»³ÉÊı×Ö
+    key_val = (key & ~AP_KEY_UP) - AP_KEY_NUM0;//å°†æ•°å­—æŒ‰é”®æ¶ˆæ¯è½¬æ¢æˆæ•°å­—
     DigitalBuf[DigitalCount] = key_val;
     DigitalCount++;
     need_draw = TRUE;
@@ -328,7 +328,7 @@ void deal_clock_mode_msg(void)
             DigitalCount = 0;
             memset(DigitalBuf, 0, 4);
         }
-        //µ±ÇĞ»»µ½×îºóÒ»ÏîÊ±£¬±£´æµ±Ç°µÄÉèÖÃ
+        //å½“åˆ‡æ¢åˆ°æœ€åä¸€é¡¹æ—¶ï¼Œä¿å­˜å½“å‰çš„è®¾ç½®
         if (set_what >= 4)
         {
             set_what = 3;
@@ -360,14 +360,14 @@ void deal_clock_mode_msg(void)
         }
     }
 }
-//Ê¹ÓÃÉèÖÃÏîÉÁË¸Ğ§¹û
+//ä½¿ç”¨è®¾ç½®é¡¹é—ªçƒæ•ˆæœ
 void enable_flicker(void)
 {
     show_ui_flag = 1;
     show_count = 0;
     need_draw = TRUE;
 }
-//È¡ÏûÉèÖÃÏîÉÁË¸Ğ§¹û
+//å–æ¶ˆè®¾ç½®é¡¹é—ªçƒæ•ˆæœ
 void disable_flicker(void)
 {
     show_ui_flag = 0;
@@ -375,7 +375,7 @@ void disable_flicker(void)
     show_what = 1;
     need_draw = TRUE;
 }
-//È¡ÏûÏµÍ³ÄÖÖÓ
+//å–æ¶ˆç³»ç»Ÿé—¹é’Ÿ
 void disable_alarm(void)
 {
     uint8 sfr_bak;

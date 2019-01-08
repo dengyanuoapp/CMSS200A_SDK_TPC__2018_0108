@@ -16,91 +16,91 @@
 #define DISK_C 0
 #define DISK_H 1
 
-/********************³£Á¿¶¨Òå***********************/
+/********************å¸¸é‡å®šä¹‰***********************/
 
-/******************È«¾Ö±äÁ¿¶¨Òå*********************/
+/******************å…¨å±€å˜é‡å®šä¹‰*********************/
 
-//±£ÁôÏî
+//ä¿ç•™é¡¹
 //uint8 DiskFlag = 0;
 //uint16 near g_rec_event = 0;
 
 bool show_time = TRUE;
 
-/*  µ±Ç°Ä¿Â¼ÏÂÂ¼ÒôÎÄ¼ş×Ü¸öÊı*/
+/*  å½“å‰ç›®å½•ä¸‹å½•éŸ³æ–‡ä»¶æ€»ä¸ªæ•°*/
 uint8 near g_file_num;
 
-/* ¿ÉÂ¼×ÜÃëÊı*/
+/* å¯å½•æ€»ç§’æ•°*/
 uint32 total_sec = 0;
 
-/* ÅäÖÃµÄ¿ÉÂ¼ÉÈÇøÊı */
+/* é…ç½®çš„å¯å½•æ‰‡åŒºæ•° */
 uint32 total_space_setting = 0;
 
-/* µ¥´Î½øÈëÂ¼Òô£¬ÀÛ¼ÆÒÑÂ¼ÉÈÇøÊı */
+/* å•æ¬¡è¿›å…¥å½•éŸ³ï¼Œç´¯è®¡å·²å½•æ‰‡åŒºæ•° */
 uint32 total_space_used = 0;
 
-/* µ¥¸öÎÄ¼şµÄÉÈÇøÊı */
+/* å•ä¸ªæ–‡ä»¶çš„æ‰‡åŒºæ•° */
 uint32 onefile_space = 0;
 uint16 near g_rec_event = 0;
 
-uint32 near g_free_space; //Ê£Óà´ÅÅÌ¿Õ¼ä//remaining disk space
+uint32 near g_free_space; //å‰©ä½™ç£ç›˜ç©ºé—´//remaining disk space
 
-/* µ±Ç°Â¼ÒôÎÄ¼şµÄpageÊı*/
+/* å½“å‰å½•éŸ³æ–‡ä»¶çš„pageæ•°*/
 //uint8 near g_total_time[11]; //000:00:00
 uint8 near g_now_time[10]; //000:00:00
 uint8 near g_file_name_time[16]; //"WAV001 04/01/01"
 
-/* µ±Ç°Â¼Òô±ÈÌØÂÊASCILL , ÓÃÓÚÏÔÊ¾*/
+/* å½“å‰å½•éŸ³æ¯”ç‰¹ç‡ASCILL , ç”¨äºæ˜¾ç¤º*/
 uint8 near currentBitrate[4];
 
 record_vars_t near g_record_vars;
-//uint8 near g_rec_from; //µ±Ç°µÄÂ¼ÒôÔ´ by ccm
+//uint8 near g_rec_from; //å½“å‰çš„å½•éŸ³æº by ccm
 
-/*  ¿ÉÂ¼Òô×ÜÊ±¼ä*/
+/*  å¯å½•éŸ³æ€»æ—¶é—´*/
 time_t_ext near g_total_time;
-/*  ÊµÊ±ÏÔÊ¾Â¼ÒôµÄÊ±¼ä*/
+/*  å®æ—¶æ˜¾ç¤ºå½•éŸ³çš„æ—¶é—´*/
 time_t near g_rec_time;
-/* Â¼Òô×´Ì¬*/
+/* å½•éŸ³çŠ¶æ€*/
 wav_rec_status_t rec_stat;
 
 //resource_t inputSelect =
 //{ 0 };
 
-/* Â¼Òô²ÎÊı½á¹¹*/
+/* å½•éŸ³å‚æ•°ç»“æ„*/
 audio_format_t Rec_format;
 //bool unicodeFlagofFolder;
 
-/* ÊÇ·ñFM  Â¼Òô*/
+/* æ˜¯å¦FM  å½•éŸ³*/
 bool isFmRecord;
-/* ¿Õ¼äÊÇ·ñÒÑÂú*/
+/* ç©ºé—´æ˜¯å¦å·²æ»¡*/
 bool overflag;
 uint8 avrEnableSave;
 //ap_inputSelect_e inputSelSave;
 
 //uint8 dir_name[30];
 
-/* Â¼Òô±ÈÌØÂÊ*/
+/* å½•éŸ³æ¯”ç‰¹ç‡*/
 ap_bitrate_e rec_bitrate;
-/* Â¼Òô²ÉÑùÂÊ*/
+/* å½•éŸ³é‡‡æ ·ç‡*/
 ap_samplerate_e Rec_Fsrate;
-/* Â¼ÒôÍ¨µÀÊı*/
+/* å½•éŸ³é€šé“æ•°*/
 channelnum_t rec_channel;
-/* Ö¸Ïòµ±Ç°Ä¬ÈÏÂ¼ÒôÄ¿Â¼*/
+/* æŒ‡å‘å½“å‰é»˜è®¤å½•éŸ³ç›®å½•*/
 const uint8 *g_dir_voice;
 
-/* ´ÅÅÌ×´Ì¬bitmap */
+/* ç£ç›˜çŠ¶æ€bitmap */
 uint8 g_DiskStateFlag = 0;
 
-/* ÊÇ·ñĞèÒªÈ¡Ê£ÓàÈİÁ¿ */
+/* æ˜¯å¦éœ€è¦å–å‰©ä½™å®¹é‡ */
 bool need_fetch_space;
 
 bool card_exist = FALSE;
 bool UDisk_exist = FALSE;
-uint8 rec_status;//µ±Ç°Â¼Òô×´Ì¬¡£0-Í£Ö¹×´Ì¬;1-Â¼Òô×´Ì¬;2-ÔİÍ£×´Ì¬
-uint8 need_change_rec_status;//ÊÇ·ñĞèÒª×ª»»Â¼Òô×´Ì¬±êÖ¾
+uint8 rec_status;//å½“å‰å½•éŸ³çŠ¶æ€ã€‚0-åœæ­¢çŠ¶æ€;1-å½•éŸ³çŠ¶æ€;2-æš‚åœçŠ¶æ€
+uint8 need_change_rec_status;//æ˜¯å¦éœ€è¦è½¬æ¢å½•éŸ³çŠ¶æ€æ ‡å¿—
 
-//ÄÜÁ¿¼ì²âÅäÖÃÖµ
-uint32 Mval = 200000;//ãĞÖµ£¬½¨ÒéÖµ1024
-uint32 Mblock = 38;//½¨ÒéÖµ60£¬½Ó½ü1Ãë  Mblock=(time*256000/8)/512
+//èƒ½é‡æ£€æµ‹é…ç½®å€¼
+uint32 Mval = 200000;//é˜ˆå€¼ï¼Œå»ºè®®å€¼1024
+uint32 Mblock = 38;//å»ºè®®å€¼60ï¼Œæ¥è¿‘1ç§’  Mblock=(time*256000/8)/512
 
 uint8 g_disk_char[MAX_DISK_NUM] =
 { 'U', 'H', 'M'};
@@ -117,7 +117,7 @@ const uint8 err_str[4] =
 
 /*
  ********************************************************************************
- * Description : Ê¹ÄÜDAC
+ * Description : ä½¿èƒ½DAC
  *
  * Arguments   : NULL
  *
@@ -131,14 +131,14 @@ void near openDAC_main(void)
 {
     dac_t dacattr;
     dacattr.dacselect = 0;
-    dacattr.rate = FS_44K1;//Ä¬ÈÏ
+    dacattr.rate = FS_44K1;//é»˜è®¤
     EnableDAC(&dacattr);
 
 }
 
 /*
  ********************************************************************************
- * Description : ¹Ø±ÕÂ¼ÒôÍ¨µÀ
+ * Description : å…³é—­å½•éŸ³é€šé“
  *
  * Arguments   : NULL
  *
@@ -158,7 +158,7 @@ void near Close_RecRoute(void)
 
 /*
  ********************************************************************************
- * Description : Record Ó¦ÓÃ²ÎÊı³õÊ¼»¯
+ * Description : Record åº”ç”¨å‚æ•°åˆå§‹åŒ–
  *
  * Arguments   : NULL
  *
@@ -177,7 +177,7 @@ void near read_var(void)
         memset(&g_record_vars, 0, sizeof(g_record_vars));
         g_record_vars.maigc = MAGIC_RECORD;
         g_record_vars.location.disk = 0;
-        g_record_vars.rec_source = AP_MICIN;        //Ä¬ÈÏÑ¡ÔñMICÂ¼Òô
+        g_record_vars.rec_source = AP_MICIN;        //é»˜è®¤é€‰æ‹©MICå½•éŸ³
 
         g_record_vars.rec_type = RECORD_FILE_TYPE_WAV;
         g_record_vars.rec_encode = ENCODE_WAV_PCM;
@@ -195,17 +195,17 @@ void near read_var(void)
 
 /*
  ********************************************************************************
- * Description : Record Ó¦ÓÃÈë¿ÚÖ÷º¯Êı
+ * Description : Record åº”ç”¨å…¥å£ä¸»å‡½æ•°
  *
  * Arguments   :
  param:
- 0, ²»×Ô¶¯¿ªÊ¼Â¼Òô
- 1, ×Ô¶¯¿ªÊ¼Â¼Òô
- RESULT_FMREC_NOSTART,  FMÂ¼Òô,   ²»×Ô¶¯¿ªÊ¼
- RESULT_FMREC_START,  FMÂ¼Òô, ×Ô¶¯¿ªÊ¼
+ 0, ä¸è‡ªåŠ¨å¼€å§‹å½•éŸ³
+ 1, è‡ªåŠ¨å¼€å§‹å½•éŸ³
+ RESULT_FMREC_NOSTART,  FMå½•éŸ³,   ä¸è‡ªåŠ¨å¼€å§‹
+ RESULT_FMREC_START,  FMå½•éŸ³, è‡ªåŠ¨å¼€å§‹
  *
  *
- * Returns     : ½á¹ûÏûÏ¢»ò0
+ * Returns     : ç»“æœæ¶ˆæ¯æˆ–0
  *
  * Notes       :
  *
@@ -227,7 +227,7 @@ int main(int param)
     LEDClearScreen();
     LEDPuts(NUMBER2, rec_str, 1);
 
-    /* ÅäÖÃÖ»Ö§³ÖNOR FLASH */
+    /* é…ç½®åªæ”¯æŒNOR FLASH */
     if(g_comval.SuppNorRec == 1)
     {
         g_record_vars.location.disk = 'M';
@@ -244,7 +244,7 @@ int main(int param)
         }
     }
 
-    /* Ã»ÓĞÉè±¸ */
+    /* æ²¡æœ‰è®¾å¤‡ */
     if(g_record_vars.location.disk == 0)
     {
         LEDPuts(NUMBER1, nodevice_str, 1);

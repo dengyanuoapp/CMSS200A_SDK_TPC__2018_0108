@@ -6,12 +6,12 @@
 #pragma name(BAC_KT)
 const uint8 Tonedate[2][2] = {0x26, 0x40, 0xda, 0xbf};
 //const uint8 Tonedate[2][2] = {0x7F, 0x7F, 0x7F, 0x7F};
-const uint8 Fout_44K_256fs[8] = {0, 0, 44, 0, 22, 0, 11, 0}; //i2SÊä³öÊ±ÊÇ256fs
+const uint8 Fout_44K_256fs[8] = {0, 0, 44, 0, 22, 0, 11, 0}; //i2Sè¾“å‡ºæ—¶æ˜¯256fs
 const uint8 Fout_48K_256fs[8] = {96, 0, 48, 32, 24, 16, 12, 8};
-const uint8 Fout_44K_512fs[8] = {44, 0, 22, 0, 11, 0, 0, 0}; //i2s¼ÓADC»òÖ»ÓĞADCÊä³öÊ±ÊÇ512fs
+const uint8 Fout_44K_512fs[8] = {44, 0, 22, 0, 11, 0, 0, 0}; //i2såŠ ADCæˆ–åªæœ‰ADCè¾“å‡ºæ—¶æ˜¯512fs
 const uint8 Fout_48K_512fs[8] = {48, 32, 24, 16, 12, 8, 0, 0};
 
-void Delay10ms(void); //24Mhz£¬ÑÓÊ±500ms
+void Delay10ms(void); //24Mhzï¼Œå»¶æ—¶500ms
 extern void _nop_(void);
 void ADC_DAC_loop(void);
 /*
@@ -90,11 +90,11 @@ void ADC_DAC_loop(void)
 
             {
                 goto exit;
-                //Ö±½ÓÍË³ö
+                //ç›´æ¥é€€å‡º
             }
         }
-        //200msÑÓ³Ùºó£¬ÈÔµÈ²»µ½kt finish£¬Ö±½ÓÍË³ö
-        break; //ÍË³ö
+        //200mså»¶è¿Ÿåï¼Œä»ç­‰ä¸åˆ°kt finishï¼Œç›´æ¥é€€å‡º
+        break; //é€€å‡º
     }
 
 exit:
@@ -142,7 +142,7 @@ exit:
             {
                 ;
             }
-            //×óÉùµÀ
+            //å·¦å£°é“
             DAC_CH0_PCML = 0x00;
             DAC_CH0_PCMM = tonedata1;
             DAC_CH0_PCMH = tonedata2;
@@ -150,7 +150,7 @@ exit:
             {
                 ;
             }
-            //ÓÒÉùµÀ
+            //å³å£°é“
             DAC_CH0_PCML = 0x00;
             DAC_CH0_PCMM = tonedata1;
             DAC_CH0_PCMH = tonedata2;

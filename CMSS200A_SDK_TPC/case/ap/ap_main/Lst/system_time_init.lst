@@ -19,42 +19,42 @@ stmt  level    source
     8          extern uint32 systemtime;
     9          extern time_t time;
    10          
-   11          extern date_t date;//ÏµÍ³ÈÕÆÚ
-   12          //time_t time;//ÏµÍ³Ê±¼ä
+   11          extern date_t date;//ç³»ç»Ÿæ—¥æœŸ
+   12          //time_t time;//ç³»ç»Ÿæ—¶é—´
    13          kval_t kval;
    14          
-   15          int8 near IsNotPowerDown(void);//ÅĞ¶Ï´Ë´Î¿ª»úÖ®Ç°ÊÇ·ñµôµç¹Ø»ú
+   15          int8 near IsNotPowerDown(void);//åˆ¤æ–­æ­¤æ¬¡å¼€æœºä¹‹å‰æ˜¯å¦æ‰ç”µå…³æœº
    16          
    17          int16 InitSystemtime(void)
    18          {
    19   1          uint8 sfr_bak;
-   20   1          uint8 InitDateTime;//ÊÇ·ñĞèÒª³õÊ¼»¯ÏµÍ³Ê±¼ä1:ĞèÒª³õÊ¼»¯0:²»ĞèÒª³õÊ¼»¯
+   20   1          uint8 InitDateTime;//æ˜¯å¦éœ€è¦åˆå§‹åŒ–ç³»ç»Ÿæ—¶é—´1:éœ€è¦åˆå§‹åŒ–0:ä¸éœ€è¦åˆå§‹åŒ–
    21   1      
-   22   1          //µ÷ÊÔÈÕÆÚ, Ê±¼äÉèÖÃ
+   22   1          //è°ƒè¯•æ—¥æœŸ, æ—¶é—´è®¾ç½®
    23   1      #ifdef VERIFY_IsNotPowerDown
    24   1      
    25   1          VMRead(&kval, VM_KERNEL, sizeof(kval_t));
    26   1      
    27   1          if (kval.magic == MAGIC_KVAL)
    28   1          {
-   29   2              //ÅĞ¶Ï´Ë´Î¿ª»úÖ®Ç°ÊÇ·ñµôµç¹Ø»ú
-   30   2              if (IsNotPowerDown() == 0) //·µ»Ø  0£ºµôµç   ·Ç0£ºÃ»µôµç
+   29   2              //åˆ¤æ–­æ­¤æ¬¡å¼€æœºä¹‹å‰æ˜¯å¦æ‰ç”µå…³æœº
+   30   2              if (IsNotPowerDown() == 0) //è¿”å›  0ï¼šæ‰ç”µ   é0ï¼šæ²¡æ‰ç”µ
    31   2              {
-   32   3                  InitDateTime = 1; //ĞèÒª³õÊ¼»¯
+   32   3                  InitDateTime = 1; //éœ€è¦åˆå§‹åŒ–
    33   3              }
    34   2              else
    35   2              {
-   36   3                  InitDateTime = 0; //²»ĞèÒª³õÊ¼»¯
+   36   3                  InitDateTime = 0; //ä¸éœ€è¦åˆå§‹åŒ–
    37   3              }
    38   2          }
-   39   1          else //Éı¼¶ÍêµÚÒ»´Î¿ª»ú
+   39   1          else //å‡çº§å®Œç¬¬ä¸€æ¬¡å¼€æœº
    40   1          {
-   41   2              InitDateTime = 1; //ĞèÒª³õÊ¼»¯
+   41   2              InitDateTime = 1; //éœ€è¦åˆå§‹åŒ–
    42   2          }
    43   1      
    44   1          if (InitDateTime == 1)
    45   1          {
-   46   2              kval.rtcresetflag = 0x55; //ÉèÖÃµôµç±êÖ¾
+   46   2              kval.rtcresetflag = 0x55; //è®¾ç½®æ‰ç”µæ ‡å¿—
    47   2              date.year = 2010;
    48   2              date.month = 01;
    49   2              date.day = 01;
@@ -62,13 +62,13 @@ stmt  level    source
    51   2              time.minute = 0;
    52   2              time.second = 1;
    53   2      
-   54   2              TM_SetDate(&date); //»áĞŞ¸Äsystemtime   systemtime²ÉÓÃÏµÍ³³õÊ¼Öµ
-   55   2              TM_SetTime(&time); //»áĞŞ¸Äsystemtime   systemtime²ÉÓÃÏµÍ³³õÊ¼Öµ
-   56   2              //½«systemtimeĞ´»Øµ½VRAMÖĞ
+   54   2              TM_SetDate(&date); //ä¼šä¿®æ”¹systemtime   systemtimeé‡‡ç”¨ç³»ç»Ÿåˆå§‹å€¼
+   55   2              TM_SetTime(&time); //ä¼šä¿®æ”¹systemtime   systemtimeé‡‡ç”¨ç³»ç»Ÿåˆå§‹å€¼
+   56   2              //å°†systemtimeå†™å›åˆ°VRAMä¸­
    57   2              kval.magic = MAGIC_KVAL;
 C251 COMPILER V4.55,  system_time_init                                                     13/12/18  16:28:43  PAGE 2   
 
-   58   2              kval.systemtime = systemtime; //ÔÚTM_SetDate±»ĞŞ¸Ä
+   58   2              kval.systemtime = systemtime; //åœ¨TM_SetDateè¢«ä¿®æ”¹
    59   2      
    60   2              VMWrite(&kval, VM_KERNEL, sizeof(kval_t));
    61   2              sfr_bak = SFR_BANK;
@@ -85,7 +85,7 @@ stmt  level    source
    72   2          }
    73   1          ClearWatchDog();
    74   1      
-   75   1          //´ÓVRAMÖĞÈ¡³ösystemtime
+   75   1          //ä»VRAMä¸­å–å‡ºsystemtime
    76   1          systemtime = kval.systemtime;
    77   1      #endif
    78   1          return 0xffff;

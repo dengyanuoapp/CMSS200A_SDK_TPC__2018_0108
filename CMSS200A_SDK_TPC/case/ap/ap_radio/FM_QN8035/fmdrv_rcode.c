@@ -19,22 +19,22 @@ uint8 qnd_R16;
 uint8 qnd_R17;
 uint8 qnd_R46;
 
-uint8 FM_Slevel; //ËÑÌ¨ÃÅÏŞ
+uint8 FM_Slevel; //æœå°é—¨é™
 
 //uint16 Freq_RF;
-/* Ó²¼şseek ×´Ì¬±êÊ¶*/
+/* ç¡¬ä»¶seek çŠ¶æ€æ ‡è¯†*/
 uint8 hardseek_flag;
 
 /*
  ********************************************************************************
  *             uint8 QNF_SetCh(uint16 freq)
  *
- * Description : ÉèÖÃÆµµã,½øĞĞtune²Ù×÷
+ * Description : è®¾ç½®é¢‘ç‚¹,è¿›è¡Œtuneæ“ä½œ
  *
- * Arguments   : ĞèÉèÖÃµÄÆµµãÖµ, ÒÔ10khz Îªµ¥Î»
+ * Arguments   : éœ€è®¾ç½®çš„é¢‘ç‚¹å€¼, ä»¥10khz ä¸ºå•ä½
 
- * Returns     : ÉèÖÃÆµµãÊÇ·ñ³É¹¦,Èô³É¹¦,·µ»Ø1
- *					  ·ñÔò,·µ»Ø0
+ * Returns     : è®¾ç½®é¢‘ç‚¹æ˜¯å¦æˆåŠŸ,è‹¥æˆåŠŸ,è¿”å›1
+ *					  å¦åˆ™,è¿”å›0
  * Notes       :
  *
  ********************************************************************************
@@ -92,14 +92,14 @@ uint8 QNF_SetCh(uint16 freq)
  ********************************************************************************
  *        uint8 QNF_SetRegBit(uint8 RegAddr, uint8 bitMask, uint8 data_val)
  *
- * Description : ½«Ö¸¶¨¼Ä´æÆ÷µÄÖ¸¶¨bitÉèÖÃÎªÖ¸¶¨µÄÖµ
+ * Description : å°†æŒ‡å®šå¯„å­˜å™¨çš„æŒ‡å®šbitè®¾ç½®ä¸ºæŒ‡å®šçš„å€¼
  *
- * Arguments   : RegAddr -- ¼Ä´æÆ÷µØÖ·
- *               bitMask -- ĞèÉèÖÃµÄbitÎ»
- *               data_val -- ÉèÖÃÖµ
+ * Arguments   : RegAddr -- å¯„å­˜å™¨åœ°å€
+ *               bitMask -- éœ€è®¾ç½®çš„bitä½
+ *               data_val -- è®¾ç½®å€¼
  *
- * Returns     : ³É¹¦,Ôò·µ»ØÖµÎª1
- *			    ·ñÔò,·µ»Ø0
+ * Returns     : æˆåŠŸ,åˆ™è¿”å›å€¼ä¸º1
+ *			    å¦åˆ™,è¿”å›0
  * Notes       :
  *
  ********************************************************************************
@@ -116,11 +116,11 @@ uint8 QNF_SetRegBit(uint8 RegAddr, uint8 bitMask, uint8 data_val)
  ********************************************************************************
  *          void QNF_ConfigScan(uint16 start, uint16 stop, uint8 step)
  *
- * Description : É¨ÃèÇ°ÅäÖÃÆğÊ¼ÆµÂÊ, ½áÊøÆµÂÊ¼°²½³¤
+ * Description : æ‰«æå‰é…ç½®èµ·å§‹é¢‘ç‡, ç»“æŸé¢‘ç‡åŠæ­¥é•¿
  *
- * Arguments   : start --- ÆğÊ¼ÆµÂÊ, 10khzÎªµ¥Î»
- *               stop --- ½áÊøÆµÂÊ, 10khzÎªµ¥Î»
- *               step --- ²½³¤    1: 100khz    2: 200khz   0: 50khz
+ * Arguments   : start --- èµ·å§‹é¢‘ç‡, 10khzä¸ºå•ä½
+ *               stop --- ç»“æŸé¢‘ç‡, 10khzä¸ºå•ä½
+ *               step --- æ­¥é•¿    1: 100khz    2: 200khz   0: 50khz
  * Returns     : none
  *
  * Notes       :
@@ -134,7 +134,7 @@ void QNF_ConfigScan(uint16 start, uint16 stop, uint8 step)
     uint16 fStart;
     uint16 fStop;
 
-    //×îµÍ2bit±£³Ö²»±ä,ch[9],ch[8]
+    //æœ€ä½2bitä¿æŒä¸å˜,ch[9],ch[8]
     //tStep = QND_ReadReg(CH_STEP);
     //tStep &= CH_CH;
 
@@ -157,11 +157,11 @@ void QNF_ConfigScan(uint16 start, uint16 stop, uint8 step)
  ********************************************************************************
  *         uint8 QND_RXValidCH(uint16 freq, uint8 step)
  *
- * Description : ÅĞ¶ÏÉèÖÃµÄÆµÂÊÊÇ·ñÊÇÓĞĞ§µçÌ¨
+ * Description : åˆ¤æ–­è®¾ç½®çš„é¢‘ç‡æ˜¯å¦æ˜¯æœ‰æ•ˆç”µå°
  *
- * Arguments :  freq:ÒªĞ´µÄÆµÂÊ, 10khz Îªµ¥Î»
- step:²½½ø100KHZ
- * Returns :	ÊÇ·ñÓĞĞ§µçÌ¨µÄ±êÖ¾
+ * Arguments :  freq:è¦å†™çš„é¢‘ç‡, 10khz ä¸ºå•ä½
+ step:æ­¥è¿›100KHZ
+ * Returns :	æ˜¯å¦æœ‰æ•ˆç”µå°çš„æ ‡å¿—
  *
  * Notes :
  *
@@ -227,13 +227,13 @@ uint8 QND_RXValidCH(uint16 freq, uint8 step)
  ********************************************************************************
  *          uint8 QND_WriteReg(uint8 RegAddr, uint8 Data)
  *
- * Description : Ğ´¼Ä´æÆ÷
+ * Description : å†™å¯„å­˜å™¨
  *
- * Arguments :  RegAddr:ÒªĞ´µÄ¼Ä´æÆ÷
- *              Data: ÒªĞ´ÈëµÄ¼Ä´æÆ÷Öµ
- * Returns :	³É¹¦/Ê§°Ü
+ * Arguments :  RegAddr:è¦å†™çš„å¯„å­˜å™¨
+ *              Data: è¦å†™å…¥çš„å¯„å­˜å™¨å€¼
+ * Returns :	æˆåŠŸ/å¤±è´¥
  *
- * Notes :   ÉèÖÃÄ£×éÄ³¸öÖ¸¶¨¼Ä´æÆ÷µÄÖµ
+ * Notes :   è®¾ç½®æ¨¡ç»„æŸä¸ªæŒ‡å®šå¯„å­˜å™¨çš„å€¼
  *
  ********************************************************************************
  */
@@ -241,12 +241,12 @@ uint8 QND_WriteReg(uint8 RegAddr, uint8 Data)
 {
     uint8 i, result;
     uint8 WriteBuffer[3];
-    //Ğ´²Ù×÷Éè±¸µØÖ·
+    //å†™æ“ä½œè®¾å¤‡åœ°å€
     WriteBuffer[0] = 0x20;
     WriteBuffer[1] = RegAddr;
     WriteBuffer[2] = Data;
 
-    //disable_interrupt(); //½ûÖ¹ÖĞ¶Ï
+    //disable_interrupt(); //ç¦æ­¢ä¸­æ–­
     romDI();
     for (i = 0; i < 5; i++)
     {
@@ -254,12 +254,12 @@ uint8 QND_WriteReg(uint8 RegAddr, uint8 Data)
         result = I2C_Trans_Bytes(WriteBuffer, 3);
         if (result != 0)
         {
-            //enable_interrupt(); //¿ªÖĞ¶Ï
+            //enable_interrupt(); //å¼€ä¸­æ–­
             romEI();
             return 1;
         }
     }
-    //enable_interrupt(); //¿ªÖĞ¶Ï
+    //enable_interrupt(); //å¼€ä¸­æ–­
     romEI();
     return 0;
 }
@@ -268,11 +268,11 @@ uint8 QND_WriteReg(uint8 RegAddr, uint8 Data)
  ********************************************************************************
  *           uint8 QND_ReadReg(uint8 RegAddr)
  *
- * Description : ¶Á¼Ä´æÆ÷µÄÖµ
+ * Description : è¯»å¯„å­˜å™¨çš„å€¼
  *
- * Arguments :  RegAddr:Òª¶ÁµÄ¼Ä´æÆ÷
+ * Arguments :  RegAddr:è¦è¯»çš„å¯„å­˜å™¨
  *
- * Returns :	¶ÁÈ¡µ½µÄ¼Ä´æÆ÷µÄÖµ
+ * Returns :	è¯»å–åˆ°çš„å¯„å­˜å™¨çš„å€¼
  *
  * Notes :
  *
@@ -284,7 +284,7 @@ uint8 QND_ReadReg(uint8 RegAddr)
     uint8 buf[4];
     uint8 i;
 
-    //disable_interrupt(); //½ûÖ¹ÖĞ¶Ï
+    //disable_interrupt(); //ç¦æ­¢ä¸­æ–­
     romDI();
     ClearWatchDog();
 
@@ -306,7 +306,7 @@ uint8 QND_ReadReg(uint8 RegAddr)
     }
     Data = buf[0];
 
-    //enable_interrupt(); //¿ªÖĞ¶Ï
+    //enable_interrupt(); //å¼€ä¸­æ–­
     romEI();
     return Data;
 }
@@ -314,11 +314,11 @@ uint8 QND_ReadReg(uint8 RegAddr)
  ********************************************************************************
  *           uint16 ChanToFreq(uint16 chan)
  *
- * Description : ½«¶Á³öµÄ¼Ä´æÆ÷µçÌ¨Öµ×ª»»³ÉÊµ¼ÊµÄÆµµã
+ * Description : å°†è¯»å‡ºçš„å¯„å­˜å™¨ç”µå°å€¼è½¬æ¢æˆå®é™…çš„é¢‘ç‚¹
  *
- * Arguments :  chan:¶Á³öµÄµçÌ¨Öµ
+ * Arguments :  chan:è¯»å‡ºçš„ç”µå°å€¼
  *
- * Returns :	   ×ª»»³öÀ´µÄÊµ¼ÊÆµµãÖµ, ÒÔ10khz Îªµ¥Î»
+ * Returns :	   è½¬æ¢å‡ºæ¥çš„å®é™…é¢‘ç‚¹å€¼, ä»¥10khz ä¸ºå•ä½
  *
  * Notes :
  *
@@ -337,11 +337,11 @@ uint16 ChanToFreq(uint16 chan)
  ********************************************************************************
  *           uint16 FreqToChan(uint16 freq)
  *
- * Description : ½«Æµµã×ª»»³ÉĞ´¼Ä´æÆ÷µÄÖµ
+ * Description : å°†é¢‘ç‚¹è½¬æ¢æˆå†™å¯„å­˜å™¨çš„å€¼
  *
- * Arguments :  freq:ÒªĞ´ÈëµÄÆµµã, ÒÔ10khz Îªµ¥Î»
+ * Arguments :  freq:è¦å†™å…¥çš„é¢‘ç‚¹, ä»¥10khz ä¸ºå•ä½
  *
- * Returns :	   ×ª»»³öÀ´µÄÒªĞ´Èë¼Ä´æÆ÷µÄµçÌ¨ÖµChannel Index
+ * Returns :	   è½¬æ¢å‡ºæ¥çš„è¦å†™å…¥å¯„å­˜å™¨çš„ç”µå°å€¼Channel Index
  *
  * Notes :
  *

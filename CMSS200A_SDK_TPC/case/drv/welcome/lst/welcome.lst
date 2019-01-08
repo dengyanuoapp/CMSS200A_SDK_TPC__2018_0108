@@ -72,7 +72,7 @@ stmt  level    source
    59   1      
    60   1          SFR_BANK = BANK_GPIO;
    61   1          MFP_CTL2 |= 0x01; //SET UDI
-   62   1          //¼ì²âÓ²¿ª¹ØÊÇ·ñ¹Ø±Õ
+   62   1          //æ£€æµ‹ç¡¬å¼€å…³æ˜¯å¦å…³é—­
    63   1          SFR_BANK = BANK_PMU;
    64   1          onoff_status = SYSTEM_ONOFF & 0x10;
    65   1          SFR_BANK = sfrbak;
@@ -80,10 +80,10 @@ stmt  level    source
    67   1          {
    68   2              return;
    69   2          }
-   70   1          //ÅĞ¶ÏÊÇ·ñÁ¬½ÓUSBÏß
+   70   1          //åˆ¤æ–­æ˜¯å¦è¿æ¥USBçº¿
    71   1          if ((GetUsbCableStatus() & 0x40) == 0x40)
    72   1          {
-   73   2              //¿ª»ú³¤°´mode¼ü½øADFU
+   73   2              //å¼€æœºé•¿æŒ‰modeé”®è¿›ADFU
    74   2              SFR_BANK = BANK_GPIO;
    75   2                      AD_Select  &= 0xCC;
    76   2                      AD_Select  |= 0x11;/*gpio_c7 mapping to LRADC5, gpio_a6 mapping to LRADC4*/

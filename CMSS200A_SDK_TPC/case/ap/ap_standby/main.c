@@ -65,21 +65,21 @@ int16 main(int16 param)
     uint8 key = 0 ;
 
     param = param;
-    //¹Ø±ÕÍâ²¿paµçÔ´
+    //å…³é—­å¤–éƒ¨paç”µæº
     switch_pa_power(0);
-    //ÃğµôµçÔ´Ö¸Ê¾µÆ
+    //ç­æ‰ç”µæºæŒ‡ç¤ºç¯
     //    switch_pilot_light(RED_LIGHT, 0);
     ClearWatchDog();
     LEDClearScreen();
-    //½øÈë¼Ù¹Ø»ú×´Ì¬
+    //è¿›å…¥å‡å…³æœºçŠ¶æ€
     //   DRV_UnInstall(DRV_KY);
     VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval));
     if (g_comval.SleepTime != 0)
     {
-        g_comval.SleepTime = 0; //´Ë±äÁ¿ÒªÇå0£¬Ê¹Ë¯ÃßÄ£Ê½ÉèÖÃÒ»´Î½öÒ»´ÎÓĞĞ§¡£
+        g_comval.SleepTime = 0; //æ­¤å˜é‡è¦æ¸…0ï¼Œä½¿ç¡çœ æ¨¡å¼è®¾ç½®ä¸€æ¬¡ä»…ä¸€æ¬¡æœ‰æ•ˆã€‚
         VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval));
     }
-    //ÏÈ¹ı¶É³¤°´play¼ü£¬ÒÔ·À³¤°´¹Ø»úºóÓÖ³öÏÖ¿ª»úµÄÎÊÌâ
+    //å…ˆè¿‡æ¸¡é•¿æŒ‰playé”®ï¼Œä»¥é˜²é•¿æŒ‰å…³æœºååˆå‡ºç°å¼€æœºçš„é—®é¢˜
     while(ap_get_message() != NULL)
     {
     };
@@ -94,11 +94,11 @@ int16 main(int16 param)
     longkey_flag = 0;
     standby_count = 0;
     retval = GetUsbStatus();
-    //ÓÉÓÚudisk¶Ë²»»áÖ±½Ó¹©µç£¬ËùÒÔ²»ĞèÒª¼ì²âÊÇ·ñ²å×ÅusbÏß¡£
-    //Ö»Ğè¼ì²âDC5V,Èç¹û¼ì²â¼ì²â²»µ½USBÏßºÍDC5V£¬ÔòÖ±½Ó½øÈës3Ä£Ê½
+    //ç”±äºudiskç«¯ä¸ä¼šç›´æ¥ä¾›ç”µï¼Œæ‰€ä»¥ä¸éœ€è¦æ£€æµ‹æ˜¯å¦æ’ç€usbçº¿ã€‚
+    //åªéœ€æ£€æµ‹DC5V,å¦‚æœæ£€æµ‹æ£€æµ‹ä¸åˆ°USBçº¿å’ŒDC5Vï¼Œåˆ™ç›´æ¥è¿›å…¥s3æ¨¡å¼
     if (((retval & 0x80) != 0x80))
     {
-        Enter_SoftStandby();//¶ÏVCC£¬VDD
+        Enter_SoftStandby();//æ–­VCCï¼ŒVDD
     }
 #if 1
 
@@ -110,10 +110,10 @@ int16 main(int16 param)
         power_on_flag = 0;
         return retval;
     }
-    //Èç¹ûÖĞ¼ä¼ì²â²»µ½DC5VÊ±£¬ÔòÖ±½Ó½øÈës3Ä£Ê½¡£
-    return Enter_SoftStandby();//¶ÏVCC£¬VDD
+    //å¦‚æœä¸­é—´æ£€æµ‹ä¸åˆ°DC5Væ—¶ï¼Œåˆ™ç›´æ¥è¿›å…¥s3æ¨¡å¼ã€‚
+    return Enter_SoftStandby();//æ–­VCCï¼ŒVDD
 #else
-    //½øÈës2Ä£Ê½
+    //è¿›å…¥s2æ¨¡å¼
     disable_charge_pump();
     retval = Enter_HardStandby();
     enable_charge_pump();
@@ -122,11 +122,11 @@ int16 main(int16 param)
 }
 
 /********************************************************************************
- * Description : »ñÈ¡Ó²¿ª¹ØµÄ×´Ì¬
+ * Description : è·å–ç¡¬å¼€å…³çš„çŠ¶æ€
  *
  * Arguments   :
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -137,18 +137,18 @@ uint8 get_hard_switch_status(void)
     uint8 sfr_bak, hard_switch_staus;
     sfr_bak = SFR_BANK;
     SFR_BANK = BANK_PMU;
-    hard_switch_staus = SYSTEM_ONOFF & 0x10;  //»ñÈ¡Ó²¿ª¹ØµÄ×´Ì¬
+    hard_switch_staus = SYSTEM_ONOFF & 0x10;  //è·å–ç¡¬å¼€å…³çš„çŠ¶æ€
     SFR_BANK = sfr_bak;
     return hard_switch_staus;
 }
 
 
 /********************************************************************************
- * Description : ½øÈë¼Ù¹Ø»ú×´Ì¬
+ * Description : è¿›å…¥å‡å…³æœºçŠ¶æ€
  *
  * Arguments   :
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -159,31 +159,31 @@ uint8 enter_fake_standby(void)
     uint8 sfr_bank, device_flag;
     uint8 play_status, onoff_status;
     uint16 count = 0;
-    hard_onoff_status = get_hard_switch_status();  //»ñÈ¡Ó²¿ª¹ØµÄ×´Ì¬
+    hard_onoff_status = get_hard_switch_status();  //è·å–ç¡¬å¼€å…³çš„çŠ¶æ€
     standby_count = 0;
     while(1)
     {
         ClearWatchDog();
-        //·ÀÖ¹Ó²¿ª¹Ø¿ìËÙ°Î¶¯Ê±£¬»¹Ã»¼ì²âµ½Ó²¿ª¹Ø¹Ø±ÕÏûÏ¢£¬Ó²¿ª¹ØÓÖ¿ªÆğÀ´µÄÇé¿ö
+        //é˜²æ­¢ç¡¬å¼€å…³å¿«é€Ÿæ‹”åŠ¨æ—¶ï¼Œè¿˜æ²¡æ£€æµ‹åˆ°ç¡¬å¼€å…³å…³é—­æ¶ˆæ¯ï¼Œç¡¬å¼€å…³åˆå¼€èµ·æ¥çš„æƒ…å†µ
         if((power_on_flag == 1) && (hard_onoff_status == 0))
         {
             return RESULT_MAIN;
         }
-        //¼ì²âÄÖÖÓÏûÏ¢
+        //æ£€æµ‹é—¹é’Ÿæ¶ˆæ¯
         if (alarmtimerflag == 1)
         {
             alarmtimerflag = 0;
-            //Èç¹ûÓ²¿ª¹Ø¹Ø±Õ£¬Ôò²»ÏìÓ¦ÄÖÖÓ
+            //å¦‚æœç¡¬å¼€å…³å…³é—­ï¼Œåˆ™ä¸å“åº”é—¹é’Ÿ
             if ((g_comval.g_alarm.AlarmEnable != 0) && (hard_onoff_status == 0))
             {
-                return RESULT_ALARM; //ÄÖÖÓ¹Ø±Õ
+                return RESULT_ALARM; //é—¹é’Ÿå…³é—­
             }
         }
 
         play_status = get_onoff_key_status();
         onoff_status = get_hard_switch_status();
         SFR_BANK = BANK_PMU;
-        //ÅĞ¶ÏÓ²¿ª¹ØÊÇ·ñÓĞ°Î¶¯¶¯×÷
+        //åˆ¤æ–­ç¡¬å¼€å…³æ˜¯å¦æœ‰æ‹”åŠ¨åŠ¨ä½œ
         if((hard_onoff_status == 0) && (TEST_CTL & 0x02) != 0)
         {
             TEST_CTL |= 0x02;
@@ -192,11 +192,11 @@ uint8 enter_fake_standby(void)
         }
         SFR_BANK = sfr_bank;
         device_flag = GetUsbStatus();
-        if ((device_flag & 0x80) != 0x80)//Èç¹ûÃ»ÓĞDC5V,ÔòÖ±½Ó½øÈës3Ä£Ê½
+        if ((device_flag & 0x80) != 0x80)//å¦‚æœæ²¡æœ‰DC5V,åˆ™ç›´æ¥è¿›å…¥s3æ¨¡å¼
         {
             Enter_SoftStandby();
         }
-        //¼ì²â³¤°´onoff¼üÏûÏ¢
+        //æ£€æµ‹é•¿æŒ‰onoffé”®æ¶ˆæ¯
         if((play_status != 0) && (hard_onoff_status == 0))
         {
             count = 0;
@@ -208,7 +208,7 @@ uint8 enter_fake_standby(void)
                 return RESULT_MAIN;
             }
         }
-        //Èç¹ûÓ²¿ª¹Ø´Ó¹Ø±Õ×´Ì¬°Î¶¯µ½¿ª»ú×´Ì¬£¬ÔòÖ±½Ó¿ª»ú
+        //å¦‚æœç¡¬å¼€å…³ä»å…³é—­çŠ¶æ€æ‹”åŠ¨åˆ°å¼€æœºçŠ¶æ€ï¼Œåˆ™ç›´æ¥å¼€æœº
         if(hard_onoff_status == 0x10)
         {
             onoff_status = get_hard_switch_status();
@@ -242,11 +242,11 @@ uint8 enter_fake_standby(void)
     return NULL;
 }
 /********************************************************************************
- * Description : ½øÈëÈí¿ª¹Ø¼ÈS3Ä£Ê½£¬ÕâÊ±VCC£¬VDDÈ«²¿¶Ï¿ª
+ * Description : è¿›å…¥è½¯å¼€å…³æ—¢S3æ¨¡å¼ï¼Œè¿™æ—¶VCCï¼ŒVDDå…¨éƒ¨æ–­å¼€
  *
  * Arguments   :
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -263,9 +263,9 @@ uint8 Enter_SoftStandby(void)
         ClearWatchDog();
         disable_charge_pump();
         SFR_BANK = BANK_PMU;
-        //disable uvlob¼ì²âĞÅºÅ£¬·ñÔòµç³Ø¼ìµçÊ±È¥µôDC5Vºó»á×Ô¶¯»½ĞÑ
+        //disable uvlobæ£€æµ‹ä¿¡å·ï¼Œå¦åˆ™ç”µæ± æ£€ç”µæ—¶å»æ‰DC5Våä¼šè‡ªåŠ¨å”¤é†’
         SYSTEM_ONOFF = (uint8 ) (SYSTEM_ONOFF & 0x7f);
-        SYSTEM_CTL = (uint8 ) (SYSTEM_CTL & 0xfe);//¶Ï¿ªvcc,VDD
+        SYSTEM_CTL = (uint8 ) (SYSTEM_CTL & 0xfe);//æ–­å¼€vcc,VDD
         SFR_BANK = sfr_bak;
         TM_DelayMS(1);
         count++;
@@ -279,11 +279,11 @@ uint8 Enter_SoftStandby(void)
 }
 
 /********************************************************************************
- * Description : ½øÈëÓ²¿ª¹Ø£¬¼ÈS2Ä£Ê½£¬ÏµÍ³ÅÜµÄÊÇµÍÆµ32K
+ * Description : è¿›å…¥ç¡¬å¼€å…³ï¼Œæ—¢S2æ¨¡å¼ï¼Œç³»ç»Ÿè·‘çš„æ˜¯ä½é¢‘32K
  *
  * Arguments   :
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -302,19 +302,19 @@ uint8 Enter_HardStandby(void)
     while(1)
     {
         ClearWatchDog();
-        retval = Get_PowerON_Message();//»ñÈ¡³¤°´PLAY¼üÏûÏ¢»òÕß²åÈëUSBÏß£¬³äµçÆ÷Ê±µÄÏûÏ¢
+        retval = Get_PowerON_Message();//è·å–é•¿æŒ‰PLAYé”®æ¶ˆæ¯æˆ–è€…æ’å…¥USBçº¿ï¼Œå……ç”µå™¨æ—¶çš„æ¶ˆæ¯
         switch (retval)
         {
         case RESULT_MAIN:
         case RESULT_UDISK:
         case RESULT_ALARM:
-            RecoverPara();//»Ö¸´¸ßÆµ£¬È»ºó¿ª»ú
+            RecoverPara();//æ¢å¤é«˜é¢‘ï¼Œç„¶åå¼€æœº
             enable_charge_pump();
             if (!DRV_Install("DRV_UI.DRV", 0))
             {
                 while (1)
                 {
-                    ;//È±Ê¡¼òÌå
+                    ;//ç¼ºçœç®€ä½“
                 }
             }
             if (!DRV_Install("KY_HARD.DRV", 0))
@@ -330,7 +330,7 @@ uint8 Enter_HardStandby(void)
             break;
 
         case RESULT_STANDBY:
-            Enter_SoftStandby();//¶ÏVCC£¬VDD
+            Enter_SoftStandby();//æ–­VCCï¼ŒVDD
             break;
         default:
             break;
@@ -372,17 +372,17 @@ void enable_charge_pump(void)
     uint8 sfr_bak = SFR_BANK;
     SFR_BANK = BANK_PMU;
     //enable charge pump
-    CP_CTL0 |= 0x01; //µçºÉ±ÃÊ¹ÄÜ
-    CP_CTL1 |= 0x08;	//charge pumpÖ±Í¨¹¦ÄÜÊ¹ÄÜ
+    CP_CTL0 |= 0x01; //ç”µè·æ³µä½¿èƒ½
+    CP_CTL1 |= 0x08;	//charge pumpç›´é€šåŠŸèƒ½ä½¿èƒ½
     SFR_BANK = sfr_bak;
 }
 
 /********************************************************************************
- * Description : »Ö¸´¸ßÆµ£¬»Ö¸´ÆäËûÉèÖÃµÄÒ»Ğ©²ÎÊı
+ * Description : æ¢å¤é«˜é¢‘ï¼Œæ¢å¤å…¶ä»–è®¾ç½®çš„ä¸€äº›å‚æ•°
  *
  * Arguments   :
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -395,19 +395,19 @@ void RecoverPara(void)
     RecoverUSBEfuse();
     RecoverRTC();
     RecoverPMU();
-    //»Ö¸´¸ßÆµ24M£¬VDD1.6V
-    //Ö÷ÒªÊÇ·ÀÖ¹ºÚÆÁ×Ô¶¯¹Ø»úÊ±£¬PLLÉè³É6M£¬VDDÎª1.4V£¬¿ª»úÆğÀ´Ã»ÓĞ»Ö¸´¡£
+    //æ¢å¤é«˜é¢‘24Mï¼ŒVDD1.6V
+    //ä¸»è¦æ˜¯é˜²æ­¢é»‘å±è‡ªåŠ¨å…³æœºæ—¶ï¼ŒPLLè®¾æˆ6Mï¼ŒVDDä¸º1.4Vï¼Œå¼€æœºèµ·æ¥æ²¡æœ‰æ¢å¤ã€‚
     SetPLL(PLL_48MHZ);
     SetVDD(VDDSET_1_6V);
     MyEI();
 }
 
 /********************************************************************************
- * Description : ½øÈëSTANDBYÖ®Ç°£¬ÉèÖÃÏà¹Ø¼Ä´æÆ÷£¬½µµÍ¹¦ºÄ
+ * Description : è¿›å…¥STANDBYä¹‹å‰ï¼Œè®¾ç½®ç›¸å…³å¯„å­˜å™¨ï¼Œé™ä½åŠŸè€—
  *
  * Arguments   :
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -426,11 +426,11 @@ void SetParaToStandby(void)
 }
 
 /********************************************************************************
- * Description : µÍÆµ32KÏÂµÄÑÓÊ±£¬´ó¸ÅÎª3MS
+ * Description : ä½é¢‘32Kä¸‹çš„å»¶æ—¶ï¼Œå¤§æ¦‚ä¸º3MS
  *
  * Arguments   :
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -457,11 +457,11 @@ void LOSC_delay(void)
     }
 }
 /********************************************************************************
- * Description : MCU24MÊ±µÄÑÓÊ±
+ * Description : MCU24Mæ—¶çš„å»¶æ—¶
  *
  * Arguments   :
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -562,9 +562,9 @@ void SetRTC(void)
     RTC_CTL0 = 0x0;// (uint8) (RTC_CTL0& 0xE7);
     RTC_CTL0 |= 0x80;
 
-    WDCTL = (uint8) (WDCTL | 0x08);//Çåwatchdog¼ÆÊıÆ÷
-    WDCTL = (uint8) (WDCTL & 0x7f);//¹Ø±Õwatchdog
-    //¹Ø±Õ¶¨Ê±Æ÷,¹Ø±Õ2HzÖĞ¶Ï
+    WDCTL = (uint8) (WDCTL | 0x08);//æ¸…watchdogè®¡æ•°å™¨
+    WDCTL = (uint8) (WDCTL & 0x7f);//å…³é—­watchdog
+    //å…³é—­å®šæ—¶å™¨,å…³é—­2Hzä¸­æ–­
     RTC_CTL1 &= 0x1F;
     //    CTCCTL &= 0x7f;
     //    CTCCTL2 &= 0x7f;
@@ -600,7 +600,7 @@ void SetPMU(void)
     PMUBuf[6] = PMUADC_CTL;
     PMUBuf[7] = TEST_CTL;
     PMUBuf[8] = SYSTEM_ONOFF;
-    //    MULTI_USED &= 0x7F;//¹Ø±ÕUVDD
+    //    MULTI_USED &= 0x7F;//å…³é—­UVDD
     LDOPD_CTL = 0x0;
     EFUSE_CTL = 0x0;
     BDG_CTL &= 0xEF;
@@ -686,7 +686,7 @@ void RecoverHOSC(void)
     MCU_delay(0xFF);
     _nop_();
     _nop_();
-    CPUCLKCTL = (char) (CPUCLKCTL | 0x02);//ÇĞ»»HOSCÄ£Ê½,¸ßÆµÄ¬ÈÏ24M
+    CPUCLKCTL = (char) (CPUCLKCTL | 0x02);//åˆ‡æ¢HOSCæ¨¡å¼,é«˜é¢‘é»˜è®¤24M
     _nop_();
     _nop_();
     _nop_();
@@ -696,13 +696,13 @@ void RecoverHOSC(void)
 
 }
 /********************************************************************************
- * Description : »ñÈ¡USB»ò³äµçÆ÷µÄ×´Ì¬£¬
+ * Description : è·å–USBæˆ–å……ç”µå™¨çš„çŠ¶æ€ï¼Œ
  *
  * Arguments  :
  *
  *
- * Returns     :dpdm_status=0X40±íÊ¾²åÈëµÄÊÇUSBÏß£¬dpdm_status=0X80Îª³äµçÆ÷
- *            ÎŞ
+ * Returns     :dpdm_status=0X40è¡¨ç¤ºæ’å…¥çš„æ˜¯USBçº¿ï¼Œdpdm_status=0X80ä¸ºå……ç”µå™¨
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -751,16 +751,16 @@ uint8 GetUsbStatus(void)
 }
 
 /********************************************************************************
- * Description : »ñÈ¡¿ª»úµÄÏûÏ¢¼°°Î³öDC5VÏûÏ¢
+ * Description : è·å–å¼€æœºçš„æ¶ˆæ¯åŠæ‹”å‡ºDC5Væ¶ˆæ¯
  *
  * Arguments  :
  *
  *
  * Returns     :
- * RESULT_POWERON£º³¤°´PLAY¼ü¿ª»ú
- * RESULT_UDISK£º³¤°´PLAY¼ü£¬²¢ÇÒ²åÈëUSBÏß¿ª»ú
- * RESULT_STANDBY£ºDC5V°Î³ö
- * RESULT_TIMER ÄÖÁå¿ª»ú
+ * RESULT_POWERONï¼šé•¿æŒ‰PLAYé”®å¼€æœº
+ * RESULT_UDISKï¼šé•¿æŒ‰PLAYé”®ï¼Œå¹¶ä¸”æ’å…¥USBçº¿å¼€æœº
+ * RESULT_STANDBYï¼šDC5Væ‹”å‡º
+ * RESULT_TIMER é—¹é“ƒå¼€æœº
  * Notes       :
  *
  ********************************************************************************/
@@ -779,7 +779,7 @@ uint8 Get_PowerON_Message(void)
         TEST_CTL |= 0x02;
     }
     SFR_BANK = BANK_RTC;
-    alarm_msg = RTC_CTL0 & 0x01; //½«ÄÖÖÓ±êÖ¾Çå³ı
+    alarm_msg = RTC_CTL0 & 0x01; //å°†é—¹é’Ÿæ ‡å¿—æ¸…é™¤
     SFR_BANK = sfr_bak;
 #else
     play_key_flag = SYSTEM_ONOFF & 0x18;
@@ -788,7 +788,7 @@ uint8 Get_PowerON_Message(void)
     if(alarm_msg != 0)
     {
         SFR_BANK = BANK_RTC;
-        RTC_CTL0 = RTC_CTL0 | 0x01;//½«ÄÖÖÓ±êÖ¾Çå³ı
+        RTC_CTL0 = RTC_CTL0 | 0x01;//å°†é—¹é’Ÿæ ‡å¿—æ¸…é™¤
         SFR_BANK = sfr_bak;
         if(hard_onoff_status == 0)
         {
@@ -801,7 +801,7 @@ uint8 Get_PowerON_Message(void)
         return RESULT_STANDBY;
     }
 #ifndef FAKE_HARD_SWITCH
-    if ((play_key_flag != 0) && (hard_onoff_status == 0)) //¼ì²â°´PLAY¼üÏûÏ¢
+    if ((play_key_flag != 0) && (hard_onoff_status == 0)) //æ£€æµ‹æŒ‰PLAYé”®æ¶ˆæ¯
     {
         standby_count++;
         if (standby_count > 5)
@@ -828,7 +828,7 @@ uint8 Get_PowerON_Message(void)
     return 0;
 }
 /********************************************************************************
- * Description : ¹Ø±ÕËùÓĞµÄÖĞ¶Ï
+ * Description : å…³é—­æ‰€æœ‰çš„ä¸­æ–­
  *
  * Arguments  :
  *
@@ -846,7 +846,7 @@ void MyDI(void)
     AIE = 0x0;
 }
 /********************************************************************************
- * Description : »Ö¸´ÖĞ¶Ï
+ * Description : æ¢å¤ä¸­æ–­
  *
  * Arguments  :
  *

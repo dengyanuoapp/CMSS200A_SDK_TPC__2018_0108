@@ -10,7 +10,7 @@
 #ifndef _MMCMD_H
 #define _MMCMD_H
 
-/* ¹¦ÄÜ²Ù×÷Àà*/
+/* åŠŸèƒ½æ“ä½œç±»*/
 #define     MC_OPEN             0x01
 #define     MC_CLOSE            0x02
 #define     MC_LOAD             0x03
@@ -32,7 +32,7 @@
 #define     MC_SETFREQ        0x12
 #define     MC_CALTIME          0x13
 
-/* ĞÅÏ¢Éè¶¨Àà*/
+/* ä¿¡æ¯è®¾å®šç±»*/
 #define     MC_SETVOLUME        0x40
 #define     MC_SETA_B           0x41
 #define     MC_SETUSEREQ        0x42
@@ -69,7 +69,7 @@
 
 #define	    MC_SET_TTS			0xdd	//add for TTS
 
-/* ĞÅÏ¢¶ÁÈ¡Àà*/
+/* ä¿¡æ¯è¯»å–ç±»*/
 #define     MC_GETTIME          0x80
 #define     MC_GETSAPLE         0x81
 #define     MC_GETAUDIOFMT      0x82

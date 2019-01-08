@@ -18,16 +18,16 @@
 
 #pragma name(ALARM_MAIN)
 const uint8 ExtAlarmstr1[3][4] =
-{ "MP3", "WMA", "WAV" };//ÎÄ¼şºó×ºÊı×é
+{ "MP3", "WMA", "WAV" };//æ–‡ä»¶åç¼€æ•°ç»„
 const uint8 ExtNext[4] =
 { "*  " };
 uint8 key;
-uint8 playing_flag = FALSE;//²¥·Å×´Ì¬0-Í£Ö¹×´Ì¬£¬1-ÔİÍ£×´Ì¬2-²¥·Å×´Ì¬
+uint8 playing_flag = FALSE;//æ’­æ”¾çŠ¶æ€0-åœæ­¢çŠ¶æ€ï¼Œ1-æš‚åœçŠ¶æ€2-æ’­æ”¾çŠ¶æ€
 uint16 playing_count;
 Music_type_a g_currentMusicType;
 Open_param_t g_Openparam;
-uint8 play_times;//²¥·Å´ÎÊı
-uint8 g_TagInfoBuf[92];//ÓÃÓÚ·ÅTAGĞÅÏ¢µÄBUF
+uint8 play_times;//æ’­æ”¾æ¬¡æ•°
+uint8 g_TagInfoBuf[92];//ç”¨äºæ”¾TAGä¿¡æ¯çš„BUF
 uint8 SearchAlarmFile(void);
 extern uint8 play_alarm_music(uint8 type);
 int16 main(int16 param)
@@ -79,7 +79,7 @@ int16 main(int16 param)
         }
         else
         {
-            strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //Ê¹ÓÃÄÚ²¿alarmÎÄ¼ş
+            strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //ä½¿ç”¨å†…éƒ¨alarmæ–‡ä»¶
             g_comval.g_alarm.location.disk = 'S';
             g_Openparam.typeerror = 0;
             g_Openparam.musicframeoffset = 0x0000;
@@ -88,7 +88,7 @@ int16 main(int16 param)
     }
     else
     {
-        strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //Ê¹ÓÃÄÚ²¿alarmÎÄ¼ş
+        strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //ä½¿ç”¨å†…éƒ¨alarmæ–‡ä»¶
         g_comval.g_alarm.location.disk = 'S';
         g_Openparam.typeerror = 0;
         g_Openparam.musicframeoffset = 0x0000;
@@ -106,12 +106,12 @@ int16 main(int16 param)
 }
 
 /********************************************************************************
- * Description :²éÕÒ¸ùÄ¿Â¼ÏÂÊÇ·ñ´æÈëalarmÎÄ¼ş¼Ğ£¬Èç¹û´æÔÚÔò¿´ÀïÃæÊÇ·ñ´æÈë¿É²¥·Å¸èÇú¡£
+ * Description :æŸ¥æ‰¾æ ¹ç›®å½•ä¸‹æ˜¯å¦å­˜å…¥alarmæ–‡ä»¶å¤¹ï¼Œå¦‚æœå­˜åœ¨åˆ™çœ‹é‡Œé¢æ˜¯å¦å­˜å…¥å¯æ’­æ”¾æ­Œæ›²ã€‚
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
 
  *
@@ -131,7 +131,7 @@ uint8 SearchAlarmFile(void)
         ClearWatchDog();
         if (FS_Dir(file_name, ExtNext, dir_type, 1) != 0)
         {
-            //¶ÔÓÚexfatÎÄ¼şÏµÍ³£¬ĞèÒª»ñÈ¡³¤Ãû£¬È»ºóÔÙ¸ú×ª»»³É¶ÌÃû½øĞĞ±È½Ï
+            //å¯¹äºexfatæ–‡ä»¶ç³»ç»Ÿï¼Œéœ€è¦è·å–é•¿åï¼Œç„¶åå†è·Ÿè½¬æ¢æˆçŸ­åè¿›è¡Œæ¯”è¾ƒ
             if (file_name[11] == 0xfe)
             {
                 NameBuf[0] = 0x20;

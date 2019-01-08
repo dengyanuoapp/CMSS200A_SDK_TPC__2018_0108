@@ -4,7 +4,7 @@ $include (actos.inc)
 
 API30 SEGMENT 'ECODE_APISEG'
 
-/**************************FM驱动的API入口******************************/
+/**************************FM椹卞姩鐨凙PI鍏ュ彛******************************/
 //rcode api
 PUBLIC API_SetFreq{RPrefix}  
 PUBLIC API_GetSeekFlag{RPrefix}

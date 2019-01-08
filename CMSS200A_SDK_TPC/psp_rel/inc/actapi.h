@@ -26,44 +26,44 @@
 
 #define ACTOS_ROM_BASE         0xFFC0E0
 
-//#define RSTFastAPI              RSTBASE + 0x08    //¿ìËÙapi
-//#define FFSDCardAPI             RSTBASE + 0x0c    //¿ìËÙSD¿¨API
-//#define RSTBankAPI              RSTBASE + 0x10    //bank api(Ïà¶ÔÂıËÙ)
-#define RSTSYSAPI               RSTBASE + 0x10	  //ÏµÍ³¹Ì»¯bankº¯Êı±íÈë¿Ú
-//#define I2CDrvAPI               RSTBASE + 0x14    //I2C Driver Èë¿Ú
-//#define RSTMIDAPI              	RSTBASE + 0x14    //MID Èë¿Ú
-//#define RSTStgAPI               RSTBASE + 0x18    //´æ´¢ÀàÇı¶¯×¨ÓÃapiÈë¿Ú
-#define RSTSTGAPI               RSTBASE + 0x18    //´æ´¢ÀàÇı¶¯×¨ÓÃapiÈë¿Ú
-//#define SDRAMAPI                RSTBASE + 0x1c    //SDRAM Driver Èë¿Ú
-//#define RSTFARAPI				FARRSTBASE	+ 0x1C	   //HugeÄ£Ê½µ÷ÓÃAPI
-#define RSTKEYAPI				RSTBASE + 0x1C 	  //°´¼üÇı¶¯apiÈë¿Ú
-#define RSTUIAPI           		RSTBASE + 0x20    //ÏÔÊ¾ÀàÇı¶¯×¨ÓÃapiÈë¿Ú
-#define RSTMFSAPI               RSTBASE + 0x24    //miniÎÄ¼şÏµÍ³Çı¶¯×¨ÓÃapiÈë¿Ú
-#define RSTFSAPI                RSTBASE + 0x28    //ÎÄ¼şÏµÍ³Çı¶¯×¨ÓÃapiÈë¿Ú
-#define RSTFMAPI				RSTBASE + 0x2C	  //FMÇı¶¯×¨ÓÃapiÈë¿Ú
-//#define RSTSysErrAPI            RSTBASE + 0x30    //ÏµÍ³³ö´í´¦Àí×¨ÓÃapiÈë¿Ú
-#define RSTSYSAPI1              RSTBASE + 0x30    //ÏµÍ³¹Ì»¯±íÈë¿Ú
-#define RSTSYSAPI2              RSTBASE + 0x34    //ÏµÍ³³£×¤±íÈë¿Ú
-#define RSTSDFFAPI              RSTBASE + 0x38    //SD_Read¿ìËÙÈë¿Ú
-#define RSTRESAPI               RSTBASE + 0x3C    //±£ÁôÇı¶¯Èë¿Ú
+//#define RSTFastAPI              RSTBASE + 0x08    //å¿«é€Ÿapi
+//#define FFSDCardAPI             RSTBASE + 0x0c    //å¿«é€ŸSDå¡API
+//#define RSTBankAPI              RSTBASE + 0x10    //bank api(ç›¸å¯¹æ…¢é€Ÿ)
+#define RSTSYSAPI               RSTBASE + 0x10	  //ç³»ç»Ÿå›ºåŒ–bankå‡½æ•°è¡¨å…¥å£
+//#define I2CDrvAPI               RSTBASE + 0x14    //I2C Driver å…¥å£
+//#define RSTMIDAPI              	RSTBASE + 0x14    //MID å…¥å£
+//#define RSTStgAPI               RSTBASE + 0x18    //å­˜å‚¨ç±»é©±åŠ¨ä¸“ç”¨apiå…¥å£
+#define RSTSTGAPI               RSTBASE + 0x18    //å­˜å‚¨ç±»é©±åŠ¨ä¸“ç”¨apiå…¥å£
+//#define SDRAMAPI                RSTBASE + 0x1c    //SDRAM Driver å…¥å£
+//#define RSTFARAPI				FARRSTBASE	+ 0x1C	   //Hugeæ¨¡å¼è°ƒç”¨API
+#define RSTKEYAPI				RSTBASE + 0x1C 	  //æŒ‰é”®é©±åŠ¨apiå…¥å£
+#define RSTUIAPI           		RSTBASE + 0x20    //æ˜¾ç¤ºç±»é©±åŠ¨ä¸“ç”¨apiå…¥å£
+#define RSTMFSAPI               RSTBASE + 0x24    //miniæ–‡ä»¶ç³»ç»Ÿé©±åŠ¨ä¸“ç”¨apiå…¥å£
+#define RSTFSAPI                RSTBASE + 0x28    //æ–‡ä»¶ç³»ç»Ÿé©±åŠ¨ä¸“ç”¨apiå…¥å£
+#define RSTFMAPI				RSTBASE + 0x2C	  //FMé©±åŠ¨ä¸“ç”¨apiå…¥å£
+//#define RSTSysErrAPI            RSTBASE + 0x30    //ç³»ç»Ÿå‡ºé”™å¤„ç†ä¸“ç”¨apiå…¥å£
+#define RSTSYSAPI1              RSTBASE + 0x30    //ç³»ç»Ÿå›ºåŒ–è¡¨å…¥å£
+#define RSTSYSAPI2              RSTBASE + 0x34    //ç³»ç»Ÿå¸¸é©»è¡¨å…¥å£
+#define RSTSDFFAPI              RSTBASE + 0x38    //SD_Readå¿«é€Ÿå…¥å£
+#define RSTRESAPI               RSTBASE + 0x3C    //ä¿ç•™é©±åŠ¨å…¥å£
 #define WDAPI					ACTOS_ROM_BASE + 0x0c
 #define ROMDIAPI                ACTOS_ROM_BASE + 0x0f
 #define ROMEIAPI                ACTOS_ROM_BASE + 0x12
 //**************************************************************************
 
 //-------------------------------------
-//ÏµÍ³bankº¯Êıapi
+//ç³»ç»Ÿbankå‡½æ•°api
 //-------------------------------------
 #define API_IRQ_Base         0x0000        //irq manager in bank a
 #define API_ADFU_Base        0x0002        //adfu
 #define API_TM_Base          0x0003        //time manager in bank a
 #define API_SDFS_Base        0x000c        //sd file system in bank a
-#define API_DRV_Base       	 0x000e  //Çı¶¯¹ÜÀí        
-#define API_APM_Base       	 0x0016  //ap¹ÜÀí  
+#define API_DRV_Base       	 0x000e  //é©±åŠ¨ç®¡ç†        
+#define API_APM_Base       	 0x0016  //apç®¡ç†  
 #define API_VM_Base          0x0017
 #define API_DEVICE_Base      0x0019        //device in bank a
 //-------------------------------------
-//ÏµÍ³¹Ì»¯º¯Êıapi
+//ç³»ç»Ÿå›ºåŒ–å‡½æ•°api
 //-------------------------------------
 #define APINO_MSG_GetSysMsg       0x00
 #define APINO_MSG_PutSysMsg       0x01
@@ -81,7 +81,7 @@
 //***********************************************************************
 
 //-------------------------------------
-//ÏµÍ³ĞÂÔöº¯Êıapi
+//ç³»ç»Ÿæ–°å¢å‡½æ•°api
 //-------------------------------------
 #define  API_NEW_BASE 0x00
 

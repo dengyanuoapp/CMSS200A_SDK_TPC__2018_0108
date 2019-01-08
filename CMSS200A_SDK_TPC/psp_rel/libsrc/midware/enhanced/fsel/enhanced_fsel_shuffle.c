@@ -10,10 +10,10 @@
  *******************************************************************************/
 /*!
  * \file     *.c
- * \brief    Ëæ»ú»úÖÆ
+ * \brief    éšæœºæœºåˆ¶
  * \author   liminxian
  * \par      GENERAL DESCRIPTION:
- *               ÕâÀï¶ÔÎÄ¼ş½øĞĞÃèÊö
+ *               è¿™é‡Œå¯¹æ–‡ä»¶è¿›è¡Œæè¿°
  * \par      EXTERNALIZED FUNCTIONS:
  *
  * \version 1.0
@@ -25,7 +25,7 @@
 #include <stringH.h>
 #include <rand.h>
 
-//#define  OVERTURN_DEF  //·´×ªbitmap²¥·Å¹¦ÄÜ
+//#define  OVERTURN_DEF  //åè½¬bitmapæ’­æ”¾åŠŸèƒ½
 #define SET_GROUP_MAX   64
 #define SET_MEMBER_MAX  256
 #define SET_PREV_MAX    10
@@ -34,8 +34,8 @@
 
 #pragma name(MW_EH_FSEL_SHUFFLE)
 extern uint8 fselError; // store error id;
-extern uint16 fselTotalInDisk;// È«ÅÌÎÄ¼ş×ÜÊı
-extern uint16 fselFileNoInDisk;// ÎÄ¼şÔÚÈ«ÅÌµÄĞòºÅ
+extern uint16 fselTotalInDisk;// å…¨ç›˜æ–‡ä»¶æ€»æ•°
+extern uint16 fselFileNoInDisk;// æ–‡ä»¶åœ¨å…¨ç›˜çš„åºå·
 extern uint8 fselPLOrCommonDir;
 
 #ifdef _ACTIVE_USERPL
@@ -47,23 +47,23 @@ extern uint8 User_ItemTotal;
 extern uint16 shuffle_plist_total;
 #endif
 
-uint16 shuffle_total;//shuffleµÄ×Ü¸öÊı
-uint8 group_map[SET_GROUP_MAX / 8];//·Ö×é£¬¹²64×é
-uint8 member_map[SET_MEMBER_MAX / 8];//×éÄÚ³ÉÔ±£¬¹²256
-uint8 member_avg;//³ÉÔ±Æ½¾ùÖµ£¬ÉÌÖµ
-uint8 member_avg_group;//Æ½¾ùÖµ³ÉÔ±µÄ×éºÅÆğÊ¼
-uint8 group_max;//ÓĞĞ§µÄ×éºÅ
-uint8 member_max;//µ±Ç°×éµÄ×î´ó³ÉÔ±¸öÊı
-uint8 use_member_flag;//Ê¹ÓÃ×éÄÚshuffle¹¦ÄÜ
-uint8 cur_group;//µ±Ç°µÄ×éºÅ£¨1£¬2£¬¡£¡£¡£
-uint16 cur_member;//µ±Ç°×éÄÚµÄ³ÉÔ±ºÅ£¨1£¬2£¬¡£¡£¡£
-uint16 filtrate_shuffle_no; //shuffle¹ıÂË²¥·ÅĞòºÅ£¬±ÜÃâÖØ¸´
+uint16 shuffle_total;//shuffleçš„æ€»ä¸ªæ•°
+uint8 group_map[SET_GROUP_MAX / 8];//åˆ†ç»„ï¼Œå…±64ç»„
+uint8 member_map[SET_MEMBER_MAX / 8];//ç»„å†…æˆå‘˜ï¼Œå…±256
+uint8 member_avg;//æˆå‘˜å¹³å‡å€¼ï¼Œå•†å€¼
+uint8 member_avg_group;//å¹³å‡å€¼æˆå‘˜çš„ç»„å·èµ·å§‹
+uint8 group_max;//æœ‰æ•ˆçš„ç»„å·
+uint8 member_max;//å½“å‰ç»„çš„æœ€å¤§æˆå‘˜ä¸ªæ•°
+uint8 use_member_flag;//ä½¿ç”¨ç»„å†…shuffleåŠŸèƒ½
+uint8 cur_group;//å½“å‰çš„ç»„å·ï¼ˆ1ï¼Œ2ï¼Œã€‚ã€‚ã€‚
+uint16 cur_member;//å½“å‰ç»„å†…çš„æˆå‘˜å·ï¼ˆ1ï¼Œ2ï¼Œã€‚ã€‚ã€‚
+uint16 filtrate_shuffle_no; //shuffleè¿‡æ»¤æ’­æ”¾åºå·ï¼Œé¿å…é‡å¤
 
 uint16 play_num_list[SET_PREV_MAX];
-uint8 cur_save_pt; //µ±Ç°´æµÄÖ¸Õë
+uint8 cur_save_pt; //å½“å‰å­˜çš„æŒ‡é’ˆ
 uint8 cur_save_prev_count;
 uint8 cur_save_next_count;
-uint8 cur_overturn_flag; //±í·­×ª±ê¼Ç
+uint8 cur_overturn_flag; //è¡¨ç¿»è½¬æ ‡è®°
 
 static const uint8 byte_set_val[8] =
 { 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff };
@@ -82,7 +82,7 @@ static uint16 get_shuffle_num(void);
 #pragma renamecode(MW_EH_FSEL_SHUFFLE)
 /******************************************************************************/
 /*
- * \par  Description:¸ù¾İ×éºÅ³õÊ¼»¯×éÄÚ³ÉÔ±µÄmap×´Ì¬
+ * \par  Description:æ ¹æ®ç»„å·åˆå§‹åŒ–ç»„å†…æˆå‘˜çš„mapçŠ¶æ€
  *
  * \param[in]
 
@@ -107,7 +107,7 @@ void init_member_map(void)
 
     if (cur_group < member_avg_group)
     {
-        //×éºÅÔÚÆ½¾ùÖµ×éµÄÇ°ÃæÊ±
+        //ç»„å·åœ¨å¹³å‡å€¼ç»„çš„å‰é¢æ—¶
         j++;
         member_max++;
     }
@@ -123,7 +123,7 @@ void init_member_map(void)
 
 /******************************************************************************/
 /*
- * \par  Description:³õÊ¼shuffle»úÖÆ
+ * \par  Description:åˆå§‹shuffleæœºåˆ¶
  *
  * \param[in]
 
@@ -173,14 +173,14 @@ bool init_shuffle(uint16 num_total)
 
     if (num_total > SET_GROUP_MAX)
     {
-        //¸öÊı´óÓÚ×éÊı,ÆôÓÃ×éÄÚ³ÉÔ±shuffle
+        //ä¸ªæ•°å¤§äºç»„æ•°,å¯ç”¨ç»„å†…æˆå‘˜shuffle
         use_member_flag = TRUE;
         memset(group_map, 0xff, sizeof(group_map));
         group_max = SET_GROUP_MAX;
     }
     else
     {
-        //¸öÊıÉÙÓÚ×éÊı,Ö»ÓÃ×éshuffle¾Í¿ÉÒÔÁË
+        //ä¸ªæ•°å°‘äºç»„æ•°,åªç”¨ç»„shuffleå°±å¯ä»¥äº†
         group_max = (uint8) num_total;
         for (i = 0; i < (num_total / 8); i++)
         {
@@ -210,7 +210,7 @@ bool init_shuffle(uint16 num_total)
 
 /******************************************************************************/
 /*
- * \par  Description:°Ñmap·­×ª
+ * \par  Description:æŠŠmapç¿»è½¬
  *
  * \param[in]
 
@@ -246,7 +246,7 @@ void overturn_map(void)
 
     if(cur_group < member_avg_group)
     {
-        //×éºÅÔÚÆ½¾ùÖµ×éµÄÇ°ÃæÊ±
+        //ç»„å·åœ¨å¹³å‡å€¼ç»„çš„å‰é¢æ—¶
         temp8++;
     }
 
@@ -268,7 +268,7 @@ void overturn_map(void)
 
 /******************************************************************************/
 /*
- * \par  Description:»ñÈ¡shuffleµÄ×éºÅ
+ * \par  Description:è·å–shuffleçš„ç»„å·
  *
  * \param[in]
 
@@ -292,7 +292,7 @@ static uint16 get_group_num(void)
     while (i != 0)
     {
         i--;
-        //try 3´Î
+        //try 3æ¬¡
         rand_num = (rand() % group_max) + 1;
         if (FALSE != set_bitmap_bit(group_map, rand_num))
         {
@@ -305,7 +305,7 @@ static uint16 get_group_num(void)
 
 /******************************************************************************/
 /*
- * \par  Description:»ñÈ¡×éÄÚ³ÉÔ±µÄshuffleºÅ
+ * \par  Description:è·å–ç»„å†…æˆå‘˜çš„shuffleå·
  *
  * \param[in]
 
@@ -331,14 +331,14 @@ static uint16 get_member_num(void)
 
     if (cur_group < member_avg_group)
     {
-        //×éºÅÔÚÆ½¾ùÖµ×éµÄÇ°ÃæÊ±
+        //ç»„å·åœ¨å¹³å‡å€¼ç»„çš„å‰é¢æ—¶
         temp8++;
     }
 
     while (i != 0)
     {
         i--;
-        //try 3´Î
+        //try 3æ¬¡
         rand_num = (rand() % temp8) + 1;
         if (FALSE != set_bitmap_bit(member_map, rand_num))
         {
@@ -352,10 +352,10 @@ static uint16 get_member_num(void)
 
 /******************************************************************************/
 /*
- * \par  Description: ÉèÖÃÕ¼ÓÃ×éµÄ×´Ì¬
+ * \par  Description: è®¾ç½®å ç”¨ç»„çš„çŠ¶æ€
  *
- * \param[in]    bitmap-Î»Í¼±íµØÖ·
- num-µÚ¼¸¸öbit(1~8)
+ * \param[in]    bitmap-ä½å›¾è¡¨åœ°å€
+ num-ç¬¬å‡ ä¸ªbit(1~8)
 
  * \param[out]
 
@@ -368,7 +368,7 @@ static bool set_bitmap_bit(uint8 *bitmap, uint16 num)
 {
     uint8 i, j;
 
-    num--;//±äÎª´Ó0¿ªÊ¼
+    num--;//å˜ä¸ºä»0å¼€å§‹
     i = num / 8;
     j = num % 8;
 
@@ -383,7 +383,7 @@ static bool set_bitmap_bit(uint8 *bitmap, uint16 num)
 
 /******************************************************************************/
 /*
- * \par  Description:²éÕÒÎ´²¥·Å¹ıµÄ³ÉÔ±
+ * \par  Description:æŸ¥æ‰¾æœªæ’­æ”¾è¿‡çš„æˆå‘˜
  *
  * \param[in]
 
@@ -400,7 +400,7 @@ static uint16 find_bitmap_bit(uint8 *bitmap, uint8 count_max, uint16 rand_num)
 
     if ((rand_num & 0x01) > 0)
     {
-        //´ÓÍ·ÍùÇ°ÕÒ
+        //ä»å¤´å¾€å‰æ‰¾
         for (i = 1; i < (count_max + 1); i++)
         {
             if (FALSE != set_bitmap_bit(bitmap, i))
@@ -411,7 +411,7 @@ static uint16 find_bitmap_bit(uint8 *bitmap, uint8 count_max, uint16 rand_num)
     }
     else
     {
-        //´ÓÄ©Íù»ØÕÒ
+        //ä»æœ«å¾€å›æ‰¾
         for (i = count_max; i > 0; i--)
         {
             if (FALSE != set_bitmap_bit(bitmap, i))
@@ -427,7 +427,7 @@ static uint16 find_bitmap_bit(uint8 *bitmap, uint8 count_max, uint16 rand_num)
 
 /******************************************************************************/
 /*
- * \par  Description:»ñÈ¡»ØËİ¶ÓÁĞÖĞµÄÏÂÒ»¸ö
+ * \par  Description:è·å–å›æº¯é˜Ÿåˆ—ä¸­çš„ä¸‹ä¸€ä¸ª
  *
  * \param[in]
 
@@ -442,7 +442,7 @@ static uint16 get_nextlist_num(void)
 {
     if (cur_save_pt >= (SET_PREV_MAX - 1))
     {
-        //Ñ­»·bufferµÄ·½Ê½´æ·Å
+        //å¾ªç¯bufferçš„æ–¹å¼å­˜æ”¾
         cur_save_pt = 0;
     }
     else
@@ -463,7 +463,7 @@ static uint16 get_nextlist_num(void)
 
 /******************************************************************************/
 /*
- * \par  Description:»ñÈ¡»ØËİ¶ÓÁĞÖĞµÄÉÏÒ»¸ö
+ * \par  Description:è·å–å›æº¯é˜Ÿåˆ—ä¸­çš„ä¸Šä¸€ä¸ª
  *
  * \param[in]
 
@@ -478,7 +478,7 @@ static uint16 get_prevlist_num(void)
 {
     if (cur_save_pt == 0)
     {
-        //Ñ­»·bufferµÄ·½Ê½´æ·Å
+        //å¾ªç¯bufferçš„æ–¹å¼å­˜æ”¾
         cur_save_pt = SET_PREV_MAX - 1;
     }
     else
@@ -498,7 +498,7 @@ static uint16 get_prevlist_num(void)
 
 /******************************************************************************/
 /*
- * \par  Description:»ñÈ¡²¥·ÅµÄshuffleµÄnumber
+ * \par  Description:è·å–æ’­æ”¾çš„shuffleçš„number
  *
  * \param[in]
 
@@ -515,20 +515,20 @@ static uint16 get_shuffle_num(void)
 
     if (FALSE == use_member_flag)
     {
-        //Ö»Ê¹ÓÃ×éºÅshuffle
+        //åªä½¿ç”¨ç»„å·shuffle
         cur_group = (uint8) get_group_num();
         return (uint16) cur_group;
     }
 
-    //Ê¹ÓÃ×éÄÚshuffle
+    //ä½¿ç”¨ç»„å†…shuffle
 
     if (0 == cur_group)
     {
-        //Ê×´Î½øÈë
+        //é¦–æ¬¡è¿›å…¥
         cur_group = (uint8) get_group_num();
         if (0 == cur_group)
         {
-            //ËùÓĞ×éÒÑ¾­²¥·ÅÍê
+            //æ‰€æœ‰ç»„å·²ç»æ’­æ”¾å®Œ
             return 0;
         }
         init_member_map();
@@ -537,11 +537,11 @@ static uint16 get_shuffle_num(void)
     cur_member = get_member_num();
     if (0 == cur_member)
     {
-        //µ±Ç°×é³ÉÔ±ÒÑÈ«²¿²¥·ÅÍê
+        //å½“å‰ç»„æˆå‘˜å·²å…¨éƒ¨æ’­æ”¾å®Œ
         cur_group = (uint8) get_group_num();
         if (0 == cur_group)
         {
-            //ËùÓĞ×éÒÑ¾­²¥·ÅÍê
+            //æ‰€æœ‰ç»„å·²ç»æ’­æ”¾å®Œ
             return 0;
         }
         init_member_map();
@@ -559,7 +559,7 @@ static uint16 get_shuffle_num(void)
 
 /******************************************************************************/
 /*
- * \par  Description:»ñÈ¡shuffle»úÖÆµÄÏÂÒ»¸ö
+ * \par  Description:è·å–shuffleæœºåˆ¶çš„ä¸‹ä¸€ä¸ª
  *
  * \param[in]
 
@@ -630,7 +630,7 @@ uint16 shuffle_next_file(void)
 
     //list can't find,use shuffle al
 
-    //±£Ö¤Ëæ»ú³öÀ´µÄÖµÔÚshuffle_total·¶Î§ÄÚ,²¢Óëfile_no²»ÏàÍ¬
+    //ä¿è¯éšæœºå‡ºæ¥çš„å€¼åœ¨shuffle_totalèŒƒå›´å†…,å¹¶ä¸file_noä¸ç›¸åŒ
     do
     {
         temp_num = get_shuffle_num();
@@ -647,7 +647,7 @@ uint16 shuffle_next_file(void)
         //SAVE TO PLAY_NUM_LIST
         if (cur_save_pt >= (SET_PREV_MAX - 1))
         {
-            //Ñ­»·bufferµÄ·½Ê½´æ·Å
+            //å¾ªç¯bufferçš„æ–¹å¼å­˜æ”¾
             cur_save_pt = 0;
         }
         else
@@ -668,7 +668,7 @@ uint16 shuffle_next_file(void)
 
 /******************************************************************************/
 /*
- * \par  Description:»ñÈ¡shuffle»úÖÆµÄÉÏÒ»¸ö
+ * \par  Description:è·å–shuffleæœºåˆ¶çš„ä¸Šä¸€ä¸ª
  *
  * \param[in]
 
@@ -740,7 +740,7 @@ uint16 shuffle_prev_file(void)
 
     //list can't find, use shuffle al
 
-    //±£Ö¤Ëæ»ú³öÀ´µÄÖµÔÚshuffle_total·¶Î§ÄÚ,²¢Óëfile_no²»ÏàÍ¬
+    //ä¿è¯éšæœºå‡ºæ¥çš„å€¼åœ¨shuffle_totalèŒƒå›´å†…,å¹¶ä¸file_noä¸ç›¸åŒ
     do
     {
         temp_num = get_shuffle_num();
@@ -757,7 +757,7 @@ uint16 shuffle_prev_file(void)
         //SAVE TO PLAY_NUM_LIST
         if (cur_save_pt == 0)
         {
-            //Ñ­»·bufferµÄ·½Ê½´æ·Å
+            //å¾ªç¯bufferçš„æ–¹å¼å­˜æ”¾
             cur_save_pt = SET_PREV_MAX - 1;
         }
         else

@@ -29,19 +29,19 @@ stmt  level    source
                #define LAN_ID_SCHINESE 0
                const uint8 UniToMBTab[][12] =
                {
-                   "FTBL_GB.$$$", //¼òÌåÖĞÎÄcodepage table
-                   "FTBL_B5.$$$", //·±ÌåÖĞÎÄcodepage table
-                   "CP1252.L", //Ó¢ÎÄ,Î÷Å·ÓïÏµ codepage table
-                   "CP932.L", //ÈÕÎÄ codepage table
-                   "CP949.L", //º«ÎÄ codepage table
-                   "CP1257.L", //²¨ÂŞµØº£ÓïÏµ
-                   "CP1251.L", //¶íÓïÓïÏµ
-                   "CP1254.L", //ÍÁ¶úÆäÓïÏµ
-                   "CP1255.L", //Ï£²®À³Óï
-                   "CP874.L", //Ì©Óï
-                   "CP1250.L", //±±Å·£¬¶«Å·ÓïÏµ
-                   "CP1256.L", //°¢À­²®ÓïÏµ
-                   "CP1253.L" //Ï£À°
+                   "FTBL_GB.$$$", //ç®€ä½“ä¸­æ–‡codepage table
+                   "FTBL_B5.$$$", //ç¹ä½“ä¸­æ–‡codepage table
+                   "CP1252.L", //è‹±æ–‡,è¥¿æ¬§è¯­ç³» codepage table
+                   "CP932.L", //æ—¥æ–‡ codepage table
+                   "CP949.L", //éŸ©æ–‡ codepage table
+                   "CP1257.L", //æ³¢ç½—åœ°æµ·è¯­ç³»
+                   "CP1251.L", //ä¿„è¯­è¯­ç³»
+                   "CP1254.L", //åœŸè€³å…¶è¯­ç³»
+                   "CP1255.L", //å¸Œä¼¯è±è¯­
+                   "CP874.L", //æ³°è¯­
+                   "CP1250.L", //åŒ—æ¬§ï¼Œä¸œæ¬§è¯­ç³»
+                   "CP1256.L", //é˜¿æ‹‰ä¼¯è¯­ç³»
+                   "CP1253.L" //å¸Œè…Š
                };
                
                uint8 far TwoByteCode = 0;
@@ -168,7 +168,7 @@ stmt  level    source
                            FontCode = FontCode << 1;
                            if (FontCode < 0x1FE00 && FontCode >= 0x13F50)
                            {
-                               CharCode = 0x2000; //×¢Òâ´óĞ¡¶Ë×ª»»
+                               CharCode = 0x2000; //æ³¨æ„å¤§å°ç«¯è½¬æ¢
                                return CharCode;
                            }
                            else if (FontCode >= 0x1FE00)
@@ -207,15 +207,15 @@ stmt  level    source
                        CharCode = FontCode;
                        swap_int_byte((uint16 *) &CharCode);
                
-                       if (TwoByteCode == 1 && CharCode > 0x7f) //Á½×Ö½ÚÂë±àÂë×ª»»
+                       if (TwoByteCode == 1 && CharCode > 0x7f) //ä¸¤å­—èŠ‚ç ç¼–ç è½¬æ¢
                
                        {
-                           str[d_cnt++] = *((uint8 *) (&CharCode) + 1); //°Ñ¸ßÎ»ÒÆµ½µÍÎ»È¥
-                           str[d_cnt++] = *((uint8 *) (&CharCode)); //°Ñ¸ßÎ»ÒÆµ½µÍÎ»È¥
+                           str[d_cnt++] = *((uint8 *) (&CharCode) + 1); //æŠŠé«˜ä½ç§»åˆ°ä½ä½å»
+                           str[d_cnt++] = *((uint8 *) (&CharCode)); //æŠŠé«˜ä½ç§»åˆ°ä½ä½å»
                        }
                        else
                        {
-                           str[d_cnt++] = *((uint8 *) (&CharCode) + 1); //·ÅÁËµÍÎ»(&code_rename)+1);
+                           str[d_cnt++] = *((uint8 *) (&CharCode) + 1); //æ”¾äº†ä½ä½(&code_rename)+1);
                        }
                        s_cnt += 2;
                    }
@@ -231,7 +231,7 @@ stmt  level    source
                    uint8 result = 0;
                
                    table_index = GetLangIdex(lang_id);
-                   ///´ò¿ªunicode to char ×ª»»±í
+                   ///æ‰“å¼€unicode to char è½¬æ¢è¡¨
                    fp = SD_FOpen(UniToMBTab[table_index], MODE_READ);
                    if (fp == NULL)
                    {

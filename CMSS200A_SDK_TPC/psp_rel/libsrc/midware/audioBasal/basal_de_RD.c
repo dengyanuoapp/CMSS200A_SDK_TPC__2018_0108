@@ -29,13 +29,13 @@ HANDLE m_deFileHandle;
 Open_param_t *m_deOpenparam;
 uint32 deApointerSave;
 uint32 deBpointerSave;
-uint32 deBreakPointSave; //µ±Ç°ÎÄ¼ş¶ÏµãµÄµØÖ·±£´æ£¬Ò»¸öÉÈÇøÎªµ¥Î»£¬m_read_date¸üĞÂ
-decBreakPointInfor_t m_breakPointInfo;//Ö»±£´æÒ»´Î¶ÏµãĞÅÏ¢£¬ÀıÈçAµã
-uint32 deFilepages;//µ±Ç°²¥·ÅÎÄ¼ş×ÜÒ³Êı
+uint32 deBreakPointSave; //å½“å‰æ–‡ä»¶æ–­ç‚¹çš„åœ°å€ä¿å­˜ï¼Œä¸€ä¸ªæ‰‡åŒºä¸ºå•ä½ï¼Œm_read_dateæ›´æ–°
+decBreakPointInfor_t m_breakPointInfo;//åªä¿å­˜ä¸€æ¬¡æ–­ç‚¹ä¿¡æ¯ï¼Œä¾‹å¦‚Aç‚¹
+uint32 deFilepages;//å½“å‰æ’­æ”¾æ–‡ä»¶æ€»é¡µæ•°
 BYTE m_backupmode;
 play_status_t play_status;
-BYTE *m_deDataBuffer; //[512];//½âÂëÊ±ÓÃµÄBUFFER
-uint32 m_deOldDspIntAddrSav;//±£´æ¾ÉµÄINTµØÖ·
+BYTE *m_deDataBuffer; //[512];//è§£ç æ—¶ç”¨çš„BUFFER
+uint32 m_deOldDspIntAddrSav;//ä¿å­˜æ—§çš„INTåœ°å€
 uint32 m_deOldDmaIntAddrSav;
 uint8 m_decTimer_Sav;
 time_t m_Totaltimelength;
@@ -48,8 +48,8 @@ bool m_deABok_sav;
 #define ONE_PAGE_BITNUM 9
 
 #ifdef FASTFORWARDBACKWARD
-#define MOVE_FORWARD_MORE_PAGE_FLAG 0x91  //  ÓÃÓÚ¼ÓËÙ¿ì½ø
-#define MOVE_BACKWARD_MORE_PAGE_FLAG  0xa2 // ÓÃÓÚ¼ÓËÙ¿ì½ø
+#define MOVE_FORWARD_MORE_PAGE_FLAG 0x91  //  ç”¨äºåŠ é€Ÿå¿«è¿›
+#define MOVE_BACKWARD_MORE_PAGE_FLAG  0xa2 // ç”¨äºåŠ é€Ÿå¿«è¿›
 #endif
 
 
@@ -80,7 +80,7 @@ uint8 m_deRead_Data(uchar readFileDirection, uint32 position)
     //CLEAR_WATCHDOG_MIDWARE();
     ClearWatchDog();
 
-    //¶Ïµã¼ÇÂ¼µÄÊÇ½âÂë¹ıµÄĞÅÏ¢
+    //æ–­ç‚¹è®°å½•çš„æ˜¯è§£ç è¿‡çš„ä¿¡æ¯
     if ((play_status.status == PLAYING_REACH_END) || (play_status.status == PLAYING_ERROR) ||
             (play_status.status == PLAYING_REACH_HEAD))
     {
@@ -102,7 +102,7 @@ uint8 m_deRead_Data(uchar readFileDirection, uint32 position)
 #ifdef FASTFORWARDBACKWARD
     else if(readFileDirection == MOVE_BACKWARD_MORE_PAGE_FLAG)
     {
-        result = FS_FSeek(16, FS_SEEK_BFROMCUR, m_deFileHandle);	//Èç¹ûÓĞĞèÒª£¬¿ÉÒÔĞŞ¸ÄÉÈÇøÊıÄ¿£¬±ãÓÚ¼ÓËÙ¿ì½øÍË¿ìÍË¡£ÍùÇ°seek 2n¸öÉÈÇø£¬×¼±¸¶Án¸öÉÈÇø
+        result = FS_FSeek(16, FS_SEEK_BFROMCUR, m_deFileHandle);	//å¦‚æœæœ‰éœ€è¦ï¼Œå¯ä»¥ä¿®æ”¹æ‰‡åŒºæ•°ç›®ï¼Œä¾¿äºåŠ é€Ÿå¿«è¿›é€€å¿«é€€ã€‚å¾€å‰seek 2nä¸ªæ‰‡åŒºï¼Œå‡†å¤‡è¯»nä¸ªæ‰‡åŒº
     }
 #endif
     else if (RANDOM_CHOOSE_ONE_PAGE_FLAG == readFileDirection)
@@ -145,26 +145,26 @@ uint8 m_deRead_Data(uchar readFileDirection, uint32 position)
     {
     case AB_FLAG_DEAL_AB_PROCESS:
     {
-        if (play_status.status == PLAYING_WAIT_B) //ÒÑ¾­µ½´ïBµã»òÕß³¬¹ı£¬µÈ´ıstopÃüÁî
+        if (play_status.status == PLAYING_WAIT_B) //å·²ç»åˆ°è¾¾Bç‚¹æˆ–è€…è¶…è¿‡ï¼Œç­‰å¾…stopå‘½ä»¤
         {
             break;
         }
 
-        if ((play_status.status == PLAYING_AB) && (deBreakPointSave >= deBpointerSave))//·Åµ½Bµã
+        if ((play_status.status == PLAYING_AB) && (deBreakPointSave >= deBpointerSave))//æ”¾åˆ°Bç‚¹
         {
-            if (FALSE != m_deABok_sav) //²»ÓÃÔÙ²¥·ÅÁË
+            if (FALSE != m_deABok_sav) //ä¸ç”¨å†æ’­æ”¾äº†
             {
-                //´ÎÊıµ½,ÇåBµã
+                //æ¬¡æ•°åˆ°,æ¸…Bç‚¹
                 m_deABok_sav = FALSE;
                 play_status.status = PLAYING_PLAYING;
                 g_decControlInfor.ABSetFlag = AB_CLEAR;
                 g_decControlInfor.PlayMode = PLAY_MODE_NORMAL; //not need
-                //play_status.signal = SIGNAL_CLEAR_B;//Í¨ÖªABÒªÇåBµã
+                //play_status.signal = SIGNAL_CLEAR_B;//é€šçŸ¥ABè¦æ¸…Bç‚¹
                 play_status.signal = 0;//modify by wuyueqian 2010-4-3
             }
             else
             {
-                //´ÎÊıÎ´µ½,Í¨ÖªAP»Øµ½Aµã
+                //æ¬¡æ•°æœªåˆ°,é€šçŸ¥APå›åˆ°Aç‚¹
                 play_status.status = PLAYING_WAIT_B;
                 play_status.signal = SIGNAL_REACH_B;
             }
@@ -172,10 +172,10 @@ uint8 m_deRead_Data(uchar readFileDirection, uint32 position)
         break;
     }
 
-    case AB_FLAG_SET_A: //ÉèÖÃÍêAµãºóab flagÎª0£¬²»½øĞĞAB´¦Àí£¬ĞèµÈBµãÒ²ÉèºÃºó²Å¿ªÊ¼AB²¥·Å´¦Àí
+    case AB_FLAG_SET_A: //è®¾ç½®å®ŒAç‚¹åab flagä¸º0ï¼Œä¸è¿›è¡ŒABå¤„ç†ï¼Œéœ€ç­‰Bç‚¹ä¹Ÿè®¾å¥½åæ‰å¼€å§‹ABæ’­æ”¾å¤„ç†
     {
         deApointerSave = deBreakPointSave;
-        g_decControlInfor.ABSetFlag = AB_CLEAR;//ÆäÊµ·ÇAB_FLAG_SET_AºÍ·Ç0XFF¾Í¿ÉÒÔÁË
+        g_decControlInfor.ABSetFlag = AB_CLEAR;//å…¶å®éAB_FLAG_SET_Aå’Œé0XFFå°±å¯ä»¥äº†
         memcpy(&m_breakPointInfo, &g_decBreakPointInfor, sizeof(decBreakPointInfor_t));
         break;
     }
@@ -184,8 +184,8 @@ uint8 m_deRead_Data(uchar readFileDirection, uint32 position)
     {
         deBpointerSave = deBreakPointSave;
         play_status.signal = SIGNAL_REACH_B;
-        play_status.status = PLAYING_WAIT_B; //Ö»ÔÚÕâ¸öm_deRead_Dataº¯ÊıÖĞÓĞĞ§£¬StopBPlayºó³ö±ä³ÉPLAYING_WAIT_A
-        g_decControlInfor.ABSetFlag = AB_FLAG_DEAL_AB_PROCESS; //ÒÔºó¼ì²âÊÇ·ñµ½Bµã
+        play_status.status = PLAYING_WAIT_B; //åªåœ¨è¿™ä¸ªm_deRead_Dataå‡½æ•°ä¸­æœ‰æ•ˆï¼ŒStopBPlayåå‡ºå˜æˆPLAYING_WAIT_A
+        g_decControlInfor.ABSetFlag = AB_FLAG_DEAL_AB_PROCESS; //ä»¥åæ£€æµ‹æ˜¯å¦åˆ°Bç‚¹
         break;
     }
 
@@ -198,7 +198,7 @@ uint8 m_deRead_Data(uchar readFileDirection, uint32 position)
 #ifdef FASTFORWARDBACKWARD
     if((readFileDirection == MOVE_FORWARD_MORE_PAGE_FLAG) || (readFileDirection == MOVE_BACKWARD_MORE_PAGE_FLAG))
     {
-        result = FS_FRead(m_deDataBuffer, 8, m_deFileHandle);	//Èç¹ûÓĞĞèÒª£¬¿ÉÒÔĞŞ¸ÄÉÈÇøÊıÄ¿£¬±ãÓÚ¼ÓËÙ¿ì½øÍË¿ìÍË£¬Ã¿´Î¶Án¸öÉÈÇø
+        result = FS_FRead(m_deDataBuffer, 8, m_deFileHandle);	//å¦‚æœæœ‰éœ€è¦ï¼Œå¯ä»¥ä¿®æ”¹æ‰‡åŒºæ•°ç›®ï¼Œä¾¿äºåŠ é€Ÿå¿«è¿›é€€å¿«é€€ï¼Œæ¯æ¬¡è¯»nä¸ªæ‰‡åŒº
     }
     else
     {
@@ -220,20 +220,20 @@ uint8 m_deRead_Data(uchar readFileDirection, uint32 position)
 }
 
 /*  FS_GetInfo()
- *ÃèÊö
- »ñÈ¡ÎÄ¼şÏµÍ³³ö´íĞÅÏ¢
- *²ÎÊı
- *·µ»Ø
- char status£º³ö´íĞÅÏ¢
- 1   ´ÅÅÌ¶ÁĞ´´íÎó
- 2   ´ÅÅÌĞ´±£»¤
- 3   ´ÅÅÌÎ´¸ñÊ½»¯
- 4   ÎÄ¼ş²Ù×÷³¬³öÎÄ¼ş±ß½ç,Ä¿Â¼²Ù×÷³¬³öÄ¿Â¼±ß½ç
- 5   ÎÄ¼ş²Ù×÷µÄÄ¿±êÎÄ¼ş,Ä¿Â¼²Ù×÷µÄÄ¿Â¼Ïî²»´æÔÚ
- 6   ±íÊ¾ÎÄ¼ş²Ù×÷Ê±Ã»ÓĞ´ÅÅÌ¿Õ¼ä,²»ÄÜĞ´Êı¾İ»òÕßÀ©Õ¹Ä¿Â¼
- ±íÊ¾Ä¿Â¼²Ù×÷Ê±Ã»ÓĞ´ÅÅÌ¿Õ¼ä,²»ÄÜÀ©Õ¹Ä¿Â¼,ĞÂ½¨×ÓÄ¿Â¼
- 7   ÎÄ¼ş²Ù×÷Ê±¸ùÄ¿Â¼Ä¿Â¼ÏîÂú
- 8   É¾³ıÄ¿Â¼Ê±·µ»Ø,±íÊ¾É¾³ıµÄÄ¿Â¼·Ç¿Õ
+ *æè¿°
+ è·å–æ–‡ä»¶ç³»ç»Ÿå‡ºé”™ä¿¡æ¯
+ *å‚æ•°
+ *è¿”å›
+ char statusï¼šå‡ºé”™ä¿¡æ¯
+ 1   ç£ç›˜è¯»å†™é”™è¯¯
+ 2   ç£ç›˜å†™ä¿æŠ¤
+ 3   ç£ç›˜æœªæ ¼å¼åŒ–
+ 4   æ–‡ä»¶æ“ä½œè¶…å‡ºæ–‡ä»¶è¾¹ç•Œ,ç›®å½•æ“ä½œè¶…å‡ºç›®å½•è¾¹ç•Œ
+ 5   æ–‡ä»¶æ“ä½œçš„ç›®æ ‡æ–‡ä»¶,ç›®å½•æ“ä½œçš„ç›®å½•é¡¹ä¸å­˜åœ¨
+ 6   è¡¨ç¤ºæ–‡ä»¶æ“ä½œæ—¶æ²¡æœ‰ç£ç›˜ç©ºé—´,ä¸èƒ½å†™æ•°æ®æˆ–è€…æ‰©å±•ç›®å½•
+ è¡¨ç¤ºç›®å½•æ“ä½œæ—¶æ²¡æœ‰ç£ç›˜ç©ºé—´,ä¸èƒ½æ‰©å±•ç›®å½•,æ–°å»ºå­ç›®å½•
+ 7   æ–‡ä»¶æ“ä½œæ—¶æ ¹ç›®å½•ç›®å½•é¡¹æ»¡
+ 8   åˆ é™¤ç›®å½•æ—¶è¿”å›,è¡¨ç¤ºåˆ é™¤çš„ç›®å½•éç©º
  */
 
 void GetFSErrorTYPE(void)

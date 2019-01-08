@@ -49,7 +49,7 @@
 // mcu core register
 sfr SPH                   =  0xbe;      // all bank     SPH Stack Pointer high byte
 sfr SPL                   =  0x81;      // all bank     SPL Stack Pointer low byte
-sfr SP                    =  0x81;      // all bank     SPL Stack Pointer low byte  ¡ÌÕ‚“ª÷÷–¥∑®
+sfr SP                    =  0x81;      // all bank     SPL Stack Pointer low byte  Âè¶Â§ñ‰∏ÄÁßçÂÜôÊ≥ï
 sfr DPXL                  =  0x84;      // all bank     DPXL    Data Pointer extended byte
 sfr DPH                   =  0x83;      // all bank     DPH Data Pointer high byte
 sfr DPL                   =  0x82;      // all bank     DPL Data Pointer low byte
@@ -540,10 +540,10 @@ sfr AuCodecCTimeS         =  0xb4;      // bank 04h     Current time seconds reg
 sfr ACC_CTRL                                    =  0x89;      // Bank 	Control Register
 sfr ACC_BLKLEN_LENHI                            =  0x8a;      // 0x08 	Search block length or the low byte of data length of unsigned accumulation unit number
 sfr ACC_BLKNUM_LENLO                            =  0x8b;      // 0x08 	Search block number or the high byte of data length of unsigned accumulation unit number
-sfr ACC_CMPDATA0_SUMHIE                         =  0xf1;      // 0x08 	The first byte of data searched or the higher byte of unsigned accelerator°Øs result
-sfr ACC_CMPDATA1_SUMHI                          =  0xf2;      // 0x08 	The second byte of data searched or the high byte of unsigned accelerator°Øs result
-sfr ACC_CMPDATA2_SUMLO                          =  0xf3;      // 0x08 	The third byte of data searched or the low byte of unsigned accelerator°Øs result
-sfr ACC_CMPDATA3_SUMLOE                         =  0xf4;      // 0x08 	The fourth byte of data searched or the lower byte of unsigned accelerator°Øs result
+sfr ACC_CMPDATA0_SUMHIE                         =  0xf1;      // 0x08 	The first byte of data searched or the higher byte of unsigned accelerator‚Äôs result
+sfr ACC_CMPDATA1_SUMHI                          =  0xf2;      // 0x08 	The second byte of data searched or the high byte of unsigned accelerator‚Äôs result
+sfr ACC_CMPDATA2_SUMLO                          =  0xf3;      // 0x08 	The third byte of data searched or the low byte of unsigned accelerator‚Äôs result
+sfr ACC_CMPDATA3_SUMLOE                         =  0xf4;      // 0x08 	The fourth byte of data searched or the lower byte of unsigned accelerator‚Äôs result
 sfr ACC_MATCNTHI                                =  0xf5;      // 0x08 	The high byte of bitmap
 sfr ACC_MATCNTLO                                =  0xf6;      // 0x08 	The low byte of match number
 sfr ACC_BITMAPHI                                =  0xf7;      // 0x08 	The high byte of bitmap

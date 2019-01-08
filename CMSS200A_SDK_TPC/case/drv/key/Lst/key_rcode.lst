@@ -21,7 +21,7 @@ stmt  level    source
    11          uint8 const key_map[16];
    12          uint8 IR_KEY;
    13          uint8 Low_power_count;
-   14          uint8 TheCharge; //³äµç±êÊ¶£¬0,µÍµç£»1£¬³äµçÖĞ£¬2.Âúµç¡£3.ÓĞDC5V
+   14          uint8 TheCharge; //å……ç”µæ ‡è¯†ï¼Œ0,ä½ç”µï¼›1ï¼Œå……ç”µä¸­ï¼Œ2.æ»¡ç”µã€‚3.æœ‰DC5V
    15          uint8 onoff_flag;
    16          uint8 cur_keyval;
    17          
@@ -45,10 +45,10 @@ stmt  level    source
    35          const uint8 pull_out_msg[MAX_TYPE] =
    36          { AP_MSG_LINEIN_OUT, AP_MSG_MIC_OUT, USB_PLUGIN_FINISH };
    37          
-   38          //»ñÈ¡LRADC1Öµ£¬ÓÃÒÔÅĞ¶ÏµÍµçºÍÂúµç
-   39          //µÍµç£ºĞ¡ÓÚ3.3V    £¬Ô¼µÈÓÚ0X50£¬Ğ¡ÓÚµÈÓÚÕâ¸öÖµÈÏÎªµÍµç
-   40          //½Ó½üµÍµçÌáÊ¾:Ğ¡ÓÚ3.4V,Ô¼µÈÓÚ0x54
-   41          //´óÓÚ4.2V   Ô¼µÈÓÚ0X76£¬´óÓÚµÈÓÚÕâ¸öÖµÈÏÎªÂúµç
+   38          //è·å–LRADC1å€¼ï¼Œç”¨ä»¥åˆ¤æ–­ä½ç”µå’Œæ»¡ç”µ
+   39          //ä½ç”µï¼šå°äº3.3V    ï¼Œçº¦ç­‰äº0X50ï¼Œå°äºç­‰äºè¿™ä¸ªå€¼è®¤ä¸ºä½ç”µ
+   40          //æ¥è¿‘ä½ç”µæç¤º:å°äº3.4V,çº¦ç­‰äº0x54
+   41          //å¤§äº4.2V   çº¦ç­‰äº0X76ï¼Œå¤§äºç­‰äºè¿™ä¸ªå€¼è®¤ä¸ºæ»¡ç”µ
    42          const uint8 bat_vol[3] =
    43          {
    44              0x50, 0x54, 0x76
@@ -74,7 +74,7 @@ stmt  level    source
    62   1          sfr_bak = (uint8) SFR_BANK;
    63   1      
    64   1      #ifndef NONE_ONOFF
-                   //¼ì²âon/off°´¼ü
+                   //æ£€æµ‹on/offæŒ‰é”®
                    SFR_BANK = BANK_PMU;
                    if ((SYSTEM_ONOFF & 0x08) != 0)
                    {
@@ -85,10 +85,10 @@ stmt  level    source
    73   1      
    74   1      #ifdef EVB_KEY
                        SFR_BANK = BANK_PMU;
-                   //¼ì²âLRADC1(sem_con)
+                   //æ£€æµ‹LRADC1(sem_con)
                    lradc1_data = LRADC1_DATA & 0x3f;
                    lradc5_data = LRADC5_DATA & 0x3f;
-                   //ÓÅ»¯¼ì²âLRADC1,Èç¹ûlRADC1ÓĞ°´¼ü¼ü£¬Ôò²»ÔÙ¼ì²âLRADC5
+                   //ä¼˜åŒ–æ£€æµ‹LRADC1,å¦‚æœlRADC1æœ‰æŒ‰é”®é”®ï¼Œåˆ™ä¸å†æ£€æµ‹LRADC5
                    if(lradc1_data < adctab[MAX_KEYVAL - 2])
                    {
                        key_offset = 0;
@@ -185,20 +185,20 @@ stmt  level    source
   171   1          {
   172   2              key_val = NO_KEY;
   173   2          }
-  174   1          if (key_val != oldkey) //Èç¹û±¾´ÎÉ¨ÃèÖµ²»µÈÓÚÉÏ´Î°´¼üÖµ
+  174   1          if (key_val != oldkey) //å¦‚æœæœ¬æ¬¡æ‰«æå€¼ä¸ç­‰äºä¸Šæ¬¡æŒ‰é”®å€¼
   175   1          {
-  176   2              if (key_val == tmpkey) //Èç¹û±¾´Î¼üÖµµÈÓÚÇ°´ÎÉ¨ÃèÖµ
+  176   2              if (key_val == tmpkey) //å¦‚æœæœ¬æ¬¡é”®å€¼ç­‰äºå‰æ¬¡æ‰«æå€¼
   177   2              {
-  178   3                  tmp_count++; //ÀÛ¼ÓÉ¨Ãè´ÎÊı
-  179   3                  if (tmp_count >= 2) //É¨ÃèÈı´Î£¬ÊÇÍ¬Ò»¼üÖµ£¬È·¶¨ÓĞ°´¼ü°´ÏÂ
+  178   3                  tmp_count++; //ç´¯åŠ æ‰«ææ¬¡æ•°
+  179   3                  if (tmp_count >= 2) //æ‰«æä¸‰æ¬¡ï¼Œæ˜¯åŒä¸€é”®å€¼ï¼Œç¡®å®šæœ‰æŒ‰é”®æŒ‰ä¸‹
   180   3                  {
-  181   4                     if (key_val != NO_KEY) //Èç¹û±¾´ÎÉ¨Ãè²¶»ñ¼üÖµ²»Îª¿Õ
+  181   4                     if (key_val != NO_KEY) //å¦‚æœæœ¬æ¬¡æ‰«ææ•è·é”®å€¼ä¸ä¸ºç©º
   182   4                      {
   183   5                          oldkey = tmpkey;
   184   5                          wait_keyup = 1;
   185   5                                              PutSysMsg(key_map[oldkey - 1]);
   186   5                      }
-  187   4                      else //±¾´Î¼üÖµÎªNO_KEY
+  187   4                      else //æœ¬æ¬¡é”®å€¼ä¸ºNO_KEY
   188   4                      {
   189   5                          if (IR_KEY)
   190   5                          {
@@ -207,8 +207,8 @@ stmt  level    source
   191   6                              if (tmp_count == 14)
   192   6                              {
   193   7                                  wait_keyup = 0;
-  194   7                                  tmp_count = 0; //ÇåÉ¨Ãè´ÎÊı
-  195   7                                  PutSysMsg(Msg_KeyShortUp); //·¢keyupÏûÏ¢
+  194   7                                  tmp_count = 0; //æ¸…æ‰«ææ¬¡æ•°
+  195   7                                  PutSysMsg(Msg_KeyShortUp); //å‘keyupæ¶ˆæ¯
   196   7                                  IR_KEY = 0;
   197   7                                  hold_count = 0;
   198   7                                  oldkey = NO_KEY;
@@ -217,11 +217,11 @@ stmt  level    source
   201   6                          }
   202   5                          else
   203   5                          {
-  204   6                              if (wait_keyup) //µÈ´ıKEYUP
+  204   6                              if (wait_keyup) //ç­‰å¾…KEYUP
   205   6                              {
   206   7                                  wait_keyup = 0;
-  207   7                                  tmp_count = 0; //ÇåÉ¨Ãè´ÎÊı
-  208   7                                  PutSysMsg(Msg_KeyShortUp); //·¢keyupÏûÏ¢
+  207   7                                  tmp_count = 0; //æ¸…æ‰«ææ¬¡æ•°
+  208   7                                  PutSysMsg(Msg_KeyShortUp); //å‘keyupæ¶ˆæ¯
   209   7                                  hold_count = 0;
   210   7                                  oldkey = NO_KEY;
   211   7                                  tmpkey = NO_KEY;
@@ -231,7 +231,7 @@ stmt  level    source
   215   5                      }
   216   4                  }
   217   3              }
-  218   2              else //Èç¹û±¾´ÎÉ¨ÃèÖµ²»µÈÓÚÇ°´ÎÉ¨ÃèÖµ£¬ÔòÖØÖÃ¼üÖµ£¬ÖØĞÂ¼ÆÊı
+  218   2              else //å¦‚æœæœ¬æ¬¡æ‰«æå€¼ä¸ç­‰äºå‰æ¬¡æ‰«æå€¼ï¼Œåˆ™é‡ç½®é”®å€¼ï¼Œé‡æ–°è®¡æ•°
   219   2              {
   220   3                  tmpkey = key_val;
   221   3                  //if (!wait_keyup)
@@ -240,7 +240,7 @@ stmt  level    source
   224   4                  }
   225   3              }
   226   2          }
-  227   1          else //Èç¹û±¾´Î¼üÖµµÈÓÚÉÏ´Î°´¼üÖµ,ÀÛ¼Æ16´Î(320ms)£¬·¢Ò»´Î°´¼üÏûÏ¢
+  227   1          else //å¦‚æœæœ¬æ¬¡é”®å€¼ç­‰äºä¸Šæ¬¡æŒ‰é”®å€¼,ç´¯è®¡16æ¬¡(320ms)ï¼Œå‘ä¸€æ¬¡æŒ‰é”®æ¶ˆæ¯
   228   1          {
   229   2              if (key_val != NO_KEY) //
   230   2              {
@@ -249,7 +249,7 @@ stmt  level    source
   233   3                  if (hold_count == 12)
   234   3                  {
   235   4                      hold_count = 0;
-  236   4                      PutSysMsg(key_map[oldkey - 1]); //·¢¼üÖµÏûÏ¢
+  236   4                      PutSysMsg(key_map[oldkey - 1]); //å‘é”®å€¼æ¶ˆæ¯
   237   4                  }
   238   3              }
   239   2              else
@@ -274,7 +274,7 @@ stmt  level    source
 
                    uint8 batval;
                    sfr_bak = SFR_BANK;
-                   //Èç¹ûÓĞDC5V,Ôò²»ĞèÒªÅĞ¶ÏµÍµç×´Ì¬
+                   //å¦‚æœæœ‰DC5V,åˆ™ä¸éœ€è¦åˆ¤æ–­ä½ç”µçŠ¶æ€
                    SFR_BANK = BANK_PMU;
                    batval = BATADC_DATA & 0x7f;
                    SFR_BANK = sfr_bak;
@@ -334,7 +334,7 @@ stmt  level    source
   315   2              {
   316   3                  ;
   317   3              }
-  318   2              if((USBSTATUS & 0x18) != 0x18) //Èí¼şÈ¥¶¶
+  318   2              if((USBSTATUS & 0x18) != 0x18) //è½¯ä»¶å»æŠ–
   319   2              {
   320   3                  usb_status = 0x40;
   321   3              }
@@ -382,14 +382,14 @@ stmt  level    source
                        SFR_BANK = BANK_PMU;
                        status = LRADC1_DATA & 0x3f;
                        SFR_BANK = sfr_bak;
-                       //¹ı¶É´¦ÓÚ°´¼üÇøÓòµÄADCÖµ
+                       //è¿‡æ¸¡å¤„äºæŒ‰é”®åŒºåŸŸçš„ADCå€¼
                        if(status <= adctab[MAX_KEYVAL - 2])
                        {
                            return AP_MSG_RTC;
                        }
                        if ((status > adctab[MAX_KEYVAL - 2]) && (status <= adctab[MAX_KEYVAL - 1]))
                        {
-                           status = 0;//ËµÃ÷lineinÏß´æÔÚ
+                           status = 0;//è¯´æ˜lineinçº¿å­˜åœ¨
                        }
                        else
                        {
@@ -399,7 +399,7 @@ stmt  level    source
                    }
                    else if(plug_dev_type == MIC_IN)
                    {
-                       //Èç¹û¸ÃGPIO¿ÚÒ»Ö±¶¼ÊÇ¸ß£¬ËµÃ÷Ã»ÓĞmicÏßÔÚ£¬Èç¹ûÎªµÍ£¬ËµÃ÷ÓĞmicÏßÔÚ¡£
+                       //å¦‚æœè¯¥GPIOå£ä¸€ç›´éƒ½æ˜¯é«˜ï¼Œè¯´æ˜æ²¡æœ‰micçº¿åœ¨ï¼Œå¦‚æœä¸ºä½ï¼Œè¯´æ˜æœ‰micçº¿åœ¨ã€‚
                        //   SFR_BANK = BANK_GPIO;
                        // status = MIC_IN_GPIO_DAT & (1 << MIC_IN_GPIO_NUM);
                        //    status=1;
@@ -412,15 +412,15 @@ stmt  level    source
                        SFR_BANK = BANK_USB;
                        utest_status = Usbien_hcusbien;
                        SFR_BANK = sfr_bak;
-                       //usb´¦utest×´Ì¬Ê±£¬²»½øĞĞudisk×´Ì¬¼ì²â
+                       //usbå¤„utestçŠ¶æ€æ—¶ï¼Œä¸è¿›è¡ŒudiskçŠ¶æ€æ£€æµ‹
                        if (utest_status == 0xb9)
                        {
                            return AP_MSG_RTC;
                        }
                        status =0;//get_usbcable_status();// GetUsbCableStatus();
-                       //1)Èç¹û¼ì²âµ½USBÏß£¬ÔòÏÈ½øudisk
-                       //2)Èç¹ûÃ»ÓĞ½ÓusbÏß£¬ÏÈ¼ì²âuhost,ÔÙ¼ì²â¿¨
-                       //3)¼´ÎŞuhostÒ²ÎŞ¿¨Ôò½øFM
+                       //1)å¦‚æœæ£€æµ‹åˆ°USBçº¿ï¼Œåˆ™å…ˆè¿›udisk
+                       //2)å¦‚æœæ²¡æœ‰æ¥usbçº¿ï¼Œå…ˆæ£€æµ‹uhost,å†æ£€æµ‹å¡
+                       //3)å³æ— uhostä¹Ÿæ— å¡åˆ™è¿›FM
                        if (((status & 0x40) == 0x40))
                        {
                            status = 0;
@@ -434,22 +434,22 @@ stmt  level    source
                    {
                        return AP_MSG_RTC;
                    }
-                   //LineÏßÒÑ¾­½ÓÉÏ£¬²¢ÇÒ¼ì²âµ½status±»ÖÃÆğÀ´ÁË£¬ÔòËµÃ÷LINEINÏß»òMICÏßÒÑ¾­°Îµô
+                   //Lineçº¿å·²ç»æ¥ä¸Šï¼Œå¹¶ä¸”æ£€æµ‹åˆ°statusè¢«ç½®èµ·æ¥äº†ï¼Œåˆ™è¯´æ˜LINEINçº¿æˆ–MICçº¿å·²ç»æ‹”æ‰
                    if ((*cur_status == 1) && (status != 0))
                    {
                        *cur_status = 0;
                        return pull_out_msg[plug_dev_type];
-                   } //LineÏßÃ»ÓĞ½ÓÉÏ£¬²¢ÇÒ¼ì²âµ½status±»ÇåÁã£¬ÔòËµÃ÷LINEINÏß»òMICÏß²åÈë£¬ĞèÒªÇĞ»»µ½linein»òMIC¹¦ÄÜ
+                   } //Lineçº¿æ²¡æœ‰æ¥ä¸Šï¼Œå¹¶ä¸”æ£€æµ‹åˆ°statusè¢«æ¸…é›¶ï¼Œåˆ™è¯´æ˜LINEINçº¿æˆ–MICçº¿æ’å…¥ï¼Œéœ€è¦åˆ‡æ¢åˆ°lineinæˆ–MICåŠŸèƒ½
                    else if ((*cur_status == 0) && (status == 0))
                    {
                        *cur_status = 1;
                        return insert_msg[plug_dev_type];
-                   }//LineÏßÃ»ÓĞ½ÓÉÏ£¬²¢ÇÒ¼ì²âµ½status±»ÖÃÆğÀ´ÁË£¬ÔòËµÃ÷²»´æÔÚLINEINÏß»òMICÏß
+                   }//Lineçº¿æ²¡æœ‰æ¥ä¸Šï¼Œå¹¶ä¸”æ£€æµ‹åˆ°statusè¢«ç½®èµ·æ¥äº†ï¼Œåˆ™è¯´æ˜ä¸å­˜åœ¨LINEINçº¿æˆ–MICçº¿
                    else if ((*cur_status == 0) && (status != 0))
                    {
                        return AP_MSG_RTC;
                    }
-                   else //LineÏßÒÑ¾­½ÓÉÏ£¬²¢ÇÒ¼ì²âµ½status±»ÇåÁã£¬ÔòËµÃ÷LINEINÏß»òMICÏßÒ»Ö±´æÔÚ
+                   else //Lineçº¿å·²ç»æ¥ä¸Šï¼Œå¹¶ä¸”æ£€æµ‹åˆ°statusè¢«æ¸…é›¶ï¼Œåˆ™è¯´æ˜LINEINçº¿æˆ–MICçº¿ä¸€ç›´å­˜åœ¨
                    {
                        return AP_MSG_RTC;
                    }

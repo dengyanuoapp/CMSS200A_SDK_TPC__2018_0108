@@ -25,7 +25,7 @@ stmt  level    source
    14          
    15          EQ_VM_t far g_eq_vrampara;
    16          
-   17          //Ä¬ÈÏEQÒôĞ§±í
+   17          //é»˜è®¤EQéŸ³æ•ˆè¡¨
    18          const uint8 defaultEQ[SUPPORT_EQ_CNT][ONE_EQPARA_BYTE] =
    19          {
    20              0, 0, 0, 0, 0, 0, 0, //none
@@ -49,14 +49,14 @@ stmt  level    source
    38   1          uint8 *ptr;
    39   1      
    40   1          ptr = (uint8 *) &eqinfo;
-   41   1          eqmode = *eqbuf; // 1:normal 2:Rock 3:Pop 4:Classic 5:Soft 6:Jazz 7:Dbb 8:×Ô¶¨Òå
+   41   1          eqmode = *eqbuf; // 1:normal 2:Rock 3:Pop 4:Classic 5:Soft 6:Jazz 7:Dbb 8:è‡ªå®šä¹‰
    42   1          eqbuf++;
    43   1          memcpy((void *) &eqinfo, eqbuf, sizeof(utest_eq_info_t)); //get 14 bytes eq para
    44   1      
    45   1          result = VMRead(&g_eq_vrampara, VM_PCSET_EQ, sizeof(g_eq_vrampara));
    46   1          if (g_eq_vrampara.magic != EQ_VRAM_MAGIC)
    47   1          {
-   48   2              //¸øVRAM¸³³õÊ¼Öµ
+   48   2              //ç»™VRAMèµ‹åˆå§‹å€¼
    49   2              g_eq_vrampara.magic = EQ_VRAM_MAGIC;
    50   2              memcpy(g_eq_vrampara.left_eq_para, defaultEQ[0], ONE_EQPARA_BYTE * SUPPORT_EQ_CNT);
    51   2              memcpy(g_eq_vrampara.right_eq_para, defaultEQ[0], ONE_EQPARA_BYTE * SUPPORT_EQ_CNT);
@@ -73,13 +73,13 @@ stmt  level    source
    60   2              //right
    61   2              ptr += ONE_EQPARA_BYTE;
    62   2              memcpy(&g_eq_vrampara.right_eq_para[ONE_EQPARA_BYTE * eqmode], ptr, ONE_EQPARA_BYTE);
-   63   2              //½«²ÎÊı±íĞ´ÈëVRAM
+   63   2              //å°†å‚æ•°è¡¨å†™å…¥VRAM
    64   2              VMWrite(&g_eq_vrampara, VM_PCSET_EQ, sizeof(g_eq_vrampara));
    65   2              ret = 0;
    66   2          }
    67   1          else
    68   1          {
-   69   2              //´«µİÏÂÀ´µÄEQ mode²»ÔÚ·¶Î§ÄÚ, ·µ»Østatus: fail
+   69   2              //ä¼ é€’ä¸‹æ¥çš„EQ modeä¸åœ¨èŒƒå›´å†…, è¿”å›status: fail
    70   2              ret = 2;
    71   2          }
    72   1      
@@ -88,7 +88,7 @@ stmt  level    source
    75   2              return ret;
    76   2          }
    77   1      
-   78   1          //ÖØĞÂ¶Á³ö£¬±È½Ï
+   78   1          //é‡æ–°è¯»å‡ºï¼Œæ¯”è¾ƒ
    79   1          result = VMRead(&g_eq_vrampara, VM_PCSET_EQ, sizeof(g_eq_vrampara));
    80   1          if (g_eq_vrampara.magic != EQ_VRAM_MAGIC)
    81   1          {
@@ -98,14 +98,14 @@ stmt  level    source
    85   1          ptr = (uint8 *) &eqinfo;
    86   1          if (memcmp(&g_eq_vrampara.left_eq_para[ONE_EQPARA_BYTE * eqmode], ptr, ONE_EQPARA_BYTE) != 0)
    87   1          {
-   88   2              //×óÉùµÀ²ÎÊı²»Æ¥Åä
+   88   2              //å·¦å£°é“å‚æ•°ä¸åŒ¹é…
    89   2              ret = 2;
    90   2              return ret;
    91   2          }
    92   1          ptr += ONE_EQPARA_BYTE;
    93   1          if (memcmp(&g_eq_vrampara.right_eq_para[ONE_EQPARA_BYTE * eqmode], ptr, ONE_EQPARA_BYTE) != 0)
    94   1          {
-   95   2              //ÓÒÉùµÀ²ÎÊı²»Æ¥Åä
+   95   2              //å³å£°é“å‚æ•°ä¸åŒ¹é…
    96   2              ret = 2;
    97   2              return ret;
    98   2          }

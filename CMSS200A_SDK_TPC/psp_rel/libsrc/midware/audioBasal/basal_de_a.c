@@ -39,7 +39,7 @@ extern uint8 m_deRead_Data(uchar readFileDirection, DWORD position);
 
 //#define CAN_NOT_CALL_RESERVE_INTERFACE() while(1){;}
 
-#define DECODE_BUFFER_ADDRESS_NORMAL 0xD80	//Ô­0x600¸ÄÎªÊ¹ÓÃcode ram
+#define DECODE_BUFFER_ADDRESS_NORMAL 0xD80	//åŸ0x600æ”¹ä¸ºä½¿ç”¨code ram
 
 #pragma renamecode(MW_BS_AD_CMD)
 
@@ -208,8 +208,8 @@ BOOL apSendCommand(BYTE cmd, BYTE music_type, void *param)
 
 
 /*************************************************************************
- * LoadCommand ³õÊ¼»¯codecÓÃµÄÈ«¾Ö±äÁ¿g_decInitPara£¬
- * °üÀ¨codecµÄbuffer¡¢dmaÖĞ¶ÏµÄhookº¯Êı¡¢¸èÇúÎÄ¼şµÄµÚÒ»Ö¡Êı¾İµØÖ·µÈµÈ
+ * LoadCommand åˆå§‹åŒ–codecç”¨çš„å…¨å±€å˜é‡g_decInitParaï¼Œ
+ * åŒ…æ‹¬codecçš„bufferã€dmaä¸­æ–­çš„hookå‡½æ•°ã€æ­Œæ›²æ–‡ä»¶çš„ç¬¬ä¸€å¸§æ•°æ®åœ°å€ç­‰ç­‰
  ****************************************************************************/
 bool LoadCommand(BYTE music_type, void *param)
 {
@@ -235,10 +235,10 @@ bool LoadCommand(BYTE music_type, void *param)
     //play_status.speed=0x00;
     m_deABok_sav = FALSE;
 
-    //g_decControlInfor.SoftVolumeMax = 41;	 //ÓÉÉÏ²ãÈ¥Éè¶¨£¬·ñÔòÃ¿´Îµ÷ÓÃ»áĞŞ¸ÄÖ®Ç°ÉèÖÃ¹ıµÄÖµ
+    //g_decControlInfor.SoftVolumeMax = 41;	 //ç”±ä¸Šå±‚å»è®¾å®šï¼Œå¦åˆ™æ¯æ¬¡è°ƒç”¨ä¼šä¿®æ”¹ä¹‹å‰è®¾ç½®è¿‡çš„å€¼
     //g_decControlInfor.Volume = 23;
 
-    g_decControlInfor.ChannelSelect = 0;//Ë«Í¨µÀ
+    g_decControlInfor.ChannelSelect = 0;//åŒé€šé“
 
     g_decControlInfor.TimeLimit = 50; //auto ab play
     g_decControlInfor.EnergyLimit = 8; //auto ab play
@@ -263,12 +263,12 @@ bool LoadCommand(BYTE music_type, void *param)
     }
 
     {
-        uint32 EndPageLen;//×îºóÒ»¸öPAGEµÄ×Ö½ÚÊı
-        EndPageLen = (uint32)FS_GetUnalignedLen(m_deFileHandle);//È¡×îºóÒ»¸öPAGEµÄBYTEÊı
+        uint32 EndPageLen;//æœ€åä¸€ä¸ªPAGEçš„å­—èŠ‚æ•°
+        EndPageLen = (uint32)FS_GetUnalignedLen(m_deFileHandle);//å–æœ€åä¸€ä¸ªPAGEçš„BYTEæ•°
         deFilepages = (uint32)FS_GetFileLen(m_deFileHandle);
         g_decReadFilePara.FileLen = (((uint32)deFilepages) << 9); //* 512;
 
-        //´¦ÀíÎÄ¼şÎ²²»ÊÇÕûPAGEµÄÊı¾İ,Ò»Ò³Ò»Ò³´«ËÍ
+        //å¤„ç†æ–‡ä»¶å°¾ä¸æ˜¯æ•´PAGEçš„æ•°æ®,ä¸€é¡µä¸€é¡µä¼ é€
         if (EndPageLen != 0)
         {
             g_decReadFilePara.FileLen = g_decReadFilePara.FileLen - 512 + EndPageLen;
@@ -287,8 +287,8 @@ bool LoadCommand(BYTE music_type, void *param)
 
 
 /*************************************************************************
- * StopCommand Í£Ö¹²¥·Å
- *1 g_decReadFilePara.ReadFilePagesÔÚdma hookÖĞ±»¸³Öµ = deBreakPointSave
+ * StopCommand åœæ­¢æ’­æ”¾
+ *1 g_decReadFilePara.ReadFilePagesåœ¨dma hookä¸­è¢«èµ‹å€¼ = deBreakPointSave
  ****************************************************************************/
 
 bool StopCommand(void *param)
@@ -298,7 +298,7 @@ bool StopCommand(void *param)
     {
         ; //qac
     }
-    //g_decBreakPointInfor.BreakPointAddr = g_decReadFilePara.ReadFileCurAddr;//±£´æÎÄ¼ş¶ÏµãĞÅÏ¢
+    //g_decBreakPointInfor.BreakPointAddr = g_decReadFilePara.ReadFileCurAddr;//ä¿å­˜æ–‡ä»¶æ–­ç‚¹ä¿¡æ¯
     //    TM_KillTimer(m_decTimer_Sav);
     save_kill_timer();
     IRQ_Release(m_deOldDspIntAddrSav, IRQ_DSP);
@@ -309,7 +309,7 @@ bool StopCommand(void *param)
 }
 
 /*************************************************************************
- * PlayCommand ²¥·Å
+ * PlayCommand æ’­æ”¾
  *
  ****************************************************************************/
 bool PlayCommand(void *param)
@@ -325,19 +325,19 @@ bool PlayCommand(void *param)
         return TRUE;
     }
 
-    play_status.status = PLAYING_PLAYING;//Ä¬ÈÏÎª²¥·Å×´Ì¬
+    play_status.status = PLAYING_PLAYING;//é»˜è®¤ä¸ºæ’­æ”¾çŠ¶æ€
     if ((uint8) param == ABPlay_open)
     {
         RestoreCommand(param);
-        //Èç¹ûdeApointerSave = deFilepages±íÊ¾×îºóÒ»Ò³£¬²»ÓÃÔÙ¸Ä
+        //å¦‚æœdeApointerSave = deFilepagesè¡¨ç¤ºæœ€åä¸€é¡µï¼Œä¸ç”¨å†æ”¹
         if ((deApointerSave < deFilepages))
         {
             play_status.status = PLAYING_AB;
-            g_decControlInfor.ABSetFlag = AB_FLAG_DEAL_AB_PROCESS;//ÎªÁË½øÈëRD ¶ÁÎÄ¼şÊ±¾Í¼ì²â¸Ã¶ÏµãÊÇ·ñ³¬¹ıBµãÁË
+            g_decControlInfor.ABSetFlag = AB_FLAG_DEAL_AB_PROCESS;//ä¸ºäº†è¿›å…¥RD è¯»æ–‡ä»¶æ—¶å°±æ£€æµ‹è¯¥æ–­ç‚¹æ˜¯å¦è¶…è¿‡Bç‚¹äº†
             memcpy(&g_decBreakPointInfor, &m_breakPointInfo, sizeof(decBreakPointInfor_t));
             g_decControlInfor.PlayMode = PLAY_MODE_BREAK;
         }
-        //»Øµ½ÎÄ¼şÍ·ºó£¬codec»á¸ù¾İdeApointerSaveÀ´seek£¬²¢¶ÁÈ¡Êı¾İ
+        //å›åˆ°æ–‡ä»¶å¤´åï¼Œcodecä¼šæ ¹æ®deApointerSaveæ¥seekï¼Œå¹¶è¯»å–æ•°æ®
         FS_FSeek(0, 0, m_deFileHandle);
     }
     else if (((uint8) param == Nor_Break_open) || ((uint8) param == Hard_Break_open))
@@ -352,14 +352,14 @@ bool PlayCommand(void *param)
     }
     else
     {
-        //Òª´ÓÍ·¿ªÊ¼·Å
+        //è¦ä»å¤´å¼€å§‹æ”¾
         g_decControlInfor.PlayMode = PLAY_MODE_NORMAL;
         FS_FSeek(0, 0, m_deFileHandle);
     }
 
     if (m_deOpenparam == NULL)
     {
-        g_decControlInfor.PlayMode = PLAY_MODE_AB;//Èô²ÎÊı±íµØÖ·Îª¿ÕÔò±íÊ¾Îª¸ú¶Á¶Ô±È²¥·Å
+        g_decControlInfor.PlayMode = PLAY_MODE_AB;//è‹¥å‚æ•°è¡¨åœ°å€ä¸ºç©ºåˆ™è¡¨ç¤ºä¸ºè·Ÿè¯»å¯¹æ¯”æ’­æ”¾
     }
 
     decInit();

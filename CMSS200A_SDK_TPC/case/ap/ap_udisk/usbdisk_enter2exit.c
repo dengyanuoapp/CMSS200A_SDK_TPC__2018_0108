@@ -13,9 +13,9 @@
  * \brief
  * \author   wanghaijing
  * \par      GENERAL DESCRIPTION:
- *               ÕâÀï¶ÔÎÄ¼ş½øĞĞÃèÊö
+ *               è¿™é‡Œå¯¹æ–‡ä»¶è¿›è¡Œæè¿°
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
  *
@@ -31,14 +31,14 @@ extern uint8 reckeypress;
 bool UDiskInitAll(int para)
 {
     bool ret;
-    //    /*µÍµçÄ£Ê½ÏÂ½øĞĞ³äµç*/
+    //    /*ä½ç”µæ¨¡å¼ä¸‹è¿›è¡Œå……ç”µ*/
     //    if(GetBattery() < 0x13)
     //    {
     //       sKY_ChargeSet(1);
     //       sKY_ChargeGetandSet();
     //    }
 
-    //½«ramµÄclk¾ùÇĞ»»µ½mcu clk,±ÜÃâÓ¦ÓÃÍË³öµ½uÅÌ,clk²»¶Ôµ¼ÖÂÊ¹ÓÃÎÊÌâ.
+    //å°†ramçš„clkå‡åˆ‡æ¢åˆ°mcu clk,é¿å…åº”ç”¨é€€å‡ºåˆ°uç›˜,clkä¸å¯¹å¯¼è‡´ä½¿ç”¨é—®é¢˜.
     RamToMcu();
 
     if (DRV_DetectUD(0x00) == 0xff)
@@ -47,23 +47,23 @@ bool UDiskInitAll(int para)
     }
     else
     {
-        DRV_ActiveUD(0x00, MODE_FAST); //¿ìËÙÄ£Ê½udÇı¶¯
+        DRV_ActiveUD(0x00, MODE_FAST); //å¿«é€Ÿæ¨¡å¼udé©±åŠ¨
     }
 
     //read comval
-    VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval)); //¶ÁVRAM
+    VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval)); //è¯»VRAM
 
     //==================================================================================
-    //**********************ÒÔÏÂº¯Êıµ÷ÓÃ´ÎĞò²»ÄÜ¸Ä¶¯***************************************
+    //**********************ä»¥ä¸‹å‡½æ•°è°ƒç”¨æ¬¡åºä¸èƒ½æ”¹åŠ¨***************************************
     //==================================================================================
-    UDiskSetDiskNum(3); //ÉèÖÃÁª»úÄ£Ê½
+    UDiskSetDiskNum(3); //è®¾ç½®è”æœºæ¨¡å¼
 
-    AlwaysShowCardDisk(0); //ÉèÖÃÊÇ·ñÏÔÊ¾¶àÅÌ·û  //reagan modify 2009-1-6 13:39
+    AlwaysShowCardDisk(0); //è®¾ç½®æ˜¯å¦æ˜¾ç¤ºå¤šç›˜ç¬¦  //reagan modify 2009-1-6 13:39
 
-    //UÅÌ³õÊ¼ÖÕ»¯,ÊäÈë²ÎÊı:callbackº¯Êı£¬ÊôĞÔ...
+    //Uç›˜åˆå§‹ç»ˆåŒ–,è¾“å…¥å‚æ•°:callbackå‡½æ•°ï¼Œå±æ€§...
     UDiskInit(0, g_comval.udisk_setting);
 
-    ret = UDiskRun(para); //Æô¶¯USBÒıÇæ
+    ret = UDiskRun(para); //å¯åŠ¨USBå¼•æ“
     return ret;
 }
 
@@ -107,7 +107,7 @@ int16 UdiskExitAll(void)
 
     DRV_ActiveUD(0x00, MODE_SLOW);
 
-    //°´ModeÍË³ö
+    //æŒ‰Modeé€€å‡º
     if (UdiskStatus == 0x00)
     {
         if (reckeypress == 1)
@@ -123,22 +123,22 @@ int16 UdiskExitAll(void)
             ret = RESULT_NULL;
         }
     }
-    //Éı¼¶ÍË³ö
+    //å‡çº§é€€å‡º
     else if (UdiskStatus == 0x50)
     {
         ret = RESULT_UPGRADE;
     }
     else
     {
-        //°ÎÏß,µ¯³ö
+        //æ‹”çº¿,å¼¹å‡º
         ret = 0;
     }
-    //MODE¼ü¹¦ÄÜ  UHOST¡¢CARD¡¢FM¡¢USBAUDIO¡¢UDISKUSB  Ñ­»·ÇĞ»»
-    // ¶ÔÓ¦ºìÍâÒ£¿ØÉÏÃæµÄPower¼ü
+    //MODEé”®åŠŸèƒ½  UHOSTã€CARDã€FMã€USBAUDIOã€UDISKUSB  å¾ªç¯åˆ‡æ¢
+    // å¯¹åº”çº¢å¤–é¥æ§ä¸Šé¢çš„Poweré”®
     if (IRUSBExit)
     {
         ret = RESULT_NULL;
-        //        ret = RESULT_MUSIC_PLAY; //	 RESULT_MUSIC_PLAY SD Card ×¼±¸Ê±¼ä²»¹»µ¼ÖÂÓÖ½øÈë FM
+        //        ret = RESULT_MUSIC_PLAY; //	 RESULT_MUSIC_PLAY SD Card å‡†å¤‡æ—¶é—´ä¸å¤Ÿå¯¼è‡´åˆè¿›å…¥ FM
     }
     power_control();
     return ret;	//RESULT_USBAUDIO_PLAY

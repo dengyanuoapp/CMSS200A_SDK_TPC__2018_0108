@@ -22,8 +22,8 @@ extern uint8 fselType; //Type of select,  Music or voice.
 extern uint8 fselError; // store error id;
 extern int8 fselDiskLetter;
 extern int8 fselDirLayer; //dir  layer
-extern uint16 fselFileNoInDisk;// ÎÄ¼şÔÚÈ«ÅÌµÄĞòºÅ
-extern uint16 fselTotalInDisk;// È«ÅÌÎÄ¼ş×ÜÊı
+extern uint16 fselFileNoInDisk;// æ–‡ä»¶åœ¨å…¨ç›˜çš„åºå·
+extern uint16 fselTotalInDisk;// å…¨ç›˜æ–‡ä»¶æ€»æ•°
 extern bool select_file_begin_flag;
 extern uint16 fselDirNoInDisk;
 
@@ -65,13 +65,13 @@ uint8 fselSetLocationC(file_location_t *location)
     uint8 dir_buf[74];
     ClearWatchDog();
 
-    /*¼ÓÈëÇı¶¯³õÊ¼»¯´úÂë£¬½â¾ö²å¿¨°Î³öÊ±µ÷ÓÃ½Ó¿ÚËÀ»úµÄÎÊÌâ*/
+    /*åŠ å…¥é©±åŠ¨åˆå§‹åŒ–ä»£ç ï¼Œè§£å†³æ’å¡æ‹”å‡ºæ—¶è°ƒç”¨æ¥å£æ­»æœºçš„é—®é¢˜*/
     if (!DRV_ActiveDrive(location->disk, 1))
     {
         fselError = FSEL_ERR_DISK;
         return FALSE;
     }
-    if(FALSE == FS_CD(":")) //±ÜÃâ´¦ÓÚ×îºóµÄÄ¿Â¼ÏîÊ±µ÷ÓÃFS_SetCurDir³ö´í
+    if(FALSE == FS_CD(":")) //é¿å…å¤„äºæœ€åçš„ç›®å½•é¡¹æ—¶è°ƒç”¨FS_SetCurDirå‡ºé”™
     {
         fselError = FSEL_ERR_SETDIR;
         return FALSE;
@@ -87,7 +87,7 @@ uint8 fselSetLocationC(file_location_t *location)
     }
     FS_SetCurDir_layer(dir_buf);
 
-    //ÒÑ¾­ÉèÖÃºÃÎÄ¼ş¼ĞµÄÂ·¾¶ÁË
+    //å·²ç»è®¾ç½®å¥½æ–‡ä»¶å¤¹çš„è·¯å¾„äº†
     if (!FS_SetCurDir(location->ClusterNo))
     {
         fselError = FSEL_ERR_SETDIR;
@@ -117,10 +117,10 @@ uint8 fselSetLocationC(file_location_t *location)
     {
         GetNumByLocation(location);
         fselFileNoInDisk = fselFileNoInDisk + location->fselFileNo;
-        FS_SetCurDirEntry(location->DirEntry);  //»Øµ½¸Õ²ÅµÄÎÄ¼ş
+        FS_SetCurDirEntry(location->DirEntry);  //å›åˆ°åˆšæ‰çš„æ–‡ä»¶
     }
 
-    select_file_begin_flag = FALSE;	//¶Ïµã´æÔÚÔò²»´ÓµÚÒ»Ê×¿ªÊ¼²¥
+    select_file_begin_flag = FALSE;	//æ–­ç‚¹å­˜åœ¨åˆ™ä¸ä»ç¬¬ä¸€é¦–å¼€å§‹æ’­
     return TRUE;
 }
 
@@ -141,10 +141,10 @@ bool fselGetLocationC(file_location_t *location)
     ClearWatchDog();
 
     location->disk = fselDiskLetter;
-    location->ClusterNo = FS_GetCurDir();//µ±Ç°Ä¿Â¼ÏîÔÚÎÄ¼şÏµÍ³ÖĞµÄÆ«ÒÆ
-    location->DirEntry = FS_GetCurDirEntry();//ÎÄ¼şÏîÔÚµ±Ç°Ä¿Â¼ÏîÖĞµÄÆ«ÒÆ
+    location->ClusterNo = FS_GetCurDir();//å½“å‰ç›®å½•é¡¹åœ¨æ–‡ä»¶ç³»ç»Ÿä¸­çš„åç§»
+    location->DirEntry = FS_GetCurDirEntry();//æ–‡ä»¶é¡¹åœ¨å½“å‰ç›®å½•é¡¹ä¸­çš„åç§»
 
-    if (!FS_GetName(location->filename, 0)) //»ñÈ¡8+3¶ÌÃû
+    if (!FS_GetName(location->filename, 0)) //è·å–8+3çŸ­å
     {
         return FALSE;
     }
@@ -158,10 +158,10 @@ bool fselGetLocationC_Switch(file_location_t *location)
     ClearWatchDog();
 
     location->disk = fselDiskLetter;
-    location->ClusterNo = FS_GetCurDir();//µ±Ç°Ä¿Â¼ÏîÔÚÎÄ¼şÏµÍ³ÖĞµÄÆ«ÒÆ
-    location->DirEntry = FS_GetCurDirEntry();//ÎÄ¼şÏîÔÚµ±Ç°Ä¿Â¼ÏîÖĞµÄÆ«ÒÆ
+    location->ClusterNo = FS_GetCurDir();//å½“å‰ç›®å½•é¡¹åœ¨æ–‡ä»¶ç³»ç»Ÿä¸­çš„åç§»
+    location->DirEntry = FS_GetCurDirEntry();//æ–‡ä»¶é¡¹åœ¨å½“å‰ç›®å½•é¡¹ä¸­çš„åç§»
 
-    if (!FS_GetName(location->filename, 0)) //»ñÈ¡8+3¶ÌÃû
+    if (!FS_GetName(location->filename, 0)) //è·å–8+3çŸ­å
     {
         return FALSE;
     }

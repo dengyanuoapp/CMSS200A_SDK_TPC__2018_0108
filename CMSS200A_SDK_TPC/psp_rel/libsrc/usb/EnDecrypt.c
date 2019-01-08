@@ -26,11 +26,11 @@ static void sActWrite(void);
  *********************************************************************************************************
  *                                           Encrypt_Read_Check
  *
- * Description: Îª¼ÓÃÜËÍÎ±Êı¾İ.
+ * Description: ä¸ºåŠ å¯†é€ä¼ªæ•°æ®.
  *
  * Arguments  : None.
  *
- * Returns    : a=0: ¶Á  01h:²»¶Á.
+ * Returns    : a=0: è¯»  01h:ä¸è¯».
  *
  * Note(s)    : None.
  *********************************************************************************************************
@@ -42,25 +42,25 @@ uint8 sReadCheckForEncryp(void)
     if (AccessFlashPhySec1 != 0x00)
     {
         AccessFlashPhySec1 = 0;
-        //Êä³ö²ÎÊıa  0:Òª¶Á 01:²»¶Á
+        //è¾“å‡ºå‚æ•°a  0:è¦è¯» 01:ä¸è¯»
         ret = sEncrypParseInRD();
     }
     else
     {
-        //¶ÁÆäËûÉÈÇø£¬Çå¶ÁÎïÀíÉÈÇø0¼ÆÊı±êÖ¾
+        //è¯»å…¶ä»–æ‰‡åŒºï¼Œæ¸…è¯»ç‰©ç†æ‰‡åŒº0è®¡æ•°æ ‡å¿—
         Phy0Sec1RdCounter1 = 0;
         if (EncryptFlag != 0x00)
         {
-            //LBAÓëDiskBÉÈÇø±È½Ï  a=0,Ğ¡ÓÚ  01h:´óÓÚ»òµÈÓÚ,
-            //ÎªÁË·ÀÖ¹Èí¼şÆÆ½âÕß´ÓLUN0·¢DiskBµÄLBAÀ´¶ÁÈ¡¼ÓÃÜÅÌÊı¾İ
-            //LBAÓëDiskCÉÈÇø±È½Ï  a=0,Ğ¡ÓÚ  01h:´óÓÚ»òµÈÓÚ
+            //LBAä¸DiskBæ‰‡åŒºæ¯”è¾ƒ  a=0,å°äº  01h:å¤§äºæˆ–ç­‰äº,
+            //ä¸ºäº†é˜²æ­¢è½¯ä»¶ç ´è§£è€…ä»LUN0å‘DiskBçš„LBAæ¥è¯»å–åŠ å¯†ç›˜æ•°æ®
+            //LBAä¸DiskCæ‰‡åŒºæ¯”è¾ƒ  a=0,å°äº  01h:å¤§äºæˆ–ç­‰äº
             if ((PasswdPassOk != 0x00) || (LBA < EncryptDiskBStartAddr) || (LBA >= EncryptDiskCStartAddr))
             {
                 ret = 0x00;
             }
             else
             {
-                //ÇåUram Buffer 2KbytesÊı¾İÎªÁã
+                //æ¸…Uram Buffer 2Kbytesæ•°æ®ä¸ºé›¶
                 memset(DATABUFFER, 0x00, 0x200);
                 ret = 0x01;
             }
@@ -77,13 +77,13 @@ uint8 sReadCheckForEncryp(void)
  *********************************************************************************************************
  *                                           sWriteCheckForEncryp
  *
- * Description: ÅĞ¶¨ÊÇ·ñÎª¼ÓÃÜÅÌÉÏµÄ²Ù×÷.
+ * Description: åˆ¤å®šæ˜¯å¦ä¸ºåŠ å¯†ç›˜ä¸Šçš„æ“ä½œ.
  *
  * Arguments  : None.
  *
- * Returns    : a=0: ²»ÊÇ  01h:ÊÇ.
+ * Returns    : a=0: ä¸æ˜¯  01h:æ˜¯.
  *
- * Note(s)    : Ä¬ÈÏÊı¾İÊÇÔÚÖĞ.
+ * Note(s)    : é»˜è®¤æ•°æ®æ˜¯åœ¨ä¸­.
  *********************************************************************************************************
  */
 uint8 sWriteCheckForEncryp(void)
@@ -95,11 +95,11 @@ uint8 sWriteCheckForEncryp(void)
         ret = 0x01;
     }
 
-    //ÊÇÓĞ·ÖÇø
+    //æ˜¯æœ‰åˆ†åŒº
     if ((ret == 0x00) && (SplitDiskFlag != 0x00))
     {
         ret = 0x00;
-        //LBAÓëDiskCÉÈÇø±È½Ï  a=0,Ğ¡ÓÚ  01h:´óÓÚ»òµÈÓÚ
+        //LBAä¸DiskCæ‰‡åŒºæ¯”è¾ƒ  a=0,å°äº  01h:å¤§äºæˆ–ç­‰äº
         if (LBA >= EncryptDiskCStartAddr)
         {
             ret = 0x01;
@@ -113,13 +113,13 @@ uint8 sWriteCheckForEncryp(void)
  *********************************************************************************************************
  *                                           sEncrypParseInWR
  *
- * Description: ÅĞ¶ÏÊÇ·ñĞ´¼ÓÃÜÅÌ
+ * Description: åˆ¤æ–­æ˜¯å¦å†™åŠ å¯†ç›˜
  *
  * Arguments  : None.
  *
- * Returns    : a=0:Ğ´  01h:²»Ğ´.
+ * Returns    : a=0:å†™  01h:ä¸å†™.
  *
- * Note(s)    : Ä¬ÈÏĞ­ÒéÊı¾İÊÕµ½B2ÖĞ.
+ * Note(s)    : é»˜è®¤åè®®æ•°æ®æ”¶åˆ°B2ä¸­.
  *********************************************************************************************************
  */
 uint8 sEncrypParseInWR(void)
@@ -130,7 +130,7 @@ uint8 sEncrypParseInWR(void)
     encrypt_info_p = (encrypt_info *) DATABUFFER;
     if (ActWRLength != 0x00)
     {
-        //·ÖÇøÈí¼şĞ´´ÅÅÌ,Ö»ÊÇÀÛ¼ÓActWRLBA,Êı¾İĞ´»¹ĞèÔÚºóĞø¹ı³ÌÖĞÍê³É
+        //åˆ†åŒºè½¯ä»¶å†™ç£ç›˜,åªæ˜¯ç´¯åŠ ActWRLBA,æ•°æ®å†™è¿˜éœ€åœ¨åç»­è¿‡ç¨‹ä¸­å®Œæˆ
         sActWrite();
         ret = 0x00;
     }
@@ -143,20 +143,20 @@ uint8 sEncrypParseInWR(void)
         ret = 0x01;
         switch (encrypt_info_p->CMDIDRecord)
         {
-            //È¡µÃ´ÅÅÌĞÅÏ¢
+            //å–å¾—ç£ç›˜ä¿¡æ¯
         case 0x05:
             CMDPerformCondition = GETDISKINFO;//GETDISKINFO;
             break;
-            //ÉèÖÃÓÃ»§ÃûÃÜÂë
+            //è®¾ç½®ç”¨æˆ·åå¯†ç 
         case 0x08:
             //prints("set name&passwd -");
             memcpy(TempBuffer, &encrypt_info_p->OldUserNameLengthRecord, 0x40);
-            //¶Á¼ÓÃÜÇé¿ö¼ÇÂ¼ÉÈÇø
+            //è¯»åŠ å¯†æƒ…å†µè®°å½•æ‰‡åŒº
             sFlash_Rds(RW_FIX, EncryptInfoSector, DATABUFFER);
-            //¼ì²â¾ÉÃÜÂë
-            if (encrypt_info_p->IfEncryptRecord == 0x01) //´¦ÓÚÃ»¼ÓÃÜ×´Ì¬?
+            //æ£€æµ‹æ—§å¯†ç 
+            if (encrypt_info_p->IfEncryptRecord == 0x01) //å¤„äºæ²¡åŠ å¯†çŠ¶æ€?
             {
-                //¼ì²â¾ÉÓÃ»§Ãû,³¤¶È¼Ó1£¬¼ÓÉÏ³¤¶È¼ÇÂ¼±¾Éí1×Ö½Ú
+                //æ£€æµ‹æ—§ç”¨æˆ·å,é•¿åº¦åŠ 1ï¼ŒåŠ ä¸Šé•¿åº¦è®°å½•æœ¬èº«1å­—èŠ‚
                 if (0x00 != memcmp(&encrypt_info_p->UserNameLengthRecord, TempBuffer,
                                    encrypt_info_p->UserNameLengthRecord + 1))
                 {
@@ -164,7 +164,7 @@ uint8 sEncrypParseInWR(void)
                     CMDPerformCondition = SETNAMEORPASSWDFAIL;
                     break;
                 }
-                //¼ì²â¾ÉÃÜÂë,³¤¶È¼Ó1£¬¼ÓÉÏ³¤¶È¼ÇÂ¼±¾Éí1×Ö½Ú
+                //æ£€æµ‹æ—§å¯†ç ,é•¿åº¦åŠ 1ï¼ŒåŠ ä¸Šé•¿åº¦è®°å½•æœ¬èº«1å­—èŠ‚
                 if (0x00 != memcmp(&encrypt_info_p->PasswdLengthRecord, TempBuffer + 0x10,
                                    (encrypt_info_p->PasswdLengthRecord + 1)))
                 {
@@ -173,46 +173,46 @@ uint8 sEncrypParseInWR(void)
                     break;
                 }
             }
-            //¼ÇÂ¼ĞÂÃÜÂë
+            //è®°å½•æ–°å¯†ç 
             memcpy(&encrypt_info_p->UserNameLengthRecord, TempBuffer + 0x20, 0x20);
-            //ÉèÃÜÂëÉèÖÃ³É¹¦±ê¼Ç,²¢Ğ´»Øflash
+            //è®¾å¯†ç è®¾ç½®æˆåŠŸæ ‡è®°,å¹¶å†™å›flash
             encrypt_info_p->IfEncryptRecord = 0x01;
             sFlash_Wrts(RW_FIX, EncryptInfoSector, DATABUFFER);
             CMDPerformCondition = SETPASSWDOK;
             break;
-            //Ğ´uÅÌ,¼ÓÃÜÅÌĞ´×ÜÊÇÖ»Ğ´LBA1£¬ÇÒÃ¿´ÎĞ´Ò»¸öÉÈÇø£¬Êı¾İ·ÅÔÚB2ÖÖ
+            //å†™uç›˜,åŠ å¯†ç›˜å†™æ€»æ˜¯åªå†™LBA1ï¼Œä¸”æ¯æ¬¡å†™ä¸€ä¸ªæ‰‡åŒºï¼Œæ•°æ®æ”¾åœ¨B2ç§
         case 0x15:
             EndianReverse((uint8 *) & (encrypt_info_p->PhySecWRAddrRecord), sizeof(encrypt_info_p->PhySecWRAddrRecord));
             ActWRLBA = UdiskStartAddr + encrypt_info_p->PhySecWRAddrRecord;
             EndianReverse((uint8 *) & (encrypt_info_p->PhySecWRLengthRecord),
                           sizeof(encrypt_info_p->PhySecWRLengthRecord));
             ActWRLength = encrypt_info_p->PhySecWRLengthRecord;
-            //²»ÔÊĞí°ÎÏß£¬¼´²»½øÈëReadyÏÔÊ¾£¬·ñÔò½øÈëÖ÷Ñ­»·ºÄ·ÑÁËÏÔÊ¾Ê±¼ä
+            //ä¸å…è®¸æ‹”çº¿ï¼Œå³ä¸è¿›å…¥Readyæ˜¾ç¤ºï¼Œå¦åˆ™è¿›å…¥ä¸»å¾ªç¯è€—è´¹äº†æ˜¾ç¤ºæ—¶é—´
             Removable = 0x00;
             break;
-            //ÉèÖÃ¼ÓÃÜÅÌ´óĞ¡
+            //è®¾ç½®åŠ å¯†ç›˜å¤§å°
         case 0x18:
             memcpy(&TempBuffer, &encrypt_info_p->DiskACapacityRecord, 0x30);
             memset(DATABUFFER, 0, 0x200);
             memcpy(&encrypt_info_p->DiskACapacityRecord, TempBuffer, 0x30);
             if (encrypt_info_p->DiskBCapacityRecord != 0x00)
             {
-                //ÒÑ·Ö³ÉDiskA,B,C½á¹¹
+                //å·²åˆ†æˆDiskA,B,Cç»“æ„
                 encrypt_info_p->SplitDiskRecord = 0x01;
             }
             sFlash_Wrts(RW_FIX, EncryptInfoSector, DATABUFFER);
             break;
-            //ÖÃ·ÖÇøµ¯³ö±êÖ¾
+            //ç½®åˆ†åŒºå¼¹å‡ºæ ‡å¿—
         case 0x20:
             PartiEjectFlag = 0x01;
             break;
-            //¼ì²âÓÃ»§ÊäÈëµÄÓÃ»§ÃûºÍÃÜÂë
+            //æ£€æµ‹ç”¨æˆ·è¾“å…¥çš„ç”¨æˆ·åå’Œå¯†ç 
         case 0x80:
             //prints("check name&passwd -");
             memcpy(TempBuffer, &encrypt_info_p->UserNameLengthRecord, 0x20);
-            //¶Á¼ÓÃÜÇé¿ö¼ÇÂ¼ÉÈÇø
+            //è¯»åŠ å¯†æƒ…å†µè®°å½•æ‰‡åŒº
             sFlash_Rds(RW_FIX, EncryptInfoSector, DATABUFFER);
-            //¼ì²âÓÃ»§Ãû,³¤¶È¼Ó1£¬¼ÓÉÏ³¤¶È¼ÇÂ¼±¾Éí1×Ö½Ú
+            //æ£€æµ‹ç”¨æˆ·å,é•¿åº¦åŠ 1ï¼ŒåŠ ä¸Šé•¿åº¦è®°å½•æœ¬èº«1å­—èŠ‚
             if (0x00 != memcmp(&encrypt_info_p->UserNameLengthRecord, TempBuffer, encrypt_info_p->UserNameLengthRecord
                                + 1))
             {
@@ -220,7 +220,7 @@ uint8 sEncrypParseInWR(void)
                 CMDPerformCondition = NAMEORPASSWDFAIL;
                 break;
             }
-            //¼ì²âÃÜÂë,³¤¶È¼Ó1£¬¼ÓÉÏ³¤¶È¼ÇÂ¼±¾Éí1×Ö½Ú
+            //æ£€æµ‹å¯†ç ,é•¿åº¦åŠ 1ï¼ŒåŠ ä¸Šé•¿åº¦è®°å½•æœ¬èº«1å­—èŠ‚
             if (0x00 != memcmp(&encrypt_info_p->PasswdLengthRecord, TempBuffer + 0x10,
                                encrypt_info_p->PasswdLengthRecord + 1))
             {
@@ -228,20 +228,20 @@ uint8 sEncrypParseInWR(void)
                 CMDPerformCondition = NAMEORPASSWDFAIL;
                 break;
             }
-            //ÃÜÂëÍ¨¹ı,ÔÊĞí±¨´í,ÒÔÒı·¢PCÖØ¶ÁLUN2´ÅÅÌ½á¹¹
+            //å¯†ç é€šè¿‡,å…è®¸æŠ¥é”™,ä»¥å¼•å‘PCé‡è¯»LUN2ç£ç›˜ç»“æ„
             MediaChgFlag = 0x01;
             CMDPerformCondition = NAMEANDPASSWDOK;
             break;
         case 0xa0:
-            //ÊÇ·ñReadyÏÔÊ¾¡£ÎªÁËXPµÄTestReady
+            //æ˜¯å¦Readyæ˜¾ç¤ºã€‚ä¸ºäº†XPçš„TestReady
             if (USB_State == 0x00)
             {
                 CMDPerformCondition = UDBUSYINSWITCH2ADFU;
             }
-            //ÊÇ·ñWin98ÏµÍ³,0:Win2000 (XP)ÏµÍ³1:Win98ÏµÍ³ 2:LinuxÏµÍ³
+            //æ˜¯å¦Win98ç³»ç»Ÿ,0:Win2000 (XP)ç³»ç»Ÿ1:Win98ç³»ç»Ÿ 2:Linuxç³»ç»Ÿ
             else if (encrypt_info_p->SystemInfoRecord == 0x02)
             {
-                //²»Ã¦,¿ÉÒÔÇĞ»»¡£LinuxÏµÍ³ÏÂ²»ĞèÒª¶Á(Ã»·¨¶Á£¬¶Á³öµÄÊÇ»º´æÄÚÈİ)¼´µ¯³öÇĞ»»
+                //ä¸å¿™,å¯ä»¥åˆ‡æ¢ã€‚Linuxç³»ç»Ÿä¸‹ä¸éœ€è¦è¯»(æ²¡æ³•è¯»ï¼Œè¯»å‡ºçš„æ˜¯ç¼“å­˜å†…å®¹)å³å¼¹å‡ºåˆ‡æ¢
                 SwitchToADFUFlag = 0x01;
             }
             else
@@ -261,7 +261,7 @@ uint8 sEncrypParseInWR(void)
  *********************************************************************************************************
  *                                           sActWrite
  *
- * Description: ·ÖÇøÈí¼şĞ´´ÅÅÌ,½«B2ÖĞµÄ1 blockÊı¾İ°´ActWRLBA%4¶ÔÆë°áµ½B1ÖĞ,È»ºóĞ´ÈëFlash.
+ * Description: åˆ†åŒºè½¯ä»¶å†™ç£ç›˜,å°†B2ä¸­çš„1 blockæ•°æ®æŒ‰ActWRLBA%4å¯¹é½æ¬åˆ°B1ä¸­,ç„¶åå†™å…¥Flash.
  *
  * Arguments  : None.
  *
@@ -272,14 +272,14 @@ uint8 sEncrypParseInWR(void)
  */
 static void sActWrite(void)
 {
-    //½«ÕæÕıÒªĞ´ÈëµÄµØÖ·¸üĞÂµ½LBAÖĞ,Ğ´¶¯×÷²»ÔÚ¼ÓÃÜĞ­Òé´¦ÀíÖĞÍê³É
+    //å°†çœŸæ­£è¦å†™å…¥çš„åœ°å€æ›´æ–°åˆ°LBAä¸­,å†™åŠ¨ä½œä¸åœ¨åŠ å¯†åè®®å¤„ç†ä¸­å®Œæˆ
     LBA = ActWRLBA;
     ActWRLBA++;
 
     ActWRLength--;
     if (ActWRLength == 0x00)
     {
-        //·ÖÇøÈí¼şĞ´Íê´ÅÅÌ£¬½øÈëReadyÏÔÊ¾
+        //åˆ†åŒºè½¯ä»¶å†™å®Œç£ç›˜ï¼Œè¿›å…¥Readyæ˜¾ç¤º
         Removable = 0x01;
     }
 }
@@ -288,13 +288,13 @@ static void sActWrite(void)
  *********************************************************************************************************
  *                                           sEncrypParseInRD
  *
- * Description: ÅĞ¶ÏÊÇ·ñ¼ÓÃÜÅÌĞ­Òé.
+ * Description: åˆ¤æ–­æ˜¯å¦åŠ å¯†ç›˜åè®®.
  *
  * Arguments  : None.
  *
- * Returns    : a: 0:Òª¶Á 01:²»¶Á.
+ * Returns    : a: 0:è¦è¯» 01:ä¸è¯».
  *
- * Note(s)    : sEncrypParseInRD²»Ö§³Ölinux¶Á,bufferÖ¸Õë²»ÊÇ0x4800
+ * Note(s)    : sEncrypParseInRDä¸æ”¯æŒlinuxè¯»,bufferæŒ‡é’ˆä¸æ˜¯0x4800
  *********************************************************************************************************
  */
 static uint8 sEncrypParseInRD(void)
@@ -306,7 +306,7 @@ static uint8 sEncrypParseInRD(void)
 
     if (CMDPerformCondition != 0x00)
     {
-        //Òª·µ»ØÄÚÈİ,°ÑixÆğÊ¼µØÖ·(ixÖµ²»»á±»¸Ä¶¯) 0.5KbytesUram BufferÇå0£¬·ÀÖ¹°Ñ¼ÓÃÜĞÅÏ¢ÉÈÇø·µ»ØÁË
+        //è¦è¿”å›å†…å®¹,æŠŠixèµ·å§‹åœ°å€(ixå€¼ä¸ä¼šè¢«æ”¹åŠ¨) 0.5KbytesUram Bufferæ¸…0ï¼Œé˜²æ­¢æŠŠåŠ å¯†ä¿¡æ¯æ‰‡åŒºè¿”å›äº†
         memset(DATABUFFER, 0, 0x200);
     }
 
@@ -314,7 +314,7 @@ static uint8 sEncrypParseInRD(void)
     {
     case 0x00:
         Phy0Sec1RdCounter1++;
-        //=================Ê¶±ğÃüÁî¶ÁÖØ¸´´ÎÊı=================
+        //=================è¯†åˆ«å‘½ä»¤è¯»é‡å¤æ¬¡æ•°=================
         if (Phy0Sec1RdCounter1 == 0x05)
         {
             //prints("Phy0Sec1RdCounter1=0x05-");
@@ -322,7 +322,7 @@ static uint8 sEncrypParseInRD(void)
             sFlash_Rds(RW_FIX, LBA, DATABUFFER);
             sectors_trans_once = 0x01;
             memcpy(&encrypt_info_p->PhysicsSec0TagRecord, Phy0DiskTag, 0x04);
-            //Ğ´±£»¤ĞÅÏ¢
+            //å†™ä¿æŠ¤ä¿¡æ¯
             encrypt_info_p->WRProtectInfoRecord = FlashWPFlag;
             ret = 0x01;
         }
@@ -334,15 +334,15 @@ static uint8 sEncrypParseInRD(void)
         tmp = 0;
         break;
     case 0x01: //GetDiskInfo
-        if (SplitDiskFlag != 0x00) //ÊÇÓĞ·ÖÇø
+        if (SplitDiskFlag != 0x00) //æ˜¯æœ‰åˆ†åŒº
         {
-            //¶Á¼ÓÃÜÇé¿ö¼ÇÂ¼ÉÈÇø
+            //è¯»åŠ å¯†æƒ…å†µè®°å½•æ‰‡åŒº
             sFlash_Rds(RW_FIX, EncryptInfoSector, DATABUFFER);
-            //°ÑDiskABCµØÖ·ºÍÈİÁ¿±£´æÔÚ¼ÓÃÜĞÅÏ¢ÉÈÇø
+            //æŠŠDiskABCåœ°å€å’Œå®¹é‡ä¿å­˜åœ¨åŠ å¯†ä¿¡æ¯æ‰‡åŒº
             memcpy(TempBuffer, &encrypt_info_p->DiskACapacityRecord, 0x30);
-            //ÊÇ·ñÏÂÃÜÂëÁË
+            //æ˜¯å¦ä¸‹å¯†ç äº†
             tmp1 = encrypt_info_p->IfEncryptRecord;
-            //Òª·µ»ØÄÚÈİ,°ÑixÆğÊ¼µØÖ·(ixÖµ²»»á±»¸Ä¶¯) 2KbytesUram BufferÇå0£¬·ÀÖ¹°Ñ¼ÓÃÜĞÅÏ¢ÉÈÇø·µ»ØÁË.
+            //è¦è¿”å›å†…å®¹,æŠŠixèµ·å§‹åœ°å€(ixå€¼ä¸ä¼šè¢«æ”¹åŠ¨) 2KbytesUram Bufferæ¸…0ï¼Œé˜²æ­¢æŠŠåŠ å¯†ä¿¡æ¯æ‰‡åŒºè¿”å›äº†.
             memset(DATABUFFER, 0, 0x200);
             encrypt_info_p->IfEncryptRecord = tmp1;
             encrypt_info_p->SplitDiskRecord = 0x01;
@@ -350,12 +350,12 @@ static uint8 sEncrypParseInRD(void)
         }
         encrypt_info_p->CMDIDRecord = 0x00;
         encrypt_info_p->Phy0EquLog0Record = Phy0EquLog0Flag;
-        //´ÅÅÌ×ÜÈİÁ¿
+        //ç£ç›˜æ€»å®¹é‡
         encrypt_info_p->FormatCapacityRecord = udisk_total_capacity;
         EndianReverse((uint8 *) & (encrypt_info_p->FormatCapacityRecord), sizeof(encrypt_info_p->FormatCapacityRecord));
         //vidpidstring
         memcpy(&encrypt_info_p->VidPidRecord, &HS_Device_Dscrptr.idVendor, 0x04);
-        //¿¨´ÅÅÌÈİÁ¿
+        //å¡ç£ç›˜å®¹é‡
         encrypt_info_p->CardCapacityRecord = CardCapacity;
         EndianReverse((uint8 *) & (encrypt_info_p->CardCapacityRecord), sizeof(encrypt_info_p->CardCapacityRecord));
         encrypt_info_p->CardExistRecord = CardExistFlag;
@@ -379,7 +379,7 @@ static uint8 sEncrypParseInRD(void)
         break;
     case 0x06: //lsReplyUdUnBusyInSwitch2ADFU
         encrypt_info_p->CMDIDRecord = 0x20;
-        //²»Ã¦,¿ÉÒÔÇĞ»»
+        //ä¸å¿™,å¯ä»¥åˆ‡æ¢
         SwitchToADFUFlag = 0x01;
         tmp = 0x02;
         break;
@@ -394,7 +394,7 @@ static uint8 sEncrypParseInRD(void)
         if (tmp == 0x01)
         {
             Phy0Sec1RdCounter2++;
-            //=================ÆÕÍ¨ÃüÁî¶ÁÖØ¸´´ÎÊı+1=================
+            //=================æ™®é€šå‘½ä»¤è¯»é‡å¤æ¬¡æ•°+1=================
             if (Phy0Sec1RdCounter2 == 0x08)
             {
                 Phy0Sec1RdCounter2 = 0x00;

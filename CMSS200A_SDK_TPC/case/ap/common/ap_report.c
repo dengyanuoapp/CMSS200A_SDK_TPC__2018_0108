@@ -16,46 +16,46 @@
 #if defined(MAIN_AP) || defined(MUSIC_AP) || defined(RADIO_AP) || defined(LINEIN_AP)|| defined(RECORD_AP) || defined(USOUND_AP)
 #pragma name(COM_REPORT)
 
-//Ê¹ÓÃ´ÅÌõµÄ·½Ê½²¥±¨Ê±¼äºÍÈÕÆÚ
-//´ÅÌõÖĞµÄ×Ö·û´®²¿·Ö
+//ä½¿ç”¨ç£æ¡çš„æ–¹å¼æ’­æŠ¥æ—¶é—´å’Œæ—¥æœŸ
+//ç£æ¡ä¸­çš„å­—ç¬¦ä¸²éƒ¨åˆ†
 const char info_str[10] =
 {
     EXTEND_TIME_INFO, EXTEND_DAWN, EXTEND_MORNING, EXTEND_AFTERNOON,
     EXTEND_NIGHT, EXTEND_HOUR, EXTEND_MINUTE, EXTEND_MHZ,
     EXTEND_STATION, EXTEND_FREQUENCY
 };
-//´ÅÌõÖĞµÄÊı×Ö²¿·Ö
+//ç£æ¡ä¸­çš„æ•°å­—éƒ¨åˆ†
 const char num_unit[15] =
 {
     EXTEND_ZERO, EXTEND_ONE, EXTEND_TWO, EXTEND_THREE, EXTEND_FOUR,
     EXTEND_FIVE, EXTEND_SIX, EXTEND_SEVEN, EXTEND_EIGHT, EXTEND_NINE,
     EXTEND_TEN, EXTEND_TWENTY, EXTEND_THIRTY, EXTEND_FORTY, EXTEND_FIFTY
 };
-//´ÅÌõ ¡°ÒôÁ¿×î´ó¡±ºÍ¡°ÒôÁ¿×îĞ¡¡±
+//ç£æ¡ â€œéŸ³é‡æœ€å¤§â€å’Œâ€œéŸ³é‡æœ€å°â€
 //const char volume_info[][2] = {{EXTEND_VOLUME_MAX, 0}, {EXTEND_VOLUME_MIN, 0}};
 
 
-bool report_stats; //µ±Ç°²¥·Å×´Ì¬  0:Í£Ö¹  1:²¥·Å
-BOOL pa_close_flag; //²¥±¨Ç°PAµÄ×´Ì¬
+bool report_stats; //å½“å‰æ’­æ”¾çŠ¶æ€  0:åœæ­¢  1:æ’­æ”¾
+BOOL pa_close_flag; //æ’­æŠ¥å‰PAçš„çŠ¶æ€
 
-unsigned char ext_report_msg; //·µ»ØµÄÆäËüÏûÏ¢Öµ¡£Î»Í¼ÏûÏ¢
+unsigned char ext_report_msg; //è¿”å›çš„å…¶å®ƒæ¶ˆæ¯å€¼ã€‚ä½å›¾æ¶ˆæ¯
 
-//Open_param_t g_Openparam_TTS;               //²¥·Å²ÎÊı, ¹©Basel²ãÊ¹ÓÃ
+//Open_param_t g_Openparam_TTS;               //æ’­æ”¾å‚æ•°, ä¾›Baselå±‚ä½¿ç”¨
 
 void ClearWatchdog(void);
 bool pSdTtsSendCommand(BYTE cmd, BYTE music_type, void *param);
 bool unitochar(char *str, int len, unsigned char lang_id);
 
-//ÅĞ¶Ï×Ö·ûÊÇ·ñÎªÊı×Ö
+//åˆ¤æ–­å­—ç¬¦æ˜¯å¦ä¸ºæ•°å­—
 
 #pragma renamecode(COM_REPORT)
 
 /********************************************************************************
- * Description : ÑÓÊ±º¯Êı
+ * Description : å»¶æ—¶å‡½æ•°
  *
- * Arguments   : count£ºĞèÒªÑÓÊ±µÄ´ÎÊı
+ * Arguments   : countï¼šéœ€è¦å»¶æ—¶çš„æ¬¡æ•°
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -69,11 +69,11 @@ void delay_report(int count)
     }
 }
 /********************************************************************************
- * Description : ´ò¿ªDAC
+ * Description : æ‰“å¼€DAC
  *
- * Arguments   : ÎŞ
+ * Arguments   : æ— 
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -83,11 +83,11 @@ void TTSOpenDAC(void)
 
 }
 /********************************************************************************
- * Description : ´ò¿ªPA
+ * Description : æ‰“å¼€PA
  *
- * Arguments   : uchar volume ÒôÁ¿µÄ´óĞ¡£¬0-15¼¶
+ * Arguments   : uchar volume éŸ³é‡çš„å¤§å°ï¼Œ0-15çº§
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -98,11 +98,11 @@ void TTSOpenPA(uchar volume)
 }
 
 /********************************************************************************
- * Description : ³õÊ¼»¯²¥±¨Êı¾İµÄ±äÁ¿
+ * Description : åˆå§‹åŒ–æ’­æŠ¥æ•°æ®çš„å˜é‡
  *
- * Arguments   : char *buf Êı¾İÖ¸Õë
+ * Arguments   : char *buf æ•°æ®æŒ‡é’ˆ
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -113,13 +113,13 @@ void init_report_param(void)
 }
 
 /********************************************************************************
- * Description : ½áÊøµ±Ç°µÄ²¥·Å×´Ì¬
+ * Description : ç»“æŸå½“å‰çš„æ’­æ”¾çŠ¶æ€
  *
- * Arguments   : ÎŞ
+ * Arguments   : æ— 
  *
- * Returns     : 1£º²¥·Å×´Ì¬´íÎó  0£ºÕı³£½áÊø²¥·Å
+ * Returns     : 1ï¼šæ’­æ”¾çŠ¶æ€é”™è¯¯  0ï¼šæ­£å¸¸ç»“æŸæ’­æ”¾
  *
- * Notes       : ÅĞ¶Ïµ±Ç°ÊÇ·ñ´¦ÓÚ²¥±¨×´Ì¬£¬Èç¹û´¦ÓÚ²¥·Å×´Ì¬£¬½áÊøµ±Ç°µÄ²¥·Å
+ * Notes       : åˆ¤æ–­å½“å‰æ˜¯å¦å¤„äºæ’­æŠ¥çŠ¶æ€ï¼Œå¦‚æœå¤„äºæ’­æ”¾çŠ¶æ€ï¼Œç»“æŸå½“å‰çš„æ’­æ”¾
  *
  ********************************************************************************/
 unsigned char stop_report(void)
@@ -131,7 +131,7 @@ unsigned char stop_report(void)
         pSdTtsSendCommand(MC_CLOSE, TYPE_MP3, NULL);
         if(pa_close_flag)
         {
-            //½«PAµÄÒôÁ¿ÉèÖÃÎª0£¬¼õĞ¡¹Ø±ÕPAÊ±²úÉúµÄÔëÉù¡£
+            //å°†PAçš„éŸ³é‡è®¾ç½®ä¸º0ï¼Œå‡å°å…³é—­PAæ—¶äº§ç”Ÿçš„å™ªå£°ã€‚
             TTSOpenPA(0);
             delay_report(20);
             //            DisablePA();
@@ -142,11 +142,11 @@ unsigned char stop_report(void)
 }
 
 /********************************************************************************
- * Description : ¿ªÊ¼²¥·ÅÊı¾İ
+ * Description : å¼€å§‹æ’­æ”¾æ•°æ®
  *
- * Arguments   : ÎŞ
+ * Arguments   : æ— 
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
  * Notes       :
  *
@@ -165,11 +165,11 @@ void start_report(info_report_t *info)
 }
 
 /********************************************************************************
- * Description : ¼ì²éµ±Ç°²¥·Å×´Ì¬
+ * Description : æ£€æŸ¥å½“å‰æ’­æ”¾çŠ¶æ€
  *
- * Arguments   : ÎŞ
+ * Arguments   : æ— 
  *
- * Returns     : 0:½áÊø²¥·Å 1£º²¥·ÅÖĞ 2:ÎŞ²¥·Å×´Ì¬
+ * Returns     : 0:ç»“æŸæ’­æ”¾ 1ï¼šæ’­æ”¾ä¸­ 2:æ— æ’­æ”¾çŠ¶æ€
  *
  * Notes       :
  *
@@ -177,7 +177,7 @@ void start_report(info_report_t *info)
 BOOL check_report_state(info_report_t *info)
 {
     uint8 sfr_bank;
-    music_play_status_t status_buf_report; //´æ´¢²¥·Å×´Ì¬µÄbuffer, ¹©Basel²ãÊ¹ÓÃ¡£
+    music_play_status_t status_buf_report; //å­˜å‚¨æ’­æ”¾çŠ¶æ€çš„buffer, ä¾›Baselå±‚ä½¿ç”¨ã€‚
     if(info)
     {
         stop_report();
@@ -186,7 +186,7 @@ BOOL check_report_state(info_report_t *info)
         if(info->open_pa_flag)
         {
             pa_close_flag = 0x1;
-            //¿ªÆôPA£¬ÉèÖÃÒôÁ¿
+            //å¼€å¯PAï¼Œè®¾ç½®éŸ³é‡
             TTSOpenDAC();
             if(g_comval.vol_display < 10)
                 TTSOpenPA(10);
@@ -199,13 +199,13 @@ BOOL check_report_state(info_report_t *info)
         //g_Openparam_TTS.typeerror = 0;
         //g_Openparam_TTS.musicframeoffset = 0;
 
-        //¿ªÊ¼²¥·Å
+        //å¼€å§‹æ’­æ”¾
         start_report(info);
     }
-    //ÊÇ·ñ´¦ÓÚ²¥·Å×´Ì¬
+    //æ˜¯å¦å¤„äºæ’­æ”¾çŠ¶æ€
     if(report_stats)
     {
-        //¼ì²éÊÇ·ñ²¥·Å½áÊø
+        //æ£€æŸ¥æ˜¯å¦æ’­æ”¾ç»“æŸ
         pSdTtsSendCommand(MC_GETSTATUS, TYPE_MP3, &status_buf_report);
         if(status_buf_report.status == PLAYING_ERROR)
         {
@@ -218,11 +218,11 @@ BOOL check_report_state(info_report_t *info)
 }
 
 /********************************************************************************
- * Description : µÈ´ı²¥·Å½áÊø
+ * Description : ç­‰å¾…æ’­æ”¾ç»“æŸ
  *
- * Arguments   : void *param ¿ÉÑ¡²ÎÊı,ÔÚ²¥·ÅÒôÀÖµÄÊ±ºòÓÃÓÚÊ¶±ğµ±Ç°²¥·ÅµÄÅÌ·û¡£
+ * Arguments   : void *param å¯é€‰å‚æ•°,åœ¨æ’­æ”¾éŸ³ä¹çš„æ—¶å€™ç”¨äºè¯†åˆ«å½“å‰æ’­æ”¾çš„ç›˜ç¬¦ã€‚
  *
- * Returns     : 0:ÎŞÊÕµ½ÌØÊâµÄ°´¼üÏûÏ¢ ÆäËü£ºÌØÊâµÄÏûÏ¢ĞèÒªÉÏ²ã´¦Àí
+ * Returns     : 0:æ— æ”¶åˆ°ç‰¹æ®Šçš„æŒ‰é”®æ¶ˆæ¯ å…¶å®ƒï¼šç‰¹æ®Šçš„æ¶ˆæ¯éœ€è¦ä¸Šå±‚å¤„ç†
  *
  * Notes       :
  *
@@ -233,8 +233,8 @@ uint8 wait_report_end(void *param)
     BOOL ret = FALSE;
     BOOL vol_keyup = FALSE;
     uint8 result = 0;
-    uint8 delay_result = NULL; //ĞèÒªÑÓÊ±·¢ËÍµÄÏûÏ¢¡£
-    music_play_status_t status_buf_report; //´æ´¢²¥·Å×´Ì¬µÄbuffer, ¹©Basel²ãÊ¹ÓÃ¡£
+    uint8 delay_result = NULL; //éœ€è¦å»¶æ—¶å‘é€çš„æ¶ˆæ¯ã€‚
+    music_play_status_t status_buf_report; //å­˜å‚¨æ’­æ”¾çŠ¶æ€çš„buffer, ä¾›Baselå±‚ä½¿ç”¨ã€‚
     bool long_key_valid = FALSE;
 
     param = param;
@@ -243,7 +243,7 @@ uint8 wait_report_end(void *param)
     while(report_stats)
     {
         ClearWatchdog();
-        //¼ì²éÊÇ·ñ²¥·Å½áÊø
+        //æ£€æŸ¥æ˜¯å¦æ’­æ”¾ç»“æŸ
         pSdTtsSendCommand(MC_GETSTATUS, TYPE_MP3, &status_buf_report);
         if(status_buf_report.status == PLAYING_ERROR)
         {
@@ -258,7 +258,7 @@ uint8 wait_report_end(void *param)
             //need_draw = TRUE;
             break;
 
-            //´¦Àínext°´¼üºÍÒôÁ¿+°´¼ü
+            //å¤„ç†nextæŒ‰é”®å’ŒéŸ³é‡+æŒ‰é”®
 
         case AP_KEY_NEXT | AP_KEY_LONG:
         case AP_KEY_MODE| AP_KEY_LONG:
@@ -269,7 +269,7 @@ uint8 wait_report_end(void *param)
         case AP_KEY_PREV | AP_KEY_UP:
             ret = TRUE;
             break;
-            //µ¥¶À´¦ÀímusicÏÂµÄ²Ù×÷¡£
+            //å•ç‹¬å¤„ç†musicä¸‹çš„æ“ä½œã€‚
 #ifdef  MUSIC_AP
         case AP_MSG_SD_IN:
             delay_result = AP_MSG_SD_IN;
@@ -355,9 +355,9 @@ uint8 wait_report_end(void *param)
     return delay_result;
 }
 /********************************************************************************
- * Description : Ôö¼Ó¾²ÒôÊı¾İÖ¡
+ * Description : å¢åŠ é™éŸ³æ•°æ®å¸§
  *
- * Arguments   : char *str ĞèÒª´¦ÀíµÄ×Ö·û´®
+ * Arguments   : char *str éœ€è¦å¤„ç†çš„å­—ç¬¦ä¸²
  *
  * Returns     : NULL
  *
@@ -368,9 +368,9 @@ void report_str_fix(char *str)
 {
     unsigned char i, j;
 
-    //Ôö¼Ó¾²ÒôÊı¾İÖ¡
+    //å¢åŠ é™éŸ³æ•°æ®å¸§
     j = strlen(str);
-    //ÎŞÊı¾İÖ±½Ó·µ»Ø
+    //æ— æ•°æ®ç›´æ¥è¿”å›
     if(!j)
     {
         return;
@@ -389,7 +389,7 @@ void report_str_fix(char *str)
     }
     else
     {
-        //É¾³ı×Ö·û´®×îºó¶àÓàµÄ¿Õ¸ñ
+        //åˆ é™¤å­—ç¬¦ä¸²æœ€åå¤šä½™çš„ç©ºæ ¼
         for(i = j - 2; i > 0; i--)
         {
             if(str[i] != ' ')
@@ -401,13 +401,13 @@ void report_str_fix(char *str)
 
 #if defined(DATE_REPORT_EN)
 /********************************************************************************
- * Description : ÈÕÆÚ×ª»»º¯Êı£¬»ñÈ¡ÏµÍ³ÈÕÆÚ²¢×ª»»ÎªTTS¿ÉÊ¶±ğµÄ×Ö·û´®
+ * Description : æ—¥æœŸè½¬æ¢å‡½æ•°ï¼Œè·å–ç³»ç»Ÿæ—¥æœŸå¹¶è½¬æ¢ä¸ºTTSå¯è¯†åˆ«çš„å­—ç¬¦ä¸²
  *
- * Arguments   : char *buffer¡¢´æ´¢Êı¾İµÄbuffer
+ * Arguments   : char *bufferã€å­˜å‚¨æ•°æ®çš„buffer
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
- * Notes       : buffer±ØĞë¶¨ÒåµÃ±ÈÊµ¼ÊµÄ´ó£¬·ñÔò»á³öÏÖÒç³ö
+ * Notes       : bufferå¿…é¡»å®šä¹‰å¾—æ¯”å®é™…çš„å¤§ï¼Œå¦åˆ™ä¼šå‡ºç°æº¢å‡º
  *
  ********************************************************************************/
 void report_date(char *buffer)
@@ -419,13 +419,13 @@ void report_date(char *buffer)
 #endif //DATE_REPORT_EN
 #if defined(TIME_REPORT_EN)
 /********************************************************************************
- * Description : Ê±¼ä×ª»»º¯Êı£¬»ñÈ¡ÏµÍ³Ê±¼ä²¢×ª»»ÎªTTS¿ÉÊ¶±ğµÄ×Ö·û´®
+ * Description : æ—¶é—´è½¬æ¢å‡½æ•°ï¼Œè·å–ç³»ç»Ÿæ—¶é—´å¹¶è½¬æ¢ä¸ºTTSå¯è¯†åˆ«çš„å­—ç¬¦ä¸²
  *
- * Arguments   : char *buffer¡¢´æ´¢Êı¾İµÄbuffer
+ * Arguments   : char *bufferã€å­˜å‚¨æ•°æ®çš„buffer
  *
- * Returns     : ÎŞ
+ * Returns     : æ— 
  *
- * Notes       : buffer±ØĞë¶¨ÒåµÃ±ÈÊµ¼ÊµÄ´ó£¬·ñÔò»á³öÏÖÒç³ö
+ * Notes       : bufferå¿…é¡»å®šä¹‰å¾—æ¯”å®é™…çš„å¤§ï¼Œå¦åˆ™ä¼šå‡ºç°æº¢å‡º
  *
  ********************************************************************************/
 void conver_time_to_string(char *buffer)
@@ -435,10 +435,10 @@ void conver_time_to_string(char *buffer)
     unsigned char *buf = buffer;
     unsigned char count = 0;
 
-    //»ñÈ¡ÏµÍ³Ê±¼ä
+    //è·å–ç³»ç»Ÿæ—¶é—´
     TM_GetTime(&time);
 
-    //¿ªÊ¼Ìí¼Ó¾²ÒôÊı¾İ
+    //å¼€å§‹æ·»åŠ é™éŸ³æ•°æ®
     buffer[count++] = ' ';
 
     buffer[count++] = info_str[0];
@@ -459,7 +459,7 @@ void conver_time_to_string(char *buffer)
     buffer[count++] = info_str[5];
     if(time.minute < 10)
     {
-        //´¦Àí·ÖÖÓ²»ÎªÁãµÄÇé¿ö¡£
+        //å¤„ç†åˆ†é’Ÿä¸ä¸ºé›¶çš„æƒ…å†µã€‚
         if(time.minute)
             buffer[count++] = num_unit[0];
         buffer[count++] = num_unit[time.minute];
@@ -506,11 +506,11 @@ int report_tag(char *report_buf)
     return result;
 }
 /********************************************************************************
- * Description : ²¥±¨µ±Ç°FMÆµµãĞÅÏ¢
+ * Description : æ’­æŠ¥å½“å‰FMé¢‘ç‚¹ä¿¡æ¯
  *
- * Arguments   : char *info tag ĞÅÏ¢
+ * Arguments   : char *info tag ä¿¡æ¯
  *
- * Returns     : 0:ÎŞÊÕµ½ÌØÊâµÄ°´¼üÏûÏ¢ ÆäËü£ºÌØÊâµÄÏûÏ¢ĞèÒªÉÏ²ã´¦Àí
+ * Returns     : 0:æ— æ”¶åˆ°ç‰¹æ®Šçš„æŒ‰é”®æ¶ˆæ¯ å…¶å®ƒï¼šç‰¹æ®Šçš„æ¶ˆæ¯éœ€è¦ä¸Šå±‚å¤„ç†
  *
  * Notes       :
  *
@@ -522,7 +522,7 @@ int report_frequency(fm_status_t *fm_status, char *str)
     unsigned char count;
     info_report_t info;
 
-    //»ñÈ¡µçÌ¨ÆµÂÊ²¢±£´æµ½datÖĞ
+    //è·å–ç”µå°é¢‘ç‡å¹¶ä¿å­˜åˆ°datä¸­
     //if (fm_status->mode == 0)
     //    dat = fm_status->freq + 87*10;
     //else
@@ -536,9 +536,9 @@ int report_frequency(fm_status_t *fm_status, char *str)
     }
     count = 0;
 
-    //µ±Ç°ÆµÂÊ
+    //å½“å‰é¢‘ç‡
     str[count++] = info_str[9];
-    //Çø±ğÁ½Î»ÊıµÄÆµÂÊºÍÈıÎ»ÊıµÄÆµÂÊ
+    //åŒºåˆ«ä¸¤ä½æ•°çš„é¢‘ç‡å’Œä¸‰ä½æ•°çš„é¢‘ç‡
     if(buf[0])
     {
         str[count++] = num_unit[buf[0]];
@@ -555,7 +555,7 @@ int report_frequency(fm_status_t *fm_status, char *str)
     str[count++] = num_unit[buf[3]];
     str[count++] = info_str[7];
 
-    //×Ö·û´®½áÊø±êÖ¾
+    //å­—ç¬¦ä¸²ç»“æŸæ ‡å¿—
     str[count] = 0;
 
     info.report_buf = str;
@@ -567,11 +567,11 @@ int report_frequency(fm_status_t *fm_status, char *str)
 #endif
 
 /********************************************************************************
- * Description : ²¥±¨´ÊÌõ
+ * Description : æ’­æŠ¥è¯æ¡
  *
- * Arguments   : char type: ´ÊÌõÔÚTTS¿âÖĞµÄ±àÂë
+ * Arguments   : char type: è¯æ¡åœ¨TTSåº“ä¸­çš„ç¼–ç 
  *
- * Returns     : 0:ÎŞÊÕµ½ÌØÊâµÄ°´¼üÏûÏ¢ ÆäËü£ºÌØÊâµÄÏûÏ¢ĞèÒªÉÏ²ã´¦Àí
+ * Returns     : 0:æ— æ”¶åˆ°ç‰¹æ®Šçš„æŒ‰é”®æ¶ˆæ¯ å…¶å®ƒï¼šç‰¹æ®Šçš„æ¶ˆæ¯éœ€è¦ä¸Šå±‚å¤„ç†
  *
  * Notes       :
  *
@@ -596,11 +596,11 @@ int report_fix_info(char type, char pa_open_flag, void *param)
 }
 
 /********************************************************************************
- * Description : ²¥±¨´ÊÌõ
+ * Description : æ’­æŠ¥è¯æ¡
  *
- * Arguments   : char pa_open_flag: ÊÇ·ñĞèÒª¿ª¹ØPA²Ù×÷
+ * Arguments   : char pa_open_flag: æ˜¯å¦éœ€è¦å¼€å…³PAæ“ä½œ
  *
- * Returns     : 0:ÎŞÊÕµ½ÌØÊâµÄ°´¼üÏûÏ¢ ÆäËü£ºÌØÊâµÄÏûÏ¢ĞèÒªÉÏ²ã´¦Àí
+ * Returns     : 0:æ— æ”¶åˆ°ç‰¹æ®Šçš„æŒ‰é”®æ¶ˆæ¯ å…¶å®ƒï¼šç‰¹æ®Šçš„æ¶ˆæ¯éœ€è¦ä¸Šå±‚å¤„ç†
  *
  * Notes       :
  *

@@ -7,7 +7,7 @@
  *             All Right Reserved
  *
  *  $Id: show_stop.c,v 1.13 2009/10/09 09:53:51 dengyulin Exp $
- *  History Record£º
+ *  History Recordï¼š
  *  2008-03-22  15:47
  *
  *********************************************************
@@ -23,7 +23,7 @@
 
 #pragma name(AP_STOP)
 
-/*******************Íâ²¿º¯ÊıÉùÃ÷*********************/
+/*******************å¤–éƒ¨å‡½æ•°å£°æ˜*********************/
 const uint8 voice_ext[][4] =
 { "WAV", "MP3" };
 const uint8 FilenameHead[] =
@@ -35,11 +35,11 @@ const uint8 FileNameRecPlayLong[] = {'R', 0x0, 'E', 0x0, 'C', 0x0, 'P', 0x0, 'L'
 const uint8 g_dir_ext[] = "*  ";
 const uint8 g_dir_record[] = "RECORD     ";
 const uint8 load_str[] = "LOAD";
-/* ¸÷±ÈÌØÂÊ¶ÔÓ¦µÄ²ÉÑùÂÊÅäÖÃ, ĞèºÍcodec ÅäºÏ
- ** Ä¿Ç°¸÷Ë÷Òı¶ÔÓ¦µÄ²ÉÑùÂÊÎª
+/* å„æ¯”ç‰¹ç‡å¯¹åº”çš„é‡‡æ ·ç‡é…ç½®, éœ€å’Œcodec é…åˆ
+ ** ç›®å‰å„ç´¢å¼•å¯¹åº”çš„é‡‡æ ·ç‡ä¸º
  ** 8000,11025,12000,16000,22050,24000,32000,44100,48000
- ** Ôİ¶¨32kbps,  64kbps, 128kbps, 192kbps, 256kbps ¶ÔÓ¦²ÉÑùÂÊ
- ** ·Ö±ğ8kHz,  8kHz,  32kHz, 32kHz, 32kHz
+ ** æš‚å®š32kbps,  64kbps, 128kbps, 192kbps, 256kbps å¯¹åº”é‡‡æ ·ç‡
+ ** åˆ†åˆ«8kHz,  8kHz,  32kHz, 32kHz, 32kHz
  */
 /*
 typedef enum
@@ -56,11 +56,11 @@ typedef enum
    _FS_96K //96k sample rate
 } samplerate_t;
 */
-//Ä¿Ç°Â¼ÒôµÄ²ÉÑùÂÊ¶¼ÊÇÍ³Ò»Îª48k,
-//Èç¹ûĞèÒªÆäËûµÄ²ÉÑùÂÊ£¬Ö»ĞèÒªĞŞ¸ÄFsrate_ap_codecÖĞµÄÖµ¾ÍOK,
-//Ä¿Ç°×î¸ßÖ»Ö§³Öµ½48K.
+//ç›®å‰å½•éŸ³çš„é‡‡æ ·ç‡éƒ½æ˜¯ç»Ÿä¸€ä¸º48k,
+//å¦‚æœéœ€è¦å…¶ä»–çš„é‡‡æ ·ç‡ï¼Œåªéœ€è¦ä¿®æ”¹Fsrate_ap_codecä¸­çš„å€¼å°±OK,
+//ç›®å‰æœ€é«˜åªæ”¯æŒåˆ°48K.
 const uint8 Fsrate_ap_codec[] =
-{ 0, 0, 0, 2, 3, 5 }; //ÆäÖĞµÄ8¶ÔÓ¦µ½samplerate_tÖĞµÄ_FS_48K
+{ 0, 0, 0, 2, 3, 5 }; //å…¶ä¸­çš„8å¯¹åº”åˆ°samplerate_tä¸­çš„_FS_48K
 
 const int8 log_table[64] =
 {
@@ -68,34 +68,34 @@ const int8 log_table[64] =
     38, 36, 34, 32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0
 };
-/* ADPCM ÈıÖÖÄ£Ê½ÏÂ±ÈÌØÂÊÅäÖÃ*/
+/* ADPCM ä¸‰ç§æ¨¡å¼ä¸‹æ¯”ç‰¹ç‡é…ç½®*/
 const ap_bitrate_e bitrate_ap_adpcm[3] =
 { AP_BT_64K, AP_BT_128K, AP_BT_256K};
 
-/* PCM ÈıÖÖÄ£Ê½ÏÂ±ÈÌØÂÊÅäÖÃ*/
+/* PCM ä¸‰ç§æ¨¡å¼ä¸‹æ¯”ç‰¹ç‡é…ç½®*/
 const ap_bitrate_e bitrate_ap_pcm[3] =
 { AP_BT_64K, AP_BT_128K, AP_BT_256K};
 
-/* MP2 ÈıÖÖÄ£Ê½ÏÂ±ÈÌØÂÊÅäÖÃ*/
+/* MP2 ä¸‰ç§æ¨¡å¼ä¸‹æ¯”ç‰¹ç‡é…ç½®*/
 const ap_bitrate_e bitrate_ap_mp2[3] =
 { AP_BT_64K, AP_BT_128K, AP_BT_256K };
 
-/* ¸÷±ÈÌØÂÊ¶ÔÓ¦µÄÃ¿ÃëËùÂ¼µÄÉÈÇøÊı32kbps, 64kbps, 128kbps, 192kbps, 256kbps, 384kbps */
+/* å„æ¯”ç‰¹ç‡å¯¹åº”çš„æ¯ç§’æ‰€å½•çš„æ‰‡åŒºæ•°32kbps, 64kbps, 128kbps, 192kbps, 256kbps, 384kbps */
 const uint8 rec_bitrate_sector_ratio[] =
 { 8, 16, 32, 48, 64, 96 };
 
 /*
  ********************************************************************************
- * Description : È·¶¨Â¼ÒôµÄ±ÈÌØÂÊ¼°Í¨µÀÊı
+ * Description : ç¡®å®šå½•éŸ³çš„æ¯”ç‰¹ç‡åŠé€šé“æ•°
  *
  * Arguments   :  NULL
  *
  * Returns     :  NULL
  *
- * Notes       :  ¸ù¾İ²Ëµ¥Ñ¡ÔñµÄÂ¼ÒôÄ£Ê½( ³¤Ê±, ÆÕÍ¨, ÓÅÖÊ)  ÒÔ¼°
- *                   ¾ßÌåµÄÂ¼Òô¸ñÊ½( ADPCM,  PCM,  MP2) ,  ¾ö¶¨Â¼Òô²ÎÊı
+ * Notes       :  æ ¹æ®èœå•é€‰æ‹©çš„å½•éŸ³æ¨¡å¼( é•¿æ—¶, æ™®é€š, ä¼˜è´¨)  ä»¥åŠ
+ *                   å…·ä½“çš„å½•éŸ³æ ¼å¼( ADPCM,  PCM,  MP2) ,  å†³å®šå½•éŸ³å‚æ•°
  *
- * ºóĞø¸ù¾İIC  Ö§³Ö¼°·½°¸¾ßÌåĞèÇó½øĞĞµ÷Õû
+ * åç»­æ ¹æ®IC  æ”¯æŒåŠæ–¹æ¡ˆå…·ä½“éœ€æ±‚è¿›è¡Œè°ƒæ•´
  ********************************************************************************
  */
 void confirm_rec_param(void)
@@ -125,7 +125,7 @@ void confirm_rec_param(void)
     }
     else
     {
-        //mp2 64k±ÈÌØÂÊÖ»ÓĞµ¥ÉùµÀ
+        //mp2 64kæ¯”ç‰¹ç‡åªæœ‰å•å£°é“
         if ((g_record_vars.rec_type == RECORD_FILE_TYPE_MP2) && (rec_bitrate == AP_BT_64K))
         {
             rec_channel = SINGLE_CH;
@@ -139,16 +139,16 @@ void confirm_rec_param(void)
 
 /*
  ********************************************************************************
- * Description : Éú³ÉĞÂµÄÂ¼ÒôÎÄ¼şÃû
+ * Description : ç”Ÿæˆæ–°çš„å½•éŸ³æ–‡ä»¶å
  *
  * Arguments   : NULL
  *
- * Returns     : TRUE, ³É¹¦
- FALSE, ±àºÅ01~99 ÎÄ¼ş¶¼´æÔÚ
- È«¾Ö±äÁ¿
+ * Returns     : TRUE, æˆåŠŸ
+ FALSE, ç¼–å·01~99 æ–‡ä»¶éƒ½å­˜åœ¨
+ å…¨å±€å˜é‡
  g_record_vars.location
  g_record_vars.wav_num
- g_file_name_time[], ÎÄ¼şÃû,ÎÄ¼şÊ±¼ä×Ö·û´®
+ g_file_name_time[], æ–‡ä»¶å,æ–‡ä»¶æ—¶é—´å­—ç¬¦ä¸²
  *
  * Notes       :
  *
@@ -184,14 +184,14 @@ BOOL gen_filename(void)
 
 /*
  ********************************************************************************
- * Description : ·ÖÎöÊ£Óà¿Õ¼ä,¼ÆËã¿ÉÂ¼ÒôÊ±¼ä
+ * Description : åˆ†æå‰©ä½™ç©ºé—´,è®¡ç®—å¯å½•éŸ³æ—¶é—´
  *
  * Arguments   :  NULL
  *
  * Returns     :  NULL
  *
- * Notes       :  ¸ù¾İÊ£Óà¿Õ¼äg_free_space  ( ÒÔÉÈÇøÎªµ¥Î») , ¼ÆËã¿ÉÂ¼
- *                Ê±¼ä
+ * Notes       :  æ ¹æ®å‰©ä½™ç©ºé—´g_free_space  ( ä»¥æ‰‡åŒºä¸ºå•ä½) , è®¡ç®—å¯å½•
+ *                æ—¶é—´
  ********************************************************************************
  */
 void parse_total_time(void)
@@ -202,7 +202,7 @@ void parse_total_time(void)
     {
         g_free_space = (ulong) FS_GetSpace(FS_GET_SPACE_FREE);
     }
-    //NOR FLASHÖ»Â¼Ò»¸öÎÄ¼ş£¬²»ĞèÒª±£Áô¿Õ¼ä¡£
+    //NOR FLASHåªå½•ä¸€ä¸ªæ–‡ä»¶ï¼Œä¸éœ€è¦ä¿ç•™ç©ºé—´ã€‚
     if(g_record_vars.location.disk != 'M')
     {
         if (g_free_space > SPACE_LOW)
@@ -217,7 +217,7 @@ void parse_total_time(void)
         }
         if (RecSpare != 0xffffffff)
         {
-            /* ÓÃÅäÖÃµÄÈİÁ¿ */
+            /* ç”¨é…ç½®çš„å®¹é‡ */
             g_free_space = total_space_setting - total_space_used;
             if (g_free_space <= SPACE_LOW)
             {
@@ -243,7 +243,7 @@ void parse_total_time(void)
 
 uint8 change_device(void)
 {
-    /* NOR FLASH²»ÇĞ»»µ½ÆäËüÅÌ·û */
+    /* NOR FLASHä¸åˆ‡æ¢åˆ°å…¶å®ƒç›˜ç¬¦ */
     if(g_record_vars.location.disk == 'M')
     {
         g_record_vars.location.disk = 0;
@@ -279,11 +279,11 @@ void DeleteRecFile(void)
         {
             nameBuf[0] = 0x20;
             tmp = FS_GetName(nameBuf, sizeof(FileNameRecPlayLong) / 2 - 1);
-            /* »ñÈ¡³¤Ãû³É¹¦£¬¶Ô±ÈÎÄ¼ş³¤Ãû */
+            /* è·å–é•¿åæˆåŠŸï¼Œå¯¹æ¯”æ–‡ä»¶é•¿å */
             if((tmp) && \
                     (memcmp(FileNameRecPlayLong, nameBuf, sizeof(FileNameRecPlayLong) - 2) == 0))
                 break;
-            /* »ñÈ¡³¤ÃûÊ§°Ü£¬¶Ô±ÈÎÄ¼ş¶ÌÃû */
+            /* è·å–é•¿åå¤±è´¥ï¼Œå¯¹æ¯”æ–‡ä»¶çŸ­å */
             if((tmp == 0) && \
                     (memcmp(FileNameRecPlay, strFile, sizeof(FileNameRecPlay) - 1) == 0))
                 break;
@@ -299,7 +299,7 @@ void DeleteRecFile(void)
 
 uint8 init_rec_param(void)
 {
-    /* Â¼Òô×¼±¸¹ı³Ì*/
+    /* å½•éŸ³å‡†å¤‡è¿‡ç¨‹*/
     uint8 result;
 
     if (g_record_vars.rec_type == RECORD_FILE_TYPE_MP2)
@@ -383,13 +383,13 @@ continue_init:
 }
 /*
  ********************************************************************************
- * Description : »ñÈ¡µ±Ç°µÄÂ¼ÒôÔ´,²¢¼ÇÂ¼ÔÚg_resource.inputÖĞ.
+ * Description : è·å–å½“å‰çš„å½•éŸ³æº,å¹¶è®°å½•åœ¨g_resource.inputä¸­.
  *
  * Arguments   :
  *
  * Returns     :
  *
- * Notes       :ÔÚµ÷ÓÃMC_SETRESOURCEÖ®Ç°,µ÷ÓÃ´Ëº¯Êı!
+ * Notes       :åœ¨è°ƒç”¨MC_SETRESOURCEä¹‹å‰,è°ƒç”¨æ­¤å‡½æ•°!
  *
  ********************************************************************************
  */
@@ -424,13 +424,13 @@ void get_rec_source(void)
 
 /*
  ********************************************************************************
- * Description :    ×¼±¸¿ªÊ¼WAV¸ñÊ½Â¼Òô
+ * Description :    å‡†å¤‡å¼€å§‹WAVæ ¼å¼å½•éŸ³
  *
  * Arguments   :  NULL
  *
  * Returns     :   success/fail
  *
- * Notes       :   Ö÷ÒªÊÇµ÷ÓÃbasal½Ó¿Úº¯Êı·¢ÃüÁî
+ * Notes       :   ä¸»è¦æ˜¯è°ƒç”¨basalæ¥å£å‡½æ•°å‘å‘½ä»¤
  *
  ********************************************************************************
  */
@@ -438,7 +438,7 @@ uint8 StartWAVRecord(void)
 {
     uint8 result;
 
-    //³õÊ¼»¯codec ±äÁ¿,  ´«²Î2   ±êÊ¶Â¼Òô¸ñÊ½, ĞèºÍcodec  ¶¨ÒåÆ¥Åä
+    //åˆå§‹åŒ–codec å˜é‡,  ä¼ å‚2   æ ‡è¯†å½•éŸ³æ ¼å¼, éœ€å’Œcodec  å®šä¹‰åŒ¹é…
     result = recSendCommand(MC_OPEN, 2);
     recSendCommand(MC_RECODEMODE, (void *) g_record_vars.rec_encode);
     recSendCommand(MC_SET_RECORD_DELAY, (void *) g_record_vars.rec_DelayTime);
@@ -458,20 +458,20 @@ uint8 StartWAVRecord(void)
     Rec_format.bit_rate[2] = (currentBitrate[2]);
     recSendCommand(MC_SETAUDIOFMT, (void *) &Rec_format);
 
-    /* ´´½¨Â¼ÒôÎÄ¼ş*/
+    /* åˆ›å»ºå½•éŸ³æ–‡ä»¶*/
     result = recSendCommand(MC_LOAD, (void *) g_record_vars.location.filename);
     return result;
 }
 
 /*
  ********************************************************************************
- * Description :    ×¼±¸¿ªÊ¼MP2   ¸ñÊ½Â¼Òô
+ * Description :    å‡†å¤‡å¼€å§‹MP2   æ ¼å¼å½•éŸ³
  *
  * Arguments   :  NULL
  *
  * Returns     :   success/fail
  *
- * Notes       :   Ö÷ÒªÊÇµ÷ÓÃbasal½Ó¿Úº¯Êı·¢ÃüÁî
+ * Notes       :   ä¸»è¦æ˜¯è°ƒç”¨basalæ¥å£å‡½æ•°å‘å‘½ä»¤
  *
  ********************************************************************************
  */
@@ -508,7 +508,7 @@ uint8 StartMP2Record(void)
     Rec_format.bit_rate[2] = (currentBitrate[2]);
     recSendCommand(MC_SETAUDIOFMT, (void *) &Rec_format);
 
-    /* ´´½¨Â¼ÒôÎÄ¼ş*/
+    /* åˆ›å»ºå½•éŸ³æ–‡ä»¶*/
     result = recSendCommand(MC_LOAD, (void *) g_record_vars.location.filename);
 
     return result;
@@ -516,33 +516,33 @@ uint8 StartMP2Record(void)
 
 /*
  ********************************************************************************
- * Description : ¸ù¾İËùÅäÖÃµÄÂ¼Òô·½Ê½£¬ÎªGet_Space×ö×¼±¸
+ * Description : æ ¹æ®æ‰€é…ç½®çš„å½•éŸ³æ–¹å¼ï¼Œä¸ºGet_Spaceåšå‡†å¤‡
  *
  * Arguments   : NULL
  *
  * Returns     : NULL
  *
- * Notes       : ÈçÅäÖÃ×î³¤Â¼ÒôÊ±¼äÎª0£¬ Ôò±íÊ¾Ê¹ÓÃÊµ¼Ê´ÅÅÌÈİÁ¿Â¼Òô
- *               ·ñÔò£¬±íÊ¾×î³¤Â¼ÒôÊ±¼äÎªËùÉèÖÃµÄĞ¡Ê±Êı
- *               ÉèÖÃºÃÏµÍ³±äÁ¿£¬ ÎÄ¼şÏµÍ³FS_GetSpace½Ó¿Ú·µ»ØÈçÏÂ
- * Èç¹û´ÅÅÌÊµ¼ÊÈİÁ¿´óÓÚËùÉèÖÃÈİÁ¿£¬Ôò·µ»ØÉèÖÃµÄÈİÁ¿
- * Èç¹û´ÅÅÌÊµ¼ÊÈİÁ¿Ğ¡ÓÚËùÉèÖÃÈİÁ¿£¬Ôò·µ»Ø´ÅÅÌÊµ¼ÊÈİÁ¿
+ * Notes       : å¦‚é…ç½®æœ€é•¿å½•éŸ³æ—¶é—´ä¸º0ï¼Œ åˆ™è¡¨ç¤ºä½¿ç”¨å®é™…ç£ç›˜å®¹é‡å½•éŸ³
+ *               å¦åˆ™ï¼Œè¡¨ç¤ºæœ€é•¿å½•éŸ³æ—¶é—´ä¸ºæ‰€è®¾ç½®çš„å°æ—¶æ•°
+ *               è®¾ç½®å¥½ç³»ç»Ÿå˜é‡ï¼Œ æ–‡ä»¶ç³»ç»ŸFS_GetSpaceæ¥å£è¿”å›å¦‚ä¸‹
+ * å¦‚æœç£ç›˜å®é™…å®¹é‡å¤§äºæ‰€è®¾ç½®å®¹é‡ï¼Œåˆ™è¿”å›è®¾ç½®çš„å®¹é‡
+ * å¦‚æœç£ç›˜å®é™…å®¹é‡å°äºæ‰€è®¾ç½®å®¹é‡ï¼Œåˆ™è¿”å›ç£ç›˜å®é™…å®¹é‡
  ********************************************************************************
  */
 void near prepare_GetSpace(void)
 {
     uint32 total_sec_setting = 0;
-    //ÕâÀïÇ¿ÖÆ½«ÌÀÄ·Ã¨Â¼ÒôÂ¼ÖÆµ½¿¨»òuÅÌµÄÊ±¼äÉèÖÃÎª1Ğ¡Ê±
+    //è¿™é‡Œå¼ºåˆ¶å°†æ±¤å§†çŒ«å½•éŸ³å½•åˆ¶åˆ°å¡æˆ–uç›˜çš„æ—¶é—´è®¾ç½®ä¸º1å°æ—¶
     uint8 card_rec_time = 1;
     //    if(g_comval.RecordTime_max == 0)
     if(card_rec_time == 0)
     {
-        //ÓÃÊµ¼ÊÈİÁ¿
+        //ç”¨å®é™…å®¹é‡
         RecSpare = 0xffffffff;
     }
     else
     {
-        //ÓÃÉèÖÃÈİÁ¿
+        //ç”¨è®¾ç½®å®¹é‡
         //        total_sec_setting = (uint32)g_comval.RecordTime_max * 3600;
         total_sec_setting = (uint32)card_rec_time * 3600;
         RecSpare = (rec_bitrate_sector_ratio[(uint8)rec_bitrate]) * total_sec_setting;
@@ -552,12 +552,12 @@ void near prepare_GetSpace(void)
 }
 /*
  ********************************************************************************
- * Description : ÉèÖÃÂ¼ÒôÈ±Ê¡Ä¿Â¼²¢¼ì²éÊ£ÓàÈİÁ¿
+ * Description : è®¾ç½®å½•éŸ³ç¼ºçœç›®å½•å¹¶æ£€æŸ¥å‰©ä½™å®¹é‡
  *
  * Arguments   : NULL
  *
- * Returns     : true -- Â¼ÒôÈ±Ê¡Ä¿Â¼ÉèÖÃ³É¹¦, Ê£ÓàÈİÁ¿×ã¹»
- *                   false -- Â¼ÒôÈ±Ê¡Ä¿Â¼ÉèÖÃÊ§°Ü»òÈİÁ¿ÒÑÂú
+ * Returns     : true -- å½•éŸ³ç¼ºçœç›®å½•è®¾ç½®æˆåŠŸ, å‰©ä½™å®¹é‡è¶³å¤Ÿ
+ *                   false -- å½•éŸ³ç¼ºçœç›®å½•è®¾ç½®å¤±è´¥æˆ–å®¹é‡å·²æ»¡
  * Notes       :
  *
  ********************************************************************************
@@ -609,7 +609,7 @@ BOOL CheckStoreOK(void)
         }
         if ((RecSpare != 0xffffffff) && (g_free_space < total_space_setting))
         {
-            /* ÓÃÅäÖÃµÄÈİÁ¿,µ«´ÅÅÌÊµ¼ÊÈİÁ¿Ğ¡ÓÚÅäÖÃÈİÁ¿ */
+            /* ç”¨é…ç½®çš„å®¹é‡,ä½†ç£ç›˜å®é™…å®¹é‡å°äºé…ç½®å®¹é‡ */
             total_space_setting = g_free_space;
         }
     }

@@ -3,7 +3,7 @@
 #include "ap_common.h"
 
 #pragma name(FUNCTION)
-//´ÓVRAMÖĞ¶Á³öµÄEQ,SRS²ÎÊı±í£¬Í¨¹ıEQ¹¤¾ßÉèÖÃ
+//ä»VRAMä¸­è¯»å‡ºçš„EQ,SRSå‚æ•°è¡¨ï¼Œé€šè¿‡EQå·¥å…·è®¾ç½®
 EQ_VM_t g_eq_para;
 const uint8 EQtemp[eq_max][10] =
 {
@@ -19,16 +19,16 @@ const uint8 EQtemp[eq_max][10] =
 
 void volume_callback(uint16 Vol)
 {
-    //ÊµÊ±¸Ä±äÒôÁ¿µÄÖµ
+    //å®æ—¶æ”¹å˜éŸ³é‡çš„å€¼
     //   g_comval.volume = (uint8) Vol * SOFTVOL_MAX / g_comval.VolumeMax;
     OutPutVolume(g_comval.volume);
 }
 
 /*===========================================
  functions: OutPutVolume(int vol)
- input:    int vol: ÒªÊä³öµÄÒôÁ¿
+ input:    int vol: è¦è¾“å‡ºçš„éŸ³é‡
  output:  void
- ¹¦ÄÜ£º °ÑÒôÁ¿ÖµËÍµ½IO¿Ú£¬
+ åŠŸèƒ½ï¼š æŠŠéŸ³é‡å€¼é€åˆ°IOå£ï¼Œ
  ============================================*/
 void OutPutVolume(uint16 vol)
 {
@@ -40,7 +40,7 @@ void OutPutVolume(uint16 vol)
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -57,18 +57,18 @@ uint8 callback_eq(eq_t eq_type, uint8 *buf)
 
         if (buf == NULL)
         {
-            //´ÓVRAM¶Á£¬±£´æµÄ²ÎÊı¼°Ê±ÉúĞ§
+            //ä»VRAMè¯»ï¼Œä¿å­˜çš„å‚æ•°åŠæ—¶ç”Ÿæ•ˆ
             VMRead(&g_eq_para, VM_PCSET_EQ, sizeof(EQ_VM_t));
 
             if (g_eq_para.magic != EQ_VRAM_MAGIC)
             {
-                //Ê¹ÓÃ´úÂëÄ¬ÈÏEQ±í
+                //ä½¿ç”¨ä»£ç é»˜è®¤EQè¡¨
                 memcpy(g_decControlInfor.EQVal, (void *) EQtemp[(uint8) eq_type],
                        sizeof(g_decControlInfor.EQVal));
             }
             else
             {
-                //Ê¹ÓÃ¹¤¾ßÉèÖÃEQ±í
+                //ä½¿ç”¨å·¥å…·è®¾ç½®EQè¡¨
                 memcpy(g_decControlInfor.EQVal, (void *) &g_eq_para.left_eq_para[(uint8) ONE_EQPARA_BYTE * eq_type],
                        ONE_EQPARA_BYTE);
             }
@@ -87,13 +87,13 @@ uint8 callback_eq(eq_t eq_type, uint8 *buf)
         {
             if (g_eq_para.magic != EQ_VRAM_MAGIC)
             {
-                //Ê¹ÓÃ´úÂëÄ¬ÈÏEQ±í
+                //ä½¿ç”¨ä»£ç é»˜è®¤EQè¡¨
                 memcpy(g_decControlInfor.EQVal, (void *) EQtemp[(uint8) eq_type],
                        sizeof(g_decControlInfor.EQVal));
             }
             else
             {
-                //Ê¹ÓÃ¹¤¾ßÉèÖÃEQ±í
+                //ä½¿ç”¨å·¥å…·è®¾ç½®EQè¡¨
                 memcpy(g_decControlInfor.EQVal, (void *) &g_eq_para.right_eq_para[(uint8) ONE_EQPARA_BYTE * eq_type],
                        ONE_EQPARA_BYTE);
             }
@@ -115,7 +115,7 @@ uint8 callback_eq(eq_t eq_type, uint8 *buf)
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -131,7 +131,7 @@ uint8 EQMode_callback(void)
  ********************************************************************************
  *             void deal_eq_msg(void)
  *
- * Description : ´¦ÀíEQÄ£Ê½µ÷½ÚÏûÏ¢
+ * Description : å¤„ç†EQæ¨¡å¼è°ƒèŠ‚æ¶ˆæ¯
  *
  *
  * Arguments   :
@@ -187,12 +187,12 @@ uint8 deal_eq_msg(uint8 key)
 }
 #if 0
 /********************************************************************************
- * Description : ´¦ÀíÒôÁ¿¼ü
+ * Description : å¤„ç†éŸ³é‡é”®
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/

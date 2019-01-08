@@ -1,7 +1,7 @@
 #include "ap_radio.h"
 #include "actos.h"
 #include "ap_common.h"
-#include "decC.h"       //ÉèÖÃEQÊ±Ê¹ÓÃ
+#include "decC.h"       //è®¾ç½®EQæ—¶ä½¿ç”¨
 #pragma name(FM_EFFECT)
 
 const uint8 EQtemp[8][10] =
@@ -33,17 +33,17 @@ void set_eq_data(eq_t eq_type, void *dat)
         g_decControlInfor.EQFlag = 0x67;
         if (dat == NULL)
         {
-            //´ÓVRAM¶Á£¬±£´æµÄ²ÎÊı¼°Ê±ÉúĞ§
+            //ä»VRAMè¯»ï¼Œä¿å­˜çš„å‚æ•°åŠæ—¶ç”Ÿæ•ˆ
             VMRead(&g_eq_para, VM_PCSET_EQ, sizeof(EQ_VM_t));
             if (g_eq_para.magic != EQ_VRAM_MAGIC)
             {
-                //Ê¹ÓÃ´úÂëÄ¬ÈÏEQ±í
+                //ä½¿ç”¨ä»£ç é»˜è®¤EQè¡¨
                 memcpy(g_decControlInfor.EQVal, (void *) EQtemp[(uint8) g_comval.eq_type],
                        sizeof(g_decControlInfor.EQVal));
             }
             else
             {
-                //Ê¹ÓÃ¹¤¾ßÉèÖÃEQ±í
+                //ä½¿ç”¨å·¥å…·è®¾ç½®EQè¡¨
                 memcpy(g_decControlInfor.EQVal, (void *) &g_eq_para.left_eq_para[(uint8) ONE_EQPARA_BYTE
                         * g_comval.eq_type], ONE_EQPARA_BYTE);
             }
@@ -64,13 +64,13 @@ void set_eq_data(eq_t eq_type, void *dat)
         {
             if (g_eq_para.magic != EQ_VRAM_MAGIC)
             {
-                //Ê¹ÓÃ´úÂëÄ¬ÈÏEQ±í
+                //ä½¿ç”¨ä»£ç é»˜è®¤EQè¡¨
                 memcpy(g_decControlInfor.EQVal, (void *) EQtemp[(uint8) g_comval.eq_type],
                        sizeof(g_decControlInfor.EQVal));
             }
             else
             {
-                //Ê¹ÓÃ¹¤¾ßÉèÖÃEQ±í
+                //ä½¿ç”¨å·¥å…·è®¾ç½®EQè¡¨
                 memcpy(g_decControlInfor.EQVal, (void *) &g_eq_para.right_eq_para[(uint8) ONE_EQPARA_BYTE
                         * g_comval.eq_type], ONE_EQPARA_BYTE);
             }
@@ -92,7 +92,7 @@ void set_eq_data(eq_t eq_type, void *dat)
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -108,7 +108,7 @@ uint8 EQMode_callback(eq_t eq_type)
  ********************************************************************************
  *             void deal_eq_msg(void)
  *
- * Description : ´¦ÀíEQÄ£Ê½µ÷½ÚÏûÏ¢
+ * Description : å¤„ç†EQæ¨¡å¼è°ƒèŠ‚æ¶ˆæ¯
  *
  *
  * Arguments   :
@@ -178,7 +178,7 @@ void init_fmin_channel(void)
     set_eq_data(g_comval.eq_type, NULL);
 
     decinitAnalog(AD_FM); //demo layout error
-    //TM_DelayMS(50); //ÑÓÊ±£¬·ÀÖ¹PAPA Éù
+    //TM_DelayMS(50); //å»¶æ—¶ï¼Œé˜²æ­¢PAPA å£°
     decstartAnalog(AD_FM);
     SetAINGain(7, 0 );
     volume_callback(g_comval.volume);
@@ -190,9 +190,9 @@ void init_fmin_channel(void)
  ********************************************************************************
  *             void    volume_callback(uint16 Vol)
  *
- * Description : ÒôÁ¿ÉèÖÃµÄCALLBACKº¯Êı
+ * Description : éŸ³é‡è®¾ç½®çš„CALLBACKå‡½æ•°
  *
- * Arguments   :    µ±Ç°ĞèÉèÖÃµÄÒôÁ¿Öµ
+ * Arguments   :    å½“å‰éœ€è®¾ç½®çš„éŸ³é‡å€¼
  *
  * Returns     :
  *
@@ -202,7 +202,7 @@ void init_fmin_channel(void)
  */
 void volume_callback(uint16 Vol)
 {
-    //ÊµÊ±¸Ä±äÒôÁ¿µÄÖµ
+    //å®æ—¶æ”¹å˜éŸ³é‡çš„å€¼
     g_comval.vol_display = (uint8) Vol;
     if (g_comval.VolumeMax != 0)
     {

@@ -12,12 +12,12 @@ bool key_init(uint8 api_no)
     SFR_BANK = BANK_PMU;
     PMUADC_CTL |= 0xa0; //enable LRADC1,ADC FREQUENCY 128Hz
     _nop_();
-    delay(); //enable LRADC1ºóĞèÒªµÈ´ı×î³¤10ms²ÅÄÜ¶Á³öÕıÈ·µÄÊı¾İ£¬·ñÔò¿ÉÄÜÊÇÈ«0
-    SYSTEM_CTL &= 0x7f; //ÉèÖÃplay°´¼üÊ±¼ä=2S
+    delay(); //enable LRADC1åéœ€è¦ç­‰å¾…æœ€é•¿10msæ‰èƒ½è¯»å‡ºæ­£ç¡®çš„æ•°æ®ï¼Œå¦åˆ™å¯èƒ½æ˜¯å…¨0
+    SYSTEM_CTL &= 0x7f; //è®¾ç½®playæŒ‰é”®æ—¶é—´=2S
 
 	adjust_key_sequence();
 	
-    TM_SetTimer((uint32) key_scan, 2); //ÉèÖÃRTCÖĞ¶Ïº¯ÊıÈë¿Ú
+    TM_SetTimer((uint32) key_scan, 2); //è®¾ç½®RTCä¸­æ–­å‡½æ•°å…¥å£
     //   TM_SetClock((int) (uint16) key_scan, 1);
 
     //ctc set
@@ -26,7 +26,7 @@ bool key_init(uint8 api_no)
     CTCCNTL = 0x1a; //0x52;
     CTCCTL = 0xc0; //0xc8;       /256  hosc
 
-    IRQ_Intercept((uint32) ctc_isr, IRQ_CTC); //ÉèÖÃCTCÖĞ¶Ïº¯ÊıÈë¿Ú
+    IRQ_Intercept((uint32) ctc_isr, IRQ_CTC); //è®¾ç½®CTCä¸­æ–­å‡½æ•°å…¥å£
     CTCCTL |= 1 << 7; //enable ctc
     IE0 |= 1 << 1; //enable IE.1
 
@@ -53,7 +53,7 @@ void delay(void)
 void key_exit(uint8 api_no)
 {
     api_no = api_no;
-    TM_KillTimer(0x02); //¹Ø±ÕRTC
+    TM_KillTimer(0x02); //å…³é—­RTC
     IE0 &= ~(1 << 1); //disable IE.1
     IRQ_Release((uint16) ctc_isr, IRQ_CTC);
     IRQ_Release((uint16) IR_Interrupt, IRQ_UART);
@@ -112,7 +112,7 @@ void ADC_DAC_init(void)
     SFR_BANK = sfr_temp;
 
 }
-//³õÊ¼ºìÍâÒ£¿ØÆ÷°´¼üÏà¹ØµÄ¼Ä´æÆ÷
+//åˆå§‹çº¢å¤–é¥æ§å™¨æŒ‰é”®ç›¸å…³çš„å¯„å­˜å™¨
 void init_ir(void)
 {
 #if 0
@@ -125,8 +125,8 @@ void init_ir(void)
     CLKENCTL1 |= 0x20;
 
     SFR_BANK = BANK_GPIO;
-    //Êı×ÖºìÍâÖ¸Íâ½ÓºìÍâÍ·
-    //Ä£ÄâºìÍâÖ¸Íâ½Ó¶ş¼«¹Ü
+    //æ•°å­—çº¢å¤–æŒ‡å¤–æ¥çº¢å¤–å¤´
+    //æ¨¡æ‹Ÿçº¢å¤–æŒ‡å¤–æ¥äºŒæç®¡
     //set GPIO_c5 as IR_RX
     GPIOCOUTEN &= 0xDF;
     GPIOCINEN &= 0xDF;
@@ -140,7 +140,7 @@ void init_ir(void)
     IR_HUC = 0xbf; //IRC high user code
     IE0 |= 0x10; //enable IRC interrupt
     SFR_BANK = sfr_bak;
-    //×¢²áIRÖĞ¶Ï
+    //æ³¨å†ŒIRä¸­æ–­
     IRQ_Intercept((uint32) IR_Interrupt, IRQ_UART);
 #endif
 }
@@ -157,15 +157,15 @@ void init_bat_gpio(void)
     uint8 sfr_bak;
     sfr_bak = SFR_BANK;
     SFR_BANK = BANK_GPIO;
-    //Ê¹ÄÜbat¼ì²â,½«GPIO A6ÇĞ»»µ½LCD_seg2Ä£Ê½
+    //ä½¿èƒ½batæ£€æµ‹,å°†GPIO A6åˆ‡æ¢åˆ°LCD_seg2æ¨¡å¼
     BAT_CHECK_GPIO_INPUT &= ~ (1 << BAT_CHECK_GPIO_NUM);
     MFP_CTL0 &= 0xEF;
     MFP_CTL0 |= 0x08;
-    //Ê¹ÄÜred light¿ª¹ØGPIO ¿Ú
+    //ä½¿èƒ½red lightå¼€å…³GPIO å£
     RED_LIGHT_GPIO_OUTPUT |= (1 << RED_LIGHT_GPIO_NUM);
     RED_LIGHT_GPIO_DAT &= ~(1 << RED_LIGHT_GPIO_NUM);
 #if 0
-    //Ê¹ÄÜblue light¿ª¹ØGPIO ¿Ú
+    //ä½¿èƒ½blue lightå¼€å…³GPIO å£
     BLUE_LIGHT_GPIO_OUTPUT |= (1 << BLUE_LIGHT_GPIO_NUM);
     BLUE_LIGHT_GPIO_DAT &= ~(1 << BLUE_LIGHT_GPIO_NUM);
 #endif
@@ -224,8 +224,8 @@ void drv_switch_pilot_light(uint8 api_no, uint8 light_type, uint8 flag)
     }
 #endif
 }
-//½«GPIOC6ÇĞ»»µ½AVCC1Ä£Ê½£¬ÒÔ±ã¸ømic¶Ë¹©µç
-//½«GPIOC7ÇĞ»»µ½LRADC5,ÓÃÓÚ×÷ÎªLRADC°´¼üÊ¹ÓÃ
+//å°†GPIOC6åˆ‡æ¢åˆ°AVCC1æ¨¡å¼ï¼Œä»¥ä¾¿ç»™micç«¯ä¾›ç”µ
+//å°†GPIOC7åˆ‡æ¢åˆ°LRADC5,ç”¨äºä½œä¸ºLRADCæŒ‰é”®ä½¿ç”¨
 void init_ADSelect0(void)
 {
     uint8 sfr_bak;

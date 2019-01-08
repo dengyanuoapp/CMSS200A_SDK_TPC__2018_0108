@@ -24,11 +24,11 @@
 #define MSG_LOW_POWER            0x82
 #define Msg_RtcAlarm             0x83
 
-#define MSG_SD_IN                0xb0   /*�忨״̬*/
-#define MSG_SD_OUT               0xb1   /*����״̬*/
+#define MSG_SD_IN                0xb0   /*插卡状态*/
+#define MSG_SD_OUT               0xb1   /*拨卡状态*/
 
-#define MSG_UH_IN				 0xc0	/*U�̲���*/
-#define MSG_UH_OUT				 0xc1	/*U�̰γ�*/
+#define MSG_UH_IN				 0xc0	/*U盘插入*/
+#define MSG_UH_OUT				 0xc1	/*U盘拔出*/
 
 //#define APINO_MSG_GetSysMsg        0x0000+API_MSG_Base
 //#define APINO_MSG_PutSysMsg        0x0001+API_MSG_Base

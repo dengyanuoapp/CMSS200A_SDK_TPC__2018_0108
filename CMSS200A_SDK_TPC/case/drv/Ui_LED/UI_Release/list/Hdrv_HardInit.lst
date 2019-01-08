@@ -95,13 +95,13 @@ stmt  level    source
    82   1          sfr_bak = SFR_BANK;
    83   1          //set BANK_CMU_RMU
    84   1          SFR_BANK = BANK_CMU_RMU;
-   85   1          //enable LCD & SEG LCD clock,Ä£¿éÊ±ÖÓÊ¹ÄÜ
+   85   1          //enable LCD & SEG LCD clock,æ¨¡å—æ—¶é’Ÿä½¿èƒ½
    86   1          CLKENCTL2 |= 0x10;
-   87   1          // touch key controller reset,Ä£¿éreset
+   87   1          // touch key controller reset,æ¨¡å—reset
    88   1          MRCR3 &= 0xFD;
    89   1          MRCR3 |= 0x02;
    90   1      
-   91   1          //select LED &SEG LCD clock,Ä£¿éÊ±ÖÓÉèÖÃ
+   91   1          //select LED &SEG LCD clock,æ¨¡å—æ—¶é’Ÿè®¾ç½®
    92   1          LED_SEGLCDCLKCTL &= 0xF0;
    93   1          LED_SEGLCDCLKCTL |= 0x03;
    94   1          SFR_BANK = sfr_bak;
@@ -111,7 +111,7 @@ stmt  level    source
    98          ///*    void Hdrv_HardInit(void);
    99          //** FUNCTION:     Hdrv_HardInit
   100          //**
-  101          //** Description:  ³õÊ¼»¯LCMµÄÓ²¼şÉè±¸
+  101          //** Description:  åˆå§‹åŒ–LCMçš„ç¡¬ä»¶è®¾å¤‡
   102          //**
   103          //**  input
   104          //**     none
@@ -129,23 +129,23 @@ stmt  level    source
                    //select lcd segment and com
                    Hdrv_SetMfpToEmif();
                    SFR_BANK = BANK_LCD;
-                   //lcd_ledÄ£Ê½Ñ¡Ôñ
+                   //lcd_ledæ¨¡å¼é€‰æ‹©
                    LCD_MODE = LCD_MODE & (~0x7) | 0x07;
-                   //´ò¿ªsegment
+                   //æ‰“å¼€segment
                    LCD_MODE |= 0x80;
-                   //Êä³öÊ¹ÓÃ
+                   //è¾“å‡ºä½¿ç”¨
 C251 COMPILER V4.55,  Hdrv_HardInit                                                        23/07/16  20:31:14  PAGE 3   
 
                    LCD_MODE |= 0x10;
                    SFR_BANK = BANK_GPIO;
                #if 1
-                   //Ê¹ÓÃÊı×Ö²¿·ÖµãLEDµÆ
-                   //½µµÍÇı¶¯¹¦ÄÜ£¬Ò²ÊÇ¾Í¸Ä±äIO¿ÚµÄÇı¶¯µÈ¼¶
+                   //ä½¿ç”¨æ•°å­—éƒ¨åˆ†ç‚¹LEDç¯
+                   //é™ä½é©±åŠ¨åŠŸèƒ½ï¼Œä¹Ÿæ˜¯å°±æ”¹å˜IOå£çš„é©±åŠ¨ç­‰çº§
                    //    PADDRV0=0x0;
                    //    PADDRV1=0x0;
                    LED_SEG_BIAS_EN &= 0xF7;
                #else
-                   //Ê¹ÓÃºãÁ÷Ô´µãÁÁLEDµÆ
+                   //ä½¿ç”¨æ’æµæºç‚¹äº®LEDç¯
                    LED_SEG_BIAS_EN &= 0xF8;
                    LED_SEG_BIAS_EN |= 0x0C;
                    LED_SEG_RC_EN = 0x7f;

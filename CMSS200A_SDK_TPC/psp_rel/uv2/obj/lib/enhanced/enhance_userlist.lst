@@ -81,7 +81,7 @@ stmt  level    source
    66   1          {
    67   2              if (!FS_SetCurDir(location->ClusterNo))
    68   2              {
-   69   3                  fselError = FSEL_ERR_SETDIR;                             //Ä¿Â¼²»´æÔÚ
+   69   3                  fselError = FSEL_ERR_SETDIR;                             //ç›®å½•ä¸å­˜åœ¨
    70   3                  return FALSE;
    71   3              }
    72   2              if (FALSE == FS_SetCurDirEntry(location->DirEntry))

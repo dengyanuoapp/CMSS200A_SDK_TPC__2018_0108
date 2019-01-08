@@ -8,19 +8,19 @@
 *      <author>       <time>             <version >           <desc>
 *       husanxi     2010-3-30 16:35          1.0             build this file
 *
-* Description:spi nor������صĺ궨��
+* Description:spi nor驱动相关的宏定义
 *
 ******************************************************************************/
 #ifndef __SNOR_H__
 #define __SNOR_H__
 
-//#define         BREC_START_SECTOR           0x01                    //Brec ���ĸ�sector��ʼ
-//#define         LFI_START_SECTOR            0x41                    //LFI ���ĸ�sector��ʼ
-#define         SPINOR_ERASE_UNITS          0x80                    //SPI norһ�β�����λ(������)
+//#define         BREC_START_SECTOR           0x01                    //Brec 从哪个sector开始
+//#define         LFI_START_SECTOR            0x41                    //LFI 从哪个sector开始
+#define         SPINOR_ERASE_UNITS          0x80                    //SPI nor一次擦除单位(扇区数)
 
-#define         VRAM_TOATL_USE_SCTRS        0x80                    //SPI Nor��Ϊʵ��Vram��ռ�õ���������,���һ��������ſռ�λͼ
-#define         SPINOR_VRAM_MAX_SCTRS       0x20                    //���д32������Vram����
-#define			VRAM_AJUST_BUFFER			0x4400					//����vram����ʱ����ʱ�ռ� 4000��8000
+#define         VRAM_TOATL_USE_SCTRS        0x80                    //SPI Nor上为实现Vram所占用的总扇区数,最后一个扇区存放空间位图
+#define         SPINOR_VRAM_MAX_SCTRS       0x20                    //最大写32个扇区Vram数据
+#define			VRAM_AJUST_BUFFER			0x4400					//整理vram数据时的临时空间 4000～8000
 
 
 #define		  NOR_TABLE_SECT			0x01

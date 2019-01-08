@@ -53,11 +53,11 @@
 
 #define AK211X_SUPPORT_WAV_ONLY
 
-BYTE far m_wavRecStatus;// = RECORDING_WAITING;      //µ±Ç°×´Ì¬
-handle far m_wavRecFileHandle;// = NULL;    //´ò¿ªÓïÒôÎÄ¼þµÄ¾ä±ú
-uint8 far m_wavRecOldTimerNum; //timer isr Ê¹ÓÃµÄtimerºÅÂë
-uint16 far m_wavRecOldDspIsr; //±£´æ¾ÉµÄhip isr
-uint16 far m_wavRecOldDMAIsr; //±£´æ¾ÉµÄADC isr
+BYTE far m_wavRecStatus;// = RECORDING_WAITING;      //å½“å‰çŠ¶æ€
+handle far m_wavRecFileHandle;// = NULL;    //æ‰“å¼€è¯­éŸ³æ–‡ä»¶çš„å¥æŸ„
+uint8 far m_wavRecOldTimerNum; //timer isr ä½¿ç”¨çš„timerå·ç 
+uint16 far m_wavRecOldDspIsr; //ä¿å­˜æ—§çš„hip isr
+uint16 far m_wavRecOldDMAIsr; //ä¿å­˜æ—§çš„ADC isr
 
 char far m_wavRecFileName[12];
 
@@ -93,11 +93,11 @@ void swappage(uint8 *dat)
 
 /*******************************************************************************
  * Function:       Wav2rProceed
- * Description:    wav Â¼Òô±àÂëÐ´ÈëÎÄ¼þ
- * Input£º
- * Output£º        0:Ã»ÓÐÐ´, 1:Ð´Ò»¸öÉÈÇø, 8:ÒÑÐ´ÁËWAVÍ·ÎÄ¼þ
- *                 -1:³ö´í,ÓÃwavrSendCommand(MC_GETSTATUS,mp3_rec_status_t *)»ñÈ¡ÏêÏ¸ÐÅÏ¢
- * Other£º         Ò»´ÎÐ´Ò»¸öÉÈÇø(512 bytes),
+ * Description:    wav å½•éŸ³ç¼–ç å†™å…¥æ–‡ä»¶
+ * Inputï¼š
+ * Outputï¼š        0:æ²¡æœ‰å†™, 1:å†™ä¸€ä¸ªæ‰‡åŒº, 8:å·²å†™äº†WAVå¤´æ–‡ä»¶
+ *                 -1:å‡ºé”™,ç”¨wavrSendCommand(MC_GETSTATUS,mp3_rec_status_t *)èŽ·å–è¯¦ç»†ä¿¡æ¯
+ * Otherï¼š         ä¸€æ¬¡å†™ä¸€ä¸ªæ‰‡åŒº(512 bytes),
  *******************************************************************************/
 #ifdef PC
 retWavrProceed_e srProceed(void)
@@ -109,7 +109,7 @@ retWavrProceed_e rProceed(void)
     uchar status;
     BOOL result;
     uint8 flag;
-    status = encGetBitstream();//²éÑ¯encµÄÊý¾Ý±àÂë
+    status = encGetBitstream();//æŸ¥è¯¢encçš„æ•°æ®ç¼–ç 
     if (WRITE_PAGE == status)
     {
 #ifdef ENABLE_PITCH
@@ -124,7 +124,7 @@ retWavrProceed_e rProceed(void)
         if(flag)
         {
             result = FS_FWrite((const char *) g_encWriteFilePara.WriteFileBuffAddr,
-                               (char)(g_encWriteFilePara.WriteFileCurSize >> ONE_PAGE_BITNUM),    //·çÏÕ£¬´Ó16Î»±ä8Î»
+                               (char)(g_encWriteFilePara.WriteFileCurSize >> ONE_PAGE_BITNUM),    //é£Žé™©ï¼Œä»Ž16ä½å˜8ä½
                                m_wavRecFileHandle);
             pitch_write_page++;
         }
@@ -134,7 +134,7 @@ retWavrProceed_e rProceed(void)
         }
 #else
         result = FS_FWrite((const char *) g_encWriteFilePara.WriteFileBuffAddr,
-                           (char)(g_encWriteFilePara.WriteFileCurSize >> ONE_PAGE_BITNUM),    //·çÏÕ£¬´Ó16Î»±ä8Î»
+                           (char)(g_encWriteFilePara.WriteFileCurSize >> ONE_PAGE_BITNUM),    //é£Žé™©ï¼Œä»Ž16ä½å˜8ä½
                            m_wavRecFileHandle);
 #endif
         if (result == 1)
@@ -156,12 +156,12 @@ retWavrProceed_e rProceed(void)
             }
             FS_FClose(m_wavRecFileHandle);
             m_wavRecStatus = RECORDING_DISK_ERROR;
-            //ÎÄ¼þÒÑ¹Ø±Õ
+            //æ–‡ä»¶å·²å…³é—­
             m_wavRecFileHandle = NULL;
             return WRITE_WRONG;
         }
     }
-    else if (status == 0x02)// ÊÇÎÄ¼þÍ·Ð´ÈëWAVÎÄ¼þ
+    else if (status == 0x02)// æ˜¯æ–‡ä»¶å¤´å†™å…¥WAVæ–‡ä»¶
     {
         encExit();
         IRQ_Release(m_wavRecOldDspIsr, IRQ_DSP);
@@ -220,7 +220,7 @@ retWavrProceed_e rProceed(void)
         //	}
         //	else
         //	{
-        //ÒÑ¾­³É¹¦¹Ø±ÕÎÄ¼þ
+        //å·²ç»æˆåŠŸå…³é—­æ–‡ä»¶
         //	   m_wavRecFileHandle = NULL;
         //	   m_wavRecStatus = RECORDING_STOP;
         //	   return WRITE_HEAD;
@@ -234,9 +234,9 @@ retWavrProceed_e rProceed(void)
 /*******************************************************************************
  * Function:       wavrSendCommand
  * Description:    wav encode modual entry
- * Input£º
- * Output£º
- * Other£º         // ·¢ËÍMC_STOPÖ®ºó,ÐèÒªµÈµ½wav2rProceed()·µ»Ø8²Å¿ÉÒÔ·¢ËÍMC_CLOSE
+ * Inputï¼š
+ * Outputï¼š
+ * Otherï¼š         // å‘é€MC_STOPä¹‹åŽ,éœ€è¦ç­‰åˆ°wav2rProceed()è¿”å›ž8æ‰å¯ä»¥å‘é€MC_CLOSE
  *******************************************************************************/
 #ifdef PC
 BOOL srSendCommand(BYTE cmd, BYTE music_type, void *param)
@@ -245,7 +245,7 @@ BOOL rSendCommand(BYTE cmd, BYTE music_type, void *param)
 #endif
 //BOOL srSendCommand(BYTE cmd, BYTE music_type, void* param)
 {
-    mp3_rec_status_t *wav_rec_status; // AP ²ã
+    mp3_rec_status_t *wav_rec_status; // AP å±‚
     time_t *pTime;
     BOOL result;
 
@@ -314,7 +314,7 @@ BOOL rSendCommand(BYTE cmd, BYTE music_type, void *param)
         }
         else
         {
-            // ¼ÌÐøÂ¼Òô
+            // ç»§ç»­å½•éŸ³
             if (m_wavRecStatus == RECORDING_PAUSE)
             {
                 encContinue();
@@ -453,10 +453,10 @@ void setRecordBufferClock(void)
 
 /*******************************************************************************
  * Function:       encode_initAudioFormat
- * Description:    ³õÊ¼»¯Â¼Òô²ÎÊý
- * Input£º
- * Output£º
- * Other£º         ¶ÔÓ¦ MC_OPEN
+ * Description:    åˆå§‹åŒ–å½•éŸ³å‚æ•°
+ * Inputï¼š
+ * Outputï¼š
+ * Otherï¼š         å¯¹åº” MC_OPEN
  *******************************************************************************/
 
 void encode_initAudioFormat(BYTE music_type)
@@ -485,7 +485,7 @@ void encode_initAudioFormat(BYTE music_type)
     g_encWriteFilePara.WriteFileBuffAddr = RECORD_BUFFER_ADDRESS;
     g_encWriteFilePara.WriteFileCurSize = RECORD_BUFFER_SIZE;
     g_encWriteFilePara.FileLen = 0;
-    //g_encWriteFilePara.WriteFileHandle ÔÚMC_LOADÖÐ³õÊ¼»¯
+    //g_encWriteFilePara.WriteFileHandle åœ¨MC_LOADä¸­åˆå§‹åŒ–
 
     m_wavRecStatus = RECORDING_WAITING;
     pitch_write_page = 0;
@@ -494,10 +494,10 @@ void encode_initAudioFormat(BYTE music_type)
 
 /*******************************************************************************
  * Function:       encode_getNewFileHandle
- * Description:    ¼ì²éÎÄ¼þÊÇ·ñ´æÔÚ,²»´æÔÚ,´´½¨¸ÃÎÄ¼þ.
- * Input£º
- * Output£º
- * Other£º         ¶ÔÓ¦ MC_LOAD
+ * Description:    æ£€æŸ¥æ–‡ä»¶æ˜¯å¦å­˜åœ¨,ä¸å­˜åœ¨,åˆ›å»ºè¯¥æ–‡ä»¶.
+ * Inputï¼š
+ * Outputï¼š
+ * Otherï¼š         å¯¹åº” MC_LOAD
  *******************************************************************************/
 BOOL encode_getNewFileHandle(void *param)
 {
@@ -524,10 +524,10 @@ BOOL encode_getNewFileHandle(void *param)
 
 /*******************************************************************************
  * Function:       parse_bit_rate
- * Description:    ×ª»» AP²ãµÄ BIT RATE µ½ CODE²ãµÄBIT RATE
- * Input£º
- * Output£º
- * Other£º         //
+ * Description:    è½¬æ¢ APå±‚çš„ BIT RATE åˆ° CODEå±‚çš„BIT RATE
+ * Inputï¼š
+ * Outputï¼š
+ * Otherï¼š         //
  *******************************************************************************/
 int8 parse_bit_rate(uint8 *ch)
 {
@@ -551,10 +551,10 @@ int8 parse_bit_rate(uint8 *ch)
 
 /*******************************************************************************
  * Function:       encode_setAudioFormat
- * Description:    ÉèÖÃ CODE ²ãµÄ  g_encInitPara
- * Input£º
- * Output£º
- * Other£º         ¶ÔÓ¦ MC_SETAUDIOFMT
+ * Description:    è®¾ç½® CODE å±‚çš„  g_encInitPara
+ * Inputï¼š
+ * Outputï¼š
+ * Otherï¼š         å¯¹åº” MC_SETAUDIOFMT
  *******************************************************************************/
 void encode_setAudioFormat(void *param)
 {
@@ -584,10 +584,10 @@ void encode_setAudioFormat(void *param)
 }
 /*******************************************************************************
  * Function:       ch_bit_rate
- * Description:    ×ª»» CODE ²ãµÄ BIT RATE µ½ AP ²ãµÄBIT RATE
- * Input£º
- * Output£º
- * Other£º         //
+ * Description:    è½¬æ¢ CODE å±‚çš„ BIT RATE åˆ° AP å±‚çš„BIT RATE
+ * Inputï¼š
+ * Outputï¼š
+ * Otherï¼š         //
  *******************************************************************************/
 void ch_bit_rate(char *tmp)
 {
@@ -694,10 +694,10 @@ void ch_bit_rate(char *tmp)
 
 /*******************************************************************************
  * Function:       encode_getAudioFormat
- * Description:    »ñÈ¡ CODE ²ã audio_format_t
- * Input£º
- * Output£º
- * Other£º         ¶ÔÓ¦ MC_GETAUDIOFMT
+ * Description:    èŽ·å– CODE å±‚ audio_format_t
+ * Inputï¼š
+ * Outputï¼š
+ * Otherï¼š         å¯¹åº” MC_GETAUDIOFMT
  *******************************************************************************/
 void encode_getAudioFormat(void *param)
 {
@@ -706,5 +706,5 @@ void encode_getAudioFormat(void *param)
     m_audio_fmt = (audio_format_t *) param;
     m_audio_fmt->sample_rate = g_encControlInfor.FsIndex;
     m_audio_fmt->channel = g_encControlInfor.ChannelNum;
-    ch_bit_rate(m_audio_fmt->bit_rate); //Óï·¨
+    ch_bit_rate(m_audio_fmt->bit_rate); //è¯­æ³•
 }

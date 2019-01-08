@@ -4,7 +4,7 @@ $include (actos.inc)
 
 API30 SEGMENT 'ECODE_APISEG'
 
-/**************************SetAsciiFont µƒAPI»Îø⁄******************************/
+/**************************SetAsciiFont ÁöÑAPIÂÖ•Âè£******************************/
 PUBLIC API_LEDInit{RPrefix}
 PUBLIC API_LEDExit{RPrefix}
 PUBLIC API_LEDClearScreen{RPrefix}

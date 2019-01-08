@@ -56,7 +56,7 @@ wait_hosc_stable:
 	nop	
 
 	
-	MOV	0xA8,#0			;�ر��ж�
+	MOV	0xA8,#0			;关闭中断
 	MOV	0xE8,#0	    
 
 ;-----------------------------reset -----------------------------
@@ -81,12 +81,12 @@ wait_hosc_stable:
 ;--------------------------------RTC---------------------------------------
 	mov     SFR_BANK,#0ch
 	
-	CLR	RTC_CTL0.7		;�ر�calendar����(RTCVDD��Ĵ���)
+	CLR	RTC_CTL0.7		;关闭calendar功能(RTCVDD域寄存器)
 	
-	SETB    WDCtl.3			;��watchdog������
-        CLR     WDCtl.7			;�ر�watchdog
-        CLR     RTC_CTL1.6		;�رն�ʱ��
-        CLR     RTC_CTL1.7		;�ر�2Hz�ж�
+	SETB    WDCtl.3			;清watchdog计数器
+        CLR     WDCtl.7			;关闭watchdog
+        CLR     RTC_CTL1.6		;关闭定时器
+        CLR     RTC_CTL1.7		;关闭2Hz中断
 	nop
 	nop
 	
@@ -94,17 +94,17 @@ wait_hosc_stable:
 	mov 	SFR_BANK,#06	
     	
     	mov 	PADDRV1,#00h
-    	mov 	PADDRV0,#00h             ; ������ǿ��Ϊ��͵�
+    	mov 	PADDRV0,#00h             ; 驱动增强设为最低档
     	clr 	PADPUPD0.2
-	clr 	PADPUPD0.3               ; ȡ��RB1,RB2��������
+	clr 	PADPUPD0.3               ; 取消RB1,RB2上拉电阻
 	clr 	PADPUPD1.7
 	nop
 	nop
 ;--------------------------------PWM---------------------------------------		
-;PWM��Standbyʱ�����������
-;1.PWM��������������ƣ�ֻ��Ҫ��clockԴ�е�LOSC�����ҽ�ģ��resetд"0" 
-;2.�����ʱ��PWM�������ı��⣬�����Standbyʱ��PWMѡ��LOSC��PWMDUTY�Ĵ���д��0x00��
-;  PWM����������0",����һֱ���رգ��رյ�ʱ���ο�LCD��standby����
+;PWM进Standby时，有两种情况
+;1.PWM并不是作背光控制，只需要将clock源切到LOSC，并且将模块reset写"0" 
+;2.假如此时用PWM控制屏的背光，则进入Standby时，PWM选择LOSC，PWMDUTY寄存器写成0x00，
+;  PWM便可以输出“0",背光一直被关闭，关闭的时机参考LCD进standby步骤
 	
 	mov     SFR_BANK,#06h
 	mov     PWMDUTY,#0x00
@@ -181,7 +181,7 @@ wait_hosc_stable:
    	
    	lcall	delay
 	#endif
-;GPIOG[4:0]ΪJTAG��	
+;GPIOG[4:0]为JTAG口	
 	
 ;--------------------------------PMU---------------------------------------
 	mov     SFR_BANK,#05h
@@ -195,7 +195,7 @@ wait_hosc_stable:
 	
 	SETB	0X9A.6			;Disable EFUSE 
 	
-;--------------------------------��Ϊ��Ƶ-----------------------------------
+;--------------------------------切为低频-----------------------------------
 	mov     SFR_BANK,#01h	
 	CLR	0XB6.0			;DISABLE SINGLE PIN LOSC
 ;	CLR	0XB7.0			;DISABLE DUAL PIN LOSC
@@ -226,7 +226,7 @@ wait_hosc_stable:
 
 	MOV	R0,MCSR5
 	ANL	R0,#0x20
-	MOV	MCSR5,R0		;PRAM251�ǳ���ռ䣬���ܹ�
+	MOV	MCSR5,R0		;PRAM251是程序空间，不能关
 	
 	MOV	MCSR6,#0
 	MOV	MCSR7,#0

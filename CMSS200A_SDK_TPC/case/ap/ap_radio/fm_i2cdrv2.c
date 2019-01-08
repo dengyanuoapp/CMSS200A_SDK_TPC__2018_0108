@@ -101,7 +101,7 @@ void I2C_Stop(void)
 uint8 WriteOneFrame(uint8 count)
 {
     uint8 i, result;
-    disable_interrupt(); //½ûÖ¹ÖĞ¶Ï
+    disable_interrupt(); //ç¦æ­¢ä¸­æ–­
     for (i = 0; i < 2; i++)
     {
         I2C_Start();
@@ -127,12 +127,12 @@ uint8 WriteOneFrame(uint8 count)
             }
         }
         I2C_Stop();
-        enable_interrupt(); //¿ªÖĞ¶Ï
+        enable_interrupt(); //å¼€ä¸­æ–­
         return TRUE;
     }
 error:
     I2C_Stop();
-    enable_interrupt(); //¿ªÖĞ¶Ï
+    enable_interrupt(); //å¼€ä¸­æ–­
     return FALSE;
 }
 
@@ -219,7 +219,7 @@ uint8 I2C_ReceByte(uint8 param)
         IOStatus1 = GPIOBDAT & (0x01 << SCL_DATAPORT_NUM);
     }
     while (IOStatus1 == 0);
-    //	Reset_GPIO(SCL_INPORT,SCL_INPORT_NUM);			//±£³ÖGPIOB5 ÊäÈëÒ»Ö±Ê¹ÄÜ£¬·ÀÖ¹³öÏÖÖĞ¼ä×´Ì¬£¬µ¼ÖÂNAND»áÓ°ÏìSCLµÄÊ±Ğò
+    //	Reset_GPIO(SCL_INPORT,SCL_INPORT_NUM);			//ä¿æŒGPIOB5 è¾“å…¥ä¸€ç›´ä½¿èƒ½ï¼Œé˜²æ­¢å‡ºç°ä¸­é—´çŠ¶æ€ï¼Œå¯¼è‡´NANDä¼šå½±å“SCLçš„æ—¶åº
     Set_GPIO(I2CSCL, SCL_DATAPORT, SCL_DATAPORT_NUM);
     Set_GPIO(I2CSCL, SCL_OUTPORT, SCL_OUTPORT_NUM);
     for (i = 0; i < 8; i++)
@@ -306,7 +306,7 @@ uint8 ReadStatus(void)
     uint8 count = 0;
 #ifndef PC
     FM_Wait50ms();
-    disable_interrupt(); //½ûÖ¹ÖĞ¶Ï
+    disable_interrupt(); //ç¦æ­¢ä¸­æ–­
     do
     {
         ClearWatchDog();
@@ -322,12 +322,12 @@ uint8 ReadStatus(void)
         count++;
         if (count > 20)
         {
-            enable_interrupt(); //¿ªÖĞ¶Ï
+            enable_interrupt(); //å¼€ä¸­æ–­
             return 0;
         }
     }
     while (temp != 0xff);
-    enable_interrupt(); //¿ªÖĞ¶Ï
+    enable_interrupt(); //å¼€ä¸­æ–­
     return 1;
 #else
     return 1;
@@ -338,7 +338,7 @@ void I2C_Wait5us(void)
     uint8 i;
     for (i = 30; i > 0; i--)
     {
-        ; //FM¶ÌÔİÑÓÊ±
+        ; //FMçŸ­æš‚å»¶æ—¶
     }
 
 }
@@ -351,7 +351,7 @@ void FM_Wait50ms(void)
         ClearWatchDog();
         for (k = 0; k < 2000; k++)
         {
-            ; //FMÑÓÊ±
+            ; //FMå»¶æ—¶
         }
     }
 }

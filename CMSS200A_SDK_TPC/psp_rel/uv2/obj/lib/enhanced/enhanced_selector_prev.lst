@@ -36,8 +36,8 @@ stmt  level    source
    24          extern uint8 fselError; // store error id;
    25          extern int8 fselDiskLetter;
    26          extern int8 fselDirLayer; //dir  layer
-   27          extern uint16 fselFileNoInDisk;// ÎÄ¼şÔÚÈ«ÅÌµÄĞòºÅ
-   28          extern uint16 fselTotalInDisk;// È«ÅÌÎÄ¼ş×ÜÊı
+   27          extern uint16 fselFileNoInDisk;// æ–‡ä»¶åœ¨å…¨ç›˜çš„åºå·
+   28          extern uint16 fselTotalInDisk;// å…¨ç›˜æ–‡ä»¶æ€»æ•°
    29          extern uint16 CurDirFileNum;
    30          extern uint16 fselDirNoInDisk;
    31          extern uint16 fselTotalDir;
@@ -82,7 +82,7 @@ stmt  level    source
    68          #pragma renamecode(MW_EH_FSEL_PREV)
    69          
    70          /********************************************************************************
-   71           * Description : PREV²Ù×÷»ñÈ¡ºó×ºÃûBUFFERµÄµØÖ·
+   71           * Description : PREVæ“ä½œè·å–åç¼€åBUFFERçš„åœ°å€
    72           *
    73           * Arguments  :  None
    74           * Returns     :  the buffer of current file extend name
@@ -108,7 +108,7 @@ stmt  level    source
    94   1      }
    95          
    96          /********************************************************************************
-   97           * Description : PREV²Ù×÷»ñÈ¡ºó×ºÃûµÄ¸öÊı£¬ÀıÈçMUSICÖ§³ÖWMA MP3 WAVÒ»ÆğDIR
+   97           * Description : PREVæ“ä½œè·å–åç¼€åçš„ä¸ªæ•°ï¼Œä¾‹å¦‚MUSICæ”¯æŒWMA MP3 WAVä¸€èµ·DIR
    98           *
    99           * Arguments  :  None
   100           * Returns     :  the buffer of current file extend name
@@ -137,7 +137,7 @@ stmt  level    source
 C251 COMPILER V4.55,  enhanced_selector_prev                                               13/12/18  16:27:39  PAGE 3   
 
   123          /********************************************************************************
-  124           * Description : »ñµÃµ±Ç°Ä¿Â¼µÄÄ³ÖÖÀàĞÍÎÄ¼şµÄ×ÜÊı
+  124           * Description : è·å¾—å½“å‰ç›®å½•çš„æŸç§ç±»å‹æ–‡ä»¶çš„æ€»æ•°
   125           * Arguments  :
   126           *            strDir: Dos 8.3 directory name
   127           *            bCheckValidDir: if check valid directory only
@@ -174,7 +174,7 @@ stmt  level    source
   158          
   159          /********************************************************************************
   160           * Description : select the next file and get the file name
-  161           *ÏòÄ¿Â¼Ê×·½Ïò»ñÈ¡ÉÏÒ»¸öÎÄ¼ş
+  161           *å‘ç›®å½•é¦–æ–¹å‘è·å–ä¸Šä¸€ä¸ªæ–‡ä»¶
   162           ********************************************************************************/
   163          bool SelectPrevFile(uint8 *strFile)
   164          {
@@ -183,7 +183,7 @@ stmt  level    source
   167   1      }
   168          
   169          /********************************************************************************
-  170           * Description : Ñ¡ÔñÉÏÒ»¸öÎÄ¼ş¼Ğ
+  170           * Description : é€‰æ‹©ä¸Šä¸€ä¸ªæ–‡ä»¶å¤¹
   171           *
   172           * Arguments  : none
   173           *
@@ -200,11 +200,11 @@ stmt  level    source
   184   1      }
   185          
   186          /********************************************************************************
-  187           * Description : Ò»°ãPREV²Ù×÷½øÈëµ½Ò»¸ö×ÓÄ¿Â¼£¬ ¾ÍĞèÒª¶¨Î»µ½×îºóµÄÎÄ¼ş¼Ğ
+  187           * Description : ä¸€èˆ¬PREVæ“ä½œè¿›å…¥åˆ°ä¸€ä¸ªå­ç›®å½•ï¼Œ å°±éœ€è¦å®šä½åˆ°æœ€åçš„æ–‡ä»¶å¤¹
   188           *
 C251 COMPILER V4.55,  enhanced_selector_prev                                               13/12/18  16:27:39  PAGE 4   
 
-  189           * Arguments  :         ÒòÎªÊÂÏÈ²»ÖªµÀ×Ü¹²¼¸¸öÄ¿Â¼£¬ËùÒÔĞèÒª´ÓÍ·¿ªÊ¼DIR
+  189           * Arguments  :         å› ä¸ºäº‹å…ˆä¸çŸ¥é“æ€»å…±å‡ ä¸ªç›®å½•ï¼Œæ‰€ä»¥éœ€è¦ä»å¤´å¼€å§‹DIR
   190           strDir:output Dir name
   191           * Returns    :
   192           TRUE: Successful
@@ -226,7 +226,7 @@ stmt  level    source
   208   1      }
   209          
   210          /********************************************************************************
-  211           *Ñ¡ÔñÉÏÒ»¸öÎÄ¼ş
+  211           *é€‰æ‹©ä¸Šä¸€ä¸ªæ–‡ä»¶
   212           ********************************************************************************/
   213          
   214          bool SelectPrev_8Layer(uint8 *strFile)
@@ -236,20 +236,20 @@ stmt  level    source
   218   1      
   219   1          if (!SelectPrevFile(strFile))
   220   1          {
-  221   2              //¼ì²é¸¸Ä¿Â¼.
+  221   2              //æ£€æŸ¥çˆ¶ç›®å½•.
   222   2      ParentDiragainNext:
   223   2              ClearWatchDog();
   224   2              if (FALSE != FS_DirParPrev())
   225   2              {
   226   3                  fselDirLayer--;
-  227   3                  if (FALSE != fselPrevDir(strDir)) //Æ½¼¶Ä¿Â¼µÄÇ°Ò»¸öÄ¿Â¼
+  227   3                  if (FALSE != fselPrevDir(strDir)) //å¹³çº§ç›®å½•çš„å‰ä¸€ä¸ªç›®å½•
   228   3                  {
   229   4                      goto CurrentDiragainNext;
-  230   4                      //Æ½¼¶¹ıÈ¥±£Ö¤LAYER²»»á´óÓÚ7
+  230   4                      //å¹³çº§è¿‡å»ä¿è¯LAYERä¸ä¼šå¤§äº7
   231   4                  }
   232   3                  else
   233   3                  {
-  234   4                      //µ±Ç°Ä¿Â¼ÏÂÓĞĞ§µÄÎÄ¼ş
+  234   4                      //å½“å‰ç›®å½•ä¸‹æœ‰æ•ˆçš„æ–‡ä»¶
   235   4                      if (FALSE == FS_DirLast())
   236   4                      {
   237   5                          return FALSE;
@@ -260,7 +260,7 @@ stmt  level    source
   242   5                          fselDirNoInDisk--;
   243   5                          return TRUE;
   244   5                      }
-  245   4                      //  µ±Ç°Ä¿Â¼·ÖÖ§Ã»ÓĞºÏÊÊµÄÎÄ¼ş,ÍË»ØÉÏ¼¶Ä¿Â¼
+  245   4                      //  å½“å‰ç›®å½•åˆ†æ”¯æ²¡æœ‰åˆé€‚çš„æ–‡ä»¶,é€€å›ä¸Šçº§ç›®å½•
   246   4                      goto ParentDiragainNext;
   247   4                  }
   248   3              }
@@ -269,7 +269,7 @@ stmt  level    source
   251   3                  fselError = FSEL_ERR_OUTOF;
   252   3                  return FALSE;
   253   3              }
-  254   2              //Ñ°ÕÒµ±Ç°Ä¿Â¼ÏÂµÄËùÓĞÄ¿Â¼
+  254   2              //å¯»æ‰¾å½“å‰ç›®å½•ä¸‹çš„æ‰€æœ‰ç›®å½•
 C251 COMPILER V4.55,  enhanced_selector_prev                                               13/12/18  16:27:39  PAGE 5   
 
   255   2      CurrentDiragainNext:
@@ -277,10 +277,10 @@ stmt  level    source
   257   2              FS_CD(FS_CD_SON);
   258   2              fselDirLayer++;
   259   2      
-  260   2              if (FALSE != SelLastDir(strDir)) //ÏòÏÂ²éÕÒÄ¿Â¼
+  260   2              if (FALSE != SelLastDir(strDir)) //å‘ä¸‹æŸ¥æ‰¾ç›®å½•
   261   2              {
   262   3                  goto CurrentDiragainNext;
-  263   3                  //Ò»Ö±ÕÒµ½¾¡Í·
+  263   3                  //ä¸€ç›´æ‰¾åˆ°å°½å¤´
   264   3              }
   265   2              else
   266   2              {
@@ -294,7 +294,7 @@ stmt  level    source
   274   4                      fselDirNoInDisk--;
   275   4                      return TRUE;
   276   4                  }
-  277   3                  //  µ±Ç°Ä¿Â¼·ÖÖ§Ã»ÓĞºÏÊÊµÄÎÄ¼ş,ÍË»ØÉÏ¼¶Ä¿Â¼
+  277   3                  //  å½“å‰ç›®å½•åˆ†æ”¯æ²¡æœ‰åˆé€‚çš„æ–‡ä»¶,é€€å›ä¸Šçº§ç›®å½•
   278   3                  goto ParentDiragainNext;
   279   3              }
   280   2          }
@@ -404,7 +404,7 @@ stmt  level    source
   382   5                      return TRUE;
   383   5                  }
   384   4              }
-  385   3              else   //ĞèÒª´ÓµÚÒ»Ê×ÇĞ»»µ½×îºóÒ»Ê×
+  385   3              else   //éœ€è¦ä»ç¬¬ä¸€é¦–åˆ‡æ¢åˆ°æœ€åä¸€é¦–
   386   3              {
 C251 COMPILER V4.55,  enhanced_selector_prev                                               13/12/18  16:27:39  PAGE 7   
 
@@ -470,7 +470,7 @@ stmt  level    source
   446   3              {
   447   4                  fselFileNoInDisk--;
   448   4              }
-  449   3              else    //ÒÑ¾­µ½µ±Ç°Ä¿Â¼µÚÒ»Ê×¸è£¬·µ»ØÄ¿Â¼Î²¿ªÊ¼
+  449   3              else    //å·²ç»åˆ°å½“å‰ç›®å½•ç¬¬ä¸€é¦–æ­Œï¼Œè¿”å›ç›®å½•å°¾å¼€å§‹
   450   3              {
   451   4                  FS_DirLast();
   452   4                  if(!FS_DirPrev(strFile, GetExtBuf_Prev(), FS_DIR_FILE_CONT, GetExtSize_Prev()))
@@ -493,7 +493,7 @@ stmt  level    source
   467          /********************************************************************************
   468           * Description : Select the last folder file
   469           *
-  470           * Ö»Ğè»»ÎÄ¼ş¼Ğ¾Í¿ÉÒÔÁË
+  470           * åªéœ€æ¢æ–‡ä»¶å¤¹å°±å¯ä»¥äº†
   471           ********************************************************************************/
   472          bool fselGetPrevFolder (uint8 *strFile)
   473          {
@@ -511,7 +511,7 @@ stmt  level    source
   485   3                  break;
   486   3              }
   487   2          }
-  488   1          if(!fselGetPrev(strFile))   //ÇĞ»»µ½ÉÏÒ»Ä¿Â¼×îºóÒ»¸öÎÄ¼ş
+  488   1          if(!fselGetPrev(strFile))   //åˆ‡æ¢åˆ°ä¸Šä¸€ç›®å½•æœ€åä¸€ä¸ªæ–‡ä»¶
   489   1          {
   490   2              fselMode = mode;
   491   2              return FALSE;

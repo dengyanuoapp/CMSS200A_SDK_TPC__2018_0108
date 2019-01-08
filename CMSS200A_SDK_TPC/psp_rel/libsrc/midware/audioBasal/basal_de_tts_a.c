@@ -103,8 +103,8 @@ bool pSdTtsSendCommand(BYTE cmd, BYTE music_type, void *param)
 }
 
 /*************************************************************************
- * SdStopCommand Í£Ö¹²¥·Å
- *1 g_decReadFilePara.ReadFilePagesÔÚdma hookÖĞ±»¸³Öµ = deSdBreakPointSave
+ * SdStopCommand åœæ­¢æ’­æ”¾
+ *1 g_decReadFilePara.ReadFilePagesåœ¨dma hookä¸­è¢«èµ‹å€¼ = deSdBreakPointSave
  ****************************************************************************/
 
 bool TTSStopCommand(void *param)

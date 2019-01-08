@@ -133,14 +133,14 @@ stmt  level    source
   120   2              //                              }
   121   2              if (((uint8)param & 0xf0) == FADEIN_DEF)
   122   2              {
-  123   3                  g_decControlInfor.FadeInTime = (uint8)param & 0x0f;//设置淡入标志
+  123   3                  g_decControlInfor.FadeInTime = (uint8)param & 0x0f;//璁剧疆娣″叆鏍囧織
 C251 COMPILER V4.55,  basal_de_sd_a                                                        13/12/18  16:27:23  PAGE 3   
 
   124   3                  return TRUE;
   125   3              }
   126   2              else if (((uint8)param & 0xf0) == FADEOUT_DEF)
   127   2              {
-  128   3                  g_decControlInfor.FadeOutTime = (uint8)param & 0x0f;//设置淡出标志
+  128   3                  g_decControlInfor.FadeOutTime = (uint8)param & 0x0f;//璁剧疆娣″嚭鏍囧織
   129   3                  return TRUE;
   130   3              }
   131   2              else

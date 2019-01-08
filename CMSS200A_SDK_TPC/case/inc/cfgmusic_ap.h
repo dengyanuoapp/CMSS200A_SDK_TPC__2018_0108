@@ -1,112 +1,112 @@
 #ifndef MUSIC_AP_H
 #define MUSIC_AP_H
 
-//±³¾°Í¼
+//èƒŒæ™¯å›¾
 #define PIC_ID_B_BACKDROP COMMBK
 #define PIC_X_B_BACKDROP	0
 #define PIC_Y_B_BACKDROP	0
 
-//¶ú»úÍ¼±ê
+//è€³æœºå›¾æ ‡
 #define PIC_ID_EARLOGO  EARLOGO
 #define PIC_X_EARLOGO	3
 #define PIC_Y_EARLOGO	145
 
-//ÒôÀÖÀàĞÍ
+//éŸ³ä¹ç±»å‹
 #define PIC_ID_MUSICTYPE MMP3
 //#define PIC_X_MUSICTYPE	66
 #define PIC_X_MUSICTYPE	34
 #define PIC_Y_MUSICTYPE	4
 
-//bitrate±³¾°
+//bitrateèƒŒæ™¯
 #define PIC_ID_BBCK2   BBCK2
 #define PIC_X_BBCK2	0
 #define PIC_Y_BBCK2	0
 
-//BitrateµÄµÚÒ»Î»Êı×Ö
+//Bitrateçš„ç¬¬ä¸€ä½æ•°å­—
 #define PIC_ID_F1BITRATE MBIT0
 //#define PIC_X_F1BITRATE	9
 #define PIC_X_F1BITRATE	0
 #define PIC_Y_F1BITRATE	4
 
-//BitrateµÄµÚÒ»Î»Êı×Ö
+//Bitrateçš„ç¬¬ä¸€ä½æ•°å­—
 #define PIC_ID_F2BITRATE MBIT1
 //#define PIC_X_F2BITRATE	16
 #define PIC_X_F2BITRATE	7
 #define PIC_Y_F2BITRATE	4
 
-//BitrateµÄµÚÒ»Î»Êı×Ö
+//Bitrateçš„ç¬¬ä¸€ä½æ•°å­—
 #define PIC_ID_F3BITRATE MBIT2
 //#define PIC_X_F3BITRATE	23
 #define PIC_X_F3BITRATE	14
 #define PIC_Y_F3BITRATE	4
 
-//Ñ­»·Ä£Ê½
+//å¾ªç¯æ¨¡å¼
 #define PIC_ID_REPEAT    MLOOP1
 //#define PIC_X_REPEAT	128
 #define PIC_X_REPEAT	73
 #define PIC_Y_REPEAT	1
 
-//ÁĞ±í
+//åˆ—è¡¨
 #define PIC_ID_PLAYMODE  PLAYLIST
 #define PIC_X_PLAYMODE	0
 #define PIC_Y_PLAYMODE	119
 
-//µ±Ç°ÇúÄ¿µÚ1Î»
+//å½“å‰æ›²ç›®ç¬¬1ä½
 #define PIC_ID_SONGNUM1  MNUM0
 #define PIC_X_SONGNUM1	42
 //#define PIC_Y_SONGNUM1	162
 #define PIC_Y_SONGNUM1	146
 
-//µ±Ç°ÇúÄ¿µÚ2Î»
+//å½“å‰æ›²ç›®ç¬¬2ä½
 #define PIC_ID_SONGNUM2  MNUM1
 #define PIC_X_SONGNUM2	50
 //#define PIC_Y_SONGNUM2	162
 #define PIC_Y_SONGNUM2	146
 
-//µ±Ç°ÇúÄ¿µÚ3Î»
+//å½“å‰æ›²ç›®ç¬¬3ä½
 #define PIC_ID_SONGNUM3  MNUM0
 #define PIC_X_SONGNUM3	58
 //#define PIC_Y_SONGNUM3	162
 #define PIC_Y_SONGNUM3	146
-//¸ôÀëÏß
+//éš”ç¦»çº¿
 #define PIC_ID_SONGLINE  SINGLINE
 #define PIC_X_SONGLINE	66
 #define PIC_Y_SONGLINE	146
 
-//×ÜÇúÄ¿µÚ1Î»
+//æ€»æ›²ç›®ç¬¬1ä½
 #define PIC_ID_TSONGNUM1  MNUM0
 #define PIC_X_TSONGNUM1	74
 #define PIC_Y_TSONGNUM1	146
 
-//×ÜÇúÄ¿µÚ2Î»
+//æ€»æ›²ç›®ç¬¬2ä½
 #define PIC_ID_TSONGNUM2  MNUM0
 #define PIC_X_TSONGNUM2	82
 #define PIC_Y_TSONGNUM2	146
 
-//×ÜÇúÄ¿µÚ3Î»
+//æ€»æ›²ç›®ç¬¬3ä½
 #define PIC_ID_TSONGNUM3  MNUM0
 #define PIC_X_TSONGNUM3	90
 #define PIC_Y_TSONGNUM3	146
 
-//ÒôÁ¿µÚ1Î»
+//éŸ³é‡ç¬¬1ä½
 #define PIC_ID_VOL1  MNUM0
 //#define PIC_X_VOL1	23
 //#define PIC_Y_VOL1	163
 #define PIC_X_VOL1	16
 #define PIC_Y_VOL1	146
 
-//ÒôÁ¿µÚ2Î»
+//éŸ³é‡ç¬¬2ä½
 #define PIC_ID_VOL2  MNUM0
 #define PIC_X_VOL2	24
 //#define PIC_Y_VOL2	163
 #define PIC_Y_VOL2	146
 
-//ÒôĞ§Ä£Ê½
+//éŸ³æ•ˆæ¨¡å¼
 #define PIC_ID_EQ         MEQICON1
 #define PIC_X_EQ	101
 #define PIC_Y_EQ	4
 
-//µç³ØµçÁ¿
+//ç”µæ± ç”µé‡
 #define PIC_ID_BATTERY    BATTERY1
 #define PIC_X_BATTERY	107
 #define PIC_Y_BATTERY	146
@@ -131,37 +131,37 @@
 #define STR_X_NEXTFOLDER	35
 #define STR_Y_NEXTFOLDER	60
 
-//¸è´Ê
+//æ­Œè¯
 #define PIC_ID_LYRIC    MMUSICT
 #define PIC_X_LYRIC	97
 #define PIC_Y_LYRIC	146
 
-//¿¨±êÖ¾
+//å¡æ ‡å¿—
 #define PIC_ID_CARDDISK   CARDDISK
 #define PIC_X_CARDDISK	109
 #define PIC_Y_CARDDISK	128
 
-//Ğ¡Ê±
+//å°æ—¶
 #define PIC_ID_TIMEH     PRGNUM0
 #define PIC_X_TIMEH	25
 #define PIC_Y_TIMEH	34
 
-//·ÖÖÓ¸ßÎ»
+//åˆ†é’Ÿé«˜ä½
 #define PIC_ID_TIMEMH     PRGNUM0
 #define PIC_X_TIMEMH	49
 #define PIC_Y_TIMEMH	34
 
-//·ÖÖÓµÍÎ»
+//åˆ†é’Ÿä½ä½
 #define PIC_ID_TIMEML     PRGNUM0
 #define PIC_X_TIMEML	64
 #define PIC_Y_TIMEML	34
 
-//Ãë¸ßÎ»
+//ç§’é«˜ä½
 #define PIC_ID_TIMESH     PRGNUM0
 #define PIC_X_TIMESH	88
 #define PIC_Y_TIMESH	34
 
-//ÃëµÍÎ»
+//ç§’ä½ä½
 #define PIC_ID_TIMESL     PRGNUM0
 #define PIC_X_TIMESL	102
 #define PIC_Y_TIMESL	34
@@ -182,7 +182,7 @@
 #define PIC_ID_GUAGE     GUAGE
 #define PIC_X_GUAGE	15
 #define PIC_Y_GUAGE	30
-//½ø¶ÈÌõ
+//è¿›åº¦æ¡
 #define PIC_ID_PROGRESSBAR GUAGEBG
 #define PIC_X_PROGRESSBAR	8
 #define PIC_Y_PROGRESSBAR	23
@@ -197,7 +197,7 @@
 #define PIC_X_ABLOOPB	0
 #define PIC_Y_ABLOOPB	0
 
-//±³¾°Í¼ /*±³¾°Í¼µÄID £¬X£¬ Y¶¨Òå
+//èƒŒæ™¯å›¾ /*èƒŒæ™¯å›¾çš„ID ï¼ŒXï¼Œ Yå®šä¹‰
 #define PIC_ID_ERROR_CARDLOCK CARDLOCK
 #define PIC_X_ERROR_CARDLOCK	9
 #define PIC_Y_ERROR_CARDLOCK	32
@@ -206,12 +206,12 @@
 #define STR_X_ERROR_STR	255
 #define STR_Y_ERROR_STR	54
 
-//±³¾°Í¼
+//èƒŒæ™¯å›¾
 #define PIC_ID_ERROR_MESSAGE MESSAGE
 #define PIC_X_ERROR_MESSAGE	0
 #define PIC_Y_ERROR_MESSAGE	38
 
-//±³¾°Í¼ /*±³¾°Í¼µÄID £¬X£¬ Y¶¨Òå
+//èƒŒæ™¯å›¾ /*èƒŒæ™¯å›¾çš„ID ï¼ŒXï¼Œ Yå®šä¹‰
 #define PIC_ID_LY_MLRCBCK MLRCBCK
 #define PIC_X_LY_MLRCBCK	0
 #define PIC_Y_LY_MLRCBCK	0
@@ -232,12 +232,12 @@
 #define STR_X_LY_BOTSTR	24
 #define STR_Y_LY_BOTSTR	54
 
-//±³¾°Í¼ /*±³¾°Í¼µÄID £¬X£¬ Y¶¨Òå
+//èƒŒæ™¯å›¾ /*èƒŒæ™¯å›¾çš„ID ï¼ŒXï¼Œ Yå®šä¹‰
 #define PIC_ID_DLALL_SSBCK SSBCK
 #define PIC_X_DLALL_SSBCK	0
 #define PIC_Y_DLALL_SSBCK	0
 
-//±³¾°Í¼ /*±³¾°Í¼µÄID £¬X£¬ Y¶¨Òå
+//èƒŒæ™¯å›¾ /*èƒŒæ™¯å›¾çš„ID ï¼ŒXï¼Œ Yå®šä¹‰
 #define PIC_ID_DLALL_YN DELNO
 #define PIC_X_DLALL_YN	32
 #define PIC_Y_DLALL_YN	56
@@ -246,7 +246,7 @@
 #define STR_X_DLALL_CDELALL	255
 #define STR_Y_DLALL_CDELALL	131
 
-//±³¾°Í¼ /*±³¾°Í¼µÄID £¬X£¬ Y¶¨Òå
+//èƒŒæ™¯å›¾ /*èƒŒæ™¯å›¾çš„ID ï¼ŒXï¼Œ Yå®šä¹‰
 #define PIC_ID_DLING_MENUTWO MENUTWO
 #define PIC_X_DLING_MENUTWO	0
 #define PIC_Y_DLING_MENUTWO	0
@@ -255,7 +255,7 @@
 #define STR_X_DLING_CDELING	255
 #define STR_Y_DLING_CDELING	80
 
-//±³¾°Í¼
+//èƒŒæ™¯å›¾
 #define PIC_ID_UDLOCK_S UDLOCK_S
 #define PIC_X_UDLOCK_S	86
 #define PIC_Y_UDLOCK_S	80
@@ -336,18 +336,18 @@
 //#define PIC_X_BASE5	10
 //#define PIC_Y_BASE5	14
 
-/*²Ëµ¥ÏîÄ¿µÄ×Ö·û´®µÄÆ«ÒÆÁ¿×ø±ê */
+/*èœå•é¡¹ç›®çš„å­—ç¬¦ä¸²çš„åç§»é‡åæ ‡ */
 #define POPMENU_ITM_X_ITEM	20
 #define POPMENU_ITM_Y_ITEM	 1
 
-/*¹öÆÁÇøÓò */
+/*æ»šå±åŒºåŸŸ */
 #define POPMENU_SCR_X_M_SCROLLZONE	30
 #define POPMENU_SCR_Y_M_SCROLLZONE	15
 
 #define POPMENU_SCR_W_M_SCROLLZONE	80
 #define POPMENU_SCR_H_M_SCROLLZONE	16
 
-/*¼¤»îÏîµÄÏÔÊ¾,Æä×ø±êÎ»ÖÃÒÔ¼¤»îÎ»ÖÃ¾ö¶¨ÏÔÊ¾ */
+/*æ¿€æ´»é¡¹çš„æ˜¾ç¤º,å…¶åæ ‡ä½ç½®ä»¥æ¿€æ´»ä½ç½®å†³å®šæ˜¾ç¤º */
 #define PIC_ID_F_MENUBCK  MENUBCK
 #define PIC_X_F_MENUBCK	0
 #define PIC_Y_F_MENUBCK	0
@@ -357,8 +357,8 @@
 #define PIC_ID_F_DHTHK  DHTHK
 #define PIC_X_F_DHTHK	102
 #define PIC_Y_F_DHTHK	6
-#define POPMENU_MENU_TITLE_X 255 // ²Ëµ¥±êÌâ×ø±ê
-#define POPMENU_MENU_TITLE_Y 131 //²Ëµ¥±êÌâ×ø±ê
+#define POPMENU_MENU_TITLE_X 255 // èœå•æ ‡é¢˜åæ ‡
+#define POPMENU_MENU_TITLE_Y 131 //èœå•æ ‡é¢˜åæ ‡
 
 #define PIC_ID_V_MENUTWO  MENUTWO
 #define PIC_X_V_MENUTWO	0
@@ -372,12 +372,12 @@
 #define PIC_X_FINFO0	10
 #define PIC_Y_FINFO0	99
 
-/*ÏÔÊ¾¿¨±êÖ¾*/
+/*æ˜¾ç¤ºå¡æ ‡å¿—*/
 #define PIC_ID_CARD_F    CARD_F
 #define PIC_X_CARD_F	5
 #define PIC_Y_CARD_F	100
 
-/*ÏÔÊ¾¸è´Ê±êÖ¾*/
+/*æ˜¾ç¤ºæ­Œè¯æ ‡å¿—*/
 #define PIC_X_LYRIC_G	5
 #define PIC_Y_LYRIC_G	78
 
@@ -396,18 +396,18 @@
 //#define PIC_X_FINFO5	9
 //#define PIC_Y_FINFO5	10
 
-/*²Ëµ¥ÏîÄ¿µÄ×Ö·û´®µÄÆ«ÒÆÁ¿×ø±ê */
+/*èœå•é¡¹ç›®çš„å­—ç¬¦ä¸²çš„åç§»é‡åæ ‡ */
 #define VARMENU_ITM_X_ITEM	22
 #define VARMENU_ITM_Y_ITEM	1
 
-/*¹öÆÁÇøÓò*/
+/*æ»šå±åŒºåŸŸ*/
 #define VARMENU_SCR_X_M_SCROLLZONE	30
 #define VARMENU_SCR_Y_M_SCROLLZONE	10
 
 #define VARMENU_SCR_W_M_SCROLLZONE	80
 #define VARMENU_SCR_H_M_SCROLLZONE	16
 
-/*¼¤»îÏîµÄÏÔÊ¾,Æä×ø±êÎ»ÖÃÒÔ¼¤»îÎ»ÖÃ¾ö¶¨ÏÔÊ¾ */
+/*æ¿€æ´»é¡¹çš„æ˜¾ç¤º,å…¶åæ ‡ä½ç½®ä»¥æ¿€æ´»ä½ç½®å†³å®šæ˜¾ç¤º */
 #define PIC_ID_V_ ACTIVEBAR2  MENUBCK
 #define PIC_X_V_ACTIVEBAR2	0
 #define PIC_Y_V_ACTIVEBAR2	0
@@ -420,8 +420,8 @@
 #define PIC_ID_F_FILEBCK  FILEBCK
 #define PIC_X_F_FILEBCK	19
 #define PIC_Y_F_FILEBCK	0
-#define VARMENU_MENU_TITLE_X 255 // ²Ëµ¥±êÌâ×ø±ê 
-#define VARMENU_MENU_TITLE_Y 131 //²Ëµ¥±êÌâ×ø±ê 
+#define VARMENU_MENU_TITLE_X 255 // èœå•æ ‡é¢˜åæ ‡ 
+#define VARMENU_MENU_TITLE_Y 131 //èœå•æ ‡é¢˜åæ ‡ 
 
 //defines for ui lyric
 #define  PIC_ID_L_LYRIC_R      LYRIC_R

@@ -15,43 +15,43 @@
 #include "ap_music.h"
 
 #pragma name(AP_MAIN)
-/*³£Á¿¶Î¶¨Òå*/
-uint8 g_TagInfoBuf[92];//ÓÃÓÚ·ÅTAGĞÅÏ¢µÄBUF
-uint16 g_musicamount = 0;//µ±Ç°Ä¿Â¼¸èÇú×ÜÊı
-uint16 g_musicsequence = 0;//µ±Ç°¸èÇúĞòºÅ
-/*È«¾ÖÊı¾İ¶Î¶¨Òå*/
-bool g_PAOpenFlag = FALSE; //±êÖ¾PAµÄ¿ª¹Ø×´Ì¬
-bool Read_VMflag = TRUE;//FALSE:²»¶ÁVM ,TRUE:¶ÁVM
-music_vars_t g_music_vars;//±¾APµÄ¹«¹²±äÁ¿
-file_location_t CurUselocation;//µ±Ç°ÕıÔÚÊ¹ÓÃµÄlocationĞÅÏ¢
+/*å¸¸é‡æ®µå®šä¹‰*/
+uint8 g_TagInfoBuf[92];//ç”¨äºæ”¾TAGä¿¡æ¯çš„BUF
+uint16 g_musicamount = 0;//å½“å‰ç›®å½•æ­Œæ›²æ€»æ•°
+uint16 g_musicsequence = 0;//å½“å‰æ­Œæ›²åºå·
+/*å…¨å±€æ•°æ®æ®µå®šä¹‰*/
+bool g_PAOpenFlag = FALSE; //æ ‡å¿—PAçš„å¼€å…³çŠ¶æ€
+bool Read_VMflag = TRUE;//FALSE:ä¸è¯»VM ,TRUE:è¯»VM
+music_vars_t g_music_vars;//æœ¬APçš„å…¬å…±å˜é‡
+file_location_t CurUselocation;//å½“å‰æ­£åœ¨ä½¿ç”¨çš„locationä¿¡æ¯
 Open_param_t g_Openparam;
-Play_status_t PlayStatus = StopSta; //Í£Ö¹×´Ì¬
-Play_status_t prev_PlayStatus = StopSta; //ÉÏÒ»´ÎµÄ²¥·Å×´Ì¬
+Play_status_t PlayStatus = StopSta; //åœæ­¢çŠ¶æ€
+Play_status_t prev_PlayStatus = StopSta; //ä¸Šä¸€æ¬¡çš„æ’­æ”¾çŠ¶æ€
 
-Music_type_t g_currentMusicType = Music_NON;//±êÖ¾µ±Ç°ÒôÀÖµÄÀàĞÍ(mp3/wma/asf/wmv)
+Music_type_t g_currentMusicType = Music_NON;//æ ‡å¿—å½“å‰éŸ³ä¹çš„ç±»å‹(mp3/wma/asf/wmv)
 
-uint8 FF_flag;//µ±Ç°´¦Àí¿ì½ø×´Ì¬±ê¼Ç
-uint8 get_fileinfo_flag;//ÊÇ·ñĞèÒª»ñÈ¡ÎÄ¼şĞÅÏ¢±êÖ¾
-uint8 auto_switch_device_flag;//×Ô¶¯ÇĞ»»´ÅÅÌ±êÖ¾
-uint8 no_device_flag;//ÎŞ´ÅÅÌ»ò´ÅÅÌÎŞÎÄ¼ş±êÖ¾
-uint16 dir_no;//µ±Ç°Ä¿Â¼ĞòºÅ
-uint8 scan_flag = TRUE;//ÊÇ·ñĞèÒªÉ¨ÃèÈ«ÅÌ±êÖ¾
-//¼ÇÂ¼ÉÏÒ»´ÎµÄ°´¼ü£¬Ö÷ÒªÊÇÇø·ÖÉÏÒ»´ÎÊÇnext»¹ÊÇprev,ÒÔ
-//±ãÔÚÇĞ»»ÉÏÒ»ÇúÓöµ½·Ç·¨ÎÄ¼şÊ±¿ÉÒÔ¼ÌĞøÏòÉÏÇĞ»»£¬¶ø²»ÊÇ¼ÌĞøÇĞ»»µ½ÏÂÒ»Ê×
+uint8 FF_flag;//å½“å‰å¤„ç†å¿«è¿›çŠ¶æ€æ ‡è®°
+uint8 get_fileinfo_flag;//æ˜¯å¦éœ€è¦è·å–æ–‡ä»¶ä¿¡æ¯æ ‡å¿—
+uint8 auto_switch_device_flag;//è‡ªåŠ¨åˆ‡æ¢ç£ç›˜æ ‡å¿—
+uint8 no_device_flag;//æ— ç£ç›˜æˆ–ç£ç›˜æ— æ–‡ä»¶æ ‡å¿—
+uint16 dir_no;//å½“å‰ç›®å½•åºå·
+uint8 scan_flag = TRUE;//æ˜¯å¦éœ€è¦æ‰«æå…¨ç›˜æ ‡å¿—
+//è®°å½•ä¸Šä¸€æ¬¡çš„æŒ‰é”®ï¼Œä¸»è¦æ˜¯åŒºåˆ†ä¸Šä¸€æ¬¡æ˜¯nextè¿˜æ˜¯prev,ä»¥
+//ä¾¿åœ¨åˆ‡æ¢ä¸Šä¸€æ›²é‡åˆ°éæ³•æ–‡ä»¶æ—¶å¯ä»¥ç»§ç»­å‘ä¸Šåˆ‡æ¢ï¼Œè€Œä¸æ˜¯ç»§ç»­åˆ‡æ¢åˆ°ä¸‹ä¸€é¦–
 uint8 prev_key_direc = Key_Next;
-uint8 micin_status;//micÊÇ·ñ²åÈë×´Ì¬¡£0-²»´æÔÚmic.1-micÒÑ¾­²å×Å
-uint16 err_music_count;//³ö´í¸èÇú¼ÆÊı
-uint16 max_music_err = MAX_ERR_MUSIC_NUM; //×î´ó¸èÇú³ö´íÊı
-uint8 g_power_flag = 0;//ÊÇ·ñÍ»È»¶Ïµç±êÖ¾
-uint8 first_init = TRUE;//¿¨ºÍuÅÌÇĞ»»Çé¿ö£¬·ÀÖ¹¿¨ºÍuÅÌ¶¼Ã»ÎÄ¼şÊ±½øÈë²»¶ÏÇĞ»»×´Ì¬
+uint8 micin_status;//micæ˜¯å¦æ’å…¥çŠ¶æ€ã€‚0-ä¸å­˜åœ¨mic.1-micå·²ç»æ’ç€
+uint16 err_music_count;//å‡ºé”™æ­Œæ›²è®¡æ•°
+uint16 max_music_err = MAX_ERR_MUSIC_NUM; //æœ€å¤§æ­Œæ›²å‡ºé”™æ•°
+uint8 g_power_flag = 0;//æ˜¯å¦çªç„¶æ–­ç”µæ ‡å¿—
+uint8 first_init = TRUE;//å¡å’Œuç›˜åˆ‡æ¢æƒ…å†µï¼Œé˜²æ­¢å¡å’Œuç›˜éƒ½æ²¡æ–‡ä»¶æ—¶è¿›å…¥ä¸æ–­åˆ‡æ¢çŠ¶æ€
 
-uint8 disk_char[MAX_DISK_NUM] = //´æ´¢ÅÌ·ûĞÅÏ¢,·Ö±ğÎªuÅÌ£¬¿¨ÅÌ£¬¿¨base
+uint8 disk_char[MAX_DISK_NUM] = //å­˜å‚¨ç›˜ç¬¦ä¿¡æ¯,åˆ†åˆ«ä¸ºuç›˜ï¼Œå¡ç›˜ï¼Œå¡base
 { 'U', 'H', 'C' };
 uint8 load_str[5] =
 { "LOAD" };
 uint8 err_str[5] =
 { "ERRZ" };
-uint8  support_fav = 0;          //ÊÇ·ñÖ§³ÖÊÕ²Ø¼Ğ,Ä¬ÈÏ²»Ö§³Ö
+uint8  support_fav = 0;          //æ˜¯å¦æ”¯æŒæ”¶è—å¤¹,é»˜è®¤ä¸æ”¯æŒ
 EQ_VM_t g_eq_para;
 
 //for analog mic
@@ -69,7 +69,7 @@ int16 main(int16 param)
     int16 main_result;
     bool card_exist = FALSE, uhost_exist = FALSE;
     auto_switch_device_flag = 1;
-    /* ¶ÁÈë¹«¹²±äÁ¿ */
+    /* è¯»å…¥å…¬å…±å˜é‡ */
     read_var();
     read_VM();
     //    SetPAVolume(g_comval.volume);
@@ -86,7 +86,7 @@ int16 main(int16 param)
     }
     if (param == RESULT_MUSIC_CPLAY)
     {
-        /* Ñ¡Ôñ¿¨ÅÌ²¥·Å */
+        /* é€‰æ‹©å¡ç›˜æ’­æ”¾ */
         if (DRV_DetectUD(1) == 0x20)
         {
             CurUselocation.disk = disk_char[1];
@@ -102,7 +102,7 @@ int16 main(int16 param)
     }
     else
     {
-        /* Ñ¡ÔñUÅÌ²¥·Å */
+        /* é€‰æ‹©Uç›˜æ’­æ”¾ */
         if (USBH_Check_Udisk())
         {
             CurUselocation.disk = disk_char[0];
@@ -120,13 +120,13 @@ int16 main(int16 param)
 
     CurUselocation.fselTotal = 0;
     CurUselocation.ID3buffer = g_TagInfoBuf;
-    g_Openparam.filename = CurUselocation.filename;//ÎÄ¼şÃûµØÖ·
-    g_Openparam.BreakPTSave = &g_music_vars.BreakPTSave;//±¸·İ²ÎÊıµØÖ·
-    g_Openparam.typeerror = 0;//Ä¬ÈÏÎªÕı³£¸ñÊ½ÎÄ¼ş
+    g_Openparam.filename = CurUselocation.filename;//æ–‡ä»¶ååœ°å€
+    g_Openparam.BreakPTSave = &g_music_vars.BreakPTSave;//å¤‡ä»½å‚æ•°åœ°å€
+    g_Openparam.typeerror = 0;//é»˜è®¤ä¸ºæ­£å¸¸æ ¼å¼æ–‡ä»¶
     g_Openparam.SoftVolumeMax = 0;
     g_Openparam.FadeInTime = 0x03;
 
-    g_music_vars.fselmod = FSEL_TYPE_COMMONDIR;//Ã¿´Î½øÈë¶¼ÊÇÉèÎªÄ¿Â¼Ñ¡ÔñÆ÷
+    g_music_vars.fselmod = FSEL_TYPE_COMMONDIR;//æ¯æ¬¡è¿›å…¥éƒ½æ˜¯è®¾ä¸ºç›®å½•é€‰æ‹©å™¨
     LEDClearScreen();
     LEDPuts(NUMBER1, load_str, 1);
     if (InitFileSelector() == 0)
@@ -139,18 +139,18 @@ int16 main(int16 param)
     else
     {
         PlayStatus = StopSta;
-        need_draw = TRUE;/* ĞèÒª»­screen */
+        need_draw = TRUE;/* éœ€è¦ç”»screen */
         get_fileinfo_flag = TRUE;
     }
     // OpenPA();
     //  openDAC();
     //    SetPAVolume_LR(g_comval.volume, g_comval.volume);
     // init_mic_in_gpio();
-    //ÏÈ¹ıÂËËùÓĞµÄÏûÏ¢£¬ÒÔÃâ¼ì²âµ½²»±ØÒªµÄÏûÏ¢
+    //å…ˆè¿‡æ»¤æ‰€æœ‰çš„æ¶ˆæ¯ï¼Œä»¥å…æ£€æµ‹åˆ°ä¸å¿…è¦çš„æ¶ˆæ¯
     while (ap_get_message() != NULL)
     {
     };
-    main_result = (uint16) ui_play();// =============> ½øÈë½çÃæ
+    main_result = (uint16) ui_play();// =============> è¿›å…¥ç•Œé¢
     stop_music_play(TRUE);
     write_poweroff_flag(0);
     if(mute_flag != 0)
@@ -185,7 +185,7 @@ int16 main(int16 param)
  ********************************************************************************
  *             void read_var(void)
  *
- * Description : ¶ÁÏµÍ³±äÁ¿ºÍap¾Ö²¿±äÁ¿
+ * Description : è¯»ç³»ç»Ÿå˜é‡å’Œapå±€éƒ¨å˜é‡
  *
  * Arguments   : void
  *
@@ -215,7 +215,7 @@ void read_var(void)
  ********************************************************************************
  *             void read_var(void)
  *
- * Description : ¶ÁmusicÓ¦ÓÃÏµÍ³±äÁ¿
+ * Description : è¯»musicåº”ç”¨ç³»ç»Ÿå˜é‡
  *
  * Arguments   : void
  *
@@ -265,9 +265,9 @@ void OpenPA(void)
 
     if (!g_PAOpenFlag)
     {
-        g_PAOpenFlag = TRUE;//±êÖ¾PAÒÑ´ò¿ª
+        g_PAOpenFlag = TRUE;//æ ‡å¿—PAå·²æ‰“å¼€
 
-        pa.pa_in.dacin = 1;//Ä¬ÈÏ
+        pa.pa_in.dacin = 1;//é»˜è®¤
         pa.pa_in.micin = 1;
         pa.volume = g_comval.volume;
         pa.reserve[0] = g_comval.volume;
@@ -279,7 +279,7 @@ void openDAC(void)
 {
     dac_t dacattr;
     dacattr.dacselect = 0;
-    dacattr.rate = FS_44K1;//Ä¬ÈÏ
+    dacattr.rate = FS_44K1;//é»˜è®¤
     EnableDAC(&dacattr);
 }
 /*

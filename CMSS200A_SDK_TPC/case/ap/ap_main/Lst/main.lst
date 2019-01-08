@@ -32,13 +32,13 @@ stmt  level    source
    22          vm_cfg_t g_modifyval;
    23          
    24          uint8 ap_id[MAX_AP_NUM];
-   25          bool with_fm = FALSE; //´æÔÚfmÄ£¿é
+   25          bool with_fm = FALSE; //å­˜åœ¨fmæ¨¡å—
    26          uint32 item_offset[8];
    27          uint8 far sd_read_buf[512];
    28          const uint8 FwcfgName[] = "FWCFG.BIN";
    29          
    30          #ifdef MAIN_AP
-               char report_buf[16]; //´æÖî²¥±¨Êı¾İµÄbuffer
+               char report_buf[16]; //å­˜è¯¸æ’­æŠ¥æ•°æ®çš„buffer
                info_report_t info =
                {   report_buf, 0, TRUE};
                #endif
@@ -49,9 +49,9 @@ stmt  level    source
    39          
    40          /*
    41           *******************************************************************************
-   42           * Description : ³õÊ¼»¯ModifyÉèÖÃ±äÁ¿
+   42           * Description : åˆå§‹åŒ–Modifyè®¾ç½®å˜é‡
    43           *
-   44           * Arguments   :   ap_result,´æ·Å AP½á¹ûÏûÏ¢µÄÊı×éÖ¸Õë
+   44           * Arguments   :   ap_result,å­˜æ”¾ APç»“æœæ¶ˆæ¯çš„æ•°ç»„æŒ‡é’ˆ
    45           *
    46           * Returns     :   NONE
    47           *
@@ -72,8 +72,8 @@ stmt  level    source
    60   2              //read modify information from FWCFG.BIN
    61   2              SD_FILE *fwcfgfp;
    62   2              fwcfgfp = SD_FOpen(FwcfgName, MODE_READ);
-   63   2              /*¶ÁÈ¡ÅäÖÃÎÄ¼şÍ·ĞÅÏ¢*/
-   64   2              SD_FRead(fwcfgfp, sd_read_buf, sizeof(sd_read_buf)); //¶ÁÈ¡ÅäÖÃÎÄ¼şÍ·ĞÅÏ¢
+   63   2              /*è¯»å–é…ç½®æ–‡ä»¶å¤´ä¿¡æ¯*/
+   64   2              SD_FRead(fwcfgfp, sd_read_buf, sizeof(sd_read_buf)); //è¯»å–é…ç½®æ–‡ä»¶å¤´ä¿¡æ¯
    65   2      
    66   2              //item_offset[0] --- parameters set item offset
    67   2              //item_offset[1] ---  key config item offset
@@ -86,12 +86,12 @@ stmt  level    source
    74   3                  item_offset[i] = *(uint32 *) (sd_read_buf + 16 + i * SIZE_ONE_ITEM);
    75   3              }
    76   2      
-   77   2              SD_FSeek(fwcfgfp, SEEK_SET, item_offset[0]); //¶ÁÈ¡²ÎÊıÀàÍ·ĞÅÏ¢
-   78   2              SD_FRead(fwcfgfp, sd_read_buf, 512); //¶ÁÈ¡ÊıÖµÉèÖÃÀàĞÅÏ¢
+   77   2              SD_FSeek(fwcfgfp, SEEK_SET, item_offset[0]); //è¯»å–å‚æ•°ç±»å¤´ä¿¡æ¯
+   78   2              SD_FRead(fwcfgfp, sd_read_buf, 512); //è¯»å–æ•°å€¼è®¾ç½®ç±»ä¿¡æ¯
    79   2      
-   80   2              //»ñÈ¡¹Ì¼ş°æ±¾ĞÅÏ¢Æ«ÒÆÎ»ÖÃ
+   80   2              //è·å–å›ºä»¶ç‰ˆæœ¬ä¿¡æ¯åç§»ä½ç½®
    81   2              item_offset[6] = *(uint32 *) (sd_read_buf + 5);
-   82   2              /*¶ÁÈ¡ÊıÖµÀà²ÎÊıĞÅÏ¢*/
+   82   2              /*è¯»å–æ•°å€¼ç±»å‚æ•°ä¿¡æ¯*/
    83   2              memcpy(&g_modifyval.SleepTime, &sd_read_buf[SIZE_PARA_HEAD], sizeof(value_set_t));
    84   2              memcpy(&g_modifyval.Volume, &sd_read_buf[SIZE_PARA_HEAD + SIZE_PARA_ONEITEM], sizeof(value_set_t)
              -);
@@ -106,7 +106,7 @@ stmt  level    source
    89   2              //        memcpy(&g_modifyval.RecordGain, &sd_read_buf[SIZE_PARA_HEAD + 4 * SIZE_PARA_ONEITEM], s
              -izeof(value_set_t));
    90   2      
-   91   2              /*¶ÁÈ¡°´¼üÅäÖÃĞÅÏ¢*/
+   91   2              /*è¯»å–æŒ‰é”®é…ç½®ä¿¡æ¯*/
    92   2              SD_FSeek(fwcfgfp, SEEK_SET, item_offset[1]);
    93   2              SD_FRead(fwcfgfp, sd_read_buf, sizeof(key_cfg_t));
    94   2      
@@ -133,7 +133,7 @@ stmt  level    source
   114   2              //       g_modifyval.TTS_Report= ((func_item_t *) (&sd_read_buf[SIZE_FUNC_HEAD + 4 * sizeof(func_item_
              -t)]))->State;
   115   2      
-  116   2              /*¶ÁÈ¡apÅäÖÃÀàĞÅÏ¢*/
+  116   2              /*è¯»å–apé…ç½®ç±»ä¿¡æ¯*/
 C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 3   
 
   117   2              SD_FSeek(fwcfgfp, SEEK_SET, item_offset[2]);
@@ -142,11 +142,11 @@ stmt  level    source
   120   2              {
   121   3                  if (((ap_infor_t *) (&sd_read_buf[SIZE_APCFG_HEAD + SIZE_APINFOR_ITEM * i]))->Status != 0)
   122   3                  {
-  123   4                      //ÓĞĞ§AP
+  123   4                      //æœ‰æ•ˆAP
   124   4                      g_modifyval.ApInfor.Table[j]
   125   4                          = ((ap_infor_t *) (&sd_read_buf[SIZE_APCFG_HEAD + SIZE_APINFOR_ITEM * i]))->Index;
   126   4                      j++;
-  127   4                      /*ÕÒ³öActive µÄĞòºÅ*/
+  127   4                      /*æ‰¾å‡ºActive çš„åºå·*/
   128   4                      if (j == sd_read_buf[1])
   129   4                      {
   130   5                          g_modifyval.ApInfor.Active = j;
@@ -156,12 +156,12 @@ stmt  level    source
   134   3              }
   135   2              g_modifyval.ApInfor.Total = j;
   136   2      
-  137   2              /*¶ÁÈ¡ÓïÑÔÅäÖÃĞÅÏ¢*/
+  137   2              /*è¯»å–è¯­è¨€é…ç½®ä¿¡æ¯*/
   138   2              //       SD_FSeek(fwcfgfp, SEEK_SET, item_offset[3]);
   139   2              //        SD_FRead(fwcfgfp, sd_read_buf, sizeof(lan_set_t));
   140   2              //        memcpy(&g_modifyval.LanInfor, sd_read_buf, sizeof(lan_set_t));
   141   2      
-  142   2              /*¶ÁÈ¡¹¦ÄÜÅäÖÃĞÅÏ¢*/
+  142   2              /*è¯»å–åŠŸèƒ½é…ç½®ä¿¡æ¯*/
   143   2              SD_FSeek(fwcfgfp, SEEK_SET, item_offset[5]);
   144   2              SD_FRead(fwcfgfp, sd_read_buf, 512);
   145   2              g_modifyval.KeyToneFlag = ((func_item_t *) (&sd_read_buf[SIZE_FUNC_HEAD]))->State;
@@ -184,7 +184,7 @@ stmt  level    source
   159          
   160          /*
   161           ********************************************************************************
-  162           * Description : ³õÊ¼»¯ÏµÍ³ÉèÖÃ±äÁ¿
+  162           * Description : åˆå§‹åŒ–ç³»ç»Ÿè®¾ç½®å˜é‡
   163           *
   164           * Arguments   :
   165           *
@@ -230,20 +230,20 @@ stmt  level    source
   202   2      
   203   2              g_comval.g_alarm.AlarmEnable = FALSE;
   204   2              g_comval.g_alarm.volume = 35;
-  205   2              g_comval.g_alarm.alarmTime.hour = 12; //ÄÖÖÓÊ±
-  206   2              g_comval.g_alarm.alarmTime.minute = 0; //ÄÖÖÓ·Ö
-  207   2              g_comval.g_alarm.alarmTime.second = 0;//ÄÖÖÓ·Ö
-  208   2              g_comval.g_alarm.alarmDate.month = 1; //ÄÖÖÓÔÂ
-  209   2              g_comval.g_alarm.alarmDate.day = 1; //ÄÖÖÓÈÕ
-  210   2              g_comval.g_alarm.alarmDate.year = 2013; //ÄÖÖÓÄê
+  205   2              g_comval.g_alarm.alarmTime.hour = 12; //é—¹é’Ÿæ—¶
+  206   2              g_comval.g_alarm.alarmTime.minute = 0; //é—¹é’Ÿåˆ†
+  207   2              g_comval.g_alarm.alarmTime.second = 0;//é—¹é’Ÿåˆ†
+  208   2              g_comval.g_alarm.alarmDate.month = 1; //é—¹é’Ÿæœˆ
+  209   2              g_comval.g_alarm.alarmDate.day = 1; //é—¹é’Ÿæ—¥
+  210   2              g_comval.g_alarm.alarmDate.year = 2013; //é—¹é’Ÿå¹´
   211   2              g_comval.g_alarm.location.disk = 'U';
-  212   2              strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //Ê¹ÓÃÄÚ²¿alarmÎÄ¼ş
+  212   2              strcpy(g_comval.g_alarm.location.filename, "alarm.mp3"); //ä½¿ç”¨å†…éƒ¨alarmæ–‡ä»¶
   213   2              result = VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval));
   214   2          }
   215   1      }
   216          /*
   217           ********************************************************************************
-  218           * Description : paµçÔ´GPIO°´¼ü³õÊ¼»¯
+  218           * Description : paç”µæºGPIOæŒ‰é”®åˆå§‹åŒ–
   219           *
   220           * Arguments   :
   221           *
@@ -259,15 +259,15 @@ stmt  level    source
   231   1          uint8 sfr_bak;
   232   1          sfr_bak = SFR_BANK;
   233   1          SFR_BANK = BANK_GPIO;
-  234   1          //Ê¹ÄÜpa µçÔ´¿ª¹ØGPIO ¿Ú
+  234   1          //ä½¿èƒ½pa ç”µæºå¼€å…³GPIO å£
   235   1          PA_POWER_GPIO_OUTPUT |= (1 << PA_POWER_GPIO_NUM);
-  236   1          //½«GPIOE2,3,4,5ÇĞ»»³ÉGPIO¿Ú¹¦ÄÜ£¬ÒÔ·ÀÄ¬ÈÏÎªI2SÊÇ¶ÔFMµÄ¸ÉÈÅ
+  236   1          //å°†GPIOE2,3,4,5åˆ‡æ¢æˆGPIOå£åŠŸèƒ½ï¼Œä»¥é˜²é»˜è®¤ä¸ºI2Sæ˜¯å¯¹FMçš„å¹²æ‰°
   237   1          GPIOEINEN |= 0x3c;
   238   1          SFR_BANK = sfr_bak;
   239   1      }
   240          /*
   241           ********************************************************************************
-  242           * Description : ¹Ø±ÕEJTAG
+  242           * Description : å…³é—­EJTAG
   243           *
   244           * Arguments   :
 C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 5   
@@ -275,7 +275,7 @@ stmt  level    source
   245           *
   246           * Returns     :
   247           *
-  248           * Notes       :ÓÉÓÚI2CÊ¹ÓÃµÄGPIO¿ÚÓëEJTAG¸´ÓÃ£¬ËùÒÔÁ½ÕßÖ»ÄÜÑ¡ÆäÒ»
+  248           * Notes       :ç”±äºI2Cä½¿ç”¨çš„GPIOå£ä¸EJTAGå¤ç”¨ï¼Œæ‰€ä»¥ä¸¤è€…åªèƒ½é€‰å…¶ä¸€
   249           *
   250           ********************************************************************************
   251           */
@@ -299,11 +299,11 @@ stmt  level    source
   269          
   270          /*
   271           ********************************************************************************
-  272           * Description : Ö÷º¯Êı
+  272           * Description : ä¸»å‡½æ•°
   273           *
   274           * Arguments   :
   275           *
-  276           * Returns     : ½á¹ûÏûÏ¢»ò0
+  276           * Returns     : ç»“æœæ¶ˆæ¯æˆ–0
   277           *
   278           * Notes       :
   279           *
@@ -350,9 +350,9 @@ stmt  level    source
   318   2          }
   319   1              
   320   1      //    init_pa_ctl_gpio();
-  321   1          //Ê¹ÄÜPaÖ®Ç°ÏÈ½«Íâ²¿paµçÔ´disable£¬·ÀÖ¹¿ª»úÊ±³öÏÖpapaµçÁ÷Éù
+  321   1          //ä½¿èƒ½Paä¹‹å‰å…ˆå°†å¤–éƒ¨paç”µæºdisableï¼Œé˜²æ­¢å¼€æœºæ—¶å‡ºç°papaç”µæµå£°
   322   1      //    switch_pa_power(0);
-  323   1          //¶ÁÈ¡ÏµÍ³ÅäÖÃ
+  323   1          //è¯»å–ç³»ç»Ÿé…ç½®
   324   1          ReadModifyInfor();
   325   1          read_var();
   326   1      
@@ -367,8 +367,8 @@ stmt  level    source
   335   3                      }
   336   2              }
   337   1              
-  338   1          //Èç¹ûÊÇ³¤°´onoff¿ª»úµÄ»°£¬ĞèÒª½«longkey_flagÖÃÆğÀ´£¬
-  339   1          //ÒÔ±ã¹ıÂËplay¼üÏûÏ¢£¬ÒÔ·ÀÔÙ´Î½øÈëstandby
+  338   1          //å¦‚æœæ˜¯é•¿æŒ‰onoffå¼€æœºçš„è¯ï¼Œéœ€è¦å°†longkey_flagç½®èµ·æ¥ï¼Œ
+  339   1          //ä»¥ä¾¿è¿‡æ»¤playé”®æ¶ˆæ¯ï¼Œä»¥é˜²å†æ¬¡è¿›å…¥standby
   340   1          if(get_onoff_key_status() != 0)
   341   1          {
   342   2              longkey_flag = 1;
@@ -383,12 +383,12 @@ stmt  level    source
   351   1          //never run here
   352   1      }
   353          
-  354          /*´ò¿ªPA¿ª¹Ø*/
+  354          /*æ‰“å¼€PAå¼€å…³*/
   355          void  OpenPA(uint8 volume)
   356          {
   357   1      
   358   1          pa_t paattr;
-  359   1          //g_PAOpenFlag = TRUE;//±êÖ¾PAÒÑ´ò¿ª
+  359   1          //g_PAOpenFlag = TRUE;//æ ‡å¿—PAå·²æ‰“å¼€
   360   1      
   361   1      
   362   1          paattr.pa_in.dacin = 0;
@@ -398,14 +398,14 @@ stmt  level    source
   366   1          paattr.volume = (int8) get_dac_real_vol(volume);
   367   1          paattr.reserve[0] = (int8) get_dac_real_vol(volume);
   368   1      #if 0
-                   //·ÇÖ±Çı
+                   //éç›´é©±
                    EnablePA(&paattr);
                #else
-  372   1          //Ö±Çı
+  372   1          //ç›´é©±
   373   1          EnablePADDV(&paattr);
   374   1      #endif
   375   1      }
-  376          /*´ò¿ªDAC¿ª¹Ø*/
+  376          /*æ‰“å¼€DACå¼€å…³*/
 C251 COMPILER V4.55,  main                                                                 13/12/18  16:28:42  PAGE 7   
 
   377          void  OpenDAC(void)
@@ -417,12 +417,12 @@ stmt  level    source
   383   1      }
   384          
   385          /********************************************************************************
-  386           * Description :¿ª»ú»ñÈ¡ÄÖÖÓ±ê¼Ç
+  386           * Description :å¼€æœºè·å–é—¹é’Ÿæ ‡è®°
   387           *
   388           * Arguments  :
   389           *
   390           * Returns     :
-  391           *            ÎŞ
+  391           *            æ— 
   392           * Notes       :
   393          
   394           *
@@ -434,20 +434,20 @@ stmt  level    source
   400   1          uint8 alarm_pending;
   401   1          sfr_bak = SFR_BANK;
   402   1          SFR_BANK = BANK_RTC;
-  403   1          alarm_pending = RTC_CTL0 & 0x40;//¼ì²âÄÖÖÓpendingÎ»ÊÇ·ñÖÃÆğÀ´
+  403   1          alarm_pending = RTC_CTL0 & 0x40;//æ£€æµ‹é—¹é’Ÿpendingä½æ˜¯å¦ç½®èµ·æ¥
   404   1          SFR_BANK = sfr_bak;
   405   1          if (alarm_pending == 0)
   406   1          {
   407   2              return alarm_flag;
   408   2          }
-  409   1          //¼ì²âÄÖÖÓÏûÏ¢
+  409   1          //æ£€æµ‹é—¹é’Ÿæ¶ˆæ¯
   410   1          if (alarmtimerflag == 1)
   411   1          {
   412   2              alarmtimerflag = 0;
   413   2              if (g_comval.g_alarm.AlarmEnable != 0)
   414   2              {
   415   3                  SFR_BANK = BANK_RTC;
-  416   3                  RTC_CTL0 = RTC_CTL0 | 0x01;//½«ÄÖÖÓ±êÖ¾Çå³ı
+  416   3                  RTC_CTL0 = RTC_CTL0 | 0x01;//å°†é—¹é’Ÿæ ‡å¿—æ¸…é™¤
   417   3                  SFR_BANK = sfr_bak;
   418   3                  alarm_flag = 1;
   419   3              }
@@ -455,14 +455,14 @@ stmt  level    source
   421   1          return alarm_flag;
   422   1      }
   423          /********************************************************************************
-  424           * Description :¼ì²âÓ²¿ª¹ØÊÇ·ñ´¦ÓÚ¹Ø±Õ×´Ì¬
+  424           * Description :æ£€æµ‹ç¡¬å¼€å…³æ˜¯å¦å¤„äºå…³é—­çŠ¶æ€
   425           *
   426           * Arguments  :
   427           *
   428           * Returns     :
-  429           *            ÎŞ
-  430           * Notes       :²»¹ÜĞ¡»ú²»ÖªÒÔºÎÖÖ·½Ê½»½ĞÑÁË£¬µ±¼ì²âµ½Ó²¿ª¹Ø´¦ÓÚ¹Ø±Õ×´Ì¬Ê±£¬
-  431           *                ¶¼Ö±½Ó½øÈëstandby×´Ì¬£¬ÒÔ±£Ö¤Ó²¿ª¹ØµÄÍ³Ò»ĞÔ
+  429           *            æ— 
+  430           * Notes       :ä¸ç®¡å°æœºä¸çŸ¥ä»¥ä½•ç§æ–¹å¼å”¤é†’äº†ï¼Œå½“æ£€æµ‹åˆ°ç¡¬å¼€å…³å¤„äºå…³é—­çŠ¶æ€æ—¶ï¼Œ
+  431           *                éƒ½ç›´æ¥è¿›å…¥standbyçŠ¶æ€ï¼Œä»¥ä¿è¯ç¡¬å¼€å…³çš„ç»Ÿä¸€æ€§
   432           *
   433           *
   434           ********************************************************************************/
@@ -484,13 +484,13 @@ stmt  level    source
   448   1          return retval;
   449   1      }
   450          /********************************************************************************
-  451           * Description :¿ª»úÆô¶¯ÔËĞĞµ½apÒÔºóµÄ³õÊ¼»¯
+  451           * Description :å¼€æœºå¯åŠ¨è¿è¡Œåˆ°apä»¥åçš„åˆå§‹åŒ–
   452           *
   453           * Arguments  :
   454           *
   455           * Returns     :
-  456           *            ÎŞ
-  457           * Notes       :Ö÷ÒªÊÇ´ò¿ªpa,dac,¿ª»ú¼ì²âÄÖÖÓÏûÏ¢£¬USBÏßÊÇ·ñ´æÔÚµÈÇé¿ö
+  456           *            æ— 
+  457           * Notes       :ä¸»è¦æ˜¯æ‰“å¼€pa,dac,å¼€æœºæ£€æµ‹é—¹é’Ÿæ¶ˆæ¯ï¼ŒUSBçº¿æ˜¯å¦å­˜åœ¨ç­‰æƒ…å†µ
   458           *
   459           *
   460           *
@@ -503,8 +503,8 @@ stmt  level    source
                    uint8 retval;
                    {
                        retval = GetUsbCableStatus();
-                       //1)Èç¹û¼ì²âµ½USBÏß£¬ÔòÏÈ½øudisk
-                       //2)Èç¹ûÃ»ÓĞ½ÓusbÏß£¬Ôò½øÈëÉÏÒ»´Î½øÈëstandbyÊ±ap
+                       //1)å¦‚æœæ£€æµ‹åˆ°USBçº¿ï¼Œåˆ™å…ˆè¿›udisk
+                       //2)å¦‚æœæ²¡æœ‰æ¥usbçº¿ï¼Œåˆ™è¿›å…¥ä¸Šä¸€æ¬¡è¿›å…¥standbyæ—¶ap
                        if ((retval & 0x40) == 0x40)
                        {
                            result = RESULT_USBAUDIO_PLAY;
@@ -524,7 +524,7 @@ stmt  level    source
   488   2              linein_status = 0;
   489   2              usb_on_flag = 0;
   490   2              memset(&tmp_time, 0xFF, sizeof(time_t));
-  491   2          //    OpenPA(g_comval.volume); //ÓĞ°´¼üÒô£¬¿ªPA
+  491   2          //    OpenPA(g_comval.volume); //æœ‰æŒ‰é”®éŸ³ï¼Œå¼€PA
   492   2              set_dac_volume(g_comval.volume);
   493   2          }
   494   1      

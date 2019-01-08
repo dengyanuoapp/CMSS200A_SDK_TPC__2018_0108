@@ -24,9 +24,9 @@ stmt  level    source
    13           * \brief    .
    14           * \author   dengtaiping
    15           * \par      GENERAL DESCRIPTION:
-   16           *               Êı¾İ´«Êä´úÂë
+   16           *               æ•°æ®ä¼ è¾“ä»£ç 
    17           * \par      EXTERNALIZED FUNCTIONS:
-   18           *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+   18           *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
    19           *
    20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
    21           *
@@ -42,7 +42,7 @@ stmt  level    source
    31          /*!
    32           * \par  Description:
    33           *     access usb fifo data
-   34           * \param[in]    ep_select:endp NO.¡¢address:buff address¡¢data_lenth:data length
+   34           * \param[in]    ep_select:endp NO.ã€address:buff addressã€data_lenth:data length
    35           * \param[out]   none.
    36           * \return       none
    37          
@@ -60,7 +60,7 @@ stmt  level    source
    49   1          {
    50   2              if (EP1IN == ep_select)
    51   2              {
-   52   3                  //address += 2; //ÉÏ´«×óÉùµÀÊı¾İ
+   52   3                  //address += 2; //ä¸Šä¼ å·¦å£°é“æ•°æ®
    53   3                  //i += 2;
    54   3                  Fifo1dat = *address;
    55   3                  address++;
@@ -69,7 +69,7 @@ stmt  level    source
 C251 COMPILER V4.55,  usound_trans                                                         13/12/18  14:07:00  PAGE 2   
 
    58   3                  i++;
-   59   3                  address += 2; //ÉÏ´«ÓÒÉùµÀÊı¾İ
+   59   3                  address += 2; //ä¸Šä¼ å³å£°é“æ•°æ®
    60   3                  i += 2;
    61   3              }
    62   2              else if (EP2OUT == ep_select)

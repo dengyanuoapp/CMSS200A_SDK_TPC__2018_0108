@@ -41,7 +41,7 @@ stmt  level    source
    30          SD_FILE *info_TTS_Fp;
    31          //Open_param_t *m_deTTSOpenparam;
    32          play_status_t  TTSplay_status;
-   33          BYTE *m_deTTSDataBuffer;//[512];//½âÂëÊ±ÓÃµÄBUFFER
+   33          BYTE *m_deTTSDataBuffer;//[512];//è§£ç æ—¶ç”¨çš„BUFFER
    34          
    35          uint32  m_deTTSOldDspIntAddrSav;
    36          uint32  m_deTTSOldDmaIntAddrSav;
@@ -89,7 +89,7 @@ stmt  level    source
    76   1          position = position;
    77   1          readFileDirection = readFileDirection;
    78   1      
-   79   1          //¶Ïµã¼ÇÂ¼µÄÊÇ½âÂë¹ýµÄÐÅÏ¢
+   79   1          //æ–­ç‚¹è®°å½•çš„æ˜¯è§£ç è¿‡çš„ä¿¡æ¯
    80   1          //    if ((TTSplay_status.status == PLAYING_REACH_END) || (TTSplay_status.status == PLAYING_ERROR) ||
    81   1          //            (TTSplay_status.status == PLAYING_REACH_HEAD))
    82   1          //    {
@@ -194,12 +194,12 @@ stmt  level    source
   179   1      
   180   1          if ((*pbuf >= (unsigned char)0x80) && (tts_lib_flag != 0))
   181   1          {
-  182   2              //Ã¿¸öºº×Ö»úÄÚÂëµÄµÚÒ»¸ö×Ö½Ú·¶Î§½éÓÚ0xB0~ 0xF7Ö®¼ä¾ÍOKÁË£¬×ª»»³ÉÇøÎ»Âë¾ÍÊÇ0~71£¨Ê®½øÖÆ£©
+  182   2              //æ¯ä¸ªæ±‰å­—æœºå†…ç çš„ç¬¬ä¸€ä¸ªå­—èŠ‚èŒƒå›´ä»‹äºŽ0xB0~ 0xF7ä¹‹é—´å°±OKäº†ï¼Œè½¬æ¢æˆåŒºä½ç å°±æ˜¯0~71ï¼ˆåè¿›åˆ¶ï¼‰
   183   2              if((*pbuf > (unsigned char)0xAF) && (*pbuf < (unsigned char)0xF8))
   184   2              {
   185   3                  qu = (str_buff[str_ptr] & (unsigned char)0x7F) - 0x30;
   186   3                  wei = (str_buff[str_ptr + 1] & (unsigned char)0x7F) - 32 - 1;
-  187   3                  //TTSË÷Òý±íÍ·Êý¾Ý½á¹¹,Õ¼¾Ý32byte,reserved 24byte
+  187   3                  //TTSç´¢å¼•è¡¨å¤´æ•°æ®ç»“æž„,å æ®32byte,reserved 24byte
   188   3                  offset = 0x20 + (qu * 94 + wei) * sizeof(tts_pos_t);
   189   3                  str_ptr += 2;
 C251 COMPILER V4.55,  basal_de_tts_RD                                                      13/12/18  16:27:26  PAGE 4   
@@ -245,7 +245,7 @@ stmt  level    source
   228   2              goto re_get_struct;
   229   2          }
   230   1      
-  231   1          //¶àÒô×Ö´¦Àí
+  231   1          //å¤šéŸ³å­—å¤„ç†
   232   1          if((find_multitone_tag == 1) && (tts_pos_tmp.multi_offset != 0xffff))
   233   1          {
   234   2              deTTSApointerSave = citiao_offset + (sizeof(tts_pos_t) - 2) * \

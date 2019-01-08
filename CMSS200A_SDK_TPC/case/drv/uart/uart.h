@@ -26,11 +26,11 @@ typedef struct
      uint16 rx_count;
      uint16 time_count;
 } uart_fifo_t;
-// ²Ëµ¥Í·¿Ø¼şÓĞ¹ØµÄ¶¨Òå
+// èœå•å¤´æ§ä»¶æœ‰å…³çš„å®šä¹‰
 typedef struct
 {
-    uint16 offset;  //Êı¾İ´æ·ÅµÄÆ«ÒÆ
-    uint16 length;  //¸Ã¶ÎÊı¾İµÄ³¤¶È
+    uint16 offset;  //æ•°æ®å­˜æ”¾çš„åç§»
+    uint16 length;  //è¯¥æ®µæ•°æ®çš„é•¿åº¦
     uint16 time_delay;
 } uart_data_t;
 

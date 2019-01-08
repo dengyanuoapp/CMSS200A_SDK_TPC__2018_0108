@@ -31,8 +31,8 @@
 #pragma renamecode(MW_BS_AD_CMD1_TTS)
 
 /*************************************************************************
- * SdLoadCommand ³õÊ¼»¯codecÓÃµÄÈ«¾Ö±äÁ¿g_decInitPara£¬
- * °üÀ¨codecµÄbuffer¡¢dmaÖĞ¶ÏµÄhookº¯Êı¡¢¸èÇúÎÄ¼şµÄµÚÒ»Ö¡Êı¾İµØÖ·µÈµÈ
+ * SdLoadCommand åˆå§‹åŒ–codecç”¨çš„å…¨å±€å˜é‡g_decInitParaï¼Œ
+ * åŒ…æ‹¬codecçš„bufferã€dmaä¸­æ–­çš„hookå‡½æ•°ã€æ­Œæ›²æ–‡ä»¶çš„ç¬¬ä¸€å¸§æ•°æ®åœ°å€ç­‰ç­‰
  ****************************************************************************/
 bool TTSLoadCommand(BYTE music_type, void *param)
 {
@@ -59,7 +59,7 @@ bool TTSLoadCommand(BYTE music_type, void *param)
         TTSplay_status.status = PLAYING_ERROR;
         return FALSE;
     }
-    /* ³õÊ¼»¯TTSµÄÍ· */
+    /* åˆå§‹åŒ–TTSçš„å¤´ */
     SD_FSeek(info_TTS_Fp, SEEK_SET, 0);
     SD_FRead(info_TTS_Fp, &tts_info_head, sizeof(tts_header_t));
     fix_head_data(&tts_info_head);
@@ -73,8 +73,8 @@ bool TTSLoadCommand(BYTE music_type, void *param)
 
 #if 0
 /*************************************************************************
- * SdStopCommand Í£Ö¹²¥·Å
- *1 g_decReadFilePara.ReadFilePagesÔÚdma hookÖĞ±»¸³Öµ = deSdBreakPointSave
+ * SdStopCommand åœæ­¢æ’­æ”¾
+ *1 g_decReadFilePara.ReadFilePagesåœ¨dma hookä¸­è¢«èµ‹å€¼ = deSdBreakPointSave
  ****************************************************************************/
 
 bool TTSStopCommand(void *param)
@@ -98,7 +98,7 @@ bool TTSStopCommand(void *param)
 #endif
 
 /*************************************************************************
- * SdPlayCommand ²¥·Å
+ * SdPlayCommand æ’­æ”¾
  *
  ****************************************************************************/
 bool TTSPlayCommand(void *param)
@@ -109,13 +109,13 @@ bool TTSPlayCommand(void *param)
     {
         return FALSE;
     }
-    TTSplay_status.status = PLAYING_PLAYING;//Ä¬ÈÏÎª²¥·Å×´Ì¬
+    TTSplay_status.status = PLAYING_PLAYING;//é»˜è®¤ä¸ºæ’­æ”¾çŠ¶æ€
 
-    //Òª´ÓÍ·¿ªÊ¼·Å
+    //è¦ä»å¤´å¼€å§‹æ”¾
     g_decControlInfor.PlayMode = PLAY_MODE_NORMAL;
     //SD_FSeek(m_de_TTS_Fp, 0, 0);
 
-    //³õÊ¼»¯¶ÁÈ¡Êı¾İ±äÁ¿
+    //åˆå§‹åŒ–è¯»å–æ•°æ®å˜é‡
     deTTSSecCount = 0;
     deTTSSecOffset = 0;
     prev_next_flag = 1;

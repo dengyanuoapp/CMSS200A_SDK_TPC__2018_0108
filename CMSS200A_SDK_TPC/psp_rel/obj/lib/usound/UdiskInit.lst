@@ -59,8 +59,8 @@ stmt  level    source
    44   1      
    45   1          if (pcallback != 0)
    46   1          {
-   47   2              sFlashLedFlag = 1; //ÖÃÒªÉÁµÆ±êÖ¾
-   48   2              sFlashLed = (uint8 *) pcallback; //±£´æµØÖ·µ½Rcode
+   47   2              sFlashLedFlag = 1; //ç½®è¦é—ªç¯æ ‡å¿—
+   48   2              sFlashLed = (uint8 *) pcallback; //ä¿å­˜åœ°å€åˆ°Rcode
    49   2          }
    50   1      
    51   1          udisk_setting = (uint8) udisk_set & 0x03;
@@ -75,15 +75,15 @@ stmt  level    source
    58   1          GetUsbAttribute((usbattri_t *) (&(CMD_Inquiry_information_FOB + 8)));
    59   1      
    60   1      #ifdef USB_HOST_SUPPORT
-   61   1          //    usb_detectfunc_dereg(); //×¢ÏúTimerÖĞ¶ÏÖĞUSB²éÑ¯´¦ÀíÈë¿Ú
+   61   1          //    usb_detectfunc_dereg(); //æ³¨é”€Timerä¸­æ–­ä¸­USBæŸ¥è¯¢å¤„ç†å…¥å£
    62   1      #endif
    63   1      
-   64   1          /*fixme:needÏµÍ³¶Á³ö²»¶Ô
-   65   1           Vram_Init();                    //Çå³ıVramÖĞFlashºÍ¿¨´ØÁ´ÓĞĞ§±ê¼Ç,²¢ÔÚÍË³öºó¸ù¾İÊÇ·ñÓĞĞ´Flash»ò¿¨ÖØĞ
-             -ÂÖÃÉÏ±êÖ¾Î»
+   64   1          /*fixme:needç³»ç»Ÿè¯»å‡ºä¸å¯¹
+   65   1           Vram_Init();                    //æ¸…é™¤Vramä¸­Flashå’Œå¡ç°‡é“¾æœ‰æ•ˆæ ‡è®°,å¹¶åœ¨é€€å‡ºåæ ¹æ®æ˜¯å¦æœ‰å†™Flashæˆ–å¡é‡
+             -è½®è’™åª³æ››ç–š
    66   1           */
    67   1      
-   68   1          //×°ÔØusbµÄ¿âcode
+   68   1          //è£…è½½usbçš„åº“code
    69   1          sfrbak = SFR_BANK;
    70   1          SFR_BANK = BANK_CMU_RMU;
    71   1          //    MemBankCtl = MemBankCtl & (uint8)0xf7; //PCMRAM and MURAM2 to code FF9000H~FFBFFFH
@@ -113,21 +113,21 @@ stmt  level    source
    93          {
    94   1          ClearWatchdog();
    95   1      
-   96   1          USB_State = 0; //×´Ì¬½á¹¹¶¨Òå   0:¿ÕÏĞ×´Ì¬ ÔÙµ÷ÓÃÊ±Òª³õÊ¼»¯
-   97   1          illegalLBAFlag = 0; //LBAÊÇ·ñ·Ç·¨,ÓÃÓÚ·À·¶·¢ÃüÁî½øĞĞ·Ç·¨¶Á
-   98   1          //·µ»ØÖµ ·ÇMLC flash:0  MLC flash:1; 2:SPI Nor flash; 3:LBA flash; 4:card base; 5:TLC flash; 6:Toshib
+   96   1          USB_State = 0; //çŠ¶æ€ç»“æ„å®šä¹‰   0:ç©ºé—²çŠ¶æ€ å†è°ƒç”¨æ—¶è¦åˆå§‹åŒ–
+   97   1          illegalLBAFlag = 0; //LBAæ˜¯å¦éæ³•,ç”¨äºé˜²èŒƒå‘å‘½ä»¤è¿›è¡Œéæ³•è¯»
+   98   1          //è¿”å›å€¼ éMLC flash:0  MLC flash:1; 2:SPI Nor flash; 3:LBA flash; 4:card base; 5:TLC flash; 6:Toshib
              -a 24nm flash
    99   1          flash_type = (uint8) UD_GetFlashType();
   100   1      
-  101   1          //SectorType flashÉÈÇø´óĞ¡,1=512bytes/sector, 2=1024bytes/sector,4=2048bytes/sector;
-  102   1          //UD_GetSctrSize ·µ»ØÖµ:0=512bytes/sector; 1=1024bytes/sector; 2=2048bytes/sector;
+  101   1          //SectorType flashæ‰‡åŒºå¤§å°,1=512bytes/sector, 2=1024bytes/sector,4=2048bytes/sector;
+  102   1          //UD_GetSctrSize è¿”å›å€¼:0=512bytes/sector; 1=1024bytes/sector; 2=2048bytes/sector;
   103   1          if ((flash_type != 2) && (flash_type != 4))
   104   1          {
   105   2              SectorType = (1 << ((uint8) UD_GetSctrSize()));
   106   2          }
   107   1      
-  108   1          //SectorType = 0x02; //flashÉÈÇø´óĞ¡,1=512bytes/sector, 2=1024bytes/sector,4=2048bytes/sector;
-  109   1          if (flash_type == 4)//¶ÔÓÚ¿¨base²»×ö8k¶ÔÆë£¬ÄÇÃ´ĞèÒª»Ö¸´Ã¿¸öÉÈÇøµÄ´óĞ¡ÒÔ¼°×îºóÒ»¸öÉÈÇøµÄµØÖ·
+  108   1          //SectorType = 0x02; //flashæ‰‡åŒºå¤§å°,1=512bytes/sector, 2=1024bytes/sector,4=2048bytes/sector;
+  109   1          if (flash_type == 4)//å¯¹äºå¡baseä¸åš8kå¯¹é½ï¼Œé‚£ä¹ˆéœ€è¦æ¢å¤æ¯ä¸ªæ‰‡åŒºçš„å¤§å°ä»¥åŠæœ€åä¸€ä¸ªæ‰‡åŒºçš„åœ°å€
   110   1          {
   111   2              SectorType = 0x01;
   112   2          }
@@ -136,30 +136,30 @@ stmt  level    source
   115   1          {
 C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  15:45:45  PAGE 3   
 
-  116   2              //ÉèÖÃUdiskÉÏ±¨¸øPCµÄÈİÁ¿,sFillDiskACapµÄ²ÎÊıÒÔ512byteÎªµ¥Î»,¶øfake_udisk_capÒÔMÎªµ¥Î»
-  117   2              //note:ÉèÖÃAÅÌÈİÁ¿²¢ÖÃ¼ÙÈİÁ¿±ê¼Ç,´Ë½Ó¿Ú±ØĞëÔÚUDiskInitÖ®Ç°µ÷ÓÃ,·ñÔò¼ÓÃÜÅÌ»áÒıÆğÎÊÌâ.
+  116   2              //è®¾ç½®Udiskä¸ŠæŠ¥ç»™PCçš„å®¹é‡,sFillDiskACapçš„å‚æ•°ä»¥512byteä¸ºå•ä½,è€Œfake_udisk_capä»¥Mä¸ºå•ä½
+  117   2              //note:è®¾ç½®Aç›˜å®¹é‡å¹¶ç½®å‡å®¹é‡æ ‡è®°,æ­¤æ¥å£å¿…é¡»åœ¨UDiskInitä¹‹å‰è°ƒç”¨,å¦åˆ™åŠ å¯†ç›˜ä¼šå¼•èµ·é—®é¢˜.
   118   2              sFillDiskACap((uint32) fake_udisk_cap << 11);
   119   2              set_fake_ucap_flag = 0x01;
   120   2          }
   121   1      
-  122   1          sFlashCapCheck(); //FlashºÍ¿¨ÈİÁ¿¼ì²é£¬ÓÃÓÚÉÏ±¨PC
+  122   1          sFlashCapCheck(); //Flashå’Œå¡å®¹é‡æ£€æŸ¥ï¼Œç”¨äºä¸ŠæŠ¥PC
   123   1      
   124   1          flash_page_sctrnum = 0x0002; // need fix ???  //Get_Flash_Page_Size();
   125   1      
-  126   1          //»á×°ÉÏ¿¨Çı¶¯
+  126   1          //ä¼šè£…ä¸Šå¡é©±åŠ¨
   127   1          sCardCapCheck();
   128   1      
   129   1          if (flash_type != 2)
   130   1          {
-  131   2              sPartitionTableCheck(); //·ÖÇø±í¼ì²é£¬È·ÈÏÊÇ·ñÔÚ¼ÓÃÜ×´Ì¬
-  132   2              sFlashBootSectorCheck(); //Òıµ¼ÉÈÇø¼ì²é,Èô²»¾ß±¸´ÅÅÌ½á¹¹±ãÆÆ»µÊ¹ÆäÎªÎ´¸ñÊ½»¯
+  131   2              sPartitionTableCheck(); //åˆ†åŒºè¡¨æ£€æŸ¥ï¼Œç¡®è®¤æ˜¯å¦åœ¨åŠ å¯†çŠ¶æ€
+  132   2              sFlashBootSectorCheck(); //å¼•å¯¼æ‰‡åŒºæ£€æŸ¥,è‹¥ä¸å…·å¤‡ç£ç›˜ç»“æ„ä¾¿ç ´åä½¿å…¶ä¸ºæœªæ ¼å¼åŒ–
   133   2              if (flash_type != 0x04)
   134   2              {
-  135   3                  Partion_MBR_Initial(); //¼ì²éFAT MBR/DBR,²¢¼ÆËã³öDBRÆ«ÒÆ,Êı¾İÇøÆğÊ¼µØÖ·
+  135   3                  Partion_MBR_Initial(); //æ£€æŸ¥FAT MBR/DBR,å¹¶è®¡ç®—å‡ºDBRåç§»,æ•°æ®åŒºèµ·å§‹åœ°å€
   136   3              }
   137   2          }
   138   1      
-  139   1          sSetLUN(); //¼ì²éÓÃ»§ÉèÖÃµÄ´ÅÅÌÊıÄ¿,ÉèÖÃÕıÈ·µÄLUN
+  139   1          sSetLUN(); //æ£€æŸ¥ç”¨æˆ·è®¾ç½®çš„ç£ç›˜æ•°ç›®,è®¾ç½®æ­£ç¡®çš„LUN
   140   1      
   141   1          ClearWatchdog();
   142   1      
@@ -178,18 +178,18 @@ stmt  level    source
   154           * Returns    : None.
   155           *
   156           * Note(s)    :
-  157           *            Ô¤Áô40h¸öÉÈÇø²»ÓÃ,ÊÇÎªÁËÆ»¹ûÏµÍ³¸ñÊ½»¯
-  158           *            Æ»¹û¸ñÊ½»¯ºóÔÚXP¸ñÊ½»¯µÚÒ»´Î²»³É¹¦,µÚ¶ş´Î²Å³É¹¦
-  159           *            ·¢ÏÖÎÊÌâÊÇ:ÔÚMACÏÂ¸ñÊ½»¯Ğ¡»úÊ±,»áĞ´MBRÖÁÉè±¸ÁãÉÈÇø,ÔÚMBRµÄ·ÖÇø±íÀïĞ´ÈëDBRµÄÆğÊ¼ÉÈÇø
-  160           *            Îª0X3FÉÈÇø(1´ÅÍ·0ÖùÃæ1ÉÈÇø)¿ªÊ¼,²¢½«Éè±¸±¨ÉÏÀ´µÄÈİÁ¿ÈÏÎªÊÇ´ÓDBR¿ªÊ¼¿ÉÓÃµÄÉÈÇøÊı,Ğ´ÖÁMBRµÚÒ»
-             -¸ö·ÖÇø±íÏîÀï.
-  161           *            Éè±¸ÔÙ²åÈëXPÏµÍ³½øĞĞ¸ñÊ½»¯Ê±,XPÏµÍ³Ê×ÏÈ»á¸ù¾İMBRÖĞµÄÄÚÈİÈ¥¼ÆËãµÃµ½×îºóÒ»¸öÉÈÇøµÄLBA(0x3F + 
-             -Éè±¸ÈİÁ¿),²¢
-  162           *            Ğ´µÚ0¸öÉÈÇøºÍ×îºóÒ»¸öÉÈÇø,È»¶øXP¸ù¾İMBR¼ÆËãµÃµ½µÄ×îºóÒ»¸öÉÈÇøµÄLBA³¬³öÁËFlashµÄÈİÁ¿,µ¼ÖÂ¶ÁĞ
-             -´Éè±¸×îºóÒ»¸ö
-  163           *            ÉÈÇø²»Ò»ÖÂ,½ø¶ø±¨¸ñÊ½»¯Ê§°Ü´íÎó.²¢ÖÂÊ¹Çı¶¯Ğ´»µÁËFlash0ÉÈÇø¿ªÊ¼µÄÒ»Ğ©ÄÚÈİ,ËùÒÔµÚ¶ş´Î¸ñÊ½»¯»á
-             -³É¹¦.
-  164           *            ½â¾ö·½·¨£ºÔÚÉè±¸Ê¶±ğ³öÊÇMACÏµÍ³Ê±£¬±¨Éè±¸ÈİÁ¿ÎªÊµ¼ÊÈİÁ¿ - 0x40
+  157           *            é¢„ç•™40hä¸ªæ‰‡åŒºä¸ç”¨,æ˜¯ä¸ºäº†è‹¹æœç³»ç»Ÿæ ¼å¼åŒ–
+  158           *            è‹¹æœæ ¼å¼åŒ–ååœ¨XPæ ¼å¼åŒ–ç¬¬ä¸€æ¬¡ä¸æˆåŠŸ,ç¬¬äºŒæ¬¡æ‰æˆåŠŸ
+  159           *            å‘ç°é—®é¢˜æ˜¯:åœ¨MACä¸‹æ ¼å¼åŒ–å°æœºæ—¶,ä¼šå†™MBRè‡³è®¾å¤‡é›¶æ‰‡åŒº,åœ¨MBRçš„åˆ†åŒºè¡¨é‡Œå†™å…¥DBRçš„èµ·å§‹æ‰‡åŒº
+  160           *            ä¸º0X3Fæ‰‡åŒº(1ç£å¤´0æŸ±é¢1æ‰‡åŒº)å¼€å§‹,å¹¶å°†è®¾å¤‡æŠ¥ä¸Šæ¥çš„å®¹é‡è®¤ä¸ºæ˜¯ä»DBRå¼€å§‹å¯ç”¨çš„æ‰‡åŒºæ•°,å†™è‡³MBRç¬¬ä¸€
+             -ä¸ªåˆ†åŒºè¡¨é¡¹é‡Œ.
+  161           *            è®¾å¤‡å†æ’å…¥XPç³»ç»Ÿè¿›è¡Œæ ¼å¼åŒ–æ—¶,XPç³»ç»Ÿé¦–å…ˆä¼šæ ¹æ®MBRä¸­çš„å†…å®¹å»è®¡ç®—å¾—åˆ°æœ€åä¸€ä¸ªæ‰‡åŒºçš„LBA(0x3F + 
+             -è®¾å¤‡å®¹é‡),å¹¶
+  162           *            å†™ç¬¬0ä¸ªæ‰‡åŒºå’Œæœ€åä¸€ä¸ªæ‰‡åŒº,ç„¶è€ŒXPæ ¹æ®MBRè®¡ç®—å¾—åˆ°çš„æœ€åä¸€ä¸ªæ‰‡åŒºçš„LBAè¶…å‡ºäº†Flashçš„å®¹é‡,å¯¼è‡´è¯»
+             -ç“·ç’ç¼¸è©ˆç¬ æ¡“
+  163           *            æ‰‡åŒºä¸ä¸€è‡´,è¿›è€ŒæŠ¥æ ¼å¼åŒ–å¤±è´¥é”™è¯¯.å¹¶è‡´ä½¿é©±åŠ¨å†™åäº†Flash0æ‰‡åŒºå¼€å§‹çš„ä¸€äº›å†…å®¹,æ‰€ä»¥ç¬¬äºŒæ¬¡æ ¼å¼åŒ–ä¼š
+             -æˆåŠŸ.
+  164           *            è§£å†³æ–¹æ³•ï¼šåœ¨è®¾å¤‡è¯†åˆ«å‡ºæ˜¯MACç³»ç»Ÿæ—¶ï¼ŒæŠ¥è®¾å¤‡å®¹é‡ä¸ºå®é™…å®¹é‡ - 0x40
   165           ********************************************************************************************************
              -*
   166           */
@@ -208,13 +208,13 @@ stmt  level    source
   177   1          {
   178   2              EncryptInfoSector = SDDiskCap + VMCap + MICap + UICap - 1;
   179   2      
-  180   2              tmp = (uint32) GetHideDiskCap(); //·µ»ØÒş²ØÅÌµÄÈİÁ¿(ÉÈÇøÎªµ¥Î»)
+  180   2              tmp = (uint32) GetHideDiskCap(); //è¿”å›éšè—ç›˜çš„å®¹é‡(æ‰‡åŒºä¸ºå•ä½)
   181   2              AutoRunDiskStartAddr = SDDiskCap + VMCap + MICap + UICap + tmp;
   182   2      
-  183   2              AutoRunDiskCapacity = (uint32) GetAutoRunDiskCap(); //·µ»ØAutoRun¹âÅÌµÄÈİÁ¿(ÉÈÇøÎªµ¥Î»)
+  183   2              AutoRunDiskCapacity = (uint32) GetAutoRunDiskCap(); //è¿”å›AutoRunå…‰ç›˜çš„å®¹é‡(æ‰‡åŒºä¸ºå•ä½)
   184   2              if (AutoRunDiskCapacity == 0)
   185   2              {
-  186   3                  AutoRunDiskFlag = 0; //AutoRun¹âÅÌ´æÔÚ±êÖ¾: 0:²»´æÔÚ; ·Ç0:´æÔÚ
+  186   3                  AutoRunDiskFlag = 0; //AutoRunå…‰ç›˜å­˜åœ¨æ ‡å¿—: 0:ä¸å­˜åœ¨; é0:å­˜åœ¨
   187   3              }
   188   2              else
   189   2              {
@@ -222,7 +222,7 @@ stmt  level    source
   191   3              }
   192   2      
   193   2              UdiskStartAddr = (AutoRunDiskStartAddr + AutoRunDiskCapacity);
-  194   2              //UÅÌµÄÆğÊ¼ÉÈÇøºÅ,Ê¹UÅÌÆğÊ¼ÉÈÇøÄ£16ÎªÁã(ÒòFlashÇı¶¯¶ÁĞ´ÒÔ16sectorÎªµ¥Î»,ÇÒÊı¾İÒª¶ÔÆë)
+  194   2              //Uç›˜çš„èµ·å§‹æ‰‡åŒºå·,ä½¿Uç›˜èµ·å§‹æ‰‡åŒºæ¨¡16ä¸ºé›¶(å› Flashé©±åŠ¨è¯»å†™ä»¥16sectorä¸ºå•ä½,ä¸”æ•°æ®è¦å¯¹é½)
   195   2              if ((UdiskStartAddr & 0x0000000f) != 0x00)
   196   2              {
   197   3                  UdiskStartAddr = (UdiskStartAddr & (uint32) 0xfffffff0) + 0x10;
@@ -230,12 +230,12 @@ stmt  level    source
   199   2      
   200   2              Cap_cmd_info_DiskCDROM.LastLogBlockAddr = AutoRunDiskCapacity >> 2;
   201   2      
-  202   2              sFlashDrvCheck(); //ÇĞ»»Flash Driver
+  202   2              sFlashDrvCheck(); //åˆ‡æ¢Flash Driver
   203   2      
-  204   2              tmp = (uint32) UD_GetCap(); //ÒÔ1MByteÎªµ¥Î»
-  205   2              flash_capacity = tmp << 3; //ÒÔ128KÎªµ¥Î»
+  204   2              tmp = (uint32) UD_GetCap(); //ä»¥1MByteä¸ºå•ä½
+  205   2              flash_capacity = tmp << 3; //ä»¥128Kä¸ºå•ä½
   206   2      
-  207   2              //±£´æUÅÌ×Ü¿ÉÓÃÉÈÇø×ÜÊı,²¢Ô¤Áô0x40¸öÉÈÇø²»ÓÃ.
+  207   2              //ä¿å­˜Uç›˜æ€»å¯ç”¨æ‰‡åŒºæ€»æ•°,å¹¶é¢„ç•™0x40ä¸ªæ‰‡åŒºä¸ç”¨.
   208   2              udisk_total_capacity = (tmp << 11) - UdiskStartAddr - 0x100;
   209   2      
   210   2              if (set_fake_ucap_flag == 0x00)
@@ -243,8 +243,8 @@ stmt  level    source
   212   3                  sFillDiskACap(udisk_total_capacity);
   213   3              }
   214   2      
-  215   2              //UÅÌ¶ÁĞ´Ê±»á¶ÔµØÖ·×ö¶ÔÆë¶¯×÷,¶ÁĞ´µØÖ·¼ÓÆ«ÒÆDataAreaOffset,¶ø´ÅÅÌ×ÜÈİÁ¿Ò²ĞèÍ¬²½,·ÀÖ¹¼ÆËãÊÇ·ñÔ½½çÊ
-             -±´íÎó
+  215   2              //Uç›˜è¯»å†™æ—¶ä¼šå¯¹åœ°å€åšå¯¹é½åŠ¨ä½œ,è¯»å†™åœ°å€åŠ åç§»DataAreaOffset,è€Œç£ç›˜æ€»å®¹é‡ä¹Ÿéœ€åŒæ­¥,é˜²æ­¢è®¡ç®—æ˜¯å¦è¶Šç•Œ
+             -è´ç ¦
   216   2              udisk_total_capacity = udisk_total_capacity + 0x100;
   217   2          }
   218   1      }
@@ -254,7 +254,7 @@ stmt  level    source
              -*
   222           *                                           sPartitionTableCheck
   223           *
-  224           * Description: Partition Table Check, È·ÈÏÊÇ·ñÔÚ¼ÓÃÜ×´Ì¬.
+  224           * Description: Partition Table Check, ç¡®è®¤æ˜¯å¦åœ¨åŠ å¯†çŠ¶æ€.
   225           *
   226           * Arguments  : None.
   227           *
@@ -269,36 +269,36 @@ stmt  level    source
   235   1          encrypt_info *encrypt_info_p;
   236   1          uint32 tmp;
   237   1      
-  238   1          //³õÊ¼»¯·ÖÇø±êÖ¾
+  238   1          //åˆå§‹åŒ–åˆ†åŒºæ ‡å¿—
 C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  15:45:45  PAGE 5   
 
   239   1          SplitDiskFlag = 0;
   240   1          EncryptFlag = 0;
   241   1          PasswdPassOk = 0;
   242   1      
-  243   1          //ÉèÖÃ¼ÙÈİÁ¿ºó²»ÔÙÖ§³Ö¼ÓÃÜ·ÖÇø¹¦ÄÜ
+  243   1          //è®¾ç½®å‡å®¹é‡åä¸å†æ”¯æŒåŠ å¯†åˆ†åŒºåŠŸèƒ½
   244   1          if (set_fake_ucap_flag == 0x00)
   245   1          {
   246   2              encrypt_info_p = (encrypt_info *) DATABUFFER;
-  247   2              //¶ÁFlash 1ÉÈÇøÊı¾İµ½UramÖĞUramRWStartAddÆğÊ¼µÄµØ·½È¥
+  247   2              //è¯»Flash 1æ‰‡åŒºæ•°æ®åˆ°Uramä¸­UramRWStartAddèµ·å§‹çš„åœ°æ–¹å»
   248   2              sFlash_Rds(RW_FIX, EncryptInfoSector, DATABUFFER);
   249   2      
-  250   2              //ÊÇ·ñÓĞ·ÖÇø
+  250   2              //æ˜¯å¦æœ‰åˆ†åŒº
   251   2              if (encrypt_info_p->SplitDiskRecord == 0x01)
   252   2              {
   253   3                  sFlash_Rds(RW_FIX, UdiskStartAddr, DATABUFFER);
   254   3      
-  255   3                  //ÊÇ·ñActions·ÖÇø±í, 0:ÊÇ  ÆğÊ¼Öµ£º²»ÊÇ; ·ÇActions MBR£¬¼´·Ç¼ÓÃÜ
+  255   3                  //æ˜¯å¦Actionsåˆ†åŒºè¡¨, 0:æ˜¯  èµ·å§‹å€¼ï¼šä¸æ˜¯; éActions MBRï¼Œå³éåŠ å¯†
   256   3                  if (memcmp(MBR_Bak, DATABUFFER, 0xe0) == 0)
   257   3                  {
-  258   4                      //·ÖÇøÓĞĞ§£¬ÖÃ±êÖ¾Î»
+  258   4                      //åˆ†åŒºæœ‰æ•ˆï¼Œç½®æ ‡å¿—ä½
   259   4                      SplitDiskFlag = 1;
   260   4      
   261   4                      sFlash_Rds(RW_FIX, EncryptInfoSector, DATABUFFER);
-  262   4                      //ÊÇ·ñÓĞÃÜÂë
+  262   4                      //æ˜¯å¦æœ‰å¯†ç 
   263   4                      EncryptFlag = encrypt_info_p->IfEncryptRecord;
   264   4      
-  265   4                      //»Ö¸´AÅÌÈİÁ¿
+  265   4                      //æ¢å¤Aç›˜å®¹é‡
   266   4                      tmp = encrypt_info_p->DiskACapacityRecord;
   267   4                      EndianReverse((uint8 *) &tmp, sizeof(tmp));
   268   4                      tmp = tmp / SectorType;
@@ -306,22 +306,22 @@ stmt  level    source
   270   4                      Formatcap_cmd_info_DiskA.CurrentCap = tmp;
   271   4                      Formatcap_cmd_info_DiskA.FomatableCap = tmp;
   272   4      
-  273   4                      //Ëã³öDiskBÔÚFlashµÄÕæÕıÆğÊ¼µØÖ·
+  273   4                      //ç®—å‡ºDiskBåœ¨Flashçš„çœŸæ­£èµ·å§‹åœ°å€
   274   4                      tmp = encrypt_info_p->DiskBStartAddrRecord;
   275   4                      EndianReverse((uint8 *) &tmp, sizeof(tmp));
   276   4                      EncryptDiskBStartAddr = tmp + UdiskStartAddr;
-  277   4                      //»Ö¸´BÅÌÈİÁ¿
+  277   4                      //æ¢å¤Bç›˜å®¹é‡
   278   4                      tmp = encrypt_info_p->DiskBCapacityRecord;
   279   4                      EndianReverse((uint8 *) &tmp, sizeof(tmp));
   280   4                      Cap_cmd_info_DiskB.LastLogBlockAddr = tmp;
   281   4                      Formatcap_cmd_info_DiskB.CurrentCap = tmp;
   282   4                      Formatcap_cmd_info_DiskB.FomatableCap = tmp;
   283   4      
-  284   4                      //Ëã³öDiskCÔÚFlashµÄÕæÕıÆğÊ¼µØÖ·
+  284   4                      //ç®—å‡ºDiskCåœ¨Flashçš„çœŸæ­£èµ·å§‹åœ°å€
   285   4                      tmp = encrypt_info_p->DiskCStartAddrRecord;
   286   4                      EndianReverse((uint8 *) &tmp, sizeof(tmp));
   287   4                      EncryptDiskCStartAddr = tmp + UdiskStartAddr;
-  288   4                      //»Ö¸´CÅÌÈİÁ¿
+  288   4                      //æ¢å¤Cç›˜å®¹é‡
   289   4                      tmp = encrypt_info_p->DiskCCapacityRecord;
   290   4                      EndianReverse((uint8 *) &tmp, sizeof(tmp));
   291   4                      Cap_cmd_info_DiskC.LastLogBlockAddr = tmp;
@@ -331,7 +331,7 @@ stmt  level    source
   295   4                      if (encrypt_info_p->DataSectorsForEncOkRecord != 0xddcc)
   296   4                      {
   297   5                          encrypt_info_p->DataSectorsForEncOkRecord = 0xddcc;
-  298   5                          //½«¶ÁÖÁUram BufferÖĞ1ÉÈÇøÊı¾İÔÙĞ´ÖÁ¶ÔÓ¦´ËÊı¾İµÄFlashÖĞ
+  298   5                          //å°†è¯»è‡³Uram Bufferä¸­1æ‰‡åŒºæ•°æ®å†å†™è‡³å¯¹åº”æ­¤æ•°æ®çš„Flashä¸­
   299   5                          sFlash_Wrts(RW_FIX, EncryptInfoSector, DATABUFFER);
   300   5                      }
   301   4                  }
@@ -340,7 +340,7 @@ stmt  level    source
   304   4                      memset(DATABUFFER, 0, 0x200);
 C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  15:45:45  PAGE 6   
 
-  305   4                      //½«¶ÁÖÁUram BufferÖĞ1ÉÈÇøÊı¾İÔÙĞ´ÖÁ¶ÔÓ¦´ËÊı¾İµÄFlashÖĞ
+  305   4                      //å°†è¯»è‡³Uram Bufferä¸­1æ‰‡åŒºæ•°æ®å†å†™è‡³å¯¹åº”æ­¤æ•°æ®çš„Flashä¸­
   306   4                      sFlash_Wrts(RW_FIX, EncryptInfoSector, DATABUFFER);
   307   4                  }
   308   3              }
@@ -352,7 +352,7 @@ stmt  level    source
              -*
   314           *                                           sSetLUN
   315           *
-  316           * Description: ¼ì²éÓÃ»§ÉèÖÃµÄ´ÅÅÌÊıÄ¿,Set LUN Number.
+  316           * Description: æ£€æŸ¥ç”¨æˆ·è®¾ç½®çš„ç£ç›˜æ•°ç›®,Set LUN Number.
   317           *
   318           * Arguments  : None.
   319           *
@@ -368,21 +368,21 @@ stmt  level    source
   328   1      
   329   1          cLun = 0;
   330   1      
-  331   1          if (DiskAppearSelect == 0) //ÓÃ»§µÄÅÌ·ûÑ¡Ôñ  0:¶àÅÌ·û(Ä¬ÈÏ)  01h:ÆÕÍ¨ÅÌ  02h:¼ÓÃÜÅÌ  03h:²å¿¨
+  331   1          if (DiskAppearSelect == 0) //ç”¨æˆ·çš„ç›˜ç¬¦é€‰æ‹©  0:å¤šç›˜ç¬¦(é»˜è®¤)  01h:æ™®é€šç›˜  02h:åŠ å¯†ç›˜  03h:æ’å¡
   332   1          {
   333   2              cLun = SplitDiskFlag;
-  334   2              if (ShowMultiDiskFlag == 0) //ÊÇ·ñĞèÒªÏÔÊ¾¿¨ÅÌ·û
+  334   2              if (ShowMultiDiskFlag == 0) //æ˜¯å¦éœ€è¦æ˜¾ç¤ºå¡ç›˜ç¬¦
   335   2              {
   336   3                  cLun += CardExistFlag;
   337   3              }
   338   2              else
   339   2              {
-  340   3                  cLun++; //ÎŞÂÛÊÇ·ñ²å¿¨£¬¶¼ÒªÏÔÊ¾ÅÌ·û£¬Òò´ËLUNÖÁÉÙÎª1
+  340   3                  cLun++; //æ— è®ºæ˜¯å¦æ’å¡ï¼Œéƒ½è¦æ˜¾ç¤ºç›˜ç¬¦ï¼Œå› æ­¤LUNè‡³å°‘ä¸º1
   341   3              }
   342   2          }
   343   1      
   344   1          //for autorun
-  345   1          if (AutoRunDiskFlag != 0x00) //AutoRun¹âÅÌ´æÔÚ±êÖ¾: 0:²»´æÔÚ; ·Ç0:´æÔÚ
+  345   1          if (AutoRunDiskFlag != 0x00) //AutoRunå…‰ç›˜å­˜åœ¨æ ‡å¿—: 0:ä¸å­˜åœ¨; é0:å­˜åœ¨
   346   1          {
   347   2              cLun = cLun + 1;
   348   2          }
@@ -395,7 +395,7 @@ stmt  level    source
              -*
   355           *                                           sFlashBootSectorCheck
   356           *
-  357           * Description: Flash UdiskÒıµ¼ÉÈÇø¼ì²é,Èô²»¾ß±¸´ÅÅÌ½á¹¹±ãÆÆ»µÊ¹ÆäÎªÎ´¸ñÊ½»¯.
+  357           * Description: Flash Udiskå¼•å¯¼æ‰‡åŒºæ£€æŸ¥,è‹¥ä¸å…·å¤‡ç£ç›˜ç»“æ„ä¾¿ç ´åä½¿å…¶ä¸ºæœªæ ¼å¼åŒ–.
   358           *
   359           * Arguments  : None.
   360           *
@@ -411,31 +411,31 @@ stmt  level    source
   367          {
   368   1          char *pcDataBuffer;
   369   1      
-  370   1          //ÇåÎïÀí0ÉÈÇøÓëÂß¼­0ÉÈÇøÊÇ·ñÖØºÏ±äÁ¿
+  370   1          //æ¸…ç‰©ç†0æ‰‡åŒºä¸é€»è¾‘0æ‰‡åŒºæ˜¯å¦é‡åˆå˜é‡
   371   1          Phy0EquLog0Flag = 0;
-  372   1          //DATABUFFERÎªsFlash_Lgcl_RdFixº¯Êı¶Áµ½Uram B2ÖĞµÄÆğÊ¼µØÖ·
+  372   1          //DATABUFFERä¸ºsFlash_Lgcl_RdFixå‡½æ•°è¯»åˆ°Uram B2ä¸­çš„èµ·å§‹åœ°å€
   373   1          pcDataBuffer = DATABUFFER;
-  374   1          //¶ÁMBR
+  374   1          //è¯»MBR
   375   1          sFlash_Rds(RW_FIX, UdiskStartAddr, DATABUFFER);
   376   1      
   377   1          if ((*pcDataBuffer == 0xeb) && (*(pcDataBuffer + 2) == 0x90))
   378   1          {
-  379   2              //´ÅÅÌÕıÈ·,ÎïÀí0ÉÈÇøÓëÂß¼­0ÉÈÇøÖØºÏ
+  379   2              //ç£ç›˜æ­£ç¡®,ç‰©ç†0æ‰‡åŒºä¸é€»è¾‘0æ‰‡åŒºé‡åˆ
   380   2              Phy0EquLog0Flag = 1;
   381   2          }
-  382   1          //ÊÇ·ñActions·ÖÇø±í, 0:ÊÇ  ·Ç0:²»ÊÇ; ·ÇActions MBR£¬¼´·Ç¼ÓÃÜ
+  382   1          //æ˜¯å¦Actionsåˆ†åŒºè¡¨, 0:æ˜¯  é0:ä¸æ˜¯; éActions MBRï¼Œå³éåŠ å¯†
   383   1          else if (memcmp(MBR_Bak, UDISKSTARTADDRURAMADD, 0xe0) != 0)
   384   1          {
-  385   2              //´ÅÅÌÎ´¸ñÊ½»¯,ÎïÀí0ÉÈÇøÓëÂß¼­0ÉÈÇøÖØºÏ
+  385   2              //ç£ç›˜æœªæ ¼å¼åŒ–,ç‰©ç†0æ‰‡åŒºä¸é€»è¾‘0æ‰‡åŒºé‡åˆ
   386   2              Phy0EquLog0Flag = 0x01;
   387   2              if ((*(pcDataBuffer + 510) != 0x55) || (*(pcDataBuffer + 511) != 0xaa))
   388   2              {
-  389   3                  //¶Áfat±í
+  389   3                  //è¯»fatè¡¨
   390   3                  sFlash_Rds(RW_FIX, UdiskStartAddr + 1, DATABUFFER);
   391   3                  if ((*pcDataBuffer != 0xff) || (*(pcDataBuffer + 1) != 0xf8))
   392   3                  {
   393   4                      memset(DATABUFFER, 0, 0x200);
-  394   4                      //ÆÆ»µBootÇø,Ê¹ÆäÎ´¸ñÊ½»¯
+  394   4                      //ç ´åBootåŒº,ä½¿å…¶æœªæ ¼å¼åŒ–
   395   4                      sFlash_Wrts(RW_FIX, UdiskStartAddr, DATABUFFER);
   396   4                      sFlash_Wrts(RW_FIX, UdiskStartAddr + 1, DATABUFFER);
   397   4                  }
@@ -451,7 +451,7 @@ stmt  level    source
              -*
   407           *                                           UDiskSetDiskNum
   408           *
-  409           * Description: ÉèÖÃ´ÅÅÌ³öÏÖÊıÄ¿,ÒªÔÚµ÷ÓÃUdiskInitÇ°µ÷ÓÃ 0:¶àÅÌ·û(Ä¬ÈÏ)  01h:ÆÕÍ¨ÅÌ  02h:¼ÓÃÜÅÌ  03h:²å¿¨
+  409           * Description: è®¾ç½®ç£ç›˜å‡ºç°æ•°ç›®,è¦åœ¨è°ƒç”¨UdiskInitå‰è°ƒç”¨ 0:å¤šç›˜ç¬¦(é»˜è®¤)  01h:æ™®é€šç›˜  02h:åŠ å¯†ç›˜  03h:æ’å¡
              -.
   410           *
   411           * Arguments  : None.
@@ -478,7 +478,7 @@ stmt  level    source
 
   429           *                                           UDiskSetWP
   430           *
-  431           * Description: ÉèÖÃ´ÅÅÌĞ´±£»¤,Ó¦ÔÚUDiskRunÇ°µ÷ÓÃ.
+  431           * Description: è®¾ç½®ç£ç›˜å†™ä¿æŠ¤,åº”åœ¨UDiskRunå‰è°ƒç”¨.
   432           *
   433           * Arguments  : None.
   434           *
@@ -512,7 +512,7 @@ stmt  level    source
              -*
   461           *                                           Vram_Init
   462           *
-  463           * Description: Çå³ıVramÖĞFlashºÍ¿¨´ØÁ´ÓĞĞ§±ê¼Ç,²¢ÔÚÍË³öºó¸ù¾İÊÇ·ñÓĞĞ´Flash»ò¿¨ÖØĞÂÖÃÉÏ±êÖ¾Î».
+  463           * Description: æ¸…é™¤Vramä¸­Flashå’Œå¡ç°‡é“¾æœ‰æ•ˆæ ‡è®°,å¹¶åœ¨é€€å‡ºåæ ¹æ®æ˜¯å¦æœ‰å†™Flashæˆ–å¡é‡æ–°ç½®ä¸Šæ ‡å¿—ä½.
   464           *
   465           * Arguments  : None.
   466           *
@@ -527,8 +527,8 @@ stmt  level    source
   474           {
   475           sFlash_Rds(RW_FIX,(SDDiskCap + VM_FS_FLAG/0x200), DATABUFFER);
   476           flash_vram_vld =  *((uint8*)DATABUFFER+0x04);
-  477           *((uint8*)DATABUFFER+0x04) = 0xff;                //Flash´ØÁ´ÓĞĞ§±ê¼Ç
-  478           *((uint8*)DATABUFFER+0x0C) = 0xff;                //¿¨´ØÁ´ÓĞĞ§±ê¼Ç
+  477           *((uint8*)DATABUFFER+0x04) = 0xff;                //Flashç°‡é“¾æœ‰æ•ˆæ ‡è®°
+  478           *((uint8*)DATABUFFER+0x0C) = 0xff;                //å¡ç°‡é“¾æœ‰æ•ˆæ ‡è®°
   479           sFlash_Wrts(RW_FIX,(SDDiskCap + VM_FS_FLAG/0x200), DATABUFFER);
   480           }
   481           */
@@ -538,7 +538,7 @@ stmt  level    source
              -*
   485           *                                           Udisk_Exit_Handle
   486           *
-  487           * Description: UdiskÕı³£ÍË³öÊ±´¦ÀíÈë¿Ú,ÈçVram±ê¼Ç»ØĞ´,USBÏûÏ¢´¦ÀíTimerÖĞ¶ÏÖØĞÂ×¢²á.
+  487           * Description: Udiskæ­£å¸¸é€€å‡ºæ—¶å¤„ç†å…¥å£,å¦‚Vramæ ‡è®°å›å†™,USBæ¶ˆæ¯å¤„ç†Timerä¸­æ–­é‡æ–°æ³¨å†Œ.
   488           *
   489           * Arguments  : None.
   490           *
@@ -552,7 +552,7 @@ stmt  level    source
   495           */
   496          void Udisk_Exit_Handle(void)
   497          {
-  498   1          /*fixme:needÏµÍ³¶Á³ö²»¶Ô
+  498   1          /*fixme:needç³»ç»Ÿè¯»å‡ºä¸å¯¹
   499   1           Vram_Update();
   500   1           */
   501   1      #ifdef USB_HOST_SUPPORT
@@ -565,7 +565,7 @@ stmt  level    source
              -*
   508           *                                           Vram_Update
   509           *
-  510           * Description: Çå³ıVramÖĞFlashºÍ¿¨´ØÁ´ÓĞĞ§±ê¼Ç,²¢ÔÚÍË³öºó¸ù¾İÊÇ·ñÓĞĞ´Flash»ò¿¨ÖØĞÂÖÃÉÏ±êÖ¾Î».
+  510           * Description: æ¸…é™¤Vramä¸­Flashå’Œå¡ç°‡é“¾æœ‰æ•ˆæ ‡è®°,å¹¶åœ¨é€€å‡ºåæ ¹æ®æ˜¯å¦æœ‰å†™Flashæˆ–å¡é‡æ–°ç½®ä¸Šæ ‡å¿—ä½.
   511           *
   512           * Arguments  : None.
   513           *
@@ -578,12 +578,12 @@ stmt  level    source
   519          /*
   520           void Vram_Update(void)
   521           {
-  522           //·¢Éú¹ıUdiskĞ´¶¯×÷,ÒòVram±ê¼ÇÔÚ½øÈëÊ±ÒÑ¾­±»Çëµô²»ĞèÒª»Ö¸´;Ã»ÓĞĞ´¶¯×÷,µ«ÊÇÆäVram±ê¼Ç±¾À´¾ÍÃ»ÓĞ,Ò²²»ĞèÒª»
-             -Ö¸´
+  522           //å‘ç”Ÿè¿‡Udiskå†™åŠ¨ä½œ,å› Vramæ ‡è®°åœ¨è¿›å…¥æ—¶å·²ç»è¢«è¯·æ‰ä¸éœ€è¦æ¢å¤;æ²¡æœ‰å†™åŠ¨ä½œ,ä½†æ˜¯å…¶Vramæ ‡è®°æœ¬æ¥å°±æ²¡æœ‰,ä¹Ÿä¸éœ€è¦
+             -æŒ‡
   523           if ((flash_disk_write_flag==0x00) && (flash_vram_vld!=0x00))
   524           {
   525           sFlash_Rds(RW_FIX,(SDDiskCap + VM_FS_FLAG/0x200), DATABUFFER);
-  526           //Flash´ØÁ´ÓĞĞ§±ê¼Ç
+  526           //Flashç°‡é“¾æœ‰æ•ˆæ ‡è®°
   527           *((uint8*)DATABUFFER+0x04) = flash_vram_vld;
   528           sFlash_Wrts(RW_FIX,(SDDiskCap + VM_FS_FLAG/0x200), DATABUFFER);
   529           }
@@ -597,7 +597,7 @@ stmt  level    source
   536           *
   537           * Description: Fill DiskA Capacity.
   538           *
-  539           * Arguments  : udiskcap:DiskA Capacity,512byteµ¥Î»
+  539           * Arguments  : udiskcap:DiskA Capacity,512byteå•ä½
   540           *
   541           * Returns    : None.
   542           *
@@ -607,7 +607,7 @@ stmt  level    source
   545           */
   546          void sFillDiskACap(uint32 udiskcap)
   547          {
-  548   1          //³õÊ¼»¯blocklength
+  548   1          //åˆå§‹åŒ–blocklength
   549   1          Cap_cmd_info_DiskA.BlockLengthInBytes = 0x200;
   550   1      
 C251 COMPILER V4.55,  UdiskInit                                                            15/07/16  15:45:45  PAGE 10  

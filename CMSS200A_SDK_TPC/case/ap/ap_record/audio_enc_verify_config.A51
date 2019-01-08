@@ -108,34 +108,34 @@ c_encInputGain: 		DS      1 			;INPUT GAIN PARAMETERS
 c_encADCGain: 			DS      1 			;ADC GAIN PARAMETERS
 c_encDSPGain: 			DS      1 			;DSP GAIN PARAMETERS, Recommend 16 8 20 = 320 ms
 c_encDelayTime:			DS      1 			;Delay time for avoidding noise, unit: 20ms
-c_encEnergyOut: 		DS      1 			;0:not out ·ÇÁã:out energy
-c_encAVRFlag: 			DS      1 			;0:not SILENCE DETECTION ·ÇÁã:SILENCE DETECTION
+c_encEnergyOut: 		DS      1 			;0:not out éé›¶:out energy
+c_encAVRFlag: 			DS      1 			;0:not SILENCE DETECTION éé›¶:SILENCE DETECTION
 c_encAVRDelay:			DS      1 			;SILENCE DETECTION PERIOD
 c_encAVRLevel: 			DSW     1 			;SILENCE DETECTION LEVEL
 c_encLeftOffset:		DSW			1				;left channel dc offset
 c_encRightOffset:		DSW			1				;right channel dc offset
 
 g_encWriteFilePara:		
-c_encWriteFileHandle:		DSD		1			//ÎÄ¼ş¶ÁĞ´½Ó¿ÚµÄÖ¸Õë£¨»ò¾ä±ú£©£¬Î»ÓÚBasal²ã£¬Ã¿´ÎĞ´ÌØ¶¨µÄn*512byte			
-c_encFileLen:						DSD		1 			//ÎÄ¼ş×Ü³¤¶È£¬µ¥Î»£º×Ö½Ú
-c_encWriteFileBuffAddr:	DSW		1  			//ÎÄ¼şÊı¾İ»º³åÇøµÄÆğÊ¼µØÖ·£¬»º³åÇø´óĞ¡Îªn*512byte£¬Ôİ¶¨Îªµ¥»º³åÇø£¬Ôİ¶¨·ÅÔÚDM
-c_encWriteFileCurSize:	DSW   1 			//µ±Ç°Ğ´µÄ±àÂëÊı¾İÁ¿£¬µ¥Î»£º×Ö½Ú		
+c_encWriteFileHandle:		DSD		1			//æ–‡ä»¶è¯»å†™æ¥å£çš„æŒ‡é’ˆï¼ˆæˆ–å¥æŸ„ï¼‰ï¼Œä½äºBasalå±‚ï¼Œæ¯æ¬¡å†™ç‰¹å®šçš„n*512byte			
+c_encFileLen:						DSD		1 			//æ–‡ä»¶æ€»é•¿åº¦ï¼Œå•ä½ï¼šå­—èŠ‚
+c_encWriteFileBuffAddr:	DSW		1  			//æ–‡ä»¶æ•°æ®ç¼“å†²åŒºçš„èµ·å§‹åœ°å€ï¼Œç¼“å†²åŒºå¤§å°ä¸ºn*512byteï¼Œæš‚å®šä¸ºå•ç¼“å†²åŒºï¼Œæš‚å®šæ”¾åœ¨DM
+c_encWriteFileCurSize:	DSW   1 			//å½“å‰å†™çš„ç¼–ç æ•°æ®é‡ï¼Œå•ä½ï¼šå­—èŠ‚		
 
 c_encInitToZeroStart:		
 g_encStatus:
 c_encStatus: 						DS      1				;ENCODER STATUS
-c_encAVRStatus:					DS      1				;0: not silence, 1: Éù¿ØÍ£Ö¹£¬2£º·ÖÇú
+c_encAVRStatus:					DS      1				;0: not silence, 1: å£°æ§åœæ­¢ï¼Œ2ï¼šåˆ†æ›²
 c_encEnergyLevel:				DSW     1				;Energy Level			
-c_encCurTime:						DSD			1				;¶ÔÓ¦Ê±£¬·Ö£¬Ãë£¬×î¸ßµÄbyteÎª0 
+c_encCurTime:						DSD			1				;å¯¹åº”æ—¶ï¼Œåˆ†ï¼Œç§’ï¼Œæœ€é«˜çš„byteä¸º0 
 
 c_encSamplerate:				DSW			1			;SAMPLE RATE: SAMPLES PER SECNOD
 c_encBitrate:					DSW			1			;birate: kbps
 
-c_encWriteTempBufferAddr:DSW		1  			;16kÊı¾İ»º³åÇøµÄĞ´µØÖ·
-c_encReadTempBufferAddr: DSW		1  			;16kÊı¾İ»º³åÇøµÄ¶ÁµØÖ·
-c_encByteshaveEncode: 	DSD     1 			;ÒÑ±àÂë×Ö½ÚÊı
+c_encWriteTempBufferAddr:DSW		1  			;16kæ•°æ®ç¼“å†²åŒºçš„å†™åœ°å€
+c_encReadTempBufferAddr: DSW		1  			;16kæ•°æ®ç¼“å†²åŒºçš„è¯»åœ°å€
+c_encByteshaveEncode: 	DSD     1 			;å·²ç¼–ç å­—èŠ‚æ•°
 c_encTempBuffByteRemain: DSW    1			;BYTES IN BITSTREAM BUFFER FOR WRITE OUT To FILE
-c_encWriteFileMAXSize:	 DSW	1			//µ±Ç°BASAL BUFFER ³¤¶È£¬
+c_encWriteFileMAXSize:	 DSW	1			//å½“å‰BASAL BUFFER é•¿åº¦ï¼Œ
 
 c_encBytesPerBlock: 		DSW     1 		;
 c_encBytesPerSec: 			DSD     1 			;
@@ -155,8 +155,8 @@ c_encADCInitPara:
 c_encADCInputSel:       DS      1 			; 00h: mic ; 01h: FM(line in) ; 02h: reserved ; 03h: mix
 c_encADCChannel:    	DS      1			; 0ch: Stereo ; 08h: only left ; 04h: only Right
 c_encADCSampleRate:     DS      1			; ADC Frequency Sampling:8/16/24/32/48 etc
-c_encADCInputGain:      DS      1			; mic: 0-7 for 20-40db, fm: 0-7 for -3.0 - +7.5db, input source gain,micÂ¼ÒôÍÆ¼öÖµ5¼´·Å´ó50±¶£¬fmÂ¼ÒôÍÆ¼öÖµ2¼´²»·Å´óÒ²²»ËõĞ¡
-c_encADCLPFGain:	    DS      1			; 0: -6 db, 20h: -3db, 40h: 0db, 60h: +3db, adc analog gain,ÍÆ¼öÖµ40h¼´²»·Å´óÒ²²»ËõĞ¡
+c_encADCInputGain:      DS      1			; mic: 0-7 for 20-40db, fm: 0-7 for -3.0 - +7.5db, input source gain,micå½•éŸ³æ¨èå€¼5å³æ”¾å¤§50å€ï¼Œfmå½•éŸ³æ¨èå€¼2å³ä¸æ”¾å¤§ä¹Ÿä¸ç¼©å°
+c_encADCLPFGain:	    DS      1			; 0: -6 db, 20h: -3db, 40h: 0db, 60h: +3db, adc analog gain,æ¨èå€¼40hå³ä¸æ”¾å¤§ä¹Ÿä¸ç¼©å°
 c_encADCFifoAccess:   	DS      1			; 0: MCU, 10h: DMA, 20h: AHC, 30h: AHC
 c_encADCTrimmingFlag:	DS		1			; 0: no trimming, 01h: trimming
 c_encADCFSBit:       	DS      1		  	; 0: 16-bit A/D	, 80h: 21-bit A/D
@@ -174,13 +174,13 @@ PENDINGERR		EQU		0F5H
 ; BIT CONTROL VARS
 ;------------------------------------------------------------------------------
 				RSEG	?BT?ENC_BIT_VAR  ;
-c_encStatusFlag:			DBIT  1 			//0x00:Õı³£,0x01:Òì³£.
-c_encStartRecordFlag:	DBIT  1 			//0x00:Î´¿ªÊ¼,0x01:¿ªÊ¼.
-c_encPauseFlag:				DBIT	1			//0X00:Õı³£,0x01:ÔİÍ£.
-c_encStopFlag:				DBIT	1			//0X00:Õı³£,0x01:ÍË³ö.
-c_encWriteFHDRFlag:		DBIT	1			//0X00:È±ÎÄ¼şÍ·,0x01:ÒÑĞ´ÎÄ¼şÍ·.
+c_encStatusFlag:			DBIT  1 			//0x00:æ­£å¸¸,0x01:å¼‚å¸¸.
+c_encStartRecordFlag:	DBIT  1 			//0x00:æœªå¼€å§‹,0x01:å¼€å§‹.
+c_encPauseFlag:				DBIT	1			//0X00:æ­£å¸¸,0x01:æš‚åœ.
+c_encStopFlag:				DBIT	1			//0X00:æ­£å¸¸,0x01:é€€å‡º.
+c_encWriteFHDRFlag:		DBIT	1			//0X00:ç¼ºæ–‡ä»¶å¤´,0x01:å·²å†™æ–‡ä»¶å¤´.
 c_encReadBlockFlag:		DBIT	1			//0x00: B1, 0x01: B2
-c_encIsBufferFullFlag:DBIT	1			//0X00:Î´Âú,0x01:ÒÑÂú.
+c_encIsBufferFullFlag:DBIT	1			//0X00:æœªæ»¡,0x01:å·²æ»¡.
 c_encInputSrcDAC:			DBIT	1			//input source is dac
 c_encInputSrcFM:			DBIT	1			//input source is FM
 c_encInputSrcLine:		DBIT	1			//input source is Line
@@ -193,11 +193,11 @@ c_encInputSrcMic:			DBIT	1			//input source is Mic
 ;******************************************************************************
 ; Input parameters: none.
 ; Retrurn value: 0: false, 1: true
-; Fuction description: ³õÊ¼»¯codec£¬audio±àÂë£¬²¢ÌáÇ°×öºÃadc³õÊ¼»¯µÄ¹¤×÷											
+; Fuction description: åˆå§‹åŒ–codecï¼Œaudioç¼–ç ï¼Œå¹¶æå‰åšå¥½adcåˆå§‹åŒ–çš„å·¥ä½œ											
 ;******************************************************************************
 encInit??:        
 								
-				mDI		 ;ÓĞ¸úÖĞ¶Ï³ÌĞòÍ¬Ê±·ÃÎÊµÄ±äÁ¿Âğ£¬ÈôÃ»ÓĞÎŞĞë¹ØÖĞ¶Ï¡£
+				mDI		 ;æœ‰è·Ÿä¸­æ–­ç¨‹åºåŒæ—¶è®¿é—®çš„å˜é‡å—ï¼Œè‹¥æ²¡æœ‰æ— é¡»å…³ä¸­æ–­ã€‚
 
 //only for test
 //        ld       a,MICIN
@@ -386,11 +386,11 @@ SetADCChannelNum:
 				MOV		c_encADCInputGain,R0								
 
 				MOV		R0,#01
-				MOV		c_encADCTrimmingFlag,R0		 //ĞèÒªĞ£Õı.
+				MOV		c_encADCTrimmingFlag,R0		 //éœ€è¦æ ¡æ­£.
 
 				MOV		R0,#0
 				ANL		R0,#080H
-				MOV		c_encADCFSBit,R0		 	//½öÖ§³Ö16bit.
+				MOV		c_encADCFSBit,R0		 	//ä»…æ”¯æŒ16bit.
 
 				MOV		R0,c_encADCGain				//0,1,2,3
 				ANL		R0,#03H
@@ -401,7 +401,7 @@ SetADCChannelNum:
 				MOV		c_encADCLPFGain,R0
 
 				MOV		R0,#0
-				MOV		c_encADCFifoLevel,R0		//14 ¼¶ level.
+				MOV		c_encADCFifoLevel,R0		//14 çº§ level.
 
 				MOV		R0,c_encDSPGain
 				ANL		R0,#03H
@@ -531,7 +531,7 @@ Init_ADC:
 	orl		r0,r1
 	mov		ADC_CTL,r0
 #endif	
-	;orl     ADC_GCTL,#ADC_bits      ; set bus width fpga ÑéÖ¤ÔİÊ±²»ÓÃ
+	;orl     ADC_GCTL,#ADC_bits      ; set bus width fpga éªŒè¯æš‚æ—¶ä¸ç”¨
 	mov     ADC_FIFOCTL1,#20h       ; ahc access adc fifo, adc fifo source adc	
 	mov     ADC_FIFOCTL0,#(0c8h+Fifo_level)
 	                                ; clr irq/drq, enable irq/drq, set fifo_level	
@@ -830,7 +830,7 @@ encGetBitstream_exit:
 
 				ERET
 ;<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-////±ØĞëÈ·±£¸Ã»º³åÇøÊÇmcu»òdma012ÄÜ·ÃÎÊµÄ
+////å¿…é¡»ç¡®ä¿è¯¥ç¼“å†²åŒºæ˜¯mcuæˆ–dma012èƒ½è®¿é—®çš„
 //Input:
 //WR10:	DST	ADDR
 //WR8:  SRC ADDR
@@ -1000,7 +1000,7 @@ OutputEnergyLoop:
 				JE		GetEnergyLevel
 				SRA		WR0					// SUM / 8(16) / 256
 GetEnergyLevel:
-				MOV		c_encEnergyLevel,WR0	;8(16) block ÒÆ¶¯Æ½¾ùÖµ
+				MOV		c_encEnergyLevel,WR0	;8(16) block ç§»åŠ¨å¹³å‡å€¼
 
 OutputEnergyExit:
 
@@ -1015,7 +1015,7 @@ encTimerIntSub?_:
 			  PUSH	DR0
 			  
 				JB			c_encStartRecordFlag,NowCanRecord		   
-				MOV			R0,c_encDemolishKeyVoiceTming					;ÏûÈ¥°´¼üµÄÅ¾Å¾Éù£¬ÑÓ³Ù320ms
+				MOV			R0,c_encDemolishKeyVoiceTming					;æ¶ˆå»æŒ‰é”®çš„å•ªå•ªå£°ï¼Œå»¶è¿Ÿ320ms
 				INC			R0,#01H
 				MOV			c_encDemolishKeyVoiceTming,R0
 				MOV			R1,c_encDelayTime
@@ -1023,7 +1023,7 @@ encTimerIntSub?_:
 //				CMP			R0,#010H
 				JSL			encTimerIntSubExit
 
-				SETB		c_encStartRecordFlag							;¿ªÊ¼Â¼Òô±êÖ¾ÖÃÎ», ±£ÁôÔÚÕâÀï£¬½«À´ÓĞĞèÒªÔÙ¿ªÆô.
+				SETB		c_encStartRecordFlag							;å¼€å§‹å½•éŸ³æ ‡å¿—ç½®ä½, ä¿ç•™åœ¨è¿™é‡Œï¼Œå°†æ¥æœ‰éœ€è¦å†å¼€å¯.
 				
 				PUSH		SFR_BANK
 				MOV     	SFR_BANK,#BANK_AUIP
@@ -1164,7 +1164,7 @@ BufferIsFull:
 
 				MOV		WR0,c_encPCMLostNum
 				INC		WR0,#01H
-				MOV		c_encPCMLostNum,WR0					//PCM±»¶ªÆúµÄ´ÎÊı, ÔİÍ£µÄ²»Ëã .	      	      
+				MOV		c_encPCMLostNum,WR0					//PCMè¢«ä¸¢å¼ƒçš„æ¬¡æ•°, æš‚åœçš„ä¸ç®— .	      	      
 	     		LJMP	EncoderIntSubexit		        
 WrongPendingStatus:
 				MOV		R11,#PENDINGERR
@@ -1176,7 +1176,7 @@ EnergyDectection:
 				MOV		WR0,c_encWriteTempBufferAddr
 				MOV		R3,@WR0
 				MOV		R2,@WR0+1
-//				MOV		WR4,c_encLeftOffset		 		;ĞŞÕıÖ±Á÷µçÆ½Æ«Ö±£¬×¢Òâ´óĞ¡¶Ë.
+//				MOV		WR4,c_encLeftOffset		 		;ä¿®æ­£ç›´æµç”µå¹³åç›´ï¼Œæ³¨æ„å¤§å°ç«¯.
 //				SUB		WR2,WR4
 				MOV		R0,R2
 				ANL		R0,#80

@@ -13,35 +13,35 @@ const uint8 g_dir_ext[] = "*  ";
 const uint8 g_dir_urec[12] =
 { "UREC       " };
 
-/* UsoundÂ¼ÒôÎÄ¼şÃû */
+/* Usoundå½•éŸ³æ–‡ä»¶å */
 const uint8 FilenameHead[] =
 { "UREC" };
 
-/*************È«¾Ö±äÁ¿¶¨Òå*********************************/
+/*************å…¨å±€å˜é‡å®šä¹‰*********************************/
 
-/* ¿ÉÂ¼×ÜÃëÊı*/
+/* å¯å½•æ€»ç§’æ•°*/
 //uint32 total_sec = 0;
 
-uint32 near g_free_space; //Ê£Óà´ÅÅÌ¿Õ¼ä//remaining disk space
+uint32 near g_free_space; //å‰©ä½™ç£ç›˜ç©ºé—´//remaining disk space
 
-/* µ±Ç°Â¼ÒôÎÄ¼şµÄpageÊı*/
+/* å½“å‰å½•éŸ³æ–‡ä»¶çš„pageæ•°*/
 //uint32 near g_file_size;
 
 //comval_t g_comval;
 //alarm_vars_t g_alarm;
 record_vars_t near g_record_vars;
-//uint8 near g_rec_from; //µ±Ç°µÄÂ¼ÒôÔ´ by ccm
+//uint8 near g_rec_from; //å½“å‰çš„å½•éŸ³æº by ccm
 
-/*  ¿ÉÂ¼Òô×ÜÊ±¼ä*/
+/*  å¯å½•éŸ³æ€»æ—¶é—´*/
 //time_t_ext near time;
 
-/* Â¼Òô×´Ì¬*/
+/* å½•éŸ³çŠ¶æ€*/
 wav_rec_status_t rec_stat;
 
 resource_t inputSelect =
 { 0 };
 
-/* Â¼Òô²ÎÊı½á¹¹*/
+/* å½•éŸ³å‚æ•°ç»“æ„*/
 audio_format_t Rec_format;
 
 const int8 log_table[64] =
@@ -63,38 +63,38 @@ int16 prepare_urec(void)
 
     if (!retbool)
     {
-        //Î´²å¿¨»òÇı¶¯×°ÔØÊ§°Ü
+        //æœªæ’å¡æˆ–é©±åŠ¨è£…è½½å¤±è´¥
         return USOUND_CARD_ERROR;
     }
 
-    //ÉèÖÃUSOUNDÂ¼ÒôÄ¿Â¼
+    //è®¾ç½®USOUNDå½•éŸ³ç›®å½•
     //retbool = reset_record_dir();
     reset_record_dir();
     //if(!retbool)
     //{
-    //ÉèÖÃÂ¼ÒôÄ¿Â¼Ê§°Ü
+    //è®¾ç½®å½•éŸ³ç›®å½•å¤±è´¥
     //return USOUND_SETDIR_ERROR;
     //}
 
-    //·ÖÎöÂ¼Òô¿ÉÂ¼Ê±¼ä
+    //åˆ†æå½•éŸ³å¯å½•æ—¶é—´
     parse_total_time();
 
     if (g_free_space == 0)
     {
-        //¿¨¿Õ¼äÒÑÂú, ÎŞ·¨Â¼Òô
+        //å¡ç©ºé—´å·²æ»¡, æ— æ³•å½•éŸ³
         return USOUND_CARD_FULL;
     }
 
     format_filename();
-    if (!gen_filename()) //²úÉúÂ¼ÒôÎÄ¼şĞòºÅÃû
+    if (!gen_filename()) //äº§ç”Ÿå½•éŸ³æ–‡ä»¶åºå·å
     {
-        //ÒÑ´ïµ½¸ÃÄ¿Â¼Â¼ÒôÎÄ¼şÊıÏŞÖÆ
+        //å·²è¾¾åˆ°è¯¥ç›®å½•å½•éŸ³æ–‡ä»¶æ•°é™åˆ¶
         return USOUND_DIR_FULL;
     }
 
     if (!StartMP2Record())
     {
-        //´´½¨ÎÄ¼şÊ§°Ü
+        //åˆ›å»ºæ–‡ä»¶å¤±è´¥
         return USOUND_CREAT_FAIL;
     }
     return 0;
@@ -102,7 +102,7 @@ int16 prepare_urec(void)
 
 /*
  ********************************************************************************
- * Description : ´ò¿ªUSOUNDÂ¼Òô
+ * Description : æ‰“å¼€USOUNDå½•éŸ³
  *
  * Arguments   : NULL
  *
@@ -139,7 +139,7 @@ int16 usound_rec(void)
                 {
                     mp3rSendCommand(MC_PAUSE, 0);
 
-                    retval = do_pause(); //ÔİÍ£½çÃæ
+                    retval = do_pause(); //æš‚åœç•Œé¢
 
                     if (retval != 0)
                     {
@@ -148,7 +148,7 @@ int16 usound_rec(void)
                         if (retval == RESULT_CARD_OUT)
                         {
                             status = saving;
-                            //ÏÔÊ¾¿¨°Î³ö
+                            //æ˜¾ç¤ºå¡æ‹”å‡º
                             mp3rSendCommand(MC_STOP, 0);
                             retval = RESULT_SD_OUT;
                         }
@@ -175,7 +175,7 @@ int16 usound_rec(void)
                 if (g_record_vars.location.disk == 'H')
                 {
                     status = saving;
-                    //ÏÔÊ¾¿¨°Î³ö
+                    //æ˜¾ç¤ºå¡æ‹”å‡º
                     mp3rSendCommand(MC_STOP, 0);
                     retval = RESULT_SD_OUT;
                 }
@@ -211,7 +211,7 @@ int16 usound_rec(void)
                 return retval;
             }
             ClearWatchDog();
-#if 0		 // Ôİ²»³¬Ê±ÍË³ö, ±ÜÃâÎÄ¼ş²»±£´æ
+#if 0		 // æš‚ä¸è¶…æ—¶é€€å‡º, é¿å…æ–‡ä»¶ä¸ä¿å­˜
             i++;
             if (i >= 2000)
             {
@@ -221,7 +221,7 @@ int16 usound_rec(void)
         }
         mc_result = wavrProceed();
 
-        if (mc_result == WRITE_ONE) //ÒÑĞ´Ò»¸öpage
+        if (mc_result == WRITE_ONE) //å·²å†™ä¸€ä¸ªpage
         {
             g_free_space--;
             if (g_free_space == 0)
@@ -240,7 +240,7 @@ int16 usound_rec(void)
                 }
             }
         }
-        else if (mc_result == WRITE_WRONG) //ÖÂÃü´íÎó
+        else if (mc_result == WRITE_WRONG) //è‡´å‘½é”™è¯¯
         {
             while (ap_get_message() != NULL)
             {
@@ -272,13 +272,13 @@ int16 usound_rec(void)
 
 /*
  ********************************************************************************
- * Description :    ×¼±¸¿ªÊ¼MP2   ¸ñÊ½Â¼Òô
+ * Description :    å‡†å¤‡å¼€å§‹MP2   æ ¼å¼å½•éŸ³
  *
  * Arguments   :  NULL
  *
  * Returns     :   success/fail
  *
- * Notes       :   Ö÷ÒªÊÇµ÷ÓÃbasal½Ó¿Úº¯Êı·¢ÃüÁî
+ * Notes       :   ä¸»è¦æ˜¯è°ƒç”¨basalæ¥å£å‡½æ•°å‘å‘½ä»¤
  *
  ********************************************************************************
  */
@@ -305,19 +305,19 @@ uint16 StartMP2Record(void)
 
     //Rec_format.bits = 18;
 
-    //¹Ì¶¨²ÉÑùÂÊ
+    //å›ºå®šé‡‡æ ·ç‡
     Rec_format.sample_rate = 8;
 
-    //¹Ì¶¨µ¥Í¨µÀ
+    //å›ºå®šå•é€šé“
     Rec_format.channel = SINGLE_CH;
 
-    //¹Ì¶¨±ÈÌØÂÊ 128k
+    //å›ºå®šæ¯”ç‰¹ç‡ 128k
     Rec_format.bit_rate[0] = 0 + '0';
     Rec_format.bit_rate[1] = 6 + '0';
     Rec_format.bit_rate[2] = 4 + '0';
     mp3rSendCommand(MC_SETAUDIOFMT, (void *) &Rec_format);
 
-    /* ´´½¨Â¼ÒôÎÄ¼ş*/
+    /* åˆ›å»ºå½•éŸ³æ–‡ä»¶*/
     result = mp3rSendCommand(MC_LOAD, (void *) g_record_vars.location.filename);
 
     return result;
@@ -339,14 +339,14 @@ BOOL SetCard(void)
 
 /*
  ********************************************************************************
- * Description : ÉèÖÃÂ¼ÒôÈ±Ê¡Ä¿Â¼
+ * Description : è®¾ç½®å½•éŸ³ç¼ºçœç›®å½•
  *
  * Arguments   :
  *
- * Returns     : ³É¹¦or Ê§°Ü
+ * Returns     : æˆåŠŸor å¤±è´¥
  *
- * Notes       :  ¸ù¾İÂ¼Òô¸ñÊ½, ÉèÖÃÈ±Ê¡Ä¿Â¼ÎªRECORD/VOICE
- *                   »òRECORD/MUSIC
+ * Notes       :  æ ¹æ®å½•éŸ³æ ¼å¼, è®¾ç½®ç¼ºçœç›®å½•ä¸ºRECORD/VOICE
+ *                   æˆ–RECORD/MUSIC
  ********************************************************************************
  */
 BOOL reset_record_dir(void)
@@ -368,7 +368,7 @@ BOOL reset_record_dir(void)
     {
         status = FS_MakeDir(g_dir_urec);
         if (!status)
-        { return FALSE; } // ´´½¨Ä¿Â¼Ê§°Ü//create directory fail
+        { return FALSE; } // åˆ›å»ºç›®å½•å¤±è´¥//create directory fail
         else
         {
             FS_CD(g_dir_urec);
@@ -407,14 +407,14 @@ BOOL reset_record_dir(void)
 
 /*
  ********************************************************************************
- * Description : ·ÖÎöÊ£Óà¿Õ¼ä,¼ÆËã¿ÉÂ¼ÒôÊ±¼ä
+ * Description : åˆ†æå‰©ä½™ç©ºé—´,è®¡ç®—å¯å½•éŸ³æ—¶é—´
  *
  * Arguments   :  NULL
  *
  * Returns     :  NULL
  *
- * Notes       :  ¸ù¾İÊ£Óà¿Õ¼äg_free_space  ( ÒÔÉÈÇøÎªµ¥Î») , ¼ÆËã¿ÉÂ¼
- *                   Ê±¼ä
+ * Notes       :  æ ¹æ®å‰©ä½™ç©ºé—´g_free_space  ( ä»¥æ‰‡åŒºä¸ºå•ä½) , è®¡ç®—å¯å½•
+ *                   æ—¶é—´
  ********************************************************************************
  */
 void parse_total_time(void)
@@ -453,20 +453,20 @@ void format_filename(void)
 
 /*
  ********************************************************************************
- * Description : ¸ù¾İĞòºÅÉú³ÉĞÂµÄ¿ÉÓÃÎÄ¼şÃû
+ * Description : æ ¹æ®åºå·ç”Ÿæˆæ–°çš„å¯ç”¨æ–‡ä»¶å
  *
- * Arguments   : location->filename, Ô­À´µÄÎÄ¼şÃû
- *               location->filename, Êä³öĞÂµÄÎÄ¼şÃû
+ * Arguments   : location->filename, åŸæ¥çš„æ–‡ä»¶å
+ *               location->filename, è¾“å‡ºæ–°çš„æ–‡ä»¶å
  *
- * Returns     :  ĞÂÎÄ¼şµÄĞòºÅ, 01~99
- *        Èç¹û01~99 ÎÄ¼ş´æÔÚ, ·µ»Ø0
+ * Returns     :  æ–°æ–‡ä»¶çš„åºå·, 01~99
+ *        å¦‚æœ01~99 æ–‡ä»¶å­˜åœ¨, è¿”å›0
  *
- * Notes       :ÎÄ¼şÃû×Ö¸ñÊ½ : xxx000 WAV, xxx000 ACT, ***000 JPG...
- *        Èç¹ûÊäÈëµÄÎÄ¼ş²»´æÔÚ,ÔòÖ±½Ó·µ»Ø
- ¼ì²éÄ¿Â¼Âú×î³¤Ê±¼ä15s
- Ë³Ğò²úÉúÏÂÒ»¸öÄ¿Â¼Ãû×î³¤Ê±¼ä1s.
+ * Notes       :æ–‡ä»¶åå­—æ ¼å¼ : xxx000 WAV, xxx000 ACT, ***000 JPG...
+ *        å¦‚æœè¾“å…¥çš„æ–‡ä»¶ä¸å­˜åœ¨,åˆ™ç›´æ¥è¿”å›
+ æ£€æŸ¥ç›®å½•æ»¡æœ€é•¿æ—¶é—´15s
+ é¡ºåºäº§ç”Ÿä¸‹ä¸€ä¸ªç›®å½•åæœ€é•¿æ—¶é—´1s.
  *
- * TODO:        ²»ÒªÊ¹ÓÃ atoi(), ½ÚÊ¡128byte  (ok!)
+ * TODO:        ä¸è¦ä½¿ç”¨ atoi(), èŠ‚çœ128byte  (ok!)
  ********************************************************************************
  */
 int GenNewName_forUrec(file_location_urec_t *location)
@@ -476,21 +476,21 @@ int GenNewName_forUrec(file_location_urec_t *location)
     uint8 new_name[12];
     handle f;
 
-    //¸´ÖÆµ½new_name
+    //å¤åˆ¶åˆ°new_name
     memcpy(new_name, location->filename, 12);
 
-    // ¼ì²éÎÄ¼ş¼ĞÊÇ·ñº¬ÓĞ001Õâ¸öÎÄ¼ş,ÈçÃ»ÓĞRETURN 1
+    // æ£€æŸ¥æ–‡ä»¶å¤¹æ˜¯å¦å«æœ‰001è¿™ä¸ªæ–‡ä»¶,å¦‚æ²¡æœ‰RETURN 1
     new_name[4] = '0';
     new_name[5] = '0';
     new_name[6] = '1';
-    // Èç¹ûÎÄ¼ş²»´æÔÚ
+    // å¦‚æœæ–‡ä»¶ä¸å­˜åœ¨
     f = FS_FOpen(new_name, 0);
     if (f == NULL)
     {
         memcpy(location->filename, new_name, 11);
         location->filename[11] = 0;
-        // É¾³ıÎÄ¼ş³¤¶ÈÎª0µÄÎÄ¼ş.
-        //ÎÄ¼şÃûÒÑ¾­´æÔÚ£¬µ«ÎÄ¼ş³¤¶ÈÎª0Ê±openÒ²Ê§°Ü¡£
+        // åˆ é™¤æ–‡ä»¶é•¿åº¦ä¸º0çš„æ–‡ä»¶.
+        //æ–‡ä»¶åå·²ç»å­˜åœ¨ï¼Œä½†æ–‡ä»¶é•¿åº¦ä¸º0æ—¶openä¹Ÿå¤±è´¥ã€‚
         FS_FRemove(location->filename);
         return 1;
     }
@@ -499,7 +499,7 @@ int GenNewName_forUrec(file_location_urec_t *location)
         FS_FClose(f);
     }
 
-    // °´Ö¸¶¨µÄÖµ,¼ÌĞø²éÕÒ.
+    // æŒ‰æŒ‡å®šçš„å€¼,ç»§ç»­æŸ¥æ‰¾.
     memcpy(new_name, location->filename, 12);
     num = (new_name[4] - '0') * 100 + (new_name[5] - '0') * 10 + (new_name[6] - '0');
 
@@ -509,10 +509,10 @@ int GenNewName_forUrec(file_location_urec_t *location)
         itoa3(num, &new_name[4]);
     }
 
-    //Èç¹ûÎÄ¼ş´æÔÚ,Êı×Ö¼Ó1
+    //å¦‚æœæ–‡ä»¶å­˜åœ¨,æ•°å­—åŠ 1
     do
     {
-        // Èç¹ûÎÄ¼ş²»´æÔÚ
+        // å¦‚æœæ–‡ä»¶ä¸å­˜åœ¨
         ClearWatchDog();
         f = FS_FOpen(new_name, 0);
         if (f == NULL)
@@ -541,16 +541,16 @@ int GenNewName_forUrec(file_location_urec_t *location)
 
 /*
  ********************************************************************************
- * Description : Éú³ÉĞÂµÄÂ¼ÒôÎÄ¼şÃû
+ * Description : ç”Ÿæˆæ–°çš„å½•éŸ³æ–‡ä»¶å
  *
  * Arguments   : NULL
  *
- * Returns     : TRUE, ³É¹¦
- FALSE, ±àºÅ01~99 ÎÄ¼ş¶¼´æÔÚ
- È«¾Ö±äÁ¿
+ * Returns     : TRUE, æˆåŠŸ
+ FALSE, ç¼–å·01~99 æ–‡ä»¶éƒ½å­˜åœ¨
+ å…¨å±€å˜é‡
  g_record_vars.location
  g_record_vars.wav_num
- g_file_name_time[], ÎÄ¼şÃû,ÎÄ¼şÊ±¼ä×Ö·û´®
+ g_file_name_time[], æ–‡ä»¶å,æ–‡ä»¶æ—¶é—´å­—ç¬¦ä¸²
  *
  * Notes       :
  *

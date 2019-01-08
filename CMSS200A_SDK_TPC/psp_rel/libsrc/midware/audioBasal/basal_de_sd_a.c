@@ -120,12 +120,12 @@ BOOL apSendCommand(BYTE cmd, BYTE music_type, void *param)
         //				}
         if (((uint8)param & 0xf0) == FADEIN_DEF)
         {
-            g_decControlInfor.FadeInTime = (uint8)param & 0x0f;//设置淡入标志
+            g_decControlInfor.FadeInTime = (uint8)param & 0x0f;//璁剧疆娣″叆鏍囧織
             return TRUE;
         }
         else if (((uint8)param & 0xf0) == FADEOUT_DEF)
         {
-            g_decControlInfor.FadeOutTime = (uint8)param & 0x0f;//设置淡出标志
+            g_decControlInfor.FadeOutTime = (uint8)param & 0x0f;//璁剧疆娣″嚭鏍囧織
             return TRUE;
         }
         else

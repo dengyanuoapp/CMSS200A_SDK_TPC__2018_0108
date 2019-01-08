@@ -9,17 +9,17 @@
 #ifdef __C251__
 #define NO_KEY 0xff
 
-//ÓÃÓÚ¼ì²âµç³ØµçÁ¿
+//ç”¨äºæ£€æµ‹ç”µæ± ç”µé‡
 #define BAT_CHECK_GPIO_INPUT GPIOAINEN
 #define BAT_CHECK_GPIO_DAT GPIOADAT
 #define BAT_CHECK_GPIO_NUM    6
 
-//ÓÃÓÚºìÉ«Ö¸Ê¾µÆ¿ª¹Ø
+//ç”¨äºçº¢è‰²æŒ‡ç¤ºç¯å¼€å…³
 #define RED_LIGHT_GPIO_OUTPUT GPIODOUTEN
 #define RED_LIGHT_GPIO_DAT GPIODDAT
 #define RED_LIGHT_GPIO_NUM    1
 
-//ÓÃÓÚÀ¶É«Ö¸Ê¾µÆ¿ª¹Ø
+//ç”¨äºè“è‰²æŒ‡ç¤ºç¯å¼€å…³
 #define BLUE_LIGHT_GPIO_OUTPUT GPIOCOUTEN
 #define BLUE_LIGHT_GPIO_DAT GPIOCDAT
 #define BLUE_LIGHT_GPIO_NUM    3
@@ -27,7 +27,7 @@
 #define linein_min_adcval   0x34    //2.6V
 #define linein_max_adcval   0x3f   //3.3V
 
-extern uint8 TheCharge; //³äµç±êÊ¶£¬0,stop£»1£¬start£¬charge full
+extern uint8 TheCharge; //å……ç”µæ ‡è¯†ï¼Œ0,stopï¼›1ï¼Œstartï¼Œcharge full
 extern uint8 oldkey;
 extern uint8 tmpkey;
 extern uint8 tmp_count;
@@ -40,7 +40,7 @@ extern uint8 Low_power_count;
 extern uint8 adcdat;
 extern uint8 onoff_flag;
 
-// º¯Êı±í
+// å‡½æ•°è¡¨
 
 void ADC_DAC_init(void);
 extern void _nop_(void);
@@ -49,7 +49,7 @@ void IR_Interrupt(void);
 void init_ir(void);
 void delay(void);
 void key_scan(void);
-void Delay10ms(void); //24Mhz£¬ÑÓÊ±500ms
+void Delay10ms(void); //24Mhzï¼Œå»¶æ—¶500ms
 void ADC_DAC_loop(void);
 void init_bat_gpio(void);
 uint8 sKY_GetChargeStatus(uint8 api_no);

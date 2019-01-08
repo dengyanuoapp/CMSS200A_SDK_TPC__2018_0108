@@ -12,27 +12,27 @@
 #ifndef CODEC_H
 #define CODEC_H
 
-//³£Á¿¶¨Òå
+//å¸¸é‡å®šä¹‰
 
-//Â¼ÒôÎÄ¼şµÄ¸ñÊ½, riff µÄ wFormatTags
+//å½•éŸ³æ–‡ä»¶çš„æ ¼å¼, riff çš„ wFormatTags
 #define    WAVE_FORMAT_ACTIONS_PCM        0x81
 #define    WAVE_FORMAT_ACTIONS_ADPCM            0x82
 #define    WAVE_FORMAT_ACTIONS_AG4                0x83
 #define    WAVE_FORMAT_ACTIONS_AG8                0x84
 
-//×´Ì¬¶¨Òå
-#define    CODEC_STATUS_OK    0        //Õı³£
-#define    CODEC_STATUS_ERROR    1        //´íÎó
-#define    CODEC_STATUS_READ    2        //codecĞèÒª¶ÁÊı¾İ
-#define    CODEC_STATUS_WRITE    3        //codecĞèÒªĞ´Êı¾İ
-#define    CODEC_STATUS_REACHB    4        //²¥·Åµ½´ïbµã
+//çŠ¶æ€å®šä¹‰
+#define    CODEC_STATUS_OK    0        //æ­£å¸¸
+#define    CODEC_STATUS_ERROR    1        //é”™è¯¯
+#define    CODEC_STATUS_READ    2        //codecéœ€è¦è¯»æ•°æ®
+#define    CODEC_STATUS_WRITE    3        //codecéœ€è¦å†™æ•°æ®
+#define    CODEC_STATUS_REACHB    4        //æ’­æ”¾åˆ°è¾¾bç‚¹
 #define    CODEC_STATUS_MAXLEN    5
 #define    CODEC_STATUS_VORON        6
 #define    CODEC_STATUS_VOROFF        7
-#define    CODEC_STATUS_FORMAT_ERR        0xf0    //ÎÄ¼ş¸ñÊ½´íÎó
+#define    CODEC_STATUS_FORMAT_ERR        0xf0    //æ–‡ä»¶æ ¼å¼é”™è¯¯
 
-#define    CODEC_STATUS_SETA            0x33    //codec¼ÆËãºÃAµãµÄÆ«ÒÆ
-#define    CODEC_STATUS_SETB            0x77    //codec¼ÆËãºÃBµãµÄÆ«ÒÆ
+#define    CODEC_STATUS_SETA            0x33    //codecè®¡ç®—å¥½Aç‚¹çš„åç§»
+#define    CODEC_STATUS_SETB            0x77    //codecè®¡ç®—å¥½Bç‚¹çš„åç§»
 
 #define    CODEC_STATUS_READ_BACKWD         0x22
 #define    CODEC_STATUS_READ_FORWD          0x11
@@ -40,7 +40,7 @@
 #define    CODEC_STATUS_WRITE_TAIL        0x00
 #define    CODEC_STATUS_WRITE_HEAD        0xFF
 
-//ÃüÁî¶¨Òå
+//å‘½ä»¤å®šä¹‰
 #define    CODEC_CMD_NORMAL        0x00
 #define    CODEC_CMD_FF            0x55
 #define    CODEC_CMD_RW            0xAA
@@ -87,7 +87,7 @@
 #define LEFT_CHANNEL 1
 #define RIGHT_CHANNEL 2
 
-//Êı¾İ°áÔËº¯ÊıÈë¿ÚÖ¸Õë
+//æ•°æ®æ¬è¿å‡½æ•°å…¥å£æŒ‡é’ˆ
 typedef struct
 {
     WORD read;    //!=NULL, using interrupt mode
@@ -117,46 +117,46 @@ typedef struct
     BYTE    SongType; //song type 0:mp3  1:wma  02:adpcm/pcm
     BYTE    PlayMode; //00:normal decode, 01:break point play,02:only compute time info,03:play from begin to end
     long    FileLen; //file length
-    WORD    HookRead; //¶ÁÎÄ¼şº¯Êı
+    WORD    HookRead; //è¯»æ–‡ä»¶å‡½æ•°
 } decInitPara_t;
 
 typedef struct
 {
-    BYTE            SampleRate; //²ÉÑùÂÊ£¬kHZ
-    BYTE            Channel; //Í¨µÀÊı£¬1£ºµ¥Í¨µÀ£¬2£ºË«Í¨µÀ
-    DWORD           BitRate;  //±ÈÌØÂÊ£¬×î¸ßbyteÎª0£¬ºó3btyeÒÀ´ÎÎª£¬°Ù¡¢Ê®¡¢¸öÎ»Êı£¬µ¥Î»£ºkbps£¬¿ÉÊµÊ±¸Ä±ä
-    Full_time_t     TotalPlayTime;  //²¥·Å×ÜÊ±¼ä£¬×î¸ßbyteÎª0£¬ºó3btyeÒÀ´ÎÎª£¬Ê±¡¢·Ö¡¢Ãë
-    DWORD           FileHDRLen;//ÎÄ¼şÍ·³¤¶È£¬µ¥Î»£ºbtye£¬ÓÉbasalÌá¹©
+    BYTE            SampleRate; //é‡‡æ ·ç‡ï¼ŒkHZ
+    BYTE            Channel; //é€šé“æ•°ï¼Œ1ï¼šå•é€šé“ï¼Œ2ï¼šåŒé€šé“
+    DWORD           BitRate;  //æ¯”ç‰¹ç‡ï¼Œæœ€é«˜byteä¸º0ï¼Œå3btyeä¾æ¬¡ä¸ºï¼Œç™¾ã€åã€ä¸ªä½æ•°ï¼Œå•ä½ï¼škbpsï¼Œå¯å®æ—¶æ”¹å˜
+    Full_time_t     TotalPlayTime;  //æ’­æ”¾æ€»æ—¶é—´ï¼Œæœ€é«˜byteä¸º0ï¼Œå3btyeä¾æ¬¡ä¸ºï¼Œæ—¶ã€åˆ†ã€ç§’
+    DWORD           FileHDRLen;//æ–‡ä»¶å¤´é•¿åº¦ï¼Œå•ä½ï¼šbtyeï¼Œç”±basalæä¾›
 } decSongInfor_t;
 
 typedef struct
 {
-    BYTE            Status;//ÊµÊ±½âÂë×´Ì¬£¬0£ºÕı³££¬·Ç0£ºÒì³£
+    BYTE            Status;//å®æ—¶è§£ç çŠ¶æ€ï¼Œ0ï¼šæ­£å¸¸ï¼Œé0ï¼šå¼‚å¸¸
     BYTE            GetSongInfo; // 0x00:not yet; 0xff: get song info successfully
-    BYTE            EnergyLevel;//µ±Ç°ÄÜÁ¿¼¶±ğ£¬0-63¼¶±ğ
-    BYTE            SetenceFlag;//µ±Ç°¶Ï¾ä±êÖ¾£¬0£ºÎŞ¶Ï¾ä£¬·Ç0£º¼ì²âµ½¶Ï¾ä
-    DWORD           NowTime;//µ±Ç°²¥·ÅÊ±¼ä£¬¸ßbyteÎª0£¬ºó3btyeÒÀ´ÎÎª£¬Ê±¡¢·Ö¡¢Ãë
+    BYTE            EnergyLevel;//å½“å‰èƒ½é‡çº§åˆ«ï¼Œ0-63çº§åˆ«
+    BYTE            SetenceFlag;//å½“å‰æ–­å¥æ ‡å¿—ï¼Œ0ï¼šæ— æ–­å¥ï¼Œé0ï¼šæ£€æµ‹åˆ°æ–­å¥
+    DWORD           NowTime;//å½“å‰æ’­æ”¾æ—¶é—´ï¼Œé«˜byteä¸º0ï¼Œå3btyeä¾æ¬¡ä¸ºï¼Œæ—¶ã€åˆ†ã€ç§’
 } decCurStatus_t;
 
 typedef struct
 {
-    BYTE        SongType; //¸èÇúÀàĞÍ, 0: mp3, 1: wma, 2: wav
-    BYTE        PlayMode; //²¥·ÅÄ£Ê½£¬ 0: Õı³£²¥·Å£¬1£º¶ÏµãĞø²¥£¬ 2£º¼ÆËã¸èÇúĞÅÏ¢
-    BYTE        Volume;     // µ±Ç°ÒôÁ¿¼¶±ğ£¬Ó²ÒôÁ¿Ôò¸úPA¼¶±ğÒ»ÖÂ£¬ÈíÒôÁ¿Ôò´ı¶¨
-    BYTE        FFRevFlag; // ¿ì½øÍË±êÖ¾£¬0£ºÎŞ¿ì½øÍË£¬0x55£º¿ì½ø£¬0xaa£º¿ìÍË
-    BYTE        FFRevSpeed; // ¿ì½øÍËËÙ¶È£¬0-5¼¶±ğ£¬ÍÆ¼öÖµÎª4
+    BYTE        SongType; //æ­Œæ›²ç±»å‹, 0: mp3, 1: wma, 2: wav
+    BYTE        PlayMode; //æ’­æ”¾æ¨¡å¼ï¼Œ 0: æ­£å¸¸æ’­æ”¾ï¼Œ1ï¼šæ–­ç‚¹ç»­æ’­ï¼Œ 2ï¼šè®¡ç®—æ­Œæ›²ä¿¡æ¯
+    BYTE        Volume;     // å½“å‰éŸ³é‡çº§åˆ«ï¼Œç¡¬éŸ³é‡åˆ™è·ŸPAçº§åˆ«ä¸€è‡´ï¼Œè½¯éŸ³é‡åˆ™å¾…å®š
+    BYTE        FFRevFlag; // å¿«è¿›é€€æ ‡å¿—ï¼Œ0ï¼šæ— å¿«è¿›é€€ï¼Œ0x55ï¼šå¿«è¿›ï¼Œ0xaaï¼šå¿«é€€
+    BYTE        FFRevSpeed; // å¿«è¿›é€€é€Ÿåº¦ï¼Œ0-5çº§åˆ«ï¼Œæ¨èå€¼ä¸º4
     BYTE        ABSetFlag; // AB play flag 0x22:set a  0xaa:set b 0xff:deal AB play process
     BYTE        PlaySpeed; // play speed control
-    BYTE        SoftVolumeMax; // ÒôÁ¿µ÷½ÚÄ£Ê½£¬0£ºÓ²ÒôÁ¿£¬·Ç0£ºÈíÒôÁ¿µÄ×î´ó¼¶±ğ£¬ÈíÒôÁ¿Æô¶¯
-    BYTE        EQFlag;//EQ/SRSÀàĞÍ£¬0£ºÎŞÒôĞ§£¬0x07£º×Ô¶¨ÒåEQ£¬0x4f£º×Ô¶¨ÒåSRS£¬ÆäËûÖµ´ı¶¨
-    BYTE        EQVal[11];// EQ/SRS²ÎÊı£¬Ç°7¸öÎªEQÆµ´øÔöÒæ²ÎÊı»òSRSÄ£Ê½²ÎÊı£¬µÚ8¸öÎªÒôĞ§ÇĞ»»±êÖ¾£¬ºó3¸öÎªÔöÒæ¿ØÖÆ£¨·ÀÒç³ö£©
-    BYTE        EnergyOutFlag;//ÄÜÁ¿Êä³ö±êÖ¾£¬0£º²»Êä³ö£¬·Ç0£ºÊä³ö
-    BYTE        SentDectFlag;//¶Ï¾ä¼ì²â±êÖ¾£¬0£º²»¼ì²â£¬·Ç0£º¼ì²â
-    BYTE        TimeLimit; // ¶Ï¾ä¼ì²âÊ±¼ä£¬0-31¼¶±ğ
-    BYTE        EnergyLimit; // ¶Ï¾ä¼ì²âÄÜÁ¿ÃÅ¼÷£¬0-63¼¶±ğ
-    BYTE        FadeInTime;//µ­ÈëÊ±¼ä£¬0£º²»µ­Èë£¬1: 0.1s£¬ 2£º0.2s£¬3£º0.4s£¬4£º0.8s£¬5£º1.6s
-    BYTE        FadeOutTime; // µ­ÈëÊ±¼ä£¬0£º²»µ­Èë£¬1: 0.1s£¬ 2£º0.2s£¬3£º0.4s£¬4£º0.8s£¬5£º1.6s
-    BYTE        ChannelSelect;//Í¨µÀÑ¡Ôñ£¬0£ºË«Í¨µÀ£¬1£º×óÉùµÀ£¬2£ºÓÒÉùµÀ
+    BYTE        SoftVolumeMax; // éŸ³é‡è°ƒèŠ‚æ¨¡å¼ï¼Œ0ï¼šç¡¬éŸ³é‡ï¼Œé0ï¼šè½¯éŸ³é‡çš„æœ€å¤§çº§åˆ«ï¼Œè½¯éŸ³é‡å¯åŠ¨
+    BYTE        EQFlag;//EQ/SRSç±»å‹ï¼Œ0ï¼šæ— éŸ³æ•ˆï¼Œ0x07ï¼šè‡ªå®šä¹‰EQï¼Œ0x4fï¼šè‡ªå®šä¹‰SRSï¼Œå…¶ä»–å€¼å¾…å®š
+    BYTE        EQVal[11];// EQ/SRSå‚æ•°ï¼Œå‰7ä¸ªä¸ºEQé¢‘å¸¦å¢ç›Šå‚æ•°æˆ–SRSæ¨¡å¼å‚æ•°ï¼Œç¬¬8ä¸ªä¸ºéŸ³æ•ˆåˆ‡æ¢æ ‡å¿—ï¼Œå3ä¸ªä¸ºå¢ç›Šæ§åˆ¶ï¼ˆé˜²æº¢å‡ºï¼‰
+    BYTE        EnergyOutFlag;//èƒ½é‡è¾“å‡ºæ ‡å¿—ï¼Œ0ï¼šä¸è¾“å‡ºï¼Œé0ï¼šè¾“å‡º
+    BYTE        SentDectFlag;//æ–­å¥æ£€æµ‹æ ‡å¿—ï¼Œ0ï¼šä¸æ£€æµ‹ï¼Œé0ï¼šæ£€æµ‹
+    BYTE        TimeLimit; // æ–­å¥æ£€æµ‹æ—¶é—´ï¼Œ0-31çº§åˆ«
+    BYTE        EnergyLimit; // æ–­å¥æ£€æµ‹èƒ½é‡é—¨æ§›ï¼Œ0-63çº§åˆ«
+    BYTE        FadeInTime;//æ·¡å…¥æ—¶é—´ï¼Œ0ï¼šä¸æ·¡å…¥ï¼Œ1: 0.1sï¼Œ 2ï¼š0.2sï¼Œ3ï¼š0.4sï¼Œ4ï¼š0.8sï¼Œ5ï¼š1.6s
+    BYTE        FadeOutTime; // æ·¡å…¥æ—¶é—´ï¼Œ0ï¼šä¸æ·¡å…¥ï¼Œ1: 0.1sï¼Œ 2ï¼š0.2sï¼Œ3ï¼š0.4sï¼Œ4ï¼š0.8sï¼Œ5ï¼š1.6s
+    BYTE        ChannelSelect;//é€šé“é€‰æ‹©ï¼Œ0ï¼šåŒé€šé“ï¼Œ1ï¼šå·¦å£°é“ï¼Œ2ï¼šå³å£°é“
     BYTE        CntrReserve;//Reserve
 } decControlInfor_t;
 
@@ -164,10 +164,10 @@ typedef struct
 
 typedef struct
 {
-    DWORD       ReadFileHandleHook;//ÎÄ¼ş¶Á½Ó¿Ú£¬basalÌá¹©¸øcodecµ÷ÓÃµÄ¶ÁÊı¾İ½Ó¿Ú£¬ÀàĞÍÎªº¯ÊıÖ¸Õë R11, 0x11: ÏòÎÄ¼şÍ··½Ïò¶ÁÒ»Ò³£¬0x22£¬ÏòÎÄ¼şÎ²·½Ïò¶ÁÒ»Ò³£¬0x33£¬¶ÁÎÄ¼şÖĞÈÎÒâÎ»ÖÃ
-    DWORD		ReadFileBuffAddr; //ÎÄ¼şÊı¾İ»º³åÇøÊ×µØÖ·£¬ÀàĞÍÎªÖ¸Õë
-    DWORD       FileLen;//ÎÄ¼ş³¤¶È£¬µ¥Î»£ºbyte
-    DWORD       ReadFileCurAddr;//µ±Ç°Ò³Ê××Ö½ÚÔÚÎÄ¼şÖĞÎ»ÖÃ£¬µ¥Î»£ºbtye
+    DWORD       ReadFileHandleHook;//æ–‡ä»¶è¯»æ¥å£ï¼Œbasalæä¾›ç»™codecè°ƒç”¨çš„è¯»æ•°æ®æ¥å£ï¼Œç±»å‹ä¸ºå‡½æ•°æŒ‡é’ˆ R11, 0x11: å‘æ–‡ä»¶å¤´æ–¹å‘è¯»ä¸€é¡µï¼Œ0x22ï¼Œå‘æ–‡ä»¶å°¾æ–¹å‘è¯»ä¸€é¡µï¼Œ0x33ï¼Œè¯»æ–‡ä»¶ä¸­ä»»æ„ä½ç½®
+    DWORD		ReadFileBuffAddr; //æ–‡ä»¶æ•°æ®ç¼“å†²åŒºé¦–åœ°å€ï¼Œç±»å‹ä¸ºæŒ‡é’ˆ
+    DWORD       FileLen;//æ–‡ä»¶é•¿åº¦ï¼Œå•ä½ï¼šbyte
+    DWORD       ReadFileCurAddr;//å½“å‰é¡µé¦–å­—èŠ‚åœ¨æ–‡ä»¶ä¸­ä½ç½®ï¼Œå•ä½ï¼šbtye
 } decReadFilePara_t;
 
 typedef struct
@@ -204,52 +204,52 @@ typedef struct
 
 typedef struct
 {
-    BYTE        SongType;// ±£Áô
-    BYTE        FsIndex;//²ÉÑùÂÊIndex£¬¸ú76Ò»ÖÂ
-    BYTE        BitDepth;//²ÉÑù±ÈÌØÊı£¬Reserve
-    BYTE        BTIndex;//±ÈÌØÂÊIndex£¬¸ú76Ò»ÖÂ
-    BYTE        EncodeMode;//±àÂëÄ£Ê½£¬WavÂ¼ÒôÊ±, 0: adpcm, 1:pcm
-    BYTE        ChannelNum;//Í¨µÀÊı£¬1£ºµ¥Í¨µÀ£¬2£ºË«Í¨µÀ
-    input_t     InputSel;//ÊäÈëÔ´£¬¸ú76Ò»ÖÂ
-    BYTE        InputGain;//ÊäÈëÔ´ÔöÒæ£¬¸ú76Ò»ÖÂ£¬ÍÆ¼öÖµ5
-    BYTE        ADCGain;//ADCÔöÒæ£¬0-3, ÍÆ¼öÖµ3
-    BYTE        DSPGain;//DSPÔöÒæ£¬0-1, ÍÆ¼öÖµ0
-    BYTE        DelayTime;//Â¼ÒôÑÓÊ±Éè¶¨£¬µ¥Î»£º20ms
-    BYTE        EnergyOut;//ÄÜÁ¿Êä³ö±êÖ¾£¬0£º²»Êä³ö£¬·Ç0£ºÊä³ö
-    BYTE        AVRFlag;//¾²Òô¼ì²â±êÖ¾£¬0£º²»Æô¶¯£¬1£ºÉù¿Ø£¬2£º·ÖÇú
-    BYTE        AVRDelay;//¾²Òô¼ì²âÊ±¼ä£¬0-5Ãë£¬ÍÆ¼öÖµ3
-    uint16      AVRLevel;//¾²Òô¼ì²âÃÅ¼÷£¬ÍÆ¼öÖµ700
-    int16       LeftOffset;//×óÍ¨µÀDC OffsetĞŞÕıÖµ£¬Reserve
-    int16       RightOffset;//ÓÒÍ¨µÀDC OffsetĞŞÕıÖµ£¬Reserve
+    BYTE        SongType;// ä¿ç•™
+    BYTE        FsIndex;//é‡‡æ ·ç‡Indexï¼Œè·Ÿ76ä¸€è‡´
+    BYTE        BitDepth;//é‡‡æ ·æ¯”ç‰¹æ•°ï¼ŒReserve
+    BYTE        BTIndex;//æ¯”ç‰¹ç‡Indexï¼Œè·Ÿ76ä¸€è‡´
+    BYTE        EncodeMode;//ç¼–ç æ¨¡å¼ï¼ŒWavå½•éŸ³æ—¶, 0: adpcm, 1:pcm
+    BYTE        ChannelNum;//é€šé“æ•°ï¼Œ1ï¼šå•é€šé“ï¼Œ2ï¼šåŒé€šé“
+    input_t     InputSel;//è¾“å…¥æºï¼Œè·Ÿ76ä¸€è‡´
+    BYTE        InputGain;//è¾“å…¥æºå¢ç›Šï¼Œè·Ÿ76ä¸€è‡´ï¼Œæ¨èå€¼5
+    BYTE        ADCGain;//ADCå¢ç›Šï¼Œ0-3, æ¨èå€¼3
+    BYTE        DSPGain;//DSPå¢ç›Šï¼Œ0-1, æ¨èå€¼0
+    BYTE        DelayTime;//å½•éŸ³å»¶æ—¶è®¾å®šï¼Œå•ä½ï¼š20ms
+    BYTE        EnergyOut;//èƒ½é‡è¾“å‡ºæ ‡å¿—ï¼Œ0ï¼šä¸è¾“å‡ºï¼Œé0ï¼šè¾“å‡º
+    BYTE        AVRFlag;//é™éŸ³æ£€æµ‹æ ‡å¿—ï¼Œ0ï¼šä¸å¯åŠ¨ï¼Œ1ï¼šå£°æ§ï¼Œ2ï¼šåˆ†æ›²
+    BYTE        AVRDelay;//é™éŸ³æ£€æµ‹æ—¶é—´ï¼Œ0-5ç§’ï¼Œæ¨èå€¼3
+    uint16      AVRLevel;//é™éŸ³æ£€æµ‹é—¨æ§›ï¼Œæ¨èå€¼700
+    int16       LeftOffset;//å·¦é€šé“DC Offsetä¿®æ­£å€¼ï¼ŒReserve
+    int16       RightOffset;//å³é€šé“DC Offsetä¿®æ­£å€¼ï¼ŒReserve
 
 } encControlInfor_t;
 
 
 typedef struct
 {
-    DWORD        WriteFileHandle;//ÎÄ¼şĞ´½Ó¿Ú£¬basal²ãÌá¹©ÊµÏÖ£¬ÊäÈë²ÎÊıÇëÊ¹ÓÃc_encWriteFileBuffAddr£¬c_encWriteFileCurSize
-    DWORD        FileLen;//ÒÑĞ´³¤¶È£¬µ¥Î»£ºbyte
-    WORD        WriteFileBuffAddr;////±àÂëÊı¾İbufferµØÖ·
-    WORD        WriteFileCurSize;//buffer´óĞ¡£¬µ¥Î»£ºbyte
+    DWORD        WriteFileHandle;//æ–‡ä»¶å†™æ¥å£ï¼Œbasalå±‚æä¾›å®ç°ï¼Œè¾“å…¥å‚æ•°è¯·ä½¿ç”¨c_encWriteFileBuffAddrï¼Œc_encWriteFileCurSize
+    DWORD        FileLen;//å·²å†™é•¿åº¦ï¼Œå•ä½ï¼šbyte
+    WORD        WriteFileBuffAddr;////ç¼–ç æ•°æ®bufferåœ°å€
+    WORD        WriteFileCurSize;//bufferå¤§å°ï¼Œå•ä½ï¼šbyte
 } encWriteFilePara_t;
 
 
 
 typedef struct
 {
-    BYTE        Status;//ÊµÊ±½âÂë×´Ì¬£¬0£ºÕı³££¬·Ç0£ºÒì³£
-    BYTE        AVRStatus;//¾²Òô¼ì²â×´Ì¬£¬0£ºÕı³££¬1£ºÉù¿ØÍ£Ö¹£¬2£º·ÖÇú
-    WORD        EnergyLevel;//ÄÜÁ¿¼¶±ğ
-    Full_time_t CurTime;//µ±Ç°Â¼ÒôÊ±¼ä£¬¸ßbyteÎª0£¬ºó3btyeÒÀ´ÎÎª£¬Ê±¡¢·Ö¡¢Ãë
+    BYTE        Status;//å®æ—¶è§£ç çŠ¶æ€ï¼Œ0ï¼šæ­£å¸¸ï¼Œé0ï¼šå¼‚å¸¸
+    BYTE        AVRStatus;//é™éŸ³æ£€æµ‹çŠ¶æ€ï¼Œ0ï¼šæ­£å¸¸ï¼Œ1ï¼šå£°æ§åœæ­¢ï¼Œ2ï¼šåˆ†æ›²
+    WORD        EnergyLevel;//èƒ½é‡çº§åˆ«
+    Full_time_t CurTime;//å½“å‰å½•éŸ³æ—¶é—´ï¼Œé«˜byteä¸º0ï¼Œå3btyeä¾æ¬¡ä¸ºï¼Œæ—¶ã€åˆ†ã€ç§’
 } encStatus_t;
 
 
 
 typedef struct
 {
-    BYTE  seek_to_head;        //ÊÇĞ´Êı¾İ,»¹ÊÇĞ©ÎÄ¼şÍ·.
-    char  write_length;    //ĞèÒªĞ´ÅÌµÄ³¤¶È(page)
-    void *write_addr;        //ĞèÒªĞ´ÅÌµÄµØÖ·
+    BYTE  seek_to_head;        //æ˜¯å†™æ•°æ®,è¿˜æ˜¯äº›æ–‡ä»¶å¤´.
+    char  write_length;    //éœ€è¦å†™ç›˜çš„é•¿åº¦(page)
+    void *write_addr;        //éœ€è¦å†™ç›˜çš„åœ°å€
 } write_param_t;
 
 typedef struct
@@ -258,54 +258,54 @@ typedef struct
     uchar minute;
     uchar hour;
 } enc_time_t;
-//ÎÄ¼ş¸ñÊ½×´Ì¬/¿ØÖÆ
+//æ–‡ä»¶æ ¼å¼çŠ¶æ€/æ§åˆ¶
 typedef struct
 {
-    BYTE type;            //ºÍriff¸ñÊ½µÄ wFormatTags Í¬
-    char bits;                //²ÉÑùµãµÄ¾«¶È, 16,18 bit
-    char sample_rate;        //²ÉÑùÂÊ, 8/12/16/24/32/48
+    BYTE type;            //å’Œriffæ ¼å¼çš„ wFormatTags åŒ
+    char bits;                //é‡‡æ ·ç‚¹çš„ç²¾åº¦, 16,18 bit
+    char sample_rate;        //é‡‡æ ·ç‡, 8/12/16/24/32/48
     char channel;            //1(mono)/2(stereo)/3(Joint Stero)/4(Dual channel)
-    int bit_rate;            //8/16/24/32/40/48/56/64/80/96/112/128/144/160/192/224/256/320 //kbps, 0 ±íÊ¾¿É±äÎ»ÂÊ
-    enc_time_t total_time;        //¸èÇú×ÜÊ±¼ä,Â¼ÒôÊ±±íÊ¾¿ÉÂ¼Òô×ÜÊ±³¤
+    int bit_rate;            //8/16/24/32/40/48/56/64/80/96/112/128/144/160/192/224/256/320 //kbps, 0 è¡¨ç¤ºå¯å˜ä½ç‡
+    enc_time_t total_time;        //æ­Œæ›²æ€»æ—¶é—´,å½•éŸ³æ—¶è¡¨ç¤ºå¯å½•éŸ³æ€»æ—¶é•¿
 } audio_status_control_t;
 
 
 
-//²¥·Å¿ØÖÆ
-typedef char *buffer_de_t;     //decoder Ö»ĞèÒªÒ»¸öbuffer
+//æ’­æ”¾æ§åˆ¶
+typedef char *buffer_de_t;     //decoder åªéœ€è¦ä¸€ä¸ªbuffer
 typedef struct
 {
-    char volume;            //ÒôÁ¿,0~31, 0xff±íÊ¾ mute
-    char ff_rw;            //<0±íÊ¾rewind;>0±íÊ¾forward;=0±íÊ¾Õı³£²¥·Å
-    char seta_b;            //ÉèÖÃA-B ²¥·Å
-    char speed;            //-8~8, 0Îª²»±äËÙ
+    char volume;            //éŸ³é‡,0~31, 0xffè¡¨ç¤º mute
+    char ff_rw;            //<0è¡¨ç¤ºrewind;>0è¡¨ç¤ºforward;=0è¡¨ç¤ºæ­£å¸¸æ’­æ”¾
+    char seta_b;            //è®¾ç½®A-B æ’­æ”¾
+    char speed;            //-8~8, 0ä¸ºä¸å˜é€Ÿ
     eq_t eq;                // None/ROCK/POP/CLASSIC/ SOFT/ JAZZ/DBB/USER
-    buffer_de_t buffer;        //·ÅÒôÊ¹ÓÃµÄbuffer, ¿Õ¼äÓÉmodule²ã¸ø³ö
+    buffer_de_t buffer;        //æ”¾éŸ³ä½¿ç”¨çš„buffer, ç©ºé—´ç”±moduleå±‚ç»™å‡º
 } play_control_t;
 
-//Â¼Òô×´Ì¬
+//å½•éŸ³çŠ¶æ€
 typedef struct
 {
-    char status;            //µ±Ç°µÄ×´Ì¬, max length/dsp error/ĞèÒªĞ´ÅÌvor on/vor off
-    codec_time_t current_time;    //ÊµÊ±±¨¸æÂ¼ÒôÊ±¼ä
-    write_param_t  write_param;    //Ğ´ÅÌ²ÎÊı
+    char status;            //å½“å‰çš„çŠ¶æ€, max length/dsp error/éœ€è¦å†™ç›˜vor on/vor off
+    codec_time_t current_time;    //å®æ—¶æŠ¥å‘Šå½•éŸ³æ—¶é—´
+    write_param_t  write_param;    //å†™ç›˜å‚æ•°
 } rec_status_t;
 
-//Â¼Òô¿ØÖÆ
+//å½•éŸ³æ§åˆ¶
 typedef struct
 {
-    char     *bit_stream;        //±àÂëºóµÄÊı¾İ
-    char        *pcm_stream;        //±àÂëÇ°µÄÊı¾İ,¼´adcµÄbuffer
+    char     *bit_stream;        //ç¼–ç åçš„æ•°æ®
+    char        *pcm_stream;        //ç¼–ç å‰çš„æ•°æ®,å³adcçš„buffer
 } buffer_en_t;
 typedef struct
 {
-    uchar gain;            //ÔöÒæ0(-7.5db)/1/¡­/7(3db)
-    uchar vor_time;        // VORÊ±³¤. 0(off)/1/2/3¡­/10s(max)
-    resource_t source;        //Â¼ÒôÔ´
-    char noise_dec;        //ÊÇ·ñĞèÒª½µÔë¹¦ÄÜ
+    uchar gain;            //å¢ç›Š0(-7.5db)/1/â€¦/7(3db)
+    uchar vor_time;        // VORæ—¶é•¿. 0(off)/1/2/3â€¦/10s(max)
+    resource_t source;        //å½•éŸ³æº
+    char noise_dec;        //æ˜¯å¦éœ€è¦é™å™ªåŠŸèƒ½
     char noise_level;
-    char agc;                //ÊÇ·ñÊ¹ÓÃagc(×Ô¶¯ÔöÒæ¿ØÖÆ)
-    buffer_en_t buffer;        //Â¼ÒôÊ¹ÓÃµÄbuffer, ¿Õ¼äÓÉmodule²ã¸ø³ö
+    char agc;                //æ˜¯å¦ä½¿ç”¨agc(è‡ªåŠ¨å¢ç›Šæ§åˆ¶)
+    buffer_en_t buffer;        //å½•éŸ³ä½¿ç”¨çš„buffer, ç©ºé—´ç”±moduleå±‚ç»™å‡º
     char VoxPara;
 } rec_control_t;
 
@@ -388,8 +388,8 @@ typedef enum
 */
 typedef   struct
 {
-    char status;                    //µ±Ç°µÄ×´Ì¬, max length/dsp error/ĞèÒªĞ´ÅÌvor on/vor off
-    codec_time_t  current_time;    //ÊµÊ±±¨¸æÂ¼ÒôÊ±¼ä
+    char status;                    //å½“å‰çš„çŠ¶æ€, max length/dsp error/éœ€è¦å†™ç›˜vor on/vor off
+    codec_time_t  current_time;    //å®æ—¶æŠ¥å‘Šå½•éŸ³æ—¶é—´
 } mp3recstatus_t;
 
 typedef struct

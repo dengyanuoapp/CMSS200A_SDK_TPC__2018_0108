@@ -62,13 +62,13 @@ stmt  level    source
    51          
    52          #define AK211X_SUPPORT_WAV_ONLY
    53          
-   54          BYTE far m_wavRecStatus;// = RECORDING_WAITING;      //µ±Ç°×´Ì¬
-   55          handle far m_wavRecFileHandle;// = NULL;    //´ò¿ªÓïÒôÎÄ¼þµÄ¾ä±ú
-   56          //uint8 far m_wavRecOldTimerNum; //timer isr Ê¹ÓÃµÄtimerºÅÂë
-   57          uint16 far m_wavRecOldDspIsr; //±£´æ¾ÉµÄhip isr
+   54          BYTE far m_wavRecStatus;// = RECORDING_WAITING;      //å½“å‰çŠ¶æ€
+   55          handle far m_wavRecFileHandle;// = NULL;    //æ‰“å¼€è¯­éŸ³æ–‡ä»¶çš„å¥æŸ„
+   56          //uint8 far m_wavRecOldTimerNum; //timer isr ä½¿ç”¨çš„timerå·ç 
+   57          uint16 far m_wavRecOldDspIsr; //ä¿å­˜æ—§çš„hip isr
 C251 COMPILER V4.55,  basal_en_urec                                                        13/12/18  16:27:30  PAGE 2   
 
-   58          uint16 far m_wavRecOldDMAIsr; //±£´æ¾ÉµÄADC isr
+   58          uint16 far m_wavRecOldDMAIsr; //ä¿å­˜æ—§çš„ADC isr
    59          
    60          char far m_wavRecFileName[12];
    61          
@@ -84,11 +84,11 @@ stmt  level    source
    71          
    72          /*******************************************************************************
    73           * Function:       Wav2rProceed
-   74           * Description:    wav Â¼Òô±àÂëÐ´ÈëÎÄ¼þ
-   75           * Input£º
-   76           * Output£º        0:Ã»ÓÐÐ´, 1:Ð´Ò»¸öÉÈÇø, 8:ÒÑÐ´ÁËWAVÍ·ÎÄ¼þ
-   77           *                 -1:³ö´í,ÓÃwavrSendCommand(MC_GETSTATUS,mp3_rec_status_t *)»ñÈ¡ÏêÏ¸ÐÅÏ¢
-   78           * Other£º         Ò»´ÎÐ´Ò»¸öÉÈÇø(512 bytes),
+   74           * Description:    wav å½•éŸ³ç¼–ç å†™å…¥æ–‡ä»¶
+   75           * Inputï¼š
+   76           * Outputï¼š        0:æ²¡æœ‰å†™, 1:å†™ä¸€ä¸ªæ‰‡åŒº, 8:å·²å†™äº†WAVå¤´æ–‡ä»¶
+   77           *                 -1:å‡ºé”™,ç”¨wavrSendCommand(MC_GETSTATUS,mp3_rec_status_t *)èŽ·å–è¯¦ç»†ä¿¡æ¯
+   78           * Otherï¼š         ä¸€æ¬¡å†™ä¸€ä¸ªæ‰‡åŒº(512 bytes),
    79           *******************************************************************************/
    80          #ifdef PC
                retWavrProceed_e srProceed(void)
@@ -100,12 +100,12 @@ stmt  level    source
    87   1          uchar status;
    88   1          BOOL result;
    89   1          encTimerIntSub();
-   90   1          status = encGetBitstream();//²éÑ¯encµÄÊý¾Ý±àÂë
+   90   1          status = encGetBitstream();//æŸ¥è¯¢encçš„æ•°æ®ç¼–ç 
    91   1          if (WRITE_PAGE == status)
    92   1          {
    93   2              result = FS_FWrite((const char *) g_encWriteFilePara.WriteFileBuffAddr,
-   95   2                                 (char)(g_encWriteFilePara.WriteFileCurSize >> ONE_PAGE_BITNUM),    //·çÏÕ£¬´Ó1
-             -6Î»±ä8Î»
+   95   2                                 (char)(g_encWriteFilePara.WriteFileCurSize >> ONE_PAGE_BITNUM),    //é£Žé™©ï¼Œä»Ž1
+             -6ä½å˜8ä½
    95   2                                 m_wavRecFileHandle);
    96   2              if (result == 1)
    97   2              {
@@ -126,12 +126,12 @@ stmt  level    source
   112   3                              }*/
   113   3                  FS_FClose(m_wavRecFileHandle);
   114   3                  m_wavRecStatus = RECORDING_DISK_ERROR;
-  115   3                  //ÎÄ¼þÒÑ¹Ø±Õ
+  115   3                  //æ–‡ä»¶å·²å…³é—­
   116   3                  m_wavRecFileHandle = NULL;
   117   3                  return WRITE_WRONG;
   118   3              }
   119   2          }
-  120   1          else if (status == 0x02)// ÊÇÎÄ¼þÍ·Ð´ÈëWAVÎÄ¼þ
+  120   1          else if (status == 0x02)// æ˜¯æ–‡ä»¶å¤´å†™å…¥WAVæ–‡ä»¶
   121   1          {
   122   2              encExit();
 C251 COMPILER V4.55,  basal_en_urec                                                        13/12/18  16:27:30  PAGE 3   
@@ -175,7 +175,7 @@ stmt  level    source
   159   3              }
   160   2              else
   161   2              {
-  162   3                  //ÒÑ¾­³É¹¦¹Ø±ÕÎÄ¼þ
+  162   3                  //å·²ç»æˆåŠŸå…³é—­æ–‡ä»¶
   163   3                  m_wavRecFileHandle = NULL;
   164   3                  m_wavRecStatus = RECORDING_STOP;
   165   3                  return WRITE_HEAD;
@@ -189,9 +189,9 @@ stmt  level    source
   173          /*******************************************************************************
   174           * Function:       wavrSendCommand
   175           * Description:    wav encode modual entry
-  176           * Input£º
-  177           * Output£º
-  178           * Other£º         // ·¢ËÍMC_STOPÖ®ºó,ÐèÒªµÈµ½wav2rProceed()·µ»Ø8²Å¿ÉÒÔ·¢ËÍMC_CLOSE
+  176           * Inputï¼š
+  177           * Outputï¼š
+  178           * Otherï¼š         // å‘é€MC_STOPä¹‹åŽ,éœ€è¦ç­‰åˆ°wav2rProceed()è¿”å›ž8æ‰å¯ä»¥å‘é€MC_CLOSE
   179           *******************************************************************************/
   180          #ifdef PC
                BOOL srSendCommand(BYTE cmd, BYTE music_type, void *param)
@@ -200,7 +200,7 @@ stmt  level    source
   184          #endif
   185          //BOOL srSendCommand(BYTE cmd, BYTE music_type, void* param)
   186          {
-  187   1          mp3_rec_status_t *wav_rec_status; // AP ²ã
+  187   1          mp3_rec_status_t *wav_rec_status; // AP å±‚
   188   1          //    time_t *pTime;
 C251 COMPILER V4.55,  basal_en_urec                                                        13/12/18  16:27:30  PAGE 4   
 
@@ -249,8 +249,8 @@ stmt  level    source
   231   3                  return FALSE;
   232   3              }
   233   2      
-  234   2              //#if 0 //usound Â¼Òô, only mp2
-  235   2              // UI Simulator ²»ÐèÒªÐ´Â¼ÒôÎÄ¼þÍ·
+  234   2              //#if 0 //usound å½•éŸ³, only mp2
+  235   2              // UI Simulator ä¸éœ€è¦å†™å½•éŸ³æ–‡ä»¶å¤´
   236   2              if(g_encControlInfor.SongType != 0)
   237   2              {
   238   3      #ifndef PC
@@ -282,7 +282,7 @@ stmt  level    source
   262   2              encStart();
   263   2              //        }
   264   2              /*        else
-  265   2                      { // ¼ÌÐøÂ¼Òô
+  265   2                      { // ç»§ç»­å½•éŸ³
   266   2                          if (m_wavRecStatus == RECORDING_PAUSE)
   267   2                          {
   268   2                              encContinue();
@@ -416,10 +416,10 @@ stmt  level    source
   389          
   390          /*******************************************************************************
   391           * Function:       encode_initAudioFormat
-  392           * Description:    ³õÊ¼»¯Â¼Òô²ÎÊý
-  393           * Input£º
-  394           * Output£º
-  395           * Other£º         ¶ÔÓ¦ MC_OPEN
+  392           * Description:    åˆå§‹åŒ–å½•éŸ³å‚æ•°
+  393           * Inputï¼š
+  394           * Outputï¼š
+  395           * Otherï¼š         å¯¹åº” MC_OPEN
   396           *******************************************************************************/
   397          
   398          void encode_initAudioFormat(BYTE music_type)
@@ -448,17 +448,17 @@ stmt  level    source
   421   1          g_encWriteFilePara.WriteFileBuffAddr = RECORD_BUFFER_ADDRESS;
   422   1          g_encWriteFilePara.WriteFileCurSize = RECORD_BUFFER_SIZE;
   423   1          g_encWriteFilePara.FileLen = 0;
-  424   1          //g_encWriteFilePara.WriteFileHandle ÔÚMC_LOADÖÐ³õÊ¼»¯
+  424   1          //g_encWriteFilePara.WriteFileHandle åœ¨MC_LOADä¸­åˆå§‹åŒ–
   425   1      
   426   1          m_wavRecStatus = RECORDING_WAITING;
   427   1      }
   428          
   429          /*******************************************************************************
   430           * Function:       encode_getNewFileHandle
-  431           * Description:    ¼ì²éÎÄ¼þÊÇ·ñ´æÔÚ,²»´æÔÚ,´´½¨¸ÃÎÄ¼þ.
-  432           * Input£º
-  433           * Output£º
-  434           * Other£º         ¶ÔÓ¦ MC_LOAD
+  431           * Description:    æ£€æŸ¥æ–‡ä»¶æ˜¯å¦å­˜åœ¨,ä¸å­˜åœ¨,åˆ›å»ºè¯¥æ–‡ä»¶.
+  432           * Inputï¼š
+  433           * Outputï¼š
+  434           * Otherï¼š         å¯¹åº” MC_LOAD
   435           *******************************************************************************/
   436          
   437          BOOL encode_getNewFileHandle(void *param)
@@ -489,10 +489,10 @@ stmt  level    source
   460          
   461          /*******************************************************************************
   462           * Function:       parse_bit_rate
-  463           * Description:    ×ª»» AP²ãµÄ BIT RATE µ½ CODE²ãµÄBIT RATE
-  464           * Input£º
-  465           * Output£º
-  466           * Other£º         //
+  463           * Description:    è½¬æ¢ APå±‚çš„ BIT RATE åˆ° CODEå±‚çš„BIT RATE
+  464           * Inputï¼š
+  465           * Outputï¼š
+  466           * Otherï¼š         //
   467           *******************************************************************************/
   468          /*int8 parse_bit_rate(uint8 *ch)
   469          {
@@ -579,10 +579,10 @@ stmt  level    source
   548          
   549          /*******************************************************************************
   550           * Function:       encode_setAudioFormat
-  551           * Description:    ÉèÖÃ CODE ²ãµÄ  g_encInitPara
-  552           * Input£º
-  553           * Output£º
-  554           * Other£º         ¶ÔÓ¦ MC_SETAUDIOFMT
+  551           * Description:    è®¾ç½® CODE å±‚çš„  g_encInitPara
+  552           * Inputï¼š
+  553           * Outputï¼š
+  554           * Otherï¼š         å¯¹åº” MC_SETAUDIOFMT
   555           *******************************************************************************/
   556          /*
   557          void encode_setAudioFormat(void* param)
@@ -613,10 +613,10 @@ stmt  level    source
 C251 COMPILER V4.55,  basal_en_urec                                                        13/12/18  16:27:30  PAGE 10  
 
   582           * Function:       ch_bit_rate
-  583           * Description:    ×ª»» CODE ²ãµÄ BIT RATE µ½ AP ²ãµÄBIT RATE
-  584           * Input£º
-  585           * Output£º
-  586           * Other£º         //
+  583           * Description:    è½¬æ¢ CODE å±‚çš„ BIT RATE åˆ° AP å±‚çš„BIT RATE
+  584           * Inputï¼š
+  585           * Outputï¼š
+  586           * Otherï¼š         //
   587           *******************************************************************************/
   588          /*void ch_bit_rate(char *tmp)
   589          {
@@ -725,10 +725,10 @@ stmt  level    source
   690          
   691          /*******************************************************************************
   692           * Function:       encode_getAudioFormat
-  693           * Description:    »ñÈ¡ CODE ²ã audio_format_t
-  694           * Input£º
-  695           * Output£º
-  696           * Other£º         ¶ÔÓ¦ MC_GETAUDIOFMT
+  693           * Description:    èŽ·å– CODE å±‚ audio_format_t
+  694           * Inputï¼š
+  695           * Outputï¼š
+  696           * Otherï¼š         å¯¹åº” MC_GETAUDIOFMT
   697           *******************************************************************************/
   698          /*
   699          void encode_getAudioFormat(void* param)
@@ -738,7 +738,7 @@ stmt  level    source
   703              m_audio_fmt = (audio_format_t *) param;
   704              m_audio_fmt->sample_rate = g_encControlInfor.FsIndex;
   705              m_audio_fmt->channel = g_encControlInfor.ChannelNum;
-  706              ch_bit_rate(m_audio_fmt->bit_rate); //Óï·¨
+  706              ch_bit_rate(m_audio_fmt->bit_rate); //è¯­æ³•
   707          } */
 
 

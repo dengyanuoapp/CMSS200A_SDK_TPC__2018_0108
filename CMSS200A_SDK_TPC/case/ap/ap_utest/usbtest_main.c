@@ -13,9 +13,9 @@
  * \brief
  * \author   wanghaijing
  * \par      GENERAL DESCRIPTION:
- *               ÕâÀï¶ÔÎÄ¼þ½øÐÐÃèÊö
+ *               è¿™é‡Œå¯¹æ–‡ä»¶è¿›è¡Œæè¿°
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
  *

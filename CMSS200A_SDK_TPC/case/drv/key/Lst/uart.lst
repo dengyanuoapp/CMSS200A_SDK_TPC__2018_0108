@@ -23,9 +23,9 @@ stmt  level    source
    13           * \brief    .
    14           * \author   dengtaiping
    15           * \par      GENERAL DESCRIPTION:
-   16           *               usb¡¢AUDIOµÈÄ£¿é³õÊ¼»¯
+   16           *               usbã€AUDIOç­‰æ¨¡å—åˆå§‹åŒ–
    17           * \par      EXTERNALIZED FUNCTIONS:
-   18           *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+   18           *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
    19           *
    20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
    21           *
@@ -80,7 +80,7 @@ stmt  level    source
    68   1              IE0 = IE0 | 0x80;
    69   1              IE0 |= 0x10; //enable UART/IRC interrupt
    70   1              SFR_BANK = sfr_temp;
-   71   1              //uart_send_msg("¿ªÊ¼²¥·Å");
+   71   1              //uart_send_msg("å¼€å§‹æ’­æ”¾");
    72   1          
    73   1              //UART_DRQ = 0x03;
    74   1      }

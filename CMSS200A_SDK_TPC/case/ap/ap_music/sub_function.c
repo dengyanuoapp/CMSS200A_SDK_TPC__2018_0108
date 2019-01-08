@@ -34,10 +34,10 @@ const uint8 EQtemp[eq_max][10] =
  ********************************************************************************
  *             void volume_callback(void)
  *
- * Description : µ÷ÕûÒôÁ¿µÄ´óĞ¡
+ * Description : è°ƒæ•´éŸ³é‡çš„å¤§å°
  *
  *
- * Arguments   : Vol:µ±Ç°µÄÒôÁ¿Öµ
+ * Arguments   : Vol:å½“å‰çš„éŸ³é‡å€¼
  *
  * Returns     : void
  *
@@ -61,14 +61,14 @@ void volume_callback(uint16 Vol)
  ********************************************************************************
  *             void SelectCurMusic(void)
  *
- * Description : ÖØÑ¡µ±Ç°µÄ¸èÇú²¥·Å
+ * Description : é‡é€‰å½“å‰çš„æ­Œæ›²æ’­æ”¾
  *
  *
  * Arguments   :
  *
  * Returns     : void
  *
- * Notes       : Ö÷ÒªÊÇ¿ìÍËµ½ÎÄ¼şÍ·Ê±£¬ĞèÒªÏÈ¹Ø±Õ²¥·ÅµÄ¸èÇú£¬È»ºóÔÙ´ò¿ª²¥·Å
+ * Notes       : ä¸»è¦æ˜¯å¿«é€€åˆ°æ–‡ä»¶å¤´æ—¶ï¼Œéœ€è¦å…ˆå…³é—­æ’­æ”¾çš„æ­Œæ›²ï¼Œç„¶åå†æ‰“å¼€æ’­æ”¾
  *
  ********************************************************************************
  */
@@ -89,14 +89,14 @@ void SelectCurMusic(void)
  ********************************************************************************
  *             void DisInFBHead(void)
  *
- * Description : ´¦ÀíÎÄ¼şµ½Í·µÄÇé¿ö
+ * Description : å¤„ç†æ–‡ä»¶åˆ°å¤´çš„æƒ…å†µ
  *
  *
- * Arguments   :  DisMod:ÔİÊ±±£Áô
+ * Arguments   :  DisMod:æš‚æ—¶ä¿ç•™
  *
  * Returns     : void
  *
- * Notes       : µ±¿ìÍËµ½Í·Ê±£¬Ö»ÓĞµ±°´¼üÌ§Æğºó²ÅÖØĞÂ²¥·Å
+ * Notes       : å½“å¿«é€€åˆ°å¤´æ—¶ï¼Œåªæœ‰å½“æŒ‰é”®æŠ¬èµ·åæ‰é‡æ–°æ’­æ”¾
  *
  ********************************************************************************
  */
@@ -107,7 +107,7 @@ void DisInFBHead(uint8 DisMod)
     memset(temp_buffer, 0x0, 9);
     LEDPuts(NUMBER1, temp_buffer, 1);
     LEDDisplay(LED_COL, 0xff, 1);
-    //µÈ´ı³¤°´¼üµÄÌ§Æğ
+    //ç­‰å¾…é•¿æŒ‰é”®çš„æŠ¬èµ·
     while (ap_get_message() != AP_KEY_LONGUP)
     {
         ;
@@ -119,16 +119,16 @@ void DisInFBHead(uint8 DisMod)
  ********************************************************************************
  *             void DealMusicFileEnd(void)
  *
- * Description : ´¦ÀíÎÄ¼ş²¥·Åµ½Î²µÄÇé¿ö
+ * Description : å¤„ç†æ–‡ä»¶æ’­æ”¾åˆ°å°¾çš„æƒ…å†µ
  *
  *
  * Arguments   :
  *
  * Returns     : void
  *
- * Notes       :1.´¦Àí¿ìÍËµ½Í·µÄÇé¿ö
- *			   2.´¦Àí¿ì½øµ½ÎÄ¼şÎ²µÄÇé¿ö
- *			   3.´¦ÀíÕı³£²¥·Åµ½ÎÄ¼şÎ²µÄÇé¿ö
+ * Notes       :1.å¤„ç†å¿«é€€åˆ°å¤´çš„æƒ…å†µ
+ *			   2.å¤„ç†å¿«è¿›åˆ°æ–‡ä»¶å°¾çš„æƒ…å†µ
+ *			   3.å¤„ç†æ­£å¸¸æ’­æ”¾åˆ°æ–‡ä»¶å°¾çš„æƒ…å†µ
  *
  ********************************************************************************
  */
@@ -138,7 +138,7 @@ uint16 DealMusicFileEnd(uint8 DisMod)
     need_draw = TRUE;
     if (PlayStatus == FBPlaySta)
     {
-        DisInFBHead(DisMod);//µ½Í·ÏÔÊ¾
+        DisInFBHead(DisMod);//åˆ°å¤´æ˜¾ç¤º
     }
     else if (PlayStatus == FFPlaySta)
     {
@@ -161,7 +161,7 @@ uint8 deal_music_filehead(void)
     uint8 retval = NULL;
     if (PlayStatus == PlaySta)
     {
-        DisInFBHead(1);//µ½Í·ÏÔÊ¾
+        DisInFBHead(1);//åˆ°å¤´æ˜¾ç¤º
     }
     else
     {
@@ -174,7 +174,7 @@ uint8 deal_music_filehead(void)
  ********************************************************************************
  *             void FadeOut(void)
  *
- * Description : ´¦Àíµ­³öĞ§¹û
+ * Description : å¤„ç†æ·¡å‡ºæ•ˆæœ
  *
  *
  * Arguments   :
@@ -190,7 +190,7 @@ uint8 deal_music_filehead(void)
 
 void FadeOut(bool DisMod)
 {
-    /*µ­³ö´¦Àí*/
+    /*æ·¡å‡ºå¤„ç†*/
     DisMod = DisMod;
 #ifdef OPT_Sup_FadeOut_fun
     music_play_status_t status_buf;
@@ -222,15 +222,15 @@ void FadeOut(bool DisMod)
  ********************************************************************************
  *             void deal_long_keyup(void)
  *
- * Description : ´¦Àí³¤°´¼üÌ§ÆğµÄÇé¿ö
+ * Description : å¤„ç†é•¿æŒ‰é”®æŠ¬èµ·çš„æƒ…å†µ
  *
  *
  * Arguments   :
  *
  * Returns     : void
  *
- * Notes       : 1.ÔÚ²¥·ÅÊ±¼ä½çÃæÊ±£¬Ö÷ÒªÊÇĞŞ¸´¿ì½øÍËÎªÕı³£²¥·ÅµÄÇé¿ö
- *			    2.ÔÚÎÄ¼şĞòºÅ»òÄ¿Â¼ĞòºÅÏÔÊ¾½çÃæÊ±£¬Ö÷ÒªÍ£Ö¹¿ìËÙÇĞ»»ÎÄ¼ş»òÄ¿Â¼£¬×ª¶ø²¥·ÅÇĞ»»µ½µÄÎÄ¼ş
+ * Notes       : 1.åœ¨æ’­æ”¾æ—¶é—´ç•Œé¢æ—¶ï¼Œä¸»è¦æ˜¯ä¿®å¤å¿«è¿›é€€ä¸ºæ­£å¸¸æ’­æ”¾çš„æƒ…å†µ
+ *			    2.åœ¨æ–‡ä»¶åºå·æˆ–ç›®å½•åºå·æ˜¾ç¤ºç•Œé¢æ—¶ï¼Œä¸»è¦åœæ­¢å¿«é€Ÿåˆ‡æ¢æ–‡ä»¶æˆ–ç›®å½•ï¼Œè½¬è€Œæ’­æ”¾åˆ‡æ¢åˆ°çš„æ–‡ä»¶
  *
  *
  ********************************************************************************
@@ -263,9 +263,9 @@ void deal_long_keyup(void)
     FF_flag = 0;
 }
 /**************************************************************************
- * Description:  EQ ²ÎÊıÉèÖÃº¯Êı
+ * Description:  EQ å‚æ•°è®¾ç½®å‡½æ•°
  *
- * Input:  mode   EQ ÉèÖÃÄ£Ê½
+ * Input:  mode   EQ è®¾ç½®æ¨¡å¼
  *
  * Output:  null
  *
@@ -280,7 +280,7 @@ void EQMode_callback(EQ_set_mod_t mode)
     memset(eq_left, 0, 12);
     memset(eq_right, 0, 12);
 
-    //´ÓVRAM¶Á£¬±£´æµÄ²ÎÊı¼°Ê±ÉúĞ§
+    //ä»VRAMè¯»ï¼Œä¿å­˜çš„å‚æ•°åŠæ—¶ç”Ÿæ•ˆ
     VMRead(&g_eq_para, VM_PCSET_EQ, sizeof(g_eq_para));
     if (g_eq_para.magic != EQ_VRAM_MAGIC)
     {
@@ -310,7 +310,7 @@ void EQMode_callback(EQ_set_mod_t mode)
  ********************************************************************************
  *             void deal_eq_msg(void)
  *
- * Description : ´¦ÀíEQÄ£Ê½µ÷½ÚÏûÏ¢
+ * Description : å¤„ç†EQæ¨¡å¼è°ƒèŠ‚æ¶ˆæ¯
  *
  *
  * Arguments   :
@@ -370,7 +370,7 @@ uint8 deal_eq_msg(uint8 key)
  ********************************************************************************
  *             void deal_mute_msg(void)
  *
- * Description : ¿ª¹Ø¾²ÒôÄ£Ê½
+ * Description : å¼€å…³é™éŸ³æ¨¡å¼
  *
  *
  * Arguments   :
@@ -399,7 +399,7 @@ void deal_mute_msg(void)
  ********************************************************************************
  *             deal_repeat_msg(uint8 key)
  *
- * Description : ´¦ÀíÑ­»·²¥·ÅµÄÄ£Ê½
+ * Description : å¤„ç†å¾ªç¯æ’­æ”¾çš„æ¨¡å¼
  *
  *
  * Arguments   :
@@ -466,12 +466,12 @@ uint8 deal_repeat_msg(uint8 key)
 }
 #if 0
 /********************************************************************************
- * Description : ´¦ÀíÒôÁ¿¼ü
+ * Description : å¤„ç†éŸ³é‡é”®
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -565,7 +565,7 @@ reinit:
             ap_sleep(4);
             if(first_init == TRUE)
             {
-                //¶ÔÒÑ»µµôµÄ¿¨»òuÅÌ½øĞĞÌØ±ğ´¦Àí
+                //å¯¹å·²åæ‰çš„å¡æˆ–uç›˜è¿›è¡Œç‰¹åˆ«å¤„ç†
                 DRV_UnInstall(DRV_STG);
                 first_init = FALSE;
                 if(CurUselocation.disk == disk_char[1])
@@ -591,7 +591,7 @@ reinit:
  ********************************************************************************
  *             void deal_device_msg(void)
  *
- * Description : ´¦ÀíÉè±¸°Î²åÏûÏ¢
+ * Description : å¤„ç†è®¾å¤‡æ‹”æ’æ¶ˆæ¯
  *
  *
  * Arguments   :
@@ -611,41 +611,41 @@ uint8 deal_device_msg(uint8 key)
     //    while (ap_get_message() != NULL)
     //        ;
     no_device_flag = FALSE;
-    if (key == AP_MSG_SD_OUT)//¿¨°Î³ö
+    if (key == AP_MSG_SD_OUT)//å¡æ‹”å‡º
     {
-        if (CurUselocation.disk == disk_char[0])//Èç¹û²¥·ÅµÄÊÇuÅÌ£¬Ôò²»´¦Àí¿¨°Î³öÏûÏ¢
+        if (CurUselocation.disk == disk_char[0])//å¦‚æœæ’­æ”¾çš„æ˜¯uç›˜ï¼Œåˆ™ä¸å¤„ç†å¡æ‹”å‡ºæ¶ˆæ¯
         {
             return NULL;
         }
-        else if (USBH_Check_Udisk())//Èç¹û²¥·ÅµÄÊÇ¿¨£¬²¢ÇÒ´æÔÚuÅÌ£¬ÔòÇĞ»»µ½uÅÌ²¥·Å
+        else if (USBH_Check_Udisk())//å¦‚æœæ’­æ”¾çš„æ˜¯å¡ï¼Œå¹¶ä¸”å­˜åœ¨uç›˜ï¼Œåˆ™åˆ‡æ¢åˆ°uç›˜æ’­æ”¾
         {
             CurUselocation.disk = disk_char[0];
         }
-        else//Èç¹ûÃ»ÓĞuÅÌ£¬Ôò½«no_device_flagÖÃÆğÀ´
+        else//å¦‚æœæ²¡æœ‰uç›˜ï¼Œåˆ™å°†no_device_flagç½®èµ·æ¥
         {
             no_device_flag = TRUE;
         }
     }
-    else if (key == AP_MSG_UH_OUT)//uhost °Î³ö
+    else if (key == AP_MSG_UH_OUT)//uhost æ‹”å‡º
     {
-        if (CurUselocation.disk == disk_char[1])//Èç¹û²¥·ÅµÄÊÇ¿¨ÅÌ£¬Ôò²»´¦Àíuhost°Î³öÏûÏ¢
+        if (CurUselocation.disk == disk_char[1])//å¦‚æœæ’­æ”¾çš„æ˜¯å¡ç›˜ï¼Œåˆ™ä¸å¤„ç†uhostæ‹”å‡ºæ¶ˆæ¯
         {
             return NULL;
         }
-        else if (DRV_DetectUD(1) == 0x20)//Èç¹û²¥·ÅµÄÊÇuhost£¬²¢ÇÒ´æÔÚ¿¨£¬ÔòÇĞ»»µ½¿¨ÅÌ²¥·Å
+        else if (DRV_DetectUD(1) == 0x20)//å¦‚æœæ’­æ”¾çš„æ˜¯uhostï¼Œå¹¶ä¸”å­˜åœ¨å¡ï¼Œåˆ™åˆ‡æ¢åˆ°å¡ç›˜æ’­æ”¾
         {
             CurUselocation.disk = disk_char[1];
         }
-        else//Èç¹ûÃ»ÓĞ¿¨ÅÌ£¬Ôò½«no_device_flagÖÃÆğÀ´
+        else//å¦‚æœæ²¡æœ‰å¡ç›˜ï¼Œåˆ™å°†no_device_flagç½®èµ·æ¥
         {
             no_device_flag = TRUE;
         }
     }
-    else if (key == AP_MSG_SD_IN)//¿¨²åÈë
+    else if (key == AP_MSG_SD_IN)//å¡æ’å…¥
     {
         first_init = TRUE;
-        //Èç¹ûÔ­ÏÈµÄÅÌ·ûÊÇ¿¨ÅÌ£¬²¢ÇÒ²»ÊÇÍ£Ö¹×´Ì¬£¬ÔòËµÃ÷ÊÇÎó¼ì£¬²»×öÈÎºÎ´¦Àí
-        //·ñÔòÖ±½ÓÇĞ»»µ½¿¨ÅÌ
+        //å¦‚æœåŸå…ˆçš„ç›˜ç¬¦æ˜¯å¡ç›˜ï¼Œå¹¶ä¸”ä¸æ˜¯åœæ­¢çŠ¶æ€ï¼Œåˆ™è¯´æ˜æ˜¯è¯¯æ£€ï¼Œä¸åšä»»ä½•å¤„ç†
+        //å¦åˆ™ç›´æ¥åˆ‡æ¢åˆ°å¡ç›˜
         if ((CurUselocation.disk == disk_char[1]) && (PlayStatus == PlaySta))
         {
             return NULL;
@@ -655,15 +655,15 @@ uint8 deal_device_msg(uint8 key)
     else
     {
         first_init = TRUE;
-        //Èç¹ûÔ­ÏÈµÄÅÌ·ûÊÇuÅÌ£¬²¢ÇÒ²»ÊÇÍ£Ö¹×´Ì¬£¬ÔòËµÃ÷ÊÇÎó¼ì£¬²»×öÈÎºÎ´¦Àí
-        //·ñÔòÖ±½ÓÇĞ»»µ½uÅÌ
+        //å¦‚æœåŸå…ˆçš„ç›˜ç¬¦æ˜¯uç›˜ï¼Œå¹¶ä¸”ä¸æ˜¯åœæ­¢çŠ¶æ€ï¼Œåˆ™è¯´æ˜æ˜¯è¯¯æ£€ï¼Œä¸åšä»»ä½•å¤„ç†
+        //å¦åˆ™ç›´æ¥åˆ‡æ¢åˆ°uç›˜
         if ((CurUselocation.disk == disk_char[0]) && (PlayStatus == PlaySta))
         {
             return NULL;
         }
         CurUselocation.disk = disk_char[0];
     }
-    //ÇĞ»»´ÅÅÌÊ±£¬ÏÈ±£´æ¶ÏµãĞÅÏ¢
+    //åˆ‡æ¢ç£ç›˜æ—¶ï¼Œå…ˆä¿å­˜æ–­ç‚¹ä¿¡æ¯
     stop_music_play(TRUE);
     reinit_file_info();
 #ifdef MUSIC_AP
@@ -692,7 +692,7 @@ uint8 deal_device_msg(uint8 key)
  ********************************************************************************
  *             void deal_folder_longmsg(void)
  *
- * Description : ´¦Àí³¤°´folder key¹¦ÄÜ
+ * Description : å¤„ç†é•¿æŒ‰folder keyåŠŸèƒ½
  *
  *
  * Arguments   : void
@@ -730,17 +730,17 @@ uint8 deal_folder_longmsg(uint8 key)
  ********************************************************************************
  *             void deal_next_prev_longmsg(void)
  *
- * Description : ´¦Àí²»Í¬³¡¾°ÏÂ³¤°´next,prev keyµÄ¹¦ÄÜ
+ * Description : å¤„ç†ä¸åŒåœºæ™¯ä¸‹é•¿æŒ‰next,prev keyçš„åŠŸèƒ½
  *
  *
  * Arguments   : void
  *
  * Returns     : void
  *
- * Notes       :1.ÔÚ²¥·ÅÏÔÊ¾²¥·ÅÊ±¼ä½çÃæÊµÏÖ¿ì½øÍË
- *			   2.ÔÚ²¥·ÅÏÔÊ¾ÎÄ¼şĞòºÅ½çÃæÊµÏÖ¿ìËÙÇĞ»»¸èÇú
- *			   3.ÔÚÔİÍ£ÏÔÊ¾²¥·ÅÊ±¼ä½çÃæÊµÏÖ¿ìËÙÇĞ»»¸èÇú
- *			   4.ÔÚÏÔÊ¾ÒôÁ¿µ÷½Ú½çÃæÊµÏÖ¼ÌĞøµ÷½ÚÒôÁ¿¹¦ÄÜ
+ * Notes       :1.åœ¨æ’­æ”¾æ˜¾ç¤ºæ’­æ”¾æ—¶é—´ç•Œé¢å®ç°å¿«è¿›é€€
+ *			   2.åœ¨æ’­æ”¾æ˜¾ç¤ºæ–‡ä»¶åºå·ç•Œé¢å®ç°å¿«é€Ÿåˆ‡æ¢æ­Œæ›²
+ *			   3.åœ¨æš‚åœæ˜¾ç¤ºæ’­æ”¾æ—¶é—´ç•Œé¢å®ç°å¿«é€Ÿåˆ‡æ¢æ­Œæ›²
+ *			   4.åœ¨æ˜¾ç¤ºéŸ³é‡è°ƒèŠ‚ç•Œé¢å®ç°ç»§ç»­è°ƒèŠ‚éŸ³é‡åŠŸèƒ½
  *
  ********************************************************************************
  */
@@ -813,14 +813,14 @@ uint8 deal_next_prev_longmsg(uint8 key)
  ********************************************************************************
  *             void deal_digital_key(void)
  *
- * Description : ´¦ÀíÊı×Ö¼üÊäÈëµÄ¹¦ÄÜ
+ * Description : å¤„ç†æ•°å­—é”®è¾“å…¥çš„åŠŸèƒ½
  *
  *
  * Arguments   : void
  *
  * Returns     : void
  *
- * Notes       :1.Ö÷ÒªÊÇ½«ÊäÈëµÄÊı×Ö¼üÖµ×ª»»ÎªÏà¶ÔÓ¦µÄÊı×Ö£¬È»ºó´æ´¢µ½bufÖĞ
+ * Notes       :1.ä¸»è¦æ˜¯å°†è¾“å…¥çš„æ•°å­—é”®å€¼è½¬æ¢ä¸ºç›¸å¯¹åº”çš„æ•°å­—ï¼Œç„¶åå­˜å‚¨åˆ°bufä¸­
  *
  ********************************************************************************
  */
@@ -832,7 +832,7 @@ uint8 deal_digital_key(uint8 key)
     {
         SetCurUI_Type(Digital_UI);
     }
-    key_val = (key & ~AP_KEY_UP) - AP_KEY_NUM0;//½«Êı×Ö°´¼üÏûÏ¢×ª»»³ÉÊı×Ö
+    key_val = (key & ~AP_KEY_UP) - AP_KEY_NUM0;//å°†æ•°å­—æŒ‰é”®æ¶ˆæ¯è½¬æ¢æˆæ•°å­—
     DigitalBuf[DigitalCount] = key_val;
     DigitalCount++;
     need_draw = TRUE;
@@ -842,15 +842,15 @@ uint8 deal_digital_key(uint8 key)
  ********************************************************************************
  *             void SelMusicByDigital(void)
  *
- * Description : ÊµÏÖÊı×Öµã¸è¹¦ÄÜ
+ * Description : å®ç°æ•°å­—ç‚¹æ­ŒåŠŸèƒ½
  *
  *
  * Arguments   : void
  *
  * Returns     : void
  *
- * Notes       :Èç¹ûÊäÈëµÄÊı×Ö³¬¹ı´ÅÅÌµÄÒôÀÖÎÄ¼ş×ÜÊı»òÕßÎª0£¬Ôò²»×öÈÎºÎÏìÓ¦
- *			  ·ñÔò¸ù¾İÊäÈëµÄÊı×ÖÕÒµ½¶ÔÓ¦µÄ¸èÇú½øĞĞ²¥·Å
+ * Notes       :å¦‚æœè¾“å…¥çš„æ•°å­—è¶…è¿‡ç£ç›˜çš„éŸ³ä¹æ–‡ä»¶æ€»æ•°æˆ–è€…ä¸º0ï¼Œåˆ™ä¸åšä»»ä½•å“åº”
+ *			  å¦åˆ™æ ¹æ®è¾“å…¥çš„æ•°å­—æ‰¾åˆ°å¯¹åº”çš„æ­Œæ›²è¿›è¡Œæ’­æ”¾
  ********************************************************************************
  */
 
@@ -859,8 +859,8 @@ void SelMusicByDigital(void)
     uint16 realNum = 0;
     uint8 filename[12];
     realNum = DigitalSwitchToRealNum();
-    //Èç¹ûµ±Ç°µÄÊı×ÖĞ¡ÓÚ»òÎÄ¼ş×ÜÊıÊ±£¬Ôò²¥·ÅÑ¡È¡µÄÊı×Ö¶ÔÓ¦µÄ¸èÇú
-    //·ñÔòÊ²Ã´¶¼²»×ö£¬Ö±½Ó·µ»Ø²¥·Å½çÃæ¡£
+    //å¦‚æœå½“å‰çš„æ•°å­—å°äºæˆ–æ–‡ä»¶æ€»æ•°æ—¶ï¼Œåˆ™æ’­æ”¾é€‰å–çš„æ•°å­—å¯¹åº”çš„æ­Œæ›²
+    //å¦åˆ™ä»€ä¹ˆéƒ½ä¸åšï¼Œç›´æ¥è¿”å›æ’­æ”¾ç•Œé¢ã€‚
     if ((realNum <= g_musicamount) && (realNum > 0) && (realNum != g_musicsequence))
     {
         stop_music_play(FALSE);
@@ -880,14 +880,14 @@ void SelMusicByDigital(void)
  ********************************************************************************
  *             void deal_folder_key(void)
  *
- * Description : ´¦Àí¶Ì°´folder ¼ü¹¦ÄÜ
+ * Description : å¤„ç†çŸ­æŒ‰folder é”®åŠŸèƒ½
  *
  *
  * Arguments   : void
  *
  * Returns     : void
  *
- * Notes       :1.Ö÷ÒªÊµÏÖÉÏÏÂÇĞ»»Ä¿Â¼µÄ¹¦ÄÜ
+ * Notes       :1.ä¸»è¦å®ç°ä¸Šä¸‹åˆ‡æ¢ç›®å½•çš„åŠŸèƒ½
  *
  ********************************************************************************
  */
@@ -922,15 +922,15 @@ uint8 deal_folder_key(uint8 key)
  ********************************************************************************
  *             void deal_mode_msg(void)
  *
- * Description : ´¦Àí²»Í¬³¡¾°ÏÂ¶Ì°´mode ¼üµÄ¹¦ÄÜ
+ * Description : å¤„ç†ä¸åŒåœºæ™¯ä¸‹çŸ­æŒ‰mode é”®çš„åŠŸèƒ½
  *
  *
  * Arguments   : void
  *
  * Returns     : void
  *
- * Notes       :1.ÔÚÊı×ÖÊäÈë½çÃæ£¬ÊµÏÖÊı×Öµã¸è¹¦ÄÜ
- *			   2.ÔÚÆäËû½çÃæÊµÏÖÒ»¼üÇĞ»»¹¦ÄÜ
+ * Notes       :1.åœ¨æ•°å­—è¾“å…¥ç•Œé¢ï¼Œå®ç°æ•°å­—ç‚¹æ­ŒåŠŸèƒ½
+ *			   2.åœ¨å…¶ä»–ç•Œé¢å®ç°ä¸€é”®åˆ‡æ¢åŠŸèƒ½
  ********************************************************************************
  */
 

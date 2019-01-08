@@ -41,13 +41,13 @@ stmt  level    source
    30          Open_param_t *m_deSdOpenparam;
    31          //uint32 deSdApointerSave;
    32          //uint32 deSdBpointerSave;
-   33          uint32 deSdBreakPointSave; //µ±Ç°ÎÄ¼ş¶ÏµãµÄµØÖ·±£´æ£¬Ò»¸öÉÈÇøÎªµ¥Î»£¬m_read_date¸üĞÂ
-   34          //decBreakPointInfor_t m_SdbreakPointInfo;//Ö»±£´æÒ»´Î¶ÏµãĞÅÏ¢£¬ÀıÈçAµã
-   35          uint32 deSdFilepages;//µ±Ç°²¥·ÅÎÄ¼ş×ÜÒ³Êı
+   33          uint32 deSdBreakPointSave; //å½“å‰æ–‡ä»¶æ–­ç‚¹çš„åœ°å€ä¿å­˜ï¼Œä¸€ä¸ªæ‰‡åŒºä¸ºå•ä½ï¼Œm_read_dateæ›´æ–°
+   34          //decBreakPointInfor_t m_SdbreakPointInfo;//åªä¿å­˜ä¸€æ¬¡æ–­ç‚¹ä¿¡æ¯ï¼Œä¾‹å¦‚Aç‚¹
+   35          uint32 deSdFilepages;//å½“å‰æ’­æ”¾æ–‡ä»¶æ€»é¡µæ•°
    36          //BYTE m_Sdbackupmode;
    37          play_status_t Sdplay_status;
-   38          BYTE *m_deSdDataBuffer; //[512];//½âÂëÊ±ÓÃµÄBUFFER
-   39          uint32 m_deSdOldDspIntAddrSav;//±£´æ¾ÉµÄINTµØÖ·
+   38          BYTE *m_deSdDataBuffer; //[512];//è§£ç æ—¶ç”¨çš„BUFFER
+   39          uint32 m_deSdOldDspIntAddrSav;//ä¿å­˜æ—§çš„INTåœ°å€
    40          uint32 m_deSdOldDmaIntAddrSav;
    41          uint8 m_deSdcTimer_Sav;
    42          time_t m_SdTotaltimelength;
@@ -84,7 +84,7 @@ stmt  level    source
    71   1          ClearWatchDog();
    72   1          position = position;
    73   1      
-   74   1          //¶Ïµã¼ÇÂ¼µÄÊÇ½âÂë¹ıµÄĞÅÏ¢
+   74   1          //æ–­ç‚¹è®°å½•çš„æ˜¯è§£ç è¿‡çš„ä¿¡æ¯
    75   1          if ((Sdplay_status.status == PLAYING_REACH_END) || (Sdplay_status.status == PLAYING_ERROR) ||
    76   1                  (Sdplay_status.status == PLAYING_REACH_HEAD))
    77   1          {

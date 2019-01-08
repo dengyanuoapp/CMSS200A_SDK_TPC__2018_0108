@@ -17,7 +17,7 @@
 static void USB_EP_Reset(void);
 #pragma renamecode(?PR?INITEXITFUN_C)
 
-//´Ë¶¨ÒåÎª±ÜÃâÆÁ±Îµô´òÓ¡ºó£¬udiskÓ¦ÓÃ±àÒë³£Á¿¶Î¶¨ÒåÎ´Ê¹ÓÃµ¼ÖÂµÄ±àÒë´íÎó¡£
+//æ­¤å®šä¹‰ä¸ºé¿å…å±è”½æ‰æ‰“å°åï¼Œudiskåº”ç”¨ç¼–è¯‘å¸¸é‡æ®µå®šä¹‰æœªä½¿ç”¨å¯¼è‡´çš„ç¼–è¯‘é”™è¯¯ã€‚
 #ifndef _PRINT_DEBUG_
 const uint8 ConstSeg2 = 'A';
 #endif
@@ -32,7 +32,7 @@ const uint8 ConstSeg2 = 'A';
  *
  * Returns    : None.
  *
- * Note(s)    : UÅÌ¿ªÊ¼ÓëPCÍ¨ĞÅ
+ * Note(s)    : Uç›˜å¼€å§‹ä¸PCé€šä¿¡
  *********************************************************************************************************
  */
 bool UDiskRun(int para)
@@ -44,18 +44,18 @@ bool UDiskRun(int para)
     //word USB_Isr_Addr;
     para++;
 
-    //ÇåÈ«¾Ö±äÁ¿,·ÀÖ¹¼ÓÃÜÅÌÈ«¾Ö±äÁ¿ÓĞÎó
+    //æ¸…å…¨å±€å˜é‡,é˜²æ­¢åŠ å¯†ç›˜å…¨å±€å˜é‡æœ‰è¯¯
     Suspend_Flag = 0x00;
     PrevRTCTimerValue1 = 0x00;
     PrevRTCTimerValue2 = 0x00;
     prv_connect_idle_tm = 0x00;
 
-    //Çå³ıUSBÁ¬Ïß¶¯×÷ÎÈ¶¨±ê¼Ç,·ÀÖ¹¼ÓÃÜÅÌÓ¦ÓÃÖĞ½øÈë´íÎóµÄsuspend×´Ì¬
+    //æ¸…é™¤USBè¿çº¿åŠ¨ä½œç¨³å®šæ ‡è®°,é˜²æ­¢åŠ å¯†ç›˜åº”ç”¨ä¸­è¿›å…¥é”™è¯¯çš„suspendçŠ¶æ€
     usb_pwr_suspnd_fnsh = 0x00;
-    //Çåreset¼ÆÊı,·ÀÖ¹´íÎóµÄ½øÈëFull speedÄ£Ê½ */
+    //æ¸…resetè®¡æ•°,é˜²æ­¢é”™è¯¯çš„è¿›å…¥Full speedæ¨¡å¼ */
     usb_reset_enter_cnt = 0x00;
-    //Çåidle×´Ì¬(ÎŞbus reset)Ê±¼ä¼ÆÊı,
-    //·ÀÖ¹Òòusb_reset_enter_cnt±»Çåµôµ¼ÖÂÖØĞÂ¶Ôidle×´Ì¬Ê±¼ä¼ÆÊıÀÛ¼Ó½ø¶øÈÏÎªÊÇ²åÈëµ½³äµçÆ÷ÖĞ
+    //æ¸…idleçŠ¶æ€(æ— bus reset)æ—¶é—´è®¡æ•°,
+    //é˜²æ­¢å› usb_reset_enter_cntè¢«æ¸…æ‰å¯¼è‡´é‡æ–°å¯¹idleçŠ¶æ€æ—¶é—´è®¡æ•°ç´¯åŠ è¿›è€Œè®¤ä¸ºæ˜¯æ’å…¥åˆ°å……ç”µå™¨ä¸­
     connect_idle_cnt = 0x00;
 
     sfrbak = SFR_BANK;
@@ -103,7 +103,7 @@ bool UDiskRun(int para)
     }
 
     SFR_BANK = BANK_PMU;
-    MULTI_USED = MULTI_USED | 0x80; //USBVDD LDO Èí¼ş enable
+    MULTI_USED = MULTI_USED | 0x80; //USBVDD LDO è½¯ä»¶ enable
 
     SFR_BANK = BANK_USB;
     DPDMCTRL = 0x1f; //enable DP DM 500K pull-up & disable DP DM pull-down
@@ -115,7 +115,7 @@ bool UDiskRun(int para)
     
     IDVBUSCTRL = 0x1f; //enable software Vbus, enable PHY clock
 
-    //phy disable,FPGA invalid,note:disable is open	   //Î»ÖÃ×¢ÒâÔÚ	USBResetÖ®Ç°ÅäÖÃ
+    //phy disable,FPGA invalid,note:disable is open	   //ä½ç½®æ³¨æ„åœ¨	USBResetä¹‹å‰é…ç½®
     USB_PHYCTRL = USB_PHYCTRL & 0x3f;
 
     SFR_BANK = BANK_CMU_RMU;
@@ -197,7 +197,7 @@ static void USB_EP_Reset(void)
  *********************************************************************************************************
  *                                           UDiskExit
  *
- * Description: ÍË³öÓëPCÍ¨ĞÅ.
+ * Description: é€€å‡ºä¸PCé€šä¿¡.
  *
  * Arguments  : None.
  *
@@ -262,29 +262,29 @@ uint8 UDiskExit(void)
         /*fixme:need*/
         IRQ_Release(OldIsrPtr, IRQ_USB);
 
-        //Ğ¶ÔØsd¿¨µÄÇı¶¯³ÌĞò,¿¨´¦ÓÚmultiread»òmultiwrite×´Ì¬£¬ÔÙ´Î³õÊ¼»¯¿¨Ê±»áÊ§°Ü£¬vicky 20051121
-        //bankbº¯Êı,Éı¼¶Íê²»ÄÜµ÷ÓÃ
+        //å¸è½½sdå¡çš„é©±åŠ¨ç¨‹åº,å¡å¤„äºmultireadæˆ–multiwriteçŠ¶æ€ï¼Œå†æ¬¡åˆå§‹åŒ–å¡æ—¶ä¼šå¤±è´¥ï¼Œvicky 20051121
+        //bankbå‡½æ•°,å‡çº§å®Œä¸èƒ½è°ƒç”¨
         DRV_UnInstall(DRV_SDFF);
 
         if (EjectFlag == 0x00)
         {
             Udisk_Exit_Handle();
-            //bankbº¯Êı£¬ÍË³öapÊ±µ÷ÓÃ£¬2006-1-14 16:39¸ü»»
+            //bankbå‡½æ•°ï¼Œé€€å‡ºapæ—¶è°ƒç”¨ï¼Œ2006-1-14 16:39æ›´æ¢
             UD_Exit();
         }
         else
         {
-            //Èç¹û·¢ÉúĞ´²Ù×÷,°Ñ×îºóÒ»´Î´«ÊäÊı¾İĞ´ÈëFlash
+            //å¦‚æœå‘ç”Ÿå†™æ“ä½œ,æŠŠæœ€åä¸€æ¬¡ä¼ è¾“æ•°æ®å†™å…¥Flash
             UD_Update();
         }
     }
     else
     {
-        //Èç¹û·¢ÉúĞ´²Ù×÷,°Ñ×îºóÒ»´Î´«ÊäÊı¾İĞ´ÈëFlash
+        //å¦‚æœå‘ç”Ÿå†™æ“ä½œ,æŠŠæœ€åä¸€æ¬¡ä¼ è¾“æ•°æ®å†™å…¥Flash
         UD_Update();
     }
 
-    DPDMCTRL = 0x10; // »Ö¸´uhost¼ì²â
+    DPDMCTRL = 0x10; // æ¢å¤uhostæ£€æµ‹
 
     //open globle interrupt
     IE0 = IE0bak;

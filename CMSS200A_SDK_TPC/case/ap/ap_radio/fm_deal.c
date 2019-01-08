@@ -24,14 +24,14 @@ uint16 FMdeal(uint16 RunFMStatues)
     //clear the message pool
     while (ap_get_message() != AP_KEY_NULL)
     {
-        ; //Çå¿ÕÏûÏ¢³Ø
+        ; //æ¸…ç©ºæ¶ˆæ¯æ± 
     }
 
     while (1)
     {
-        if (BandSwitch == TRUE) //³õÊ¼»¯£¬ÖØ»­ BandSwitch
+        if (BandSwitch == TRUE) //åˆå§‹åŒ–ï¼Œé‡ç”» BandSwitch
         {
-            result = drawBandSwitch(); //»æÖÆ ²¨¶Î×ª»»¿ª¹Ø
+            result = drawBandSwitch(); //ç»˜åˆ¶ æ³¢æ®µè½¬æ¢å¼€å…³
             if (result != 0)
             {
                 return result;
@@ -39,7 +39,7 @@ uint16 FMdeal(uint16 RunFMStatues)
             BandSwitch = FALSE;
             FirstWait = TRUE;
         }
-        if (need_draw == TRUE) //ÆÁÄ»ÖØ»­
+        if (need_draw == TRUE) //å±å¹•é‡ç”»
         {
             need_draw = FALSE;
             RefreshMainScreen();
@@ -47,9 +47,9 @@ uint16 FMdeal(uint16 RunFMStatues)
         if (FirstWait == TRUE)
         {
             FirstWait = FALSE;
-            //ap_sleep(3);        //³õ´Î½øÈëAPµÈ´ı1.5SÊÍ·ÅMUTE(¾²Òô)
-            fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL); //ÉèÖÃÉùÒô´óĞ¡
-            fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL); //»ñÈ¡×´Ì¬
+            //ap_sleep(3);        //åˆæ¬¡è¿›å…¥APç­‰å¾…1.5Sé‡Šæ”¾MUTE(é™éŸ³)
+            fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL); //è®¾ç½®å£°éŸ³å¤§å°
+            fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL); //è·å–çŠ¶æ€
             if (g_comval.volume != 0)
             {
                 fmSendCommand(FM_MUTE, releaseMUTE, NULL); //fmSendCommand(MC_MUTE, releaseMUTE);
@@ -69,15 +69,15 @@ uint16 FMdeal(uint16 RunFMStatues)
             return result;
         }
     }
-    return key; //²»»áÔËĞĞµ½ÕâÀï
+    return key; //ä¸ä¼šè¿è¡Œåˆ°è¿™é‡Œ
 }
 
-//»æÖÆ ²¨¶Î×ª»»¿ª¹Ø
+//ç»˜åˆ¶ æ³¢æ®µè½¬æ¢å¼€å…³
 uint16 drawBandSwitch(void)
 {
     uint8 sfr_bak;
 
-    if (g_radio_config.band_mode == Bank_US_Europe) //FM ²¨¶ÎÄ£Ê½ £¬Èç¹ûÎªÆÕÍ¨Æµ¶Î
+    if (g_radio_config.band_mode == Bank_US_Europe) //FM æ³¢æ®µæ¨¡å¼ ï¼Œå¦‚æœä¸ºæ™®é€šé¢‘æ®µ
     {
         radio_param.param1 = g_radio_config.fmstation_us; //US Tab
     }
@@ -86,13 +86,13 @@ uint16 drawBandSwitch(void)
         radio_param.param1 = g_radio_config.fmstation_jp; //JP Tab
     }
 
-    (fm_status_t *) radio_param.param2 = &g_radio_config.FMStatus;//µ±Ç°²¥·ÅµÄµçÌ¨ĞÅÏ¢
+    (fm_status_t *) radio_param.param2 = &g_radio_config.FMStatus;//å½“å‰æ’­æ”¾çš„ç”µå°ä¿¡æ¯
 
-    fmSendCommand(FM_MID_RESTORE, &radio_param, NULL); //»Ö¸´
+    fmSendCommand(FM_MID_RESTORE, &radio_param, NULL); //æ¢å¤
 
-    fmSendCommand(FM_MID_SETVOLUME, 0, NULL); //ÉèÖÃÉùÒôÎª0
+    fmSendCommand(FM_MID_SETVOLUME, 0, NULL); //è®¾ç½®å£°éŸ³ä¸º0
 
-    if (!fmSendCommand(FM_OPEN, SEARCHLEVEL, NULL)) //Èç¹û´ò¿ªÊ§°Ü£¬Ó²¼ş´íÎóÌáÊ¾
+    if (!fmSendCommand(FM_OPEN, SEARCHLEVEL, NULL)) //å¦‚æœæ‰“å¼€å¤±è´¥ï¼Œç¡¬ä»¶é”™è¯¯æç¤º
     {
         LEDClearScreen();
         /* ERR */
@@ -101,12 +101,12 @@ uint16 drawBandSwitch(void)
         LEDDisplay(NUMBER3, NUM_R, 1);
         ap_sleep(3);
         fmSendCommand(FM_MID_SETVOLUME,  (void *) g_comval.volume, NULL);
-        return RESULT_MAIN; //·µ»ØÖ÷²Ëµ¥
+        return RESULT_MAIN; //è¿”å›ä¸»èœå•
     }
 
-    fmSendCommand(FM_MUTE, SetMUTE, NULL); //ÉèÖÃ¾²Òô
+    fmSendCommand(FM_MUTE, SetMUTE, NULL); //è®¾ç½®é™éŸ³
 
-    fmSendCommand(FM_MID_PLAY, NULL, NULL); //²¥·ÅµçÌ¨
+    fmSendCommand(FM_MID_PLAY, NULL, NULL); //æ’­æ”¾ç”µå°
 
     init_fmin_channel();
 

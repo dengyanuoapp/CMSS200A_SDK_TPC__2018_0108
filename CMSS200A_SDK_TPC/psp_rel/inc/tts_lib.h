@@ -1,41 +1,41 @@
 #ifndef TTS_LIB_H
 #define TTS_LIB_H
 
-//TTSË÷Òı±íÍ·Êı¾İ½á¹¹,Õ¼¾İ32byte,reserved 24byte
+//TTSç´¢å¼•è¡¨å¤´æ•°æ®ç»“æ„,å æ®32byte,reserved 24byte
 typedef struct
 {
-    int wordcnt;        //TTS×Ö¿âºº×ÖµÄ¸öÊı                 //ÍêÕû¿â6768
-    int bytes1;         //Ã¿¸öºº×ÖĞÅÏ¢ËùÕ¼×Ö½ÚÊı            // 8
-    int multi_cnt;      //¶àÒô×ÖÆäËû·¢Òô¸öÊı                //µ±Ç°15¸ö
-    int bytes2;         //Õ¼ÓÃ×Ö½ÚÊı                        //8
-    int citiaocnt;      //À©Õ¹´ÊÌõµÄ¸öÊı                    //31
-    int bytes3;         //Ã¿¸öÀ©Õ¹´ÊÌõĞÅÏ¢ËùÕ¼×Ö½ÚÊı        // 6
+    int wordcnt;        //TTSå­—åº“æ±‰å­—çš„ä¸ªæ•°                 //å®Œæ•´åº“6768
+    int bytes1;         //æ¯ä¸ªæ±‰å­—ä¿¡æ¯æ‰€å å­—èŠ‚æ•°            // 8
+    int multi_cnt;      //å¤šéŸ³å­—å…¶ä»–å‘éŸ³ä¸ªæ•°                //å½“å‰15ä¸ª
+    int bytes2;         //å ç”¨å­—èŠ‚æ•°                        //8
+    int citiaocnt;      //æ‰©å±•è¯æ¡çš„ä¸ªæ•°                    //31
+    int bytes3;         //æ¯ä¸ªæ‰©å±•è¯æ¡ä¿¡æ¯æ‰€å å­—èŠ‚æ•°        // 6
 } tts_header_t;
 
 typedef struct
 {
     long start_offset;  //
     int16 str_length;    //
-    int16 multi_offset;  //      ¶àÒô×ÖÁ´±íÆ«ÒÆ£¬0XFFFF´ú±íÃ»ÓĞ¶àÒô×Ö
+    int16 multi_offset;  //      å¤šéŸ³å­—é“¾è¡¨åç§»ï¼Œ0XFFFFä»£è¡¨æ²¡æœ‰å¤šéŸ³å­—
 } tts_pos_t;
 
 typedef struct
 {
     char multitone_tag; //
     char qu;    //
-    char wei;   //      ¶àÒô×ÖÁ´±íÆ«ÒÆ£¬0XFFFF´ú±íÃ»ÓĞ¶àÒô×Ö
+    char wei;   //      å¤šéŸ³å­—é“¾è¡¨åç§»ï¼Œ0XFFFFä»£è¡¨æ²¡æœ‰å¤šéŸ³å­—
 } tts_multitone_t;
 
-#define     TTS_MULTI_CON       0x01        //¶àÒô
-#define     TTS_MULTI_PREV      0x02        //ÉÏÎÄ
-#define     TTS_MULTI_NEXT      0x09        //ÏÂÎÄ
-#define     TTS_MULTI_END       0x0F        //½áÊø
+#define     TTS_MULTI_CON       0x01        //å¤šéŸ³
+#define     TTS_MULTI_PREV      0x02        //ä¸Šæ–‡
+#define     TTS_MULTI_NEXT      0x09        //ä¸‹æ–‡
+#define     TTS_MULTI_END       0x0F        //ç»“æŸ
 
 extern SD_FILE *m_de_TTS_Fp;
 extern SD_FILE *info_TTS_Fp;
 //extern Open_param_t *m_deTTSOpenparam;
 extern play_status_t  TTSplay_status;
-extern BYTE *m_deTTSDataBuffer;//[512];//½âÂëÊ±ÓÃµÄBUFFER
+extern BYTE *m_deTTSDataBuffer;//[512];//è§£ç æ—¶ç”¨çš„BUFFER
 
 extern uint32  m_deTTSOldDspIntAddrSav;
 extern uint32  m_deTTSOldDmaIntAddrSav;

@@ -15,30 +15,30 @@
 //========== global field ===============
 #pragma name(COM_COM)
 
-uint16 g_standby_time = 0; //Ë¯ÃßÊ±¼ä,0.5ÃëÎªµ¥Î»
-uint16 g_rtc_counter = 0; //rtc ÏûÏ¢¼ÆÊı
-uint16 key_count = 0; //µ±Ç°°´¼üÏûÏ¢·¢ÉúµÄ´ÎÊı
-uint8 key_value = Msg_KeyNull; //µ±Ç°°´¼üµÄÖµ
-uint8 lowpower_count;//½ÓÊÜµ½µÍµçµÄ¼ÆÊı
-uint8 file_name[12]; //´æ·ÅÎÄ¼ş¶ÌÃûÊı×Ö
+uint16 g_standby_time = 0; //ç¡çœ æ—¶é—´,0.5ç§’ä¸ºå•ä½
+uint16 g_rtc_counter = 0; //rtc æ¶ˆæ¯è®¡æ•°
+uint16 key_count = 0; //å½“å‰æŒ‰é”®æ¶ˆæ¯å‘ç”Ÿçš„æ¬¡æ•°
+uint8 key_value = Msg_KeyNull; //å½“å‰æŒ‰é”®çš„å€¼
+uint8 lowpower_count;//æ¥å—åˆ°ä½ç”µçš„è®¡æ•°
+uint8 file_name[12]; //å­˜æ”¾æ–‡ä»¶çŸ­åæ•°å­—
 
 char temp_buffer[9];
 time_t time;
-date_t date;//ÈÕÆÚ½á¹¹Ìå
+date_t date;//æ—¥æœŸç»“æ„ä½“
 time_t tmp_time;
-uint8 DigitalCount; //µ±Ç°Êı×Ö½¡µÄ¸öÊı
-uint8 DigitalBuf[4]; //´æ´¢Êı×Ö¼ü¼ü¶ÔÓ¦µÄÊı×Ö
-uint8 set_what;//µ±Ç°µÄÉèÖÃÏî
-uint8 show_what;//µ±Ç°ÉèÖÃÏîÉÁ¶¯ÇĞ»»±äÁ¿
-uint8 show_ui_flag;//ÉèÖÃÏî¿ªÊ¼ÉÁ¶¯±êÖ¾
-uint8 show_count;//¿ªÊ¼ÉèÖÃÏîÉÁ¶¯µÄ¼ÆËã
-uint8 CurUI_Type;//µ±Ç°Ëù´¦µÄÏÔÊ¾½çÃæ
+uint8 DigitalCount; //å½“å‰æ•°å­—å¥çš„ä¸ªæ•°
+uint8 DigitalBuf[4]; //å­˜å‚¨æ•°å­—é”®é”®å¯¹åº”çš„æ•°å­—
+uint8 set_what;//å½“å‰çš„è®¾ç½®é¡¹
+uint8 show_what;//å½“å‰è®¾ç½®é¡¹é—ªåŠ¨åˆ‡æ¢å˜é‡
+uint8 show_ui_flag;//è®¾ç½®é¡¹å¼€å§‹é—ªåŠ¨æ ‡å¿—
+uint8 show_count;//å¼€å§‹è®¾ç½®é¡¹é—ªåŠ¨çš„è®¡ç®—
+uint8 CurUI_Type;//å½“å‰æ‰€å¤„çš„æ˜¾ç¤ºç•Œé¢
 //alarm_vars_t g_alarm;
-ap_comval_t g_comval; //ÏµÍ³±äÁ¿,ap²»ÄÜ¸ü¸Ä
+ap_comval_t g_comval; //ç³»ç»Ÿå˜é‡,apä¸èƒ½æ›´æ”¹
 BOOL need_draw;
 uint8 mute_flag = FALSE;
-//uint8 linein_status; //lineinÏß´æÔÚ×´Ì¬¡£0-Ã»ÓĞ²åÉÏlineinÏß£¬1-lineinÏß²å×Å
-uint8 holdkey_flag;//°´¼ü³¤°´±ê¼Ç
+//uint8 linein_status; //lineinçº¿å­˜åœ¨çŠ¶æ€ã€‚0-æ²¡æœ‰æ’ä¸Šlineinçº¿ï¼Œ1-lineinçº¿æ’ç€
+uint8 holdkey_flag;//æŒ‰é”®é•¿æŒ‰æ ‡è®°
 /*
 uint8 insert_msg[MAX_TYPE] =
 { AP_MSG_LINEIN_IN, AP_MSG_MIC_IN,AP_MSG_USB_PLUGIN};
@@ -47,12 +47,12 @@ uint8 pull_out_msg[MAX_TYPE] =
 */
 
 /********************************************************************************
- * Description :ÉèÖÃµ±Ç°Ê¹ÓÃµÄ½çÃæÀàĞÍ²¢ÖÃË¢ĞÂÈ«ÆÁµÄ±ê¼Ç
+ * Description :è®¾ç½®å½“å‰ä½¿ç”¨çš„ç•Œé¢ç±»å‹å¹¶ç½®åˆ·æ–°å…¨å±çš„æ ‡è®°
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -74,12 +74,12 @@ void SetCurUI_Type(uint8 UI_Type)
     }
 }
 /********************************************************************************
- * Description :Íâ²¿paµçÔ´¿ª¹Ø¿ØÖÆ
+ * Description :å¤–éƒ¨paç”µæºå¼€å…³æ§åˆ¶
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎŞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -133,7 +133,7 @@ void close_usb_phyctrol(void)
 
     //phy enable,FPGA invalid ,note:enable is close
     USB_PHYCTRL = USB_PHYCTRL | (uint8) 0xc0;
-    DPDMCTRL = 0x10; // »Ö¸´uhost¼ì?    //restore SFR_BANK
+    DPDMCTRL = 0x10; // æ¢å¤uhostæ£€?    //restore SFR_BANK
     SFR_BANK = sfrbak;
 #endif
 }

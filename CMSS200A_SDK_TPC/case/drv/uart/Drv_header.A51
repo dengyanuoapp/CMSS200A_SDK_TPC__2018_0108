@@ -9,7 +9,7 @@ $include (actos.inc)
 		EXTRN   ECODE(uart_init{RPrefix})
         EXTRN   ECODE(uart_exit{RPrefix})
 		RSEG   UI_INFO
-//∂®“Â«˝∂ØÕ∑–≈œ¢ 
+//ÂÆö‰πâÈ©±Âä®Â§¥‰ø°ÊÅØ 
 DRV_FileType:             	  DB     'D'
 DRV_Type:                 	  DB     DRV_UI
 DRV_RcodeStartAddr:       	  DW     0x1200

@@ -11,7 +11,7 @@ uint8 wait_keyup;
 uint8 const key_map[16];
 uint8 IR_KEY;
 uint8 Low_power_count;
-uint8 TheCharge; //³äµç±êÊ¶£¬0,µÍµç£»1£¬³äµçÖĞ£¬2.Âúµç¡£3.ÓĞDC5V
+uint8 TheCharge; //å……ç”µæ ‡è¯†ï¼Œ0,ä½ç”µï¼›1ï¼Œå……ç”µä¸­ï¼Œ2.æ»¡ç”µã€‚3.æœ‰DC5V
 uint8 onoff_flag;
 uint8 cur_keyval;
 
@@ -35,10 +35,10 @@ const uint8 insert_msg[MAX_TYPE] =
 const uint8 pull_out_msg[MAX_TYPE] =
 { AP_MSG_LINEIN_OUT, AP_MSG_MIC_OUT, USB_PLUGIN_FINISH };
 
-//»ñÈ¡LRADC1Öµ£¬ÓÃÒÔÅĞ¶ÏµÍµçºÍÂúµç
-//µÍµç£ºĞ¡ÓÚ3.3V    £¬Ô¼µÈÓÚ0X50£¬Ğ¡ÓÚµÈÓÚÕâ¸öÖµÈÏÎªµÍµç
-//½Ó½üµÍµçÌáÊ¾:Ğ¡ÓÚ3.4V,Ô¼µÈÓÚ0x54
-//´óÓÚ4.2V   Ô¼µÈÓÚ0X76£¬´óÓÚµÈÓÚÕâ¸öÖµÈÏÎªÂúµç
+//è·å–LRADC1å€¼ï¼Œç”¨ä»¥åˆ¤æ–­ä½ç”µå’Œæ»¡ç”µ
+//ä½ç”µï¼šå°äº3.3V    ï¼Œçº¦ç­‰äº0X50ï¼Œå°äºç­‰äºè¿™ä¸ªå€¼è®¤ä¸ºä½ç”µ
+//æ¥è¿‘ä½ç”µæç¤º:å°äº3.4V,çº¦ç­‰äº0x54
+//å¤§äº4.2V   çº¦ç­‰äº0X76ï¼Œå¤§äºç­‰äºè¿™ä¸ªå€¼è®¤ä¸ºæ»¡ç”µ
 const uint8 bat_vol[3] =
 {
     0x50, 0x54, 0x76
@@ -62,7 +62,7 @@ void key_scan(void)
     sfr_bak = (uint8) SFR_BANK;
 
 #ifndef	NONE_ONOFF
-    //¼ì²âon/off°´¼ü
+    //æ£€æµ‹on/offæŒ‰é”®
     SFR_BANK = BANK_PMU;
     if ((SYSTEM_ONOFF & 0x08) != 0)
     {
@@ -73,10 +73,10 @@ void key_scan(void)
 
 #ifdef EVB_KEY
 	SFR_BANK = BANK_PMU;
-    //¼ì²âLRADC1(sem_con)
+    //æ£€æµ‹LRADC1(sem_con)
     lradc1_data = LRADC1_DATA & 0x3f;
     lradc5_data = LRADC5_DATA & 0x3f;
-    //ÓÅ»¯¼ì²âLRADC1,Èç¹ûlRADC1ÓĞ°´¼ü¼ü£¬Ôò²»ÔÙ¼ì²âLRADC5
+    //ä¼˜åŒ–æ£€æµ‹LRADC1,å¦‚æœlRADC1æœ‰æŒ‰é”®é”®ï¼Œåˆ™ä¸å†æ£€æµ‹LRADC5
     if(lradc1_data < adctab[MAX_KEYVAL - 2])
     {
         key_offset = 0;
@@ -171,28 +171,28 @@ get_key:
     {
         key_val = NO_KEY;
     }
-    if (key_val != oldkey) //Èç¹û±¾´ÎÉ¨ÃèÖµ²»µÈÓÚÉÏ´Î°´¼üÖµ
+    if (key_val != oldkey) //å¦‚æœæœ¬æ¬¡æ‰«æå€¼ä¸ç­‰äºä¸Šæ¬¡æŒ‰é”®å€¼
     {
-        if (key_val == tmpkey) //Èç¹û±¾´Î¼üÖµµÈÓÚÇ°´ÎÉ¨ÃèÖµ
+        if (key_val == tmpkey) //å¦‚æœæœ¬æ¬¡é”®å€¼ç­‰äºå‰æ¬¡æ‰«æå€¼
         {
-            tmp_count++; //ÀÛ¼ÓÉ¨Ãè´ÎÊı
-            if (tmp_count >= 2) //É¨ÃèÈı´Î£¬ÊÇÍ¬Ò»¼üÖµ£¬È·¶¨ÓĞ°´¼ü°´ÏÂ
+            tmp_count++; //ç´¯åŠ æ‰«ææ¬¡æ•°
+            if (tmp_count >= 2) //æ‰«æä¸‰æ¬¡ï¼Œæ˜¯åŒä¸€é”®å€¼ï¼Œç¡®å®šæœ‰æŒ‰é”®æŒ‰ä¸‹
             {
-               if (key_val != NO_KEY) //Èç¹û±¾´ÎÉ¨Ãè²¶»ñ¼üÖµ²»Îª¿Õ
+               if (key_val != NO_KEY) //å¦‚æœæœ¬æ¬¡æ‰«ææ•è·é”®å€¼ä¸ä¸ºç©º
                 {
                     oldkey = tmpkey;
                     wait_keyup = 1;
 					PutSysMsg(key_map[oldkey - 1]);
                 }
-                else //±¾´Î¼üÖµÎªNO_KEY
+                else //æœ¬æ¬¡é”®å€¼ä¸ºNO_KEY
                 {
                     if (IR_KEY)
                     {
                         if (tmp_count == 14)
                         {
                             wait_keyup = 0;
-                            tmp_count = 0; //ÇåÉ¨Ãè´ÎÊı
-                            PutSysMsg(Msg_KeyShortUp); //·¢keyupÏûÏ¢
+                            tmp_count = 0; //æ¸…æ‰«ææ¬¡æ•°
+                            PutSysMsg(Msg_KeyShortUp); //å‘keyupæ¶ˆæ¯
                             IR_KEY = 0;
                             hold_count = 0;
                             oldkey = NO_KEY;
@@ -201,11 +201,11 @@ get_key:
                     }
                     else
                     {
-                        if (wait_keyup) //µÈ´ıKEYUP
+                        if (wait_keyup) //ç­‰å¾…KEYUP
                         {
                             wait_keyup = 0;
-                            tmp_count = 0; //ÇåÉ¨Ãè´ÎÊı
-                            PutSysMsg(Msg_KeyShortUp); //·¢keyupÏûÏ¢
+                            tmp_count = 0; //æ¸…æ‰«ææ¬¡æ•°
+                            PutSysMsg(Msg_KeyShortUp); //å‘keyupæ¶ˆæ¯
                             hold_count = 0;
                             oldkey = NO_KEY;
                             tmpkey = NO_KEY;
@@ -215,7 +215,7 @@ get_key:
                 }
             }
         }
-        else //Èç¹û±¾´ÎÉ¨ÃèÖµ²»µÈÓÚÇ°´ÎÉ¨ÃèÖµ£¬ÔòÖØÖÃ¼üÖµ£¬ÖØĞÂ¼ÆÊı
+        else //å¦‚æœæœ¬æ¬¡æ‰«æå€¼ä¸ç­‰äºå‰æ¬¡æ‰«æå€¼ï¼Œåˆ™é‡ç½®é”®å€¼ï¼Œé‡æ–°è®¡æ•°
         {
             tmpkey = key_val;
             //if (!wait_keyup)
@@ -224,7 +224,7 @@ get_key:
             }
         }
     }
-    else //Èç¹û±¾´Î¼üÖµµÈÓÚÉÏ´Î°´¼üÖµ,ÀÛ¼Æ16´Î(320ms)£¬·¢Ò»´Î°´¼üÏûÏ¢
+    else //å¦‚æœæœ¬æ¬¡é”®å€¼ç­‰äºä¸Šæ¬¡æŒ‰é”®å€¼,ç´¯è®¡16æ¬¡(320ms)ï¼Œå‘ä¸€æ¬¡æŒ‰é”®æ¶ˆæ¯
     {
         if (key_val != NO_KEY) //
         {
@@ -233,7 +233,7 @@ get_key:
             if (hold_count == 12)
             {
                 hold_count = 0;
-                PutSysMsg(key_map[oldkey - 1]); //·¢¼üÖµÏûÏ¢
+                PutSysMsg(key_map[oldkey - 1]); //å‘é”®å€¼æ¶ˆæ¯
             }
         }
         else
@@ -255,7 +255,7 @@ void check_bat_status(void)
     uint8 sfr_bak;
     uint8 batval;
     sfr_bak = SFR_BANK;
-    //Èç¹ûÓĞDC5V,Ôò²»ĞèÒªÅĞ¶ÏµÍµç×´Ì¬
+    //å¦‚æœæœ‰DC5V,åˆ™ä¸éœ€è¦åˆ¤æ–­ä½ç”µçŠ¶æ€
     SFR_BANK = BANK_PMU;
     batval = BATADC_DATA & 0x7f;
     SFR_BANK = sfr_bak;
@@ -315,7 +315,7 @@ uint8 get_usbcable_status(void)
         {
             ;
         }
-        if((USBSTATUS & 0x18) != 0x18) //Èí¼şÈ¥¶¶
+        if((USBSTATUS & 0x18) != 0x18) //è½¯ä»¶å»æŠ–
         {
             usb_status = 0x40;
         }
@@ -361,14 +361,14 @@ uint8 drv_check_plug_device_msg(uint8 api_no, uint8 *cur_status, Plug_Device_t p
         SFR_BANK = BANK_PMU;
         status = LRADC1_DATA & 0x3f;
         SFR_BANK = sfr_bak;
-        //¹ı¶É´¦ÓÚ°´¼üÇøÓòµÄADCÖµ
+        //è¿‡æ¸¡å¤„äºæŒ‰é”®åŒºåŸŸçš„ADCå€¼
         if(status <= adctab[MAX_KEYVAL - 2])
         {
             return AP_MSG_RTC;
         }
         if ((status > adctab[MAX_KEYVAL - 2]) && (status <= adctab[MAX_KEYVAL - 1]))
         {
-            status = 0;//ËµÃ÷lineinÏß´æÔÚ
+            status = 0;//è¯´æ˜lineinçº¿å­˜åœ¨
         }
         else
         {
@@ -378,7 +378,7 @@ uint8 drv_check_plug_device_msg(uint8 api_no, uint8 *cur_status, Plug_Device_t p
     }
     else if(plug_dev_type == MIC_IN)
     {
-        //Èç¹û¸ÃGPIO¿ÚÒ»Ö±¶¼ÊÇ¸ß£¬ËµÃ÷Ã»ÓĞmicÏßÔÚ£¬Èç¹ûÎªµÍ£¬ËµÃ÷ÓĞmicÏßÔÚ¡£
+        //å¦‚æœè¯¥GPIOå£ä¸€ç›´éƒ½æ˜¯é«˜ï¼Œè¯´æ˜æ²¡æœ‰micçº¿åœ¨ï¼Œå¦‚æœä¸ºä½ï¼Œè¯´æ˜æœ‰micçº¿åœ¨ã€‚
         //   SFR_BANK = BANK_GPIO;
         // status = MIC_IN_GPIO_DAT & (1 << MIC_IN_GPIO_NUM);
         //    status=1;
@@ -389,15 +389,15 @@ uint8 drv_check_plug_device_msg(uint8 api_no, uint8 *cur_status, Plug_Device_t p
         SFR_BANK = BANK_USB;
         utest_status = Usbien_hcusbien;
         SFR_BANK = sfr_bak;
-        //usb´¦utest×´Ì¬Ê±£¬²»½øĞĞudisk×´Ì¬¼ì²â
+        //usbå¤„utestçŠ¶æ€æ—¶ï¼Œä¸è¿›è¡ŒudiskçŠ¶æ€æ£€æµ‹
         if (utest_status == 0xb9)
         {
             return AP_MSG_RTC;
         }
         status =0;//get_usbcable_status();// GetUsbCableStatus();
-        //1)Èç¹û¼ì²âµ½USBÏß£¬ÔòÏÈ½øudisk
-        //2)Èç¹ûÃ»ÓĞ½ÓusbÏß£¬ÏÈ¼ì²âuhost,ÔÙ¼ì²â¿¨
-        //3)¼´ÎŞuhostÒ²ÎŞ¿¨Ôò½øFM
+        //1)å¦‚æœæ£€æµ‹åˆ°USBçº¿ï¼Œåˆ™å…ˆè¿›udisk
+        //2)å¦‚æœæ²¡æœ‰æ¥usbçº¿ï¼Œå…ˆæ£€æµ‹uhost,å†æ£€æµ‹å¡
+        //3)å³æ— uhostä¹Ÿæ— å¡åˆ™è¿›FM
         if (((status & 0x40) == 0x40))
         {
             status = 0;
@@ -411,22 +411,22 @@ uint8 drv_check_plug_device_msg(uint8 api_no, uint8 *cur_status, Plug_Device_t p
     {
         return AP_MSG_RTC;
     }
-    //LineÏßÒÑ¾­½ÓÉÏ£¬²¢ÇÒ¼ì²âµ½status±»ÖÃÆğÀ´ÁË£¬ÔòËµÃ÷LINEINÏß»òMICÏßÒÑ¾­°Îµô
+    //Lineçº¿å·²ç»æ¥ä¸Šï¼Œå¹¶ä¸”æ£€æµ‹åˆ°statusè¢«ç½®èµ·æ¥äº†ï¼Œåˆ™è¯´æ˜LINEINçº¿æˆ–MICçº¿å·²ç»æ‹”æ‰
     if ((*cur_status == 1) && (status != 0))
     {
         *cur_status = 0;
         return pull_out_msg[plug_dev_type];
-    } //LineÏßÃ»ÓĞ½ÓÉÏ£¬²¢ÇÒ¼ì²âµ½status±»ÇåÁã£¬ÔòËµÃ÷LINEINÏß»òMICÏß²åÈë£¬ĞèÒªÇĞ»»µ½linein»òMIC¹¦ÄÜ
+    } //Lineçº¿æ²¡æœ‰æ¥ä¸Šï¼Œå¹¶ä¸”æ£€æµ‹åˆ°statusè¢«æ¸…é›¶ï¼Œåˆ™è¯´æ˜LINEINçº¿æˆ–MICçº¿æ’å…¥ï¼Œéœ€è¦åˆ‡æ¢åˆ°lineinæˆ–MICåŠŸèƒ½
     else if ((*cur_status == 0) && (status == 0))
     {
         *cur_status = 1;
         return insert_msg[plug_dev_type];
-    }//LineÏßÃ»ÓĞ½ÓÉÏ£¬²¢ÇÒ¼ì²âµ½status±»ÖÃÆğÀ´ÁË£¬ÔòËµÃ÷²»´æÔÚLINEINÏß»òMICÏß
+    }//Lineçº¿æ²¡æœ‰æ¥ä¸Šï¼Œå¹¶ä¸”æ£€æµ‹åˆ°statusè¢«ç½®èµ·æ¥äº†ï¼Œåˆ™è¯´æ˜ä¸å­˜åœ¨LINEINçº¿æˆ–MICçº¿
     else if ((*cur_status == 0) && (status != 0))
     {
         return AP_MSG_RTC;
     }
-    else //LineÏßÒÑ¾­½ÓÉÏ£¬²¢ÇÒ¼ì²âµ½status±»ÇåÁã£¬ÔòËµÃ÷LINEINÏß»òMICÏßÒ»Ö±´æÔÚ
+    else //Lineçº¿å·²ç»æ¥ä¸Šï¼Œå¹¶ä¸”æ£€æµ‹åˆ°statusè¢«æ¸…é›¶ï¼Œåˆ™è¯´æ˜LINEINçº¿æˆ–MICçº¿ä¸€ç›´å­˜åœ¨
     {
         return AP_MSG_RTC;
     }

@@ -44,10 +44,10 @@ uint8 StandbyCharge(void)
     while (ap_get_message() != NULL)
     {
 
-    } //Çå¿ÕÏûÏ¢³Ø
+    } //æ¸…ç©ºæ¶ˆæ¯æ± 
     while (1)
     {
-        key = ap_get_message(); //»ñÈ¡ÏûÏ¢
+        key = ap_get_message(); //è·å–æ¶ˆæ¯
         switch (key)
         {
         case AP_KEY_MODE | AP_KEY_UP:
@@ -62,7 +62,7 @@ uint8 StandbyCharge(void)
                 result = RESULT_MAIN;
             }
             break;
-        case RESULT_AUTO_BACK://AP_MSG_WAIT_TIMEOUT: //8ÃëÍË³ö
+        case RESULT_AUTO_BACK://AP_MSG_WAIT_TIMEOUT: //8ç§’é€€å‡º
             result = RESULT_NULL;
             break;
 
@@ -71,7 +71,7 @@ uint8 StandbyCharge(void)
             if (!GetUsbCableStatus()) //USB cable out
             {
                 //sKY_ChargeSet(2);
-                //sKY_ChargeGetandSet(); //usb°Î³öÊ±Ò»¶¨Òª¼ì²âÒ»´Î³äµç×´Ì¬
+                //sKY_ChargeGetandSet(); //usbæ‹”å‡ºæ—¶ä¸€å®šè¦æ£€æµ‹ä¸€æ¬¡å……ç”µçŠ¶æ€
                 KY_GetChargeStatus();
                 result = RESULT_IGNORE;
                 break;
@@ -106,7 +106,7 @@ uint8 StandbyCharge(void)
                 }
                 else if (charge_status == 0x0)
                 {
-                    //ui_err_msg(NOBATTER); Ã»ÓĞµç³ØÌáÊ¾£»
+                    //ui_err_msg(NOBATTER); æ²¡æœ‰ç”µæ± æç¤ºï¼›
                     result = RESULT_MAIN;
                     break;
                 }

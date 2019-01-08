@@ -16,12 +16,12 @@ stmt  level    source
     6          #pragma name(BAC_KT)
     7          const uint8 Tonedate[2][2] = {0x26, 0x40, 0xda, 0xbf};
     8          //const uint8 Tonedate[2][2] = {0x7F, 0x7F, 0x7F, 0x7F};
-    9          const uint8 Fout_44K_256fs[8] = {0, 0, 44, 0, 22, 0, 11, 0}; //i2SÊä³öÊ±ÊÇ256fs
+    9          const uint8 Fout_44K_256fs[8] = {0, 0, 44, 0, 22, 0, 11, 0}; //i2Sè¾“å‡ºæ—¶æ˜¯256fs
    10          const uint8 Fout_48K_256fs[8] = {96, 0, 48, 32, 24, 16, 12, 8};
-   11          const uint8 Fout_44K_512fs[8] = {44, 0, 22, 0, 11, 0, 0, 0}; //i2s¼ÓADC»òÖ»ÓĞADCÊä³öÊ±ÊÇ512fs
+   11          const uint8 Fout_44K_512fs[8] = {44, 0, 22, 0, 11, 0, 0, 0}; //i2såŠ ADCæˆ–åªæœ‰ADCè¾“å‡ºæ—¶æ˜¯512fs
    12          const uint8 Fout_48K_512fs[8] = {48, 32, 24, 16, 12, 8, 0, 0};
    13          
-   14          void Delay10ms(void); //24Mhz£¬ÑÓÊ±500ms
+   14          void Delay10ms(void); //24Mhzï¼Œå»¶æ—¶500ms
    15          extern void _nop_(void);
    16          void ADC_DAC_loop(void);
    17          /*
@@ -102,11 +102,11 @@ stmt  level    source
                
                            {
                                goto exit;
-                               //Ö±½ÓÍË³ö
+                               //ç›´æ¥é€€å‡º
                            }
                        }
-                       //200msÑÓ³Ùºó£¬ÈÔµÈ²»µ½kt finish£¬Ö±½ÓÍË³ö
-                       break; //ÍË³ö
+                       //200mså»¶è¿Ÿåï¼Œä»ç­‰ä¸åˆ°kt finishï¼Œç›´æ¥é€€å‡º
+                       break; //é€€å‡º
                    }
                
                exit:
@@ -156,7 +156,7 @@ stmt  level    source
   142   3                  {
   143   4                      ;
   144   4                  }
-  145   3                  //×óÉùµÀ
+  145   3                  //å·¦å£°é“
   146   3                  DAC_CH0_PCML = 0x00;
   147   3                  DAC_CH0_PCMM = tonedata1;
   148   3                  DAC_CH0_PCMH = tonedata2;
@@ -164,7 +164,7 @@ stmt  level    source
   150   3                  {
   151   4                      ;
   152   4                  }
-  153   3                  //ÓÒÉùµÀ
+  153   3                  //å³å£°é“
   154   3                  DAC_CH0_PCML = 0x00;
   155   3                  DAC_CH0_PCMM = tonedata1;
   156   3                  DAC_CH0_PCMH = tonedata2;

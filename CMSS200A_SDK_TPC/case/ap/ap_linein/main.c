@@ -25,7 +25,7 @@ uint32 m_decSpdifddrSav;
 bool g_PAOpenFlag;
 int8 last_SetenceFlag;
 #ifdef LINEIN_AP
-char report_buf[16]; //存诸播报数据的buffer
+char report_buf[16]; //瀛樿鎾姤鏁版嵁鐨刡uffer
 info_report_t info =
 {   report_buf, 0, TRUE};
 #endif

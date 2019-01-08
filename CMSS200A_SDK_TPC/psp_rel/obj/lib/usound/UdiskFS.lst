@@ -20,7 +20,7 @@ stmt  level    source
     9           * File   : UdiskFS.c
    10           * By     : wanghaijing
    11           * Version: v1.00     first version     2010/06/17
-   12           * brief  : ¼ÆËãÊı¾İÇøÆğÊ¼µØÖ·,ÒÔ¶ÔÊı¾İÇø½øĞĞ¶ÔÆë
+   12           * brief  : è®¡ç®—æ•°æ®åŒºèµ·å§‹åœ°å€,ä»¥å¯¹æ•°æ®åŒºè¿›è¡Œå¯¹é½
    13           ********************************************************************************************************
              -*
    14           */
@@ -37,7 +37,7 @@ stmt  level    source
              -*
    25           *                                           Partion_MBR_Initial
    26           *
-   27           * Description: ³õÊ¼»¯MBRºÍDBRÏà¹Ø±äÁ¿,²¢¼ì²éÊÇ·ñÓĞMBR, DBR,ÈçÓĞÔòÕÒµ½Êı¾İÇø(²»°üÀ¨¸ùÄ¿Â¼Ê×´Ø)ÆğÊ¼µØÖ·.
+   27           * Description: åˆå§‹åŒ–MBRå’ŒDBRç›¸å…³å˜é‡,å¹¶æ£€æŸ¥æ˜¯å¦æœ‰MBR, DBR,å¦‚æœ‰åˆ™æ‰¾åˆ°æ•°æ®åŒº(ä¸åŒ…æ‹¬æ ¹ç›®å½•é¦–ç°‡)èµ·å§‹åœ°å€.
    28           *
    29           * Arguments  : None.
    30           *
@@ -62,7 +62,7 @@ stmt  level    source
              -*
    48           *                                           Udisk_Parse_MBR
    49           *
-   50           * Description: ¼ì²éÊÇ·ñÊÇĞ´DBR,ÈçÊÇÖØĞÂ½âÎöDBRÊı¾İ²¢¼ÆËãÊı¾İÇøÆ«ÒÆºÍ¶ÔÆë.
+   50           * Description: æ£€æŸ¥æ˜¯å¦æ˜¯å†™DBR,å¦‚æ˜¯é‡æ–°è§£æDBRæ•°æ®å¹¶è®¡ç®—æ•°æ®åŒºåç§»å’Œå¯¹é½.
    51           *
    52           * Arguments  : None.
    53           *
@@ -88,7 +88,7 @@ stmt  level    source
              -*
    70           *                                           Udisk_Mbr_Check
    71           *
-   72           * Description: ¼ì²éÊÇ·ñÓĞMBR,²¢½âÎöÎÄ¼şÏµÍ³,ÒÔÊ¹Êı¾İÇø8Kbyte¶ÔÆë.
+   72           * Description: æ£€æŸ¥æ˜¯å¦æœ‰MBR,å¹¶è§£ææ–‡ä»¶ç³»ç»Ÿ,ä»¥ä½¿æ•°æ®åŒº8Kbyteå¯¹é½.
    73           *
    74           * Arguments  : None.
    75           *
@@ -138,11 +138,11 @@ stmt  level    source
 
   115           *                                           Check_Dbr_Data
   116           *
-  117           * Description: ¼ì²éDBRÊÇ·ñºÏ·¨,ÈçºÏ·¨¼ÆËãÊı¾İÇø¸ùÄ¿Â¼Ê×´ØºóÊı¾İÆğÊ¼µØÖ·,ÒÔ¼ÆËãÆä¶ÔÆëÊ±ĞèÒª²¹ÆëµÄÉÈÇøÊı.
+  117           * Description: æ£€æŸ¥DBRæ˜¯å¦åˆæ³•,å¦‚åˆæ³•è®¡ç®—æ•°æ®åŒºæ ¹ç›®å½•é¦–ç°‡åæ•°æ®èµ·å§‹åœ°å€,ä»¥è®¡ç®—å…¶å¯¹é½æ—¶éœ€è¦è¡¥é½çš„æ‰‡åŒºæ•°.
   118           *
-  119           * Arguments  : DBRAddr:DBRÊı¾İÆğÊ¼µØÖ·.
+  119           * Arguments  : DBRAddr:DBRæ•°æ®èµ·å§‹åœ°å€.
   120           *
-  121           * Returns    : DBRÊı¾İºÏ·¨ĞÔ; 0: illegal; 1:legal.
+  121           * Returns    : DBRæ•°æ®åˆæ³•æ€§; 0: illegal; 1:legal.
   122           *
   123           * Note(s)    : None.
   124           ********************************************************************************************************
@@ -185,8 +185,8 @@ stmt  level    source
   157   2              if (UdiskFSInfo.BPB_RootEntCnt != 0x00)
   158   2              {
   159   3                  /*
-  160   3                   *ÒÔÇ°ÎÄ¼şÏµÍ³FAT16Ä¬ÈÏ¸ùÄ¿Â¼Îª32¸öÉÈÇø£¬¸ù¾İÊµ¼ÊµÄÓ¦ÓÃ³¡ºÏ£¬ÕâÖÖ¼ÙÉèÊÇÃ»ÓĞµÀÀíµÄ
-  161   3                   *¸ù¾İÒÔÏÂ¹«Ê½À´¼ÆËãRootDirSectors=((BPB_RootEntCnt*32)+(BPB_BytePerSec-1))/BPB_BytePerSec
+  160   3                   *ä»¥å‰æ–‡ä»¶ç³»ç»ŸFAT16é»˜è®¤æ ¹ç›®å½•ä¸º32ä¸ªæ‰‡åŒºï¼Œæ ¹æ®å®é™…çš„åº”ç”¨åœºåˆï¼Œè¿™ç§å‡è®¾æ˜¯æ²¡æœ‰é“ç†çš„
+  161   3                   *æ ¹æ®ä»¥ä¸‹å…¬å¼æ¥è®¡ç®—RootDirSectors=((BPB_RootEntCnt*32)+(BPB_BytePerSec-1))/BPB_BytePerSec
   162   3                   *2009-8-16 14:56 husanxi
   163   3                   */
   164   3                  UdiskFSInfo.DataAreaStartAddress = UdiskFSInfo.DataAreaStartAddress + (((UdiskFSInfo.BPB_Root
@@ -211,7 +211,7 @@ stmt  level    source
   179   3              }
   180   2              else
   181   2              {
-  182   3                  //Ê¹Êı¾İÇø¸ùÄ¿Â¼Ê×´ØÖ®ºóLBAµØÖ·Ä£16¶ÔÆë
+  182   3                  //ä½¿æ•°æ®åŒºæ ¹ç›®å½•é¦–ç°‡ä¹‹åLBAåœ°å€æ¨¡16å¯¹é½
   183   3                  UdiskFSInfo.DataAreaOffset = (uint8) (0x100 - (UdiskFSInfo.DataAreaStartAddress & 0xff));
   184   3              }
   185   2      

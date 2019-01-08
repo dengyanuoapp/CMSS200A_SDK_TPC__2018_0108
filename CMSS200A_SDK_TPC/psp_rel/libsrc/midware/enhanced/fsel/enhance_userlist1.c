@@ -44,7 +44,7 @@ BOOL fselUserPLEnt(file_location_t  *location)
 
     if(memcmp(head.magic, vfilename1, 6) == 0)
     {
-        //magic ÕýÈ·
+        //magic æ­£ç¡®
         User_fileoffset = head.first_offset;
         User_LastOffset = head.last_offset;
         User_ItemTotal = head.total_item;

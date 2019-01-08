@@ -28,29 +28,29 @@
 //#define CloseFMPower()   //output8(REGDF_POWER_CTRL,((input8(REGDF_POWER_CTRL)&0xfd)|0x01))
 typedef enum
 {
-    DOWN, //[0]ÏÂ½µ
-    UP //[1]ÉÏÉı
+    DOWN, //[0]ä¸‹é™
+    UP //[1]ä¸Šå‡
 } FM_direct_t;
 
 typedef enum
 {
-    Stereo, //[0]Á¢ÌåÉù
-    Mono //[1]µ¥ÉùµÀ
+    Stereo, //[0]ç«‹ä½“å£°
+    Mono //[1]å•å£°é“
 } FM_Audio_t;
 
 typedef enum
 {
-    releaseMUTE, //½â³ı¾²Òô
-    SetMUTE //¾²Òô
+    releaseMUTE, //è§£é™¤é™éŸ³
+    SetMUTE //é™éŸ³
 } FM_MUTE_t;
 
 typedef struct
 {
-    FM_Audio_t FM_Stereo_Status; //0£¬Á¢ÌåÉù£»·Ç0£¬µ¥ÉùµÀ
-    uint16 FM_CurrentFreq; //µ±Ç°ÆµÂÊ
+    FM_Audio_t FM_Stereo_Status; //0ï¼Œç«‹ä½“å£°ï¼›é0ï¼Œå•å£°é“
+    uint16 FM_CurrentFreq; //å½“å‰é¢‘ç‡
 } FMStatus_Tab_t;
 
-typedef enum //²¨¶ÎÄ£Ê½
+typedef enum //æ³¢æ®µæ¨¡å¼
 
 {
     Bank_US_Europe,

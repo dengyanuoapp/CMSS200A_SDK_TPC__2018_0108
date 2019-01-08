@@ -274,7 +274,7 @@ stmt  level    source
 
   248   2              Set_EPA_BulkInMode();
   249   2              Set_EPB_BulkOutMode();
-  250   2              //set configºó»Ö¸´¸ßËÙÄ£Ê½,ÔÚHS´«ÊäÖĞ³ö´í×ªFS»áÊÇµ¼ÖÂ´«ÊäÖĞ¶Ï
+  250   2              //set configåæ¢å¤é«˜é€Ÿæ¨¡å¼,åœ¨HSä¼ è¾“ä¸­å‡ºé”™è½¬FSä¼šæ˜¯å¯¼è‡´ä¼ è¾“ä¸­æ–­
   251   2              Set_HighSpeed_Mode();
   252   2              break;
   253   2      
@@ -351,13 +351,13 @@ stmt  level    source
   317   1      
   318   1          if ((BKDOOR & 0x40) != 0x00)
   319   1          {
-  320   2              max_pkt_len = 0x0002; //0x200×ªÎªĞ¡¶ËÄ£Ê½,High Speed
-  321   2              max_pkt_len_alter = 0x4000; //0x40×ªÎªĞ¡¶ËÄ£Ê½
+  320   2              max_pkt_len = 0x0002; //0x200è½¬ä¸ºå°ç«¯æ¨¡å¼,High Speed
+  321   2              max_pkt_len_alter = 0x4000; //0x40è½¬ä¸ºå°ç«¯æ¨¡å¼
   322   2          }
   323   1          else
   324   1          {
-  325   2              max_pkt_len = 0x4000; //0x40×ªÎªĞ¡¶ËÄ£Ê½,Full Speed
-  326   2              max_pkt_len_alter = 0x0002; //0x200×ªÎªĞ¡¶ËÄ£Ê½
+  325   2              max_pkt_len = 0x4000; //0x40è½¬ä¸ºå°ç«¯æ¨¡å¼,Full Speed
+  326   2              max_pkt_len_alter = 0x0002; //0x200è½¬ä¸ºå°ç«¯æ¨¡å¼
   327   2          }
   328   1      
   329   1          HS_EndpointA_Dscrptr.wMaxPacketSize = max_pkt_len;
@@ -403,9 +403,9 @@ stmt  level    source
   367   2              {
   368   3                  //serial number total length, including the head;
   369   3                  SerialNumber.bLength = length * 4 + 2;
-  370   3                  // 1¸öhexÊı×ª»»Îª2¸öASCII,¸ß4bitÔÚÇ°,µÍ4bitÔÚºó;
+  370   3                  // 1ä¸ªhexæ•°è½¬æ¢ä¸º2ä¸ªASCII,é«˜4bitåœ¨å‰,ä½4bitåœ¨å;
   371   3                  Cnvrt_Hex_To_ASCII((int8 *) SerialNumber.wString, length);
-  372   3                  //1¸öASCII×ª»»Îª2byte Unicode16
+  372   3                  //1ä¸ªASCIIè½¬æ¢ä¸º2byte Unicode16
 C251 COMPILER V4.55,  UDisk20SetupPktParsing                                               15/07/16  15:45:43  PAGE 7   
 
   373   3                  Cnvrt_ASCII_To_UNI16((uint8 *) SerialNumber.wString, length * 2);
@@ -453,11 +453,11 @@ stmt  level    source
   412   1          uint8 *data_p1;
   413   1          uint8 *data_p2;
   414   1      
-  415   1          //Êı×éµÄÏÂ±ê´Ó0¿ªÊ¼
+  415   1          //æ•°ç»„çš„ä¸‹æ ‡ä»0å¼€å§‹
   416   1          data_p1 = addr + (length - 1); //The last byte address
   417   1          data_p2 = addr + (length - 1) * 2 + 1; //the data address to be load
   418   1      
-  419   1          //µ±ASCIIÂë³¤¶ÈÎª0»ò1Ê±×÷ÏÂÃæµÄ×ª»»»á¸²¸ÇµØÖ·Ö¸ÏòmemoryÖ®Ç°µÄÊı¾İ
+  419   1          //å½“ASCIIç é•¿åº¦ä¸º0æˆ–1æ—¶ä½œä¸‹é¢çš„è½¬æ¢ä¼šè¦†ç›–åœ°å€æŒ‡å‘memoryä¹‹å‰çš„æ•°æ®
   420   1          while (length != 0x00)
   421   1          {
   422   2              *data_p2 = 0x00;
@@ -490,7 +490,7 @@ stmt  level    source
   445          uint8 Count_String_CharLngth(uint8 *addr, uint8 length)
   446          {
   447   1          uint8 count = 0x00;
-  448   1          //Îª0±íÊ¾×Ö·û´®ÒÑ¾­µ½×îºó
+  448   1          //ä¸º0è¡¨ç¤ºå­—ç¬¦ä¸²å·²ç»åˆ°æœ€å
   449   1          while (length != 0x00)
   450   1          {
   451   2              if (*addr == 0x00)
@@ -525,7 +525,7 @@ stmt  level    source
   478   1          uint8 *data_p1;
   479   1          uint8 *data_p2;
   480   1      
-  481   1          //Êı×éµÄÏÂ±ê´Ó0¿ªÊ¼
+  481   1          //æ•°ç»„çš„ä¸‹æ ‡ä»0å¼€å§‹
   482   1          data_p1 = addr + (length - 1); //The last byte address
   483   1          data_p2 = addr + (length - 1) * 2 + 1; //the data address to be load
   484   1      

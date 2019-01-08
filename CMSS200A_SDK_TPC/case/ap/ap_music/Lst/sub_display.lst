@@ -130,7 +130,7 @@ stmt  level    source
   118           ********************************************************************************
   119           *           void RefreshMainScreen( void )
   120           *
-  121           * Description : 主显示的刷新函数,只有有需要时,才调用此函数
+  121           * Description : 涓绘樉绀虹殑鍒锋柊鍑芥暟,鍙湁鏈夐渶瑕佹椂,鎵嶈皟鐢ㄦ鍑芥暟
   122           *
   123           * Arguments   : void
   124           *

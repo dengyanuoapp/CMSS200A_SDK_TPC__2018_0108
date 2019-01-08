@@ -22,7 +22,7 @@
  *********************************************************************************************************
  *                                           DMA_Data_Transfer
  *
- * Description: Ê¹ÓÃÍ¨ÓÃDMAÔÚUSB FIFOÓëRAMÖ®¼ä´«ÊäÊı¾İ, USB normalÄ£Ê½
+ * Description: ä½¿ç”¨é€šç”¨DMAåœ¨USB FIFOä¸RAMä¹‹é—´ä¼ è¾“æ•°æ®, USB normalæ¨¡å¼
  *
  * Arguments  : DMA_DT_Trnsfr_t
  *
@@ -70,7 +70,7 @@ void DMA_Data_Transfer(DMA_DT_Trnsfr_t *dma_struct)
     DMAnFrameLenH = (uint8) (dma_struct->length >> 8);
 
     SFR_BANK = BANK_USB;
-    if ((dma_struct->pagenum & 0x0f) == 0x04) //Ô´µØÖ·Îªusbfifo
+    if ((dma_struct->pagenum & 0x0f) == 0x04) //æºåœ°å€ä¸ºusbfifo
     {
         EP2DMALENL = (uint8) dma_struct->length;
         EP2DMALENH = (uint8) (dma_struct->length >> 8);               
@@ -87,7 +87,7 @@ void DMA_Data_Transfer(DMA_DT_Trnsfr_t *dma_struct)
     if (fifo_trans_mode != 0x01)
     {
         SFR_BANK = BANK_DMA0;
-		DMAnCTL0 = DMAnCTL0 | 0x01; //Nomal Ä£Ê½
+		DMAnCTL0 = DMAnCTL0 | 0x01; //Nomal æ¨¡å¼
     }   
 
     SFR_BANK = BANK_USB;
@@ -98,13 +98,13 @@ void DMA_Data_Transfer(DMA_DT_Trnsfr_t *dma_struct)
  *********************************************************************************************************
  *                                           Wait_PrevDMA_TransEnd
  *
- * Description: µÈ´ıÉÏÒ»´ÎDMA´«ÊäÍê³É.
+ * Description: ç­‰å¾…ä¸Šä¸€æ¬¡DMAä¼ è¾“å®Œæˆ.
  *
  * Arguments  : None
  *
  * Returns    : None.
  *
- * Note(s)    : ¶ÔÓÚ¶Ì°üÒªÌØÊâ´¦Àí.
+ * Note(s)    : å¯¹äºçŸ­åŒ…è¦ç‰¹æ®Šå¤„ç†.
  *********************************************************************************************************
  */
 void Wait_PrevDMA_TransEnd(void)
@@ -112,9 +112,9 @@ void Wait_PrevDMA_TransEnd(void)
     if (fifo_trans_mode == 0x01)
     {
         /*
-          ÓÉÓÚflash fifoÖ±Í¨ÓÉflashÖ÷µ¼£¬ÇÒflash
-          ÄÚ²¿Êı¾İ´«Êä·Ö³ÉºÜ¶àĞ¡¿é£»ÄÇºÜÓĞ¿ÉÄÜ°ÎÏßºó
-          dmaÒÑ¾­½áÊø£¬µ¼ÖÂÎŞ·¨ÍË³öUÅÌ¡£
+          ç”±äºflash fifoç›´é€šç”±flashä¸»å¯¼ï¼Œä¸”flash
+          å†…éƒ¨æ•°æ®ä¼ è¾“åˆ†æˆå¾ˆå¤šå°å—ï¼›é‚£å¾ˆæœ‰å¯èƒ½æ‹”çº¿å
+          dmaå·²ç»ç»“æŸï¼Œå¯¼è‡´æ— æ³•é€€å‡ºUç›˜ã€‚
         */
         SFR_BANK = BANK_USB;
 #ifndef _FPGA_VERTION_
@@ -133,22 +133,22 @@ void Wait_PrevDMA_TransEnd(void)
     //wait DMA0 complete
     while ((DMAnCTL0 & 0x01) != 0x00)
     {
-        //°ÎÏß´¦Àí
+        //æ‹”çº¿å¤„ç†
         ifIsConnect();
     }
 
     //wait usb fifo empty
-    if (((DMAnCTL1 >> 4) & 0x0f) == 0x04) //Ä¿µÄµØÖ·Îªusbfifo
+    if (((DMAnCTL1 >> 4) & 0x0f) == 0x04) //ç›®çš„åœ°å€ä¸ºusbfifo
     {
         SFR_BANK = BANK_USB;
         while ((UDMAM & 0x01) != 0x00)
         {
-            //°ÎÏß´¦Àí
+            //æ‹”çº¿å¤„ç†
             ifIsConnect();
         }
         while ((In1cs_hcout1cs & 0x0E) != 0x0C) //FIFO Empty?
         {
-            //°ÎÏß´¦Àí
+            //æ‹”çº¿å¤„ç†
             ifIsConnect();
         }
     }
@@ -161,7 +161,7 @@ void Wait_PrevDMA_TransEnd(void)
     {
         SFR_BANK = BANK_DMA0;
     }
-    //FIFOÖ±Í¨Ä£Ê½½áÊøºó¹Ø±ÕÖ±Í¨ÅäÖÃ£¬±ÜÃâDMAµÄÅäÖÃ´¦ÓÚfifoÖ±Í¨Ä£Ê½,µ¼ÖÂºóĞø´æ´¢½éÖÊ´¦ÀíÒì³£
+    //FIFOç›´é€šæ¨¡å¼ç»“æŸåå…³é—­ç›´é€šé…ç½®ï¼Œé¿å…DMAçš„é…ç½®å¤„äºfifoç›´é€šæ¨¡å¼,å¯¼è‡´åç»­å­˜å‚¨ä»‹è´¨å¤„ç†å¼‚å¸¸
     DMAnCTL1 = 0x00;
 
     SFR_BANK = BANK_USB;
@@ -183,7 +183,7 @@ void Wait_PrevDMA_TransEnd(void)
 void Send_CSW(void)
 {
     Send_Data_To_PC((uint8 *) &CSWBuffer, 13);
-    //CWW½×¶ÎÒÑÍê³É£¬ÇåfifoÎªÏÂÒ»¸öIN×¼±¸
+    //CWWé˜¶æ®µå·²å®Œæˆï¼Œæ¸…fifoä¸ºä¸‹ä¸€ä¸ªINå‡†å¤‡
     EPB_OutRdy_ShortPacketNAK();
 }
 
@@ -220,12 +220,12 @@ void Send_Data_To_PC(uint8 *data_p, uint16 length)
 
         if (count != max_pkt_size)
         {
-            In1cs_hcout1cs = In1cs_hcout1cs | 0x02; //¶Ì°ü,ĞèÒªÊÖ¶¯ÉèÖÃBusyÎ»
+            In1cs_hcout1cs = In1cs_hcout1cs | 0x02; //çŸ­åŒ…,éœ€è¦æ‰‹åŠ¨è®¾ç½®Busyä½
         }
 
         while ((In1cs_hcout1cs & 0x0E) != 0x0C) //FIFO Empty?
         {
-            //°ÎÏß´¦Àí
+            //æ‹”çº¿å¤„ç†
             ifIsConnect();
         }
         sendLength = sendLength - count;
@@ -243,7 +243,7 @@ void Send_Data_To_PC(uint8 *data_p, uint16 length)
  *
  * Returns    : None.
  *
- * Note(s)    : Memory±ØĞëÇĞ¸øEPB.
+ * Note(s)    : Memoryå¿…é¡»åˆ‡ç»™EPB.
  *********************************************************************************************************
  */
 void EPB_OutRdy_ShortPacketNAK(void)
@@ -290,7 +290,7 @@ void EPB_OutRdy_FIFOFullNAK(void)
  *
  * Returns    : None.
  *
- * Note(s)    : Memory±ØĞëÇĞ¸øEPA.
+ * Note(s)    : Memoryå¿…é¡»åˆ‡ç»™EPA.
  *********************************************************************************************************
  */
 void EPA_In_Rdy(void)

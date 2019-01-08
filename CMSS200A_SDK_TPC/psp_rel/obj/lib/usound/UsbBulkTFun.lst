@@ -36,7 +36,7 @@ stmt  level    source
              -*
    23           *                                           DMA_Data_Transfer
    24           *
-   25           * Description: Ê¹ÓÃÍ¨ÓÃDMAÔÚUSB FIFOÓëRAMÖ®¼ä´«ÊäÊı¾İ, USB normalÄ£Ê½
+   25           * Description: ä½¿ç”¨é€šç”¨DMAåœ¨USB FIFOä¸RAMä¹‹é—´ä¼ è¾“æ•°æ®, USB normalæ¨¡å¼
    26           *
    27           * Arguments  : DMA_DT_Trnsfr_t
    28           *
@@ -87,7 +87,7 @@ stmt  level    source
    70   1          DMAnFrameLenH = (uint8) (dma_struct->length >> 8);
    71   1      
    72   1          SFR_BANK = BANK_USB;
-   73   1          if ((dma_struct->pagenum & 0x0f) == 0x04) //Ô´µØÖ·Îªusbfifo
+   73   1          if ((dma_struct->pagenum & 0x0f) == 0x04) //æºåœ°å€ä¸ºusbfifo
    74   1          {
    75   2              EP2DMALENL = (uint8) dma_struct->length;
    76   2              EP2DMALENH = (uint8) (dma_struct->length >> 8);               
@@ -104,7 +104,7 @@ stmt  level    source
    87   1          if (fifo_trans_mode != 0x01)
    88   1          {
    89   2              SFR_BANK = BANK_DMA0;
-   90   2                      DMAnCTL0 = DMAnCTL0 | 0x01; //Nomal Ä£Ê½
+   90   2                      DMAnCTL0 = DMAnCTL0 | 0x01; //Nomal æ¨¡å¼
    91   2          }   
    92   1      
    93   1          SFR_BANK = BANK_USB;
@@ -116,13 +116,13 @@ stmt  level    source
              -*
    99           *                                           Wait_PrevDMA_TransEnd
   100           *
-  101           * Description: µÈ´ıÉÏÒ»´ÎDMA´«ÊäÍê³É.
+  101           * Description: ç­‰å¾…ä¸Šä¸€æ¬¡DMAä¼ è¾“å®Œæˆ.
   102           *
   103           * Arguments  : None
   104           *
   105           * Returns    : None.
   106           *
-  107           * Note(s)    : ¶ÔÓÚ¶Ì°üÒªÌØÊâ´¦Àí.
+  107           * Note(s)    : å¯¹äºçŸ­åŒ…è¦ç‰¹æ®Šå¤„ç†.
   108           ********************************************************************************************************
              -*
   109           */
@@ -131,9 +131,9 @@ stmt  level    source
   112   1          if (fifo_trans_mode == 0x01)
   113   1          {
   114   2              /*
-  115   2                ÓÉÓÚflash fifoÖ±Í¨ÓÉflashÖ÷µ¼£¬ÇÒflash
-  116   2                ÄÚ²¿Êı¾İ´«Êä·Ö³ÉºÜ¶àĞ¡¿é£»ÄÇºÜÓĞ¿ÉÄÜ°ÎÏßºó
-  117   2                dmaÒÑ¾­½áÊø£¬µ¼ÖÂÎŞ·¨ÍË³öUÅÌ¡£
+  115   2                ç”±äºflash fifoç›´é€šç”±flashä¸»å¯¼ï¼Œä¸”flash
+  116   2                å†…éƒ¨æ•°æ®ä¼ è¾“åˆ†æˆå¾ˆå¤šå°å—ï¼›é‚£å¾ˆæœ‰å¯èƒ½æ‹”çº¿å
+  117   2                dmaå·²ç»ç»“æŸï¼Œå¯¼è‡´æ— æ³•é€€å‡ºUç›˜ã€‚
 C251 COMPILER V4.55,  UsbBulkTFun                                                          15/07/16  15:45:46  PAGE 3   
 
   118   2              */
@@ -154,22 +154,22 @@ stmt  level    source
   133   1          //wait DMA0 complete
   134   1          while ((DMAnCTL0 & 0x01) != 0x00)
   135   1          {
-  136   2              //°ÎÏß´¦Àí
+  136   2              //æ‹”çº¿å¤„ç†
   137   2              ifIsConnect();
   138   2          }
   139   1      
   140   1          //wait usb fifo empty
-  141   1          if (((DMAnCTL1 >> 4) & 0x0f) == 0x04) //Ä¿µÄµØÖ·Îªusbfifo
+  141   1          if (((DMAnCTL1 >> 4) & 0x0f) == 0x04) //ç›®çš„åœ°å€ä¸ºusbfifo
   142   1          {
   143   2              SFR_BANK = BANK_USB;
   144   2              while ((UDMAM & 0x01) != 0x00)
   145   2              {
-  146   3                  //°ÎÏß´¦Àí
+  146   3                  //æ‹”çº¿å¤„ç†
   147   3                  ifIsConnect();
   148   3              }
   149   2              while ((In1cs_hcout1cs & 0x0E) != 0x0C) //FIFO Empty?
   150   2              {
-  151   3                  //°ÎÏß´¦Àí
+  151   3                  //æ‹”çº¿å¤„ç†
   152   3                  ifIsConnect();
   153   3              }
   154   2          }
@@ -182,7 +182,7 @@ stmt  level    source
   161   1          {
   162   2              SFR_BANK = BANK_DMA0;
   163   2          }
-  164   1          //FIFOÖ±Í¨Ä£Ê½½áÊøºó¹Ø±ÕÖ±Í¨ÅäÖÃ£¬±ÜÃâDMAµÄÅäÖÃ´¦ÓÚfifoÖ±Í¨Ä£Ê½,µ¼ÖÂºóĞø´æ´¢½éÖÊ´¦ÀíÒì³£
+  164   1          //FIFOç›´é€šæ¨¡å¼ç»“æŸåå…³é—­ç›´é€šé…ç½®ï¼Œé¿å…DMAçš„é…ç½®å¤„äºfifoç›´é€šæ¨¡å¼,å¯¼è‡´åç»­å­˜å‚¨ä»‹è´¨å¤„ç†å¼‚å¸¸
   165   1          DMAnCTL1 = 0x00;
   166   1      
   167   1          SFR_BANK = BANK_USB;
@@ -208,7 +208,7 @@ stmt  level    source
   183          void Send_CSW(void)
   184          {
   185   1          Send_Data_To_PC((uint8 *) &CSWBuffer, 13);
-  186   1          //CWW½×¶ÎÒÑÍê³É£¬ÇåfifoÎªÏÂÒ»¸öIN×¼±¸
+  186   1          //CWWé˜¶æ®µå·²å®Œæˆï¼Œæ¸…fifoä¸ºä¸‹ä¸€ä¸ªINå‡†å¤‡
   187   1          EPB_OutRdy_ShortPacketNAK();
   188   1      }
   189          
@@ -247,12 +247,12 @@ stmt  level    source
   220   2      
   221   2              if (count != max_pkt_size)
   222   2              {
-  223   3                  In1cs_hcout1cs = In1cs_hcout1cs | 0x02; //¶Ì°ü,ĞèÒªÊÖ¶¯ÉèÖÃBusyÎ»
+  223   3                  In1cs_hcout1cs = In1cs_hcout1cs | 0x02; //çŸ­åŒ…,éœ€è¦æ‰‹åŠ¨è®¾ç½®Busyä½
   224   3              }
   225   2      
   226   2              while ((In1cs_hcout1cs & 0x0E) != 0x0C) //FIFO Empty?
   227   2              {
-  228   3                  //°ÎÏß´¦Àí
+  228   3                  //æ‹”çº¿å¤„ç†
   229   3                  ifIsConnect();
   230   3              }
   231   2              sendLength = sendLength - count;
@@ -273,7 +273,7 @@ stmt  level    source
 C251 COMPILER V4.55,  UsbBulkTFun                                                          15/07/16  15:45:46  PAGE 5   
 
   245           *
-  246           * Note(s)    : Memory±ØĞëÇĞ¸øEPB.
+  246           * Note(s)    : Memoryå¿…é¡»åˆ‡ç»™EPB.
   247           ********************************************************************************************************
              -*
   248           */
@@ -324,7 +324,7 @@ stmt  level    source
   290           *
   291           * Returns    : None.
   292           *
-  293           * Note(s)    : Memory±ØĞëÇĞ¸øEPA.
+  293           * Note(s)    : Memoryå¿…é¡»åˆ‡ç»™EPA.
   294           ********************************************************************************************************
              -*
   295           */

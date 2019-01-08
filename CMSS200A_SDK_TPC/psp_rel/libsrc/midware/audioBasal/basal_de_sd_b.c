@@ -35,7 +35,7 @@ extern void decTimerIntSub(void);
 
 
 extern SD_FILE *m_deSd_Fp;
-extern Open_param_t *m_deSdOpenparam;//²ÎÊı±íµØÖ·
+extern Open_param_t *m_deSdOpenparam;//å‚æ•°è¡¨åœ°å€
 
 //extern uint32 deSdBpointerSave;
 extern uint32 deSdBreakPointSave;
@@ -70,8 +70,8 @@ extern uint8 m_deSdRead_Data(uchar readFileDirection, DWORD position);
 #pragma renamecode(MW_BS_AD_CMD1_SD)
 
 /*************************************************************************
- * SdLoadCommand ³õÊ¼»¯codecÓÃµÄÈ«¾Ö±äÁ¿g_decInitPara£¬
- * °üÀ¨codecµÄbuffer¡¢dmaÖĞ¶ÏµÄhookº¯Êı¡¢¸èÇúÎÄ¼şµÄµÚÒ»Ö¡Êı¾İµØÖ·µÈµÈ
+ * SdLoadCommand åˆå§‹åŒ–codecç”¨çš„å…¨å±€å˜é‡g_decInitParaï¼Œ
+ * åŒ…æ‹¬codecçš„bufferã€dmaä¸­æ–­çš„hookå‡½æ•°ã€æ­Œæ›²æ–‡ä»¶çš„ç¬¬ä¸€å¸§æ•°æ®åœ°å€ç­‰ç­‰
  ****************************************************************************/
 bool SdLoadCommand(BYTE music_type, void *param)
 {
@@ -116,12 +116,12 @@ bool SdLoadCommand(BYTE music_type, void *param)
         return FALSE;
     }
     {
-        /* uint32 EndPageLen;//×îºóÒ»¸öPAGEµÄ×Ö½ÚÊı
-         EndPageLen = (uint32)FS_GetUnalignedLen(m_deSd_Fp);//È¡×îºóÒ»¸öPAGEµÄBYTEÊı
+        /* uint32 EndPageLen;//æœ€åä¸€ä¸ªPAGEçš„å­—èŠ‚æ•°
+         EndPageLen = (uint32)FS_GetUnalignedLen(m_deSd_Fp);//å–æœ€åä¸€ä¸ªPAGEçš„BYTEæ•°
          deSdFilepages = (uint32)FS_GetFileLen(m_deSd_Fp);
          g_decReadFilePara.FileLen = (((uint32)deSdFilepages)<<9); //* 512;
 
-         //´¦ÀíÎÄ¼şÎ²²»ÊÇÕûPAGEµÄÊı¾İ,Ò»Ò³Ò»Ò³´«ËÍ
+         //å¤„ç†æ–‡ä»¶å°¾ä¸æ˜¯æ•´PAGEçš„æ•°æ®,ä¸€é¡µä¸€é¡µä¼ é€
          if (EndPageLen != 0)
          {
              g_decReadFilePara.FileLen = g_decReadFilePara.FileLen - 512 + EndPageLen;
@@ -139,8 +139,8 @@ bool SdLoadCommand(BYTE music_type, void *param)
 }
 
 /*************************************************************************
- * SdStopCommand Í£Ö¹²¥·Å
- *1 g_decReadFilePara.ReadFilePagesÔÚdma hookÖĞ±»¸³Öµ = deSdBreakPointSave
+ * SdStopCommand åœæ­¢æ’­æ”¾
+ *1 g_decReadFilePara.ReadFilePagesåœ¨dma hookä¸­è¢«èµ‹å€¼ = deSdBreakPointSave
  ****************************************************************************/
 
 bool SdStopCommand(void *param)
@@ -159,7 +159,7 @@ bool SdStopCommand(void *param)
 }
 
 /*************************************************************************
- * SdPlayCommand ²¥·Å
+ * SdPlayCommand æ’­æ”¾
  *
  ****************************************************************************/
 bool SdPlayCommand(void *param)
@@ -175,7 +175,7 @@ bool SdPlayCommand(void *param)
         return TRUE;
     }
 
-    Sdplay_status.status = PLAYING_PLAYING;//Ä¬ÈÏÎª²¥·Å×´Ì¬
+    Sdplay_status.status = PLAYING_PLAYING;//é»˜è®¤ä¸ºæ’­æ”¾çŠ¶æ€
     if ((uint8) param == Nor_Break_open)
     {
         SdRestoreCommand();
@@ -187,13 +187,13 @@ bool SdPlayCommand(void *param)
     }
     else
     {
-        //Òª´ÓÍ·¿ªÊ¼·Å
+        //è¦ä»å¤´å¼€å§‹æ”¾
         g_decControlInfor.PlayMode = PLAY_MODE_NORMAL;
         SD_FSeek(m_deSd_Fp, 0, 0);
     }
     if (m_deSdOpenparam == NULL)
     {
-        g_decControlInfor.PlayMode = PLAY_MODE_AB;//Èô²ÎÊı±íµØÖ·Îª¿ÕÔò±íÊ¾Îª¸ú¶Á¶Ô±È²¥·Å
+        g_decControlInfor.PlayMode = PLAY_MODE_AB;//è‹¥å‚æ•°è¡¨åœ°å€ä¸ºç©ºåˆ™è¡¨ç¤ºä¸ºè·Ÿè¯»å¯¹æ¯”æ’­æ”¾
     }
 
     decInit();

@@ -192,8 +192,8 @@ LOC    OBJ             LINE     SOURCE
                     +2  178     
  00BE               +2  179     sfr SPH                   =  0xbe;      // all bank     SPH Stack Pointer high byte
  0081               +2  180     sfr SPL                   =  0x81;      // all bank     SPL Stack Pointer low byte
- 0081               +2  181     sfr SP                    =  0x81;      // all bank     SPL Stack Pointer low byte  ¡ÌÕ‚
-                               “ª÷÷–¥∑®
+ 0081               +2  181     sfr SP                    =  0x81;      // all bank     SPL Stack Pointer low byte  Âè¶Â§ñ
+                               ‰∏ÄÁßçÂÜôÊ≥ï
  0084               +2  182     sfr DPXL                  =  0x84;      // all bank     DPXL    Data Pointer extended by
                                te
  0083               +2  183     sfr DPH                   =  0x83;      // all bank     DPH Data Pointer high byte
@@ -1096,13 +1096,13 @@ LOC    OBJ             LINE     SOURCE
  008B               +2  671     sfr ACC_BLKNUM_LENLO                            =  0x8b;      // 0x08   Search block num
                                ber or the high byte of data length of unsigned accumulation unit number
  00F1               +2  672     sfr ACC_CMPDATA0_SUMHIE                         =  0xf1;      // 0x08   The first byte o
-                               f data searched or the higher byte of unsigned accelerator°Øs result
+                               f data searched or the higher byte of unsigned accelerator‚Äôs result
  00F2               +2  673     sfr ACC_CMPDATA1_SUMHI                          =  0xf2;      // 0x08   The second byte 
-                               of data searched or the high byte of unsigned accelerator°Øs result
+                               of data searched or the high byte of unsigned accelerator‚Äôs result
  00F3               +2  674     sfr ACC_CMPDATA2_SUMLO                          =  0xf3;      // 0x08   The third byte o
-                               f data searched or the low byte of unsigned accelerator°Øs result
+                               f data searched or the low byte of unsigned accelerator‚Äôs result
  00F4               +2  675     sfr ACC_CMPDATA3_SUMLOE                         =  0xf4;      // 0x08   The fourth byte 
-                               of data searched or the lower byte of unsigned accelerator°Øs result
+                               of data searched or the lower byte of unsigned accelerator‚Äôs result
  00F5               +2  676     sfr ACC_MATCNTHI                                =  0xf5;      // 0x08   The high byte of
                                 bitmap
  00F6               +2  677     sfr ACC_MATCNTLO                                =  0xf6;      // 0x08   The low byte of 

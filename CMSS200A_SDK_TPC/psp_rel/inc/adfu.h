@@ -26,28 +26,28 @@
 
 #ifdef __C251__
 
-void BackupZram2scode(void);      //UÅÌÒªÊ¹ÓÃ0x4000~0x4fffµÄ¿Õ¼ä×öbuffer£¬¸Ãº¯Êı°Ñ¸Ã¿Õ¼äÔ­ÓĞ´úÂë±¸·İµ½0x06 page
-void RestoreZram2scode(void);     //»Ö¸´ÏÔÊ¾Driver´úÂëBankB´úÂëµ½Ä¬ÈÏPage 0x07
+void BackupZram2scode(void);      //Uç›˜è¦ä½¿ç”¨0x4000~0x4fffçš„ç©ºé—´åšbufferï¼Œè¯¥å‡½æ•°æŠŠè¯¥ç©ºé—´åŸæœ‰ä»£ç å¤‡ä»½åˆ°0x06 page
+void RestoreZram2scode(void);     //æ¢å¤æ˜¾ç¤ºDriverä»£ç BankBä»£ç åˆ°é»˜è®¤Page 0x07
 
 
 typedef struct
 {
-    char filename[11];         //ÎÄ¼şÃû8.3
+    char filename[11];         //æ–‡ä»¶å8.3
     char type;                 //"H","F","B","I","A","S"
-    long DownloadAddr;        //download µØÖ·
-    long offset;               //ÎÄ¼şÖĞµÄµØÖ·
-    long length;              //³¤¶ÈbyteÎªµ¥Î»£¨512È¡Õû£©
-    char Subtype[4];          //×ÓÀàĞÍ
+    long DownloadAddr;        //download åœ°å€
+    long offset;               //æ–‡ä»¶ä¸­çš„åœ°å€
+    long length;              //é•¿åº¦byteä¸ºå•ä½ï¼ˆ512å–æ•´ï¼‰
+    char Subtype[4];          //å­ç±»å‹
     long checksum;
 } DIR_t;
 typedef struct
 {
-    char filename[11];      //ÎÄ¼şÃû8.3
+    char filename[11];      //æ–‡ä»¶å8.3
     BYTE attr;
     BYTE reserve1[2];
     WORD version;
-    long offset;            //ÒÔÉÈÇøÎªµ¥Î»
-    long length;            //Ò»×Ö½ÚÎªµ¥Î»
+    long offset;            //ä»¥æ‰‡åŒºä¸ºå•ä½
+    long length;            //ä¸€å­—èŠ‚ä¸ºå•ä½
     BYTE reserve2[4];
     DWORD checksum;
 } LDIR_t;   //32 bytes
@@ -55,37 +55,37 @@ typedef struct
 typedef struct
 {
     char AFIFlag[4];                        //={'A','F','I',' '};
-    WORD VID;                                //Éè±¸vid
-    WORD PID;                                //Éè±¸pid
-    BYTE Version[4];                        //°æ±¾ºÅx.x.xx
+    WORD VID;                                //è®¾å¤‡vid
+    WORD PID;                                //è®¾å¤‡pid
+    BYTE Version[4];                        //ç‰ˆæœ¬å·x.x.xx
     BYTE Date[4];
     BYTE reserve1[16];
-    DIR_t diritem[126];                        //×î¶à126
+    DIR_t diritem[126];                        //æœ€å¤š126
     BYTE reserve2[28];
-    long checksum;                            //afi headĞ£ÑéºÍ
+    long checksum;                            //afi headæ ¡éªŒå’Œ
 } AFIHead_t;       //4k
 
 typedef struct
 {
     //magic
     WORD magic;            // must equ. 0xdead
-    //ÏµÍ³ÆğÊ¼Ê±¼ä(°ëÃëÎªµ¥Î»)
-    //ÏµÍ³µ±Ç°µÄÊ±¼äµÈÓÚÏµÍ³ÆğÊ¼Ê±¼ä¼ÓÏµÍ³time counterµÄÊ±¼ä
+    //ç³»ç»Ÿèµ·å§‹æ—¶é—´(åŠç§’ä¸ºå•ä½)
+    //ç³»ç»Ÿå½“å‰çš„æ—¶é—´ç­‰äºç³»ç»Ÿèµ·å§‹æ—¶é—´åŠ ç³»ç»Ÿtime counterçš„æ—¶é—´
     unsigned long systemtime;
     unsigned int RTCRate;   //950
-    //¶Ô±È¶ÈÑ¡Ôñ0~31
+    //å¯¹æ¯”åº¦é€‰æ‹©0~31
     char DisplayContrast;
-    //±³¾°µÆÁÁÊ±¼ä,Ä¬ÈÏÖµÎª0ah=5Ãë
+    //èƒŒæ™¯ç¯äº®æ—¶é—´,é»˜è®¤å€¼ä¸º0ah=5ç§’
     char LightTime;
-    //standby¶¨Ê±
+    //standbyå®šæ—¶
     char StandbyTime;
-    //sleep¶¨Ê±
+    //sleepå®šæ—¶
     char SleepTime;
-    //½çÃæÓïÑÔ, ¼òÌå:0, Ó¢ÎÄ:1, ·±Ìå:2
+    //ç•Œé¢è¯­è¨€, ç®€ä½“:0, è‹±æ–‡:1, ç¹ä½“:2
     char langid;
-    //¸´¶ÁÄ£Ê½
+    //å¤è¯»æ¨¡å¼
     char ReplayMode;
-    //Áª»úÄ£Ê½
+    //è”æœºæ¨¡å¼
     char OnlineMode;
 
     char BatteryType;                       //modify by gongee 2004-05-24 09:21
@@ -97,12 +97,12 @@ typedef struct
 {
     //0
     BYTE LFIFlag[4];                        //={0x55,0xaa,0xf0,0x0f};
-    BYTE Version[4];                        //°æ±¾ºÅx.x.xx.xxxx
+    BYTE Version[4];                        //ç‰ˆæœ¬å·x.x.xx.xxxx
     BYTE Date[4];                           //xxxx.xx.xx
     WORD PID;                               //xxxx
     WORD VID;                               //xxxx
-    long DIRItemCheckSum;                   //ËùÓĞµÄ240¸öÄ¿Â¼Ïî¼ÓÆğÀ´
-    BYTE descriptor[44];                    //firmwareÃèÊö·û
+    long DIRItemCheckSum;                   //æ‰€æœ‰çš„240ä¸ªç›®å½•é¡¹åŠ èµ·æ¥
+    BYTE descriptor[44];                    //firmwareæè¿°ç¬¦
     BYTE Productor[32];
     BYTE DeviceName[32];
     BYTE reserve0[128];
@@ -117,7 +117,7 @@ typedef struct
     //256+80
     ComValforFMK_t defaultinf;
     //256+80+17
-    BYTE reserve2[15];                      //±£Áô
+    BYTE reserve2[15];                      //ä¿ç•™
     //256+80+15=368
     BYTE asciilen1;
     BYTE inf_mtpmfrinfo[32];
@@ -130,15 +130,15 @@ typedef struct
     WORD inf_mtpvid[2];
     WORD inf_mtppid[2];
 
-    BYTE reserve3[38];                      //±£Áô
+    BYTE reserve3[38];                      //ä¿ç•™
     //510
-    WORD headchecksum;                      //Ç°510byteĞ£ÑéºÍ
-    LDIR_t diritem[240];                    //Âß¼­Ä¿Â¼Ïî
+    WORD headchecksum;                      //å‰510byteæ ¡éªŒå’Œ
+    LDIR_t diritem[240];                    //é€»è¾‘ç›®å½•é¡¹
 } LFIHead_t;       //8k
 
 typedef struct
 {
-    BYTE jump[4];               //µÚÒ»ÌõÓï¾ä
+    BYTE jump[4];               //ç¬¬ä¸€æ¡è¯­å¥
     BYTE ADFUSFlag[4];            //={'A','D','F','U'};
     BYTE type[4];                //"3551"
     WORD version;               //x.x.xx
@@ -149,7 +149,7 @@ typedef struct
 
 typedef struct
 {
-    BYTE jump[4];               //µÚÒ»ÌõÓï¾ä
+    BYTE jump[4];               //ç¬¬ä¸€æ¡è¯­å¥
     BYTE BRECFlag[4];            //={'B','R','E','C'};
     BYTE type[4];                //"F644"/"F641"/"F321"/"O---"
     WORD version;               //x.x.xx
@@ -162,7 +162,7 @@ typedef struct
 
 typedef struct
 {
-    BYTE jump[4];               //µÚÒ»ÌõÓï¾ä
+    BYTE jump[4];               //ç¬¬ä¸€æ¡è¯­å¥
     BYTE FWSCFlag[4];            //={'F','W','S','C'};
     BYTE type[4];                //"F644"/"F641"/"F321"/"O---"
     WORD version;               //x.x.xx
@@ -173,7 +173,7 @@ typedef struct
 
 typedef struct
 {
-    BYTE jump[4];               //µÚÒ»ÌõÓï¾ä
+    BYTE jump[4];               //ç¬¬ä¸€æ¡è¯­å¥
     BYTE HWSCFlag[4];            //={'H','W','S','C'};
     BYTE type[4];                //"0000"
     WORD version;               //x.x.xx
@@ -187,22 +187,22 @@ typedef struct
     char FrameType[2];              //'F','W'
     WORD VID;
     WORD PID;
-    long FirmwareVersion;           //ÈÍ¼ş°æ±¾ºÅ
+    long FirmwareVersion;           //éŸ§ä»¶ç‰ˆæœ¬å·
     WORD Fwstatus;
-    char Productor[32];             //ÖÆÔìÉÌ
-    char DeviceName[32];            //Éè±¸Ãû
+    char Productor[32];             //åˆ¶é€ å•†
+    char DeviceName[32];            //è®¾å¤‡å
     BYTE FirmwareDate[4];
-    WORD BrecCheckSum[2];           //NandFlashÎïÀíÇøÖĞµÚÒ»·İBrecµÄĞ£ÑéºÍ
-    long Logical_cap;               //FlashÂß¼­×ÜÈİÁ¿
+    WORD BrecCheckSum[2];           //NandFlashç‰©ç†åŒºä¸­ç¬¬ä¸€ä»½Brecçš„æ ¡éªŒå’Œ
+    long Logical_cap;               //Flashé€»è¾‘æ€»å®¹é‡
 
     BYTE dg_flash_info[32];
 
-    BYTE resevred[40];           //·ÀÖ¹Êı¾İÔ½½çÒç³ö
+    BYTE resevred[40];           //é˜²æ­¢æ•°æ®è¶Šç•Œæº¢å‡º
 } ADFU_FWScanInfo_t; //160bytes
 
 typedef struct
 {
-    WORD StgInfor[4];        //Storage µÄÁ¬½ÓĞÅÏ¢
+    WORD StgInfor[4];        //Storage çš„è¿æ¥ä¿¡æ¯
     WORD CExCap[8];          //Cap of storages
 } STGInfo_t;
 
@@ -213,7 +213,7 @@ typedef struct
     BYTE SubVersion[2];     //A,B,C,D
     BYTE BromVersion[4];    //such as "3.0.00.8888"
     BYTE BromDate[4];       //such as "20,03,10,14"
-    char BootDiskType[8];   //boot diskµÄ´æ´¢ÀàĞÍ "F644"/"F641"/"F321"/"N---"
+    char BootDiskType[8];   //boot diskçš„å­˜å‚¨ç±»å‹ "F644"/"F641"/"F321"/"N---"
     STGInfo_t stginfo;
 
     BYTE flash_ID_table[64];
@@ -260,7 +260,7 @@ typedef struct
 
 typedef struct
 {
-    //pcÈí¼şÍ¨¹ıÅĞ¶Ï´Ë±êÖ¾È·¶¨ÊÇ½øÈëĞŞ¸´Ä£Ê½»¹ÊÇ½øÈëÉı¼¶Ä£Ê½
+    //pcè½¯ä»¶é€šè¿‡åˆ¤æ–­æ­¤æ ‡å¿—ç¡®å®šæ˜¯è¿›å…¥ä¿®å¤æ¨¡å¼è¿˜æ˜¯è¿›å…¥å‡çº§æ¨¡å¼
     BYTE SysinfoFlag[8];    //'S','Y','S',' ','I','N','F','O'
     ADFU_HWScanInfo_t adfu_hwscaninfo;
     ADFU_FWScanInfo_t adfu_fwscaninfo;
@@ -274,7 +274,7 @@ typedef struct
 #define GetSysInfo(sysinfo) 	API_GetSysInfo(APINO_GetSysInfo,sysinfo)
 
 
-//»ñÈ¡ÏµÍ³µÄÈíÓ²¼şĞÅÏ¢
+//è·å–ç³»ç»Ÿçš„è½¯ç¡¬ä»¶ä¿¡æ¯
 bool API_GetSysInfo(uint8 cmd, ADFU_SysInfo_t *sysinfo);
 
 bool ADFUInit(void);

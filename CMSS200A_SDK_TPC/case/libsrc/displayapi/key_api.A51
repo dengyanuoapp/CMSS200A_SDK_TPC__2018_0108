@@ -4,7 +4,7 @@ $include (actos.inc)
 
 API30 SEGMENT 'ECODE_APISEG'
 
-/**************************SetAsciiFont µÄAPIÈë¿Ú******************************/
+/**************************SetAsciiFont çš„APIå…¥å£******************************/
 public API_key_init{RPrefix}
 public API_key_exit{RPrefix}  
 public API_KY_GetChargeStatus{RPrefix}

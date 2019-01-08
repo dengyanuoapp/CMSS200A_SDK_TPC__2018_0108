@@ -14,7 +14,7 @@
 
 #pragma name(CFG_MAIN)
 
-/************************Í·ĞÅÏ¢¶¨Òå**************************************/
+/************************å¤´ä¿¡æ¯å®šä¹‰**************************************/
 
 //const char   CfgMagic[4]={"CFG"};
 //const uint8  TotallItem = 5;
@@ -29,18 +29,18 @@ const file_cfg_head_t FileHead =
 
 const cfg_item_t CfgItem[CFG_ITEM_MAX] =
 {
-    { (uint32) (&ParaHead), "Parameters", "²ÎÊıÉèÖÃ" },
-    { (uint32) (&KeyCfg), "Key-press", "°´¼ü" },
-    { (uint32) (&APCfg), "Application", "Ó¦ÓÃ³ÌĞò" },
-    { (uint32) (&LanguageCfg), "language", "ÓïÑÔ" },
-    { (uint32) (&FileCfg), "File-exchange", "Ìæ»»ÎÄ¼ş" },
-    { (uint32) (&FuncCfg), "Functions", "¹¦ÄÜÅäÖÃ" }
+    { (uint32) (&ParaHead), "Parameters", "å‚æ•°è®¾ç½®" },
+    { (uint32) (&KeyCfg), "Key-press", "æŒ‰é”®" },
+    { (uint32) (&APCfg), "Application", "åº”ç”¨ç¨‹åº" },
+    { (uint32) (&LanguageCfg), "language", "è¯­è¨€" },
+    { (uint32) (&FileCfg), "File-exchange", "æ›¿æ¢æ–‡ä»¶" },
+    { (uint32) (&FuncCfg), "Functions", "åŠŸèƒ½é…ç½®" }
 };
 const char ReservHead2[0x200 - CFG_ITEM_MAX * 0x20 - 0x10];
 
 #pragma userclass(nconst = CFG_PARA)
 
-/******************²ÎÊıÉèÖÃ********************************************/
+/******************å‚æ•°è®¾ç½®********************************************/
 
 #define PARA_VALUE_TOTAL    6
 #define PARA_STRING_TOTAL   2
@@ -50,24 +50,24 @@ const paraset_head_t ParaHead =
 
 const value_t ValueSet[PARA_VALUE_TOTAL] =
 {
-    { SLEEPTIME_VALUE, SLEEPTIME_MAX, SLEEPTIME_MIN, SLEEPTIME_STEP, "", "sleep time", "¹Ø»úÊ±¼ä(·ÖÖÓ)" },
-    { VOLUME_VALUE, VOLUME_MAX, VOLUME_MIN, VOLUME_STEP, "", "volume set", "ÒôÁ¿µÈ¼¶" },
-    { DEFVOLUME_VALUE, DEFVOLUME_MAX, DEFVOLUME_MIN, DEFVOLUME_STEP, "", "vol default", "Ä¬ÈÏÒôÁ¿" },
-    { RECGAIN_VALUE, RECGAIN_MAX, RECGAIN_MIN, RECGAIN_STEP, "", "Record gain", "Â¼ÒôÔöÒæ" },
-    { RECTIME_VALUE, RECTIME_MAX, RECTIME_MIN, RECTIME_STEP, "", "Record time", "Â¼ÒôÊ±¼ä(Ğ¡Ê±)" },
-    { NOR_RECTIME_VALUE, NOR_RECTIME_MAX, NOR_RECTIME_MIN, NOR_RECTIME_STEP, "", "Nor Record time", "NorÂ¼ÒôÊ±¼ä(Ãë)" }
+    { SLEEPTIME_VALUE, SLEEPTIME_MAX, SLEEPTIME_MIN, SLEEPTIME_STEP, "", "sleep time", "å…³æœºæ—¶é—´(åˆ†é’Ÿ)" },
+    { VOLUME_VALUE, VOLUME_MAX, VOLUME_MIN, VOLUME_STEP, "", "volume set", "éŸ³é‡ç­‰çº§" },
+    { DEFVOLUME_VALUE, DEFVOLUME_MAX, DEFVOLUME_MIN, DEFVOLUME_STEP, "", "vol default", "é»˜è®¤éŸ³é‡" },
+    { RECGAIN_VALUE, RECGAIN_MAX, RECGAIN_MIN, RECGAIN_STEP, "", "Record gain", "å½•éŸ³å¢ç›Š" },
+    { RECTIME_VALUE, RECTIME_MAX, RECTIME_MIN, RECTIME_STEP, "", "Record time", "å½•éŸ³æ—¶é—´(å°æ—¶)" },
+    { NOR_RECTIME_VALUE, NOR_RECTIME_MAX, NOR_RECTIME_MIN, NOR_RECTIME_STEP, "", "Nor Record time", "Norå½•éŸ³æ—¶é—´(ç§’)" }
 
 };
 
 const string_t StringSet[PARA_STRING_TOTAL] =
 {
-    { "AS260B_V0001", "Device Version", "Éè±¸°æ±¾" },
-    { "2013/11/18", "Firmware Date", "¹Ì¼şÈÕÆÚ" }
+    { "AS260B_V0001", "Device Version", "è®¾å¤‡ç‰ˆæœ¬" },
+    { "2013/11/18", "Firmware Date", "å›ºä»¶æ—¥æœŸ" }
 };
 
 #pragma userclass(nconst = CFG_KEY)
 
-/********************°´¼üÉèÖÃ**********************************************/
+/********************æŒ‰é”®è®¾ç½®**********************************************/
 //const uint8 KeyTotal = 5;
 //const uint8 TotalItem = 11;
 //const char  KeyReserv[14];
@@ -100,7 +100,7 @@ const key_infor_t KeyInfor[16] =
     { Msg_KeyFolderSub, 0, "FOLDERSUB" },
     { Msg_KeyClock, 0, "CLOCK" },
     { Msg_KeyCaraOk, 0, "CARAOK" },
-    { Msg_KeyPlayPause, 1, "PLAY/PAUSE" }, //PLAY¼ü²»¿ÉÅäÖÃ
+    { Msg_KeyPlayPause, 1, "PLAY/PAUSE" }, //PLAYé”®ä¸å¯é…ç½®
     { Msg_KeyLast, 0, "PREV" },
     { Msg_KeyREC, 0, "REC/AB" },
     { Msg_Keyautosleep, 0, "AUTOSLEEP" },
@@ -116,7 +116,7 @@ const key_infor_t KeyInfor[16] =
 
 #pragma userclass(nconst = CFG_AP)
 
-/********************AP ÅäÖÃ*****************************/
+/********************AP é…ç½®*****************************/
 //const uint8 TotalAP = 7;
 //const uint8 AvtiveAP = 1;
 //const char  Reserv[14];
@@ -126,14 +126,14 @@ const ap_cfg_head_t APCfg =
 
 const ap_infor_t APTable[MAX_AP_NUM] =
 {
-    { RESULT_MUSIC, 1, "Music", "ÒôÀÖ" },
-    { RESULT_RADIO, 1, "Radio", "ÊÕÒô»ú" },
-    { RESULT_LINEIN, 1, "Line-in", "ÒôÆµÊäÈë" },
-    { RESULT_CLOCK, 1, "Clock", "Ê±ÖÓ" }
+    { RESULT_MUSIC, 1, "Music", "éŸ³ä¹" },
+    { RESULT_RADIO, 1, "Radio", "æ”¶éŸ³æœº" },
+    { RESULT_LINEIN, 1, "Line-in", "éŸ³é¢‘è¾“å…¥" },
+    { RESULT_CLOCK, 1, "Clock", "æ—¶é’Ÿ" }
 };
 
 #pragma userclass(nconst = CFG_LAN)
-/******************ÓïÑÔÉèÖÃ*****************************************/
+/******************è¯­è¨€è®¾ç½®*****************************************/
 const lang_infor_t LanguageCfg =
 {
     0, 0,
@@ -146,7 +146,7 @@ const lang_infor_t LanguageCfg =
     }
 };
 
-/*************ÎÄ¼şÌæ»»******************/
+/*************æ–‡ä»¶æ›¿æ¢******************/
 #pragma userclass(nconst = CFG_FILE_EX)
 //const uint8 FileTotal = 10;
 //const char  FileExReserv[15];
@@ -160,7 +160,7 @@ const char FileName[CFG_AP_MAX][16] =
     "drv_ui.drv", "alarm.mp3", "welcome.bin"
 };
 
-/*¹¦ÄÜÅäÖÃÏî*/
+/*åŠŸèƒ½é…ç½®é¡¹*/
 #pragma userclass(nconst = CFG_FUNC)
 #define FUNC_ITEM_MAX   4
 
@@ -169,10 +169,10 @@ const func_cfg_t FuncCfg =
 
 const func_item_t FuncItem[FUNC_ITEM_MAX] =
 {
-    { 0, "", "Support KeyTone", "Ö§³Ö°´¼üÒô" },
-    { 0, "", "Support WAV", "Ö§³Ö WAV Â¼Òô" },
-    { 1, "", "Support TTS", "Ö§³ÖÓïÒô²¥±¨" },
-    { 0, "", "Support NorRec", "Ö§³ÖNorÂ¼Òô" }
+    { 0, "", "Support KeyTone", "æ”¯æŒæŒ‰é”®éŸ³" },
+    { 0, "", "Support WAV", "æ”¯æŒ WAV å½•éŸ³" },
+    { 1, "", "Support TTS", "æ”¯æŒè¯­éŸ³æ’­æŠ¥" },
+    { 0, "", "Support NorRec", "æ”¯æŒNorå½•éŸ³" }
 };
 
 const char FW_TYPE = 1;

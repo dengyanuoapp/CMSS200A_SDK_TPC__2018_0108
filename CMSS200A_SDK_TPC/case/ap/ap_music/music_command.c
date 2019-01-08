@@ -24,7 +24,7 @@ bool musicpSendCommand_bank(uint8 cmd, void *param)
     drm_flag = FALSE;
     if (cmd == MC_PLAY)
     {
-        if (g_Openparam.typeerror == 0) //Õı³£ÎÄ¼şÊ±½øĞĞÏÂÃæ²Ù×÷
+        if (g_Openparam.typeerror == 0) //æ­£å¸¸æ–‡ä»¶æ—¶è¿›è¡Œä¸‹é¢æ“ä½œ
         {
 #ifdef OPT_Sup_FadeIn_fun
             musicpSendCommand(MC_FADEINOUT, FADEIN_DEF | USE_FADEIN_TIME);
@@ -86,9 +86,9 @@ bool musicpSendCommand_bank(uint8 cmd, void *param)
  ********************************************************************************
  *             bool musicpSendCommand( uint8 cmd, uint16 param )
  *
- * Description : ¸ù¾İ²»Í¬µÄÎÄ¼şÀàĞÍÀ´Ñ¡Ôñ·¢µÄÃüÁî£¨¶ÔMODULE£©
+ * Description : æ ¹æ®ä¸åŒçš„æ–‡ä»¶ç±»å‹æ¥é€‰æ‹©å‘çš„å‘½ä»¤ï¼ˆå¯¹MODULEï¼‰
  *
- * Arguments   : cmd ÃüÁî param ²ÎÊı
+ * Arguments   : cmd å‘½ä»¤ param å‚æ•°
  *
  * Returns     : success/fail
  *

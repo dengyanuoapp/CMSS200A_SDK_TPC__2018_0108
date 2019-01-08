@@ -24,35 +24,35 @@ stmt  level    source
    13          const uint8 g_dir_urec[12] =
    14          { "UREC       " };
    15          
-   16          /* UsoundÂ¼ÒôÎÄ¼şÃû */
+   16          /* Usoundå½•éŸ³æ–‡ä»¶å */
    17          const uint8 FilenameHead[] =
    18          { "UREC" };
    19          
-   20          /*************È«¾Ö±äÁ¿¶¨Òå*********************************/
+   20          /*************å…¨å±€å˜é‡å®šä¹‰*********************************/
    21          
-   22          /* ¿ÉÂ¼×ÜÃëÊı*/
+   22          /* å¯å½•æ€»ç§’æ•°*/
    23          //uint32 total_sec = 0;
    24          
-   25          uint32 near g_free_space; //Ê£Óà´ÅÅÌ¿Õ¼ä//remaining disk space
+   25          uint32 near g_free_space; //å‰©ä½™ç£ç›˜ç©ºé—´//remaining disk space
    26          
-   27          /* µ±Ç°Â¼ÒôÎÄ¼şµÄpageÊı*/
+   27          /* å½“å‰å½•éŸ³æ–‡ä»¶çš„pageæ•°*/
    28          //uint32 near g_file_size;
    29          
    30          //comval_t g_comval;
    31          //alarm_vars_t g_alarm;
    32          record_vars_t near g_record_vars;
-   33          //uint8 near g_rec_from; //µ±Ç°µÄÂ¼ÒôÔ´ by ccm
+   33          //uint8 near g_rec_from; //å½“å‰çš„å½•éŸ³æº by ccm
    34          
-   35          /*  ¿ÉÂ¼Òô×ÜÊ±¼ä*/
+   35          /*  å¯å½•éŸ³æ€»æ—¶é—´*/
    36          //time_t_ext near time;
    37          
-   38          /* Â¼Òô×´Ì¬*/
+   38          /* å½•éŸ³çŠ¶æ€*/
    39          wav_rec_status_t rec_stat;
    40          
    41          resource_t inputSelect =
    42          { 0 };
    43          
-   44          /* Â¼Òô²ÎÊı½á¹¹*/
+   44          /* å½•éŸ³å‚æ•°ç»“æ„*/
    45          audio_format_t Rec_format;
    46          
    47          const int8 log_table[64] =
@@ -78,38 +78,38 @@ stmt  level    source
    63   1      
    64   1          if (!retbool)
    65   1          {
-   66   2              //Î´²å¿¨»òÇı¶¯×°ÔØÊ§°Ü
+   66   2              //æœªæ’å¡æˆ–é©±åŠ¨è£…è½½å¤±è´¥
    67   2              return USOUND_CARD_ERROR;
    68   2          }
    69   1      
-   70   1          //ÉèÖÃUSOUNDÂ¼ÒôÄ¿Â¼
+   70   1          //è®¾ç½®USOUNDå½•éŸ³ç›®å½•
    71   1          //retbool = reset_record_dir();
    72   1          reset_record_dir();
    73   1          //if(!retbool)
    74   1          //{
-   75   1          //ÉèÖÃÂ¼ÒôÄ¿Â¼Ê§°Ü
+   75   1          //è®¾ç½®å½•éŸ³ç›®å½•å¤±è´¥
    76   1          //return USOUND_SETDIR_ERROR;
    77   1          //}
    78   1      
-   79   1          //·ÖÎöÂ¼Òô¿ÉÂ¼Ê±¼ä
+   79   1          //åˆ†æå½•éŸ³å¯å½•æ—¶é—´
    80   1          parse_total_time();
    81   1      
    82   1          if (g_free_space == 0)
    83   1          {
-   84   2              //¿¨¿Õ¼äÒÑÂú, ÎŞ·¨Â¼Òô
+   84   2              //å¡ç©ºé—´å·²æ»¡, æ— æ³•å½•éŸ³
    85   2              return USOUND_CARD_FULL;
    86   2          }
    87   1      
    88   1          format_filename();
-   89   1          if (!gen_filename()) //²úÉúÂ¼ÒôÎÄ¼şĞòºÅÃû
+   89   1          if (!gen_filename()) //äº§ç”Ÿå½•éŸ³æ–‡ä»¶åºå·å
    90   1          {
-   91   2              //ÒÑ´ïµ½¸ÃÄ¿Â¼Â¼ÒôÎÄ¼şÊıÏŞÖÆ
+   91   2              //å·²è¾¾åˆ°è¯¥ç›®å½•å½•éŸ³æ–‡ä»¶æ•°é™åˆ¶
    92   2              return USOUND_DIR_FULL;
    93   2          }
    94   1      
    95   1          if (!StartMP2Record())
    96   1          {
-   97   2              //´´½¨ÎÄ¼şÊ§°Ü
+   97   2              //åˆ›å»ºæ–‡ä»¶å¤±è´¥
    98   2              return USOUND_CREAT_FAIL;
    99   2          }
   100   1          return 0;
@@ -117,7 +117,7 @@ stmt  level    source
   102          
   103          /*
   104           ********************************************************************************
-  105           * Description : ´ò¿ªUSOUNDÂ¼Òô
+  105           * Description : æ‰“å¼€USOUNDå½•éŸ³
   106           *
   107           * Arguments   : NULL
   108           *
@@ -156,7 +156,7 @@ stmt  level    source
                                {
                                    mp3rSendCommand(MC_PAUSE, 0);
                
-                                   retval = do_pause(); //ÔİÍ£½çÃæ
+                                   retval = do_pause(); //æš‚åœç•Œé¢
                
                                    if (retval != 0)
                                    {
@@ -165,7 +165,7 @@ stmt  level    source
                                        if (retval == RESULT_CARD_OUT)
                                        {
                                            status = saving;
-                                           //ÏÔÊ¾¿¨°Î³ö
+                                           //æ˜¾ç¤ºå¡æ‹”å‡º
                                            mp3rSendCommand(MC_STOP, 0);
                                            retval = RESULT_SD_OUT;
                                        }
@@ -192,7 +192,7 @@ stmt  level    source
                                if (g_record_vars.location.disk == 'H')
                                {
                                    status = saving;
-                                   //ÏÔÊ¾¿¨°Î³ö
+                                   //æ˜¾ç¤ºå¡æ‹”å‡º
                                    mp3rSendCommand(MC_STOP, 0);
                                    retval = RESULT_SD_OUT;
                                }
@@ -230,7 +230,7 @@ stmt  level    source
                                return retval;
                            }
                            ClearWatchDog();
-               #if 0            // Ôİ²»³¬Ê±ÍË³ö, ±ÜÃâÎÄ¼ş²»±£´æ
+               #if 0            // æš‚ä¸è¶…æ—¶é€€å‡º, é¿å…æ–‡ä»¶ä¸ä¿å­˜
                            i++;
                            if (i >= 2000)
                            {
@@ -240,7 +240,7 @@ stmt  level    source
                        }
                        mc_result = wavrProceed();
                
-                       if (mc_result == WRITE_ONE) //ÒÑĞ´Ò»¸öpage
+                       if (mc_result == WRITE_ONE) //å·²å†™ä¸€ä¸ªpage
                        {
                            g_free_space--;
                            if (g_free_space == 0)
@@ -259,7 +259,7 @@ stmt  level    source
                                }
                            }
                        }
-                       else if (mc_result == WRITE_WRONG) //ÖÂÃü´íÎó
+                       else if (mc_result == WRITE_WRONG) //è‡´å‘½é”™è¯¯
                        {
                            while (ap_get_message() != NULL)
                            {
@@ -293,13 +293,13 @@ stmt  level    source
   272          
   273          /*
   274           ********************************************************************************
-  275           * Description :    ×¼±¸¿ªÊ¼MP2   ¸ñÊ½Â¼Òô
+  275           * Description :    å‡†å¤‡å¼€å§‹MP2   æ ¼å¼å½•éŸ³
   276           *
   277           * Arguments   :  NULL
   278           *
   279           * Returns     :   success/fail
   280           *
-  281           * Notes       :   Ö÷ÒªÊÇµ÷ÓÃbasal½Ó¿Úº¯Êı·¢ÃüÁî
+  281           * Notes       :   ä¸»è¦æ˜¯è°ƒç”¨basalæ¥å£å‡½æ•°å‘å‘½ä»¤
   282           *
   283           ********************************************************************************
   284           */
@@ -326,13 +326,13 @@ stmt  level    source
   305   1      
   306   1          //Rec_format.bits = 18;
   307   1      
-  308   1          //¹Ì¶¨²ÉÑùÂÊ
+  308   1          //å›ºå®šé‡‡æ ·ç‡
   309   1          Rec_format.sample_rate = 8;
   310   1      
-  311   1          //¹Ì¶¨µ¥Í¨µÀ
+  311   1          //å›ºå®šå•é€šé“
   312   1          Rec_format.channel = SINGLE_CH;
   313   1      
-  314   1          //¹Ì¶¨±ÈÌØÂÊ 128k
+  314   1          //å›ºå®šæ¯”ç‰¹ç‡ 128k
   315   1          Rec_format.bit_rate[0] = 0 + '0';
   316   1          Rec_format.bit_rate[1] = 6 + '0';
   317   1          Rec_format.bit_rate[2] = 4 + '0';
@@ -340,7 +340,7 @@ stmt  level    source
   319   1      
 C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 6   
 
-  320   1          /* ´´½¨Â¼ÒôÎÄ¼ş*/
+  320   1          /* åˆ›å»ºå½•éŸ³æ–‡ä»¶*/
   321   1          result = mp3rSendCommand(MC_LOAD, (void *) g_record_vars.location.filename);
   322   1      
   323   1          return result;
@@ -362,14 +362,14 @@ stmt  level    source
   339          
   340          /*
   341           ********************************************************************************
-  342           * Description : ÉèÖÃÂ¼ÒôÈ±Ê¡Ä¿Â¼
+  342           * Description : è®¾ç½®å½•éŸ³ç¼ºçœç›®å½•
   343           *
   344           * Arguments   :
   345           *
-  346           * Returns     : ³É¹¦or Ê§°Ü
+  346           * Returns     : æˆåŠŸor å¤±è´¥
   347           *
-  348           * Notes       :  ¸ù¾İÂ¼Òô¸ñÊ½, ÉèÖÃÈ±Ê¡Ä¿Â¼ÎªRECORD/VOICE
-  349           *                   »òRECORD/MUSIC
+  348           * Notes       :  æ ¹æ®å½•éŸ³æ ¼å¼, è®¾ç½®ç¼ºçœç›®å½•ä¸ºRECORD/VOICE
+  349           *                   æˆ–RECORD/MUSIC
   350           ********************************************************************************
   351           */
   352          BOOL reset_record_dir(void)
@@ -391,7 +391,7 @@ stmt  level    source
   368   1          {
   369   2              status = FS_MakeDir(g_dir_urec);
   370   2              if (!status)
-  371   2              { return FALSE; } // ´´½¨Ä¿Â¼Ê§°Ü//create directory fail
+  371   2              { return FALSE; } // åˆ›å»ºç›®å½•å¤±è´¥//create directory fail
   372   2              else
   373   2              {
   374   3                  FS_CD(g_dir_urec);
@@ -432,14 +432,14 @@ stmt  level    source
   407          
   408          /*
   409           ********************************************************************************
-  410           * Description : ·ÖÎöÊ£Óà¿Õ¼ä,¼ÆËã¿ÉÂ¼ÒôÊ±¼ä
+  410           * Description : åˆ†æå‰©ä½™ç©ºé—´,è®¡ç®—å¯å½•éŸ³æ—¶é—´
   411           *
   412           * Arguments   :  NULL
   413           *
   414           * Returns     :  NULL
   415           *
-  416           * Notes       :  ¸ù¾İÊ£Óà¿Õ¼äg_free_space  ( ÒÔÉÈÇøÎªµ¥Î») , ¼ÆËã¿ÉÂ¼
-  417           *                   Ê±¼ä
+  416           * Notes       :  æ ¹æ®å‰©ä½™ç©ºé—´g_free_space  ( ä»¥æ‰‡åŒºä¸ºå•ä½) , è®¡ç®—å¯å½•
+  417           *                   æ—¶é—´
   418           ********************************************************************************
   419           */
   420          void parse_total_time(void)
@@ -480,20 +480,20 @@ stmt  level    source
   453          
   454          /*
   455           ********************************************************************************
-  456           * Description : ¸ù¾İĞòºÅÉú³ÉĞÂµÄ¿ÉÓÃÎÄ¼şÃû
+  456           * Description : æ ¹æ®åºå·ç”Ÿæˆæ–°çš„å¯ç”¨æ–‡ä»¶å
   457           *
-  458           * Arguments   : location->filename, Ô­À´µÄÎÄ¼şÃû
-  459           *               location->filename, Êä³öĞÂµÄÎÄ¼şÃû
+  458           * Arguments   : location->filename, åŸæ¥çš„æ–‡ä»¶å
+  459           *               location->filename, è¾“å‡ºæ–°çš„æ–‡ä»¶å
   460           *
-  461           * Returns     :  ĞÂÎÄ¼şµÄĞòºÅ, 01~99
-  462           *        Èç¹û01~99 ÎÄ¼ş´æÔÚ, ·µ»Ø0
+  461           * Returns     :  æ–°æ–‡ä»¶çš„åºå·, 01~99
+  462           *        å¦‚æœ01~99 æ–‡ä»¶å­˜åœ¨, è¿”å›0
   463           *
-  464           * Notes       :ÎÄ¼şÃû×Ö¸ñÊ½ : xxx000 WAV, xxx000 ACT, ***000 JPG...
-  465           *        Èç¹ûÊäÈëµÄÎÄ¼ş²»´æÔÚ,ÔòÖ±½Ó·µ»Ø
-  466           ¼ì²éÄ¿Â¼Âú×î³¤Ê±¼ä15s
-  467           Ë³Ğò²úÉúÏÂÒ»¸öÄ¿Â¼Ãû×î³¤Ê±¼ä1s.
+  464           * Notes       :æ–‡ä»¶åå­—æ ¼å¼ : xxx000 WAV, xxx000 ACT, ***000 JPG...
+  465           *        å¦‚æœè¾“å…¥çš„æ–‡ä»¶ä¸å­˜åœ¨,åˆ™ç›´æ¥è¿”å›
+  466           æ£€æŸ¥ç›®å½•æ»¡æœ€é•¿æ—¶é—´15s
+  467           é¡ºåºäº§ç”Ÿä¸‹ä¸€ä¸ªç›®å½•åæœ€é•¿æ—¶é—´1s.
   468           *
-  469           * TODO:        ²»ÒªÊ¹ÓÃ atoi(), ½ÚÊ¡128byte  (ok!)
+  469           * TODO:        ä¸è¦ä½¿ç”¨ atoi(), èŠ‚çœ128byte  (ok!)
   470           ********************************************************************************
   471           */
   472          int GenNewName_forUrec(file_location_urec_t *location)
@@ -503,21 +503,21 @@ stmt  level    source
   476   1          uint8 new_name[12];
   477   1          handle f;
   478   1      
-  479   1          //¸´ÖÆµ½new_name
+  479   1          //å¤åˆ¶åˆ°new_name
   480   1          memcpy(new_name, location->filename, 12);
   481   1      
-  482   1          // ¼ì²éÎÄ¼ş¼ĞÊÇ·ñº¬ÓĞ001Õâ¸öÎÄ¼ş,ÈçÃ»ÓĞRETURN 1
+  482   1          // æ£€æŸ¥æ–‡ä»¶å¤¹æ˜¯å¦å«æœ‰001è¿™ä¸ªæ–‡ä»¶,å¦‚æ²¡æœ‰RETURN 1
   483   1          new_name[4] = '0';
   484   1          new_name[5] = '0';
   485   1          new_name[6] = '1';
-  486   1          // Èç¹ûÎÄ¼ş²»´æÔÚ
+  486   1          // å¦‚æœæ–‡ä»¶ä¸å­˜åœ¨
   487   1          f = FS_FOpen(new_name, 0);
   488   1          if (f == NULL)
   489   1          {
   490   2              memcpy(location->filename, new_name, 11);
   491   2              location->filename[11] = 0;
-  492   2              // É¾³ıÎÄ¼ş³¤¶ÈÎª0µÄÎÄ¼ş.
-  493   2              //ÎÄ¼şÃûÒÑ¾­´æÔÚ£¬µ«ÎÄ¼ş³¤¶ÈÎª0Ê±openÒ²Ê§°Ü¡£
+  492   2              // åˆ é™¤æ–‡ä»¶é•¿åº¦ä¸º0çš„æ–‡ä»¶.
+  493   2              //æ–‡ä»¶åå·²ç»å­˜åœ¨ï¼Œä½†æ–‡ä»¶é•¿åº¦ä¸º0æ—¶openä¹Ÿå¤±è´¥ã€‚
   494   2              FS_FRemove(location->filename);
   495   2              return 1;
   496   2          }
@@ -526,7 +526,7 @@ stmt  level    source
   499   2              FS_FClose(f);
   500   2          }
   501   1      
-  502   1          // °´Ö¸¶¨µÄÖµ,¼ÌĞø²éÕÒ.
+  502   1          // æŒ‰æŒ‡å®šçš„å€¼,ç»§ç»­æŸ¥æ‰¾.
   503   1          memcpy(new_name, location->filename, 12);
   504   1          num = (new_name[4] - '0') * 100 + (new_name[5] - '0') * 10 + (new_name[6] - '0');
   505   1      
@@ -536,10 +536,10 @@ stmt  level    source
   509   2              itoa3(num, &new_name[4]);
   510   2          }
   511   1      
-  512   1          //Èç¹ûÎÄ¼ş´æÔÚ,Êı×Ö¼Ó1
+  512   1          //å¦‚æœæ–‡ä»¶å­˜åœ¨,æ•°å­—åŠ 1
   513   1          do
   514   1          {
-  515   2              // Èç¹ûÎÄ¼ş²»´æÔÚ
+  515   2              // å¦‚æœæ–‡ä»¶ä¸å­˜åœ¨
   516   2              ClearWatchDog();
   517   2              f = FS_FOpen(new_name, 0);
 C251 COMPILER V4.55,  usound_rec                                                           13/12/18  16:28:55  PAGE 9   
@@ -570,16 +570,16 @@ stmt  level    source
   541          
   542          /*
   543           ********************************************************************************
-  544           * Description : Éú³ÉĞÂµÄÂ¼ÒôÎÄ¼şÃû
+  544           * Description : ç”Ÿæˆæ–°çš„å½•éŸ³æ–‡ä»¶å
   545           *
   546           * Arguments   : NULL
   547           *
-  548           * Returns     : TRUE, ³É¹¦
-  549           FALSE, ±àºÅ01~99 ÎÄ¼ş¶¼´æÔÚ
-  550           È«¾Ö±äÁ¿
+  548           * Returns     : TRUE, æˆåŠŸ
+  549           FALSE, ç¼–å·01~99 æ–‡ä»¶éƒ½å­˜åœ¨
+  550           å…¨å±€å˜é‡
   551           g_record_vars.location
   552           g_record_vars.wav_num
-  553           g_file_name_time[], ÎÄ¼şÃû,ÎÄ¼şÊ±¼ä×Ö·û´®
+  553           g_file_name_time[], æ–‡ä»¶å,æ–‡ä»¶æ—¶é—´å­—ç¬¦ä¸²
   554           *
   555           * Notes       :
   556           *

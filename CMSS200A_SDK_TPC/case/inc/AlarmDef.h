@@ -30,8 +30,8 @@ typedef struct
     BOOL AlarmEnable;
     date_t alarmDate;
     time_t alarmTime;
-    file_location_t location; //ÏìÓ¦ÄÖÖÓÊ±Ëù²¥·ÅÒôÀÖµÄÂ·¾¶
-    uint8 volume; //ÄÖÖÓÒôÀÖ²¥·ÅÊ±£¬ÒôÁ¿µÄ´óĞ¡
+    file_location_t location; //å“åº”é—¹é’Ÿæ—¶æ‰€æ’­æ”¾éŸ³ä¹çš„è·¯å¾„
+    uint8 volume; //é—¹é’ŸéŸ³ä¹æ’­æ”¾æ—¶ï¼ŒéŸ³é‡çš„å¤§å°
     uint8 UdiskDriveNO;
 } alarm_vars_t;
 

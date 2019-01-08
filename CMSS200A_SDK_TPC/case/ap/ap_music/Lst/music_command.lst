@@ -35,7 +35,7 @@ stmt  level    source
    24   1          drm_flag = FALSE;
    25   1          if (cmd == MC_PLAY)
    26   1          {
-   27   2              if (g_Openparam.typeerror == 0) //Õı³£ÎÄ¼şÊ±½øĞĞÏÂÃæ²Ù×÷
+   27   2              if (g_Openparam.typeerror == 0) //æ­£å¸¸æ–‡ä»¶æ—¶è¿›è¡Œä¸‹é¢æ“ä½œ
    28   2              {
    29   3      #ifdef OPT_Sup_FadeIn_fun
                            musicpSendCommand(MC_FADEINOUT, FADEIN_DEF | USE_FADEIN_TIME);
@@ -99,9 +99,9 @@ stmt  level    source
    86           ********************************************************************************
    87           *             bool musicpSendCommand( uint8 cmd, uint16 param )
    88           *
-   89           * Description : ¸ù¾İ²»Í¬µÄÎÄ¼şÀàĞÍÀ´Ñ¡Ôñ·¢µÄÃüÁî£¨¶ÔMODULE£©
+   89           * Description : æ ¹æ®ä¸åŒçš„æ–‡ä»¶ç±»å‹æ¥é€‰æ‹©å‘çš„å‘½ä»¤ï¼ˆå¯¹MODULEï¼‰
    90           *
-   91           * Arguments   : cmd ÃüÁî param ²ÎÊı
+   91           * Arguments   : cmd å‘½ä»¤ param å‚æ•°
    92           *
    93           * Returns     : success/fail
    94           *

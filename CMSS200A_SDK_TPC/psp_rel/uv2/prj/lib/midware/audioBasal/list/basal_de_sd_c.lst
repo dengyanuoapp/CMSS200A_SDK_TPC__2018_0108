@@ -36,7 +36,7 @@ stmt  level    source
    25          #pragma name(MW_BS_AD_CMD2_SD)
    26          
    27          extern HANDLE m_deSd_Fp;
-   28          extern Open_param_t *m_deSdOpenparam; //≤Œ ˝±Ìµÿ÷∑
+   28          extern Open_param_t *m_deSdOpenparam; //ÂèÇÊï∞Ë°®Âú∞ÂùÄ
    29          
    30          //extern uint32 deSdApointerSave;
    31          //extern uint32 deSdBpointerSave;
@@ -56,12 +56,12 @@ stmt  level    source
    45   1          //    m_deSdOpenparam->BreakPTSave->ApointSave = deSdApointerSave;
    46   1          //    m_deSdOpenparam->BreakPTSave->BpointSave = deSdBpointerSave;
    47   1          m_deSdOpenparam->BreakPTSave->breakPT = deSdBreakPointSave;
-   48   1          //    if (m_Sdbackupmode == 0)//∂œµ„–¯≤•±∏∑›
+   48   1          //    if (m_Sdbackupmode == 0)//Êñ≠ÁÇπÁª≠Êí≠Â§á‰ªΩ
    49   1          //    {
    50   1          //        memcpy(&(m_deSdOpenparam->BreakPTSave->breakPointInfor), &g_decBreakPointInfor, sizeof(decB
              -reakPointInfor_t));
    51   1          //    }
-   52   1          //    else//AB ∏¥∂¡π˝≥Ã÷–µƒ∂œµ„≤ª±£¥Ê£¨÷ª «±£¥ÊAµ„£¨“‘∫Û∂œµ„–¯≤•¥”Aµ„ø™ º
+   52   1          //    else//AB Â§çËØªËøáÁ®ã‰∏≠ÁöÑÊñ≠ÁÇπ‰∏ç‰øùÂ≠òÔºåÂè™ÊòØ‰øùÂ≠òAÁÇπÔºå‰ª•ÂêéÊñ≠ÁÇπÁª≠Êí≠‰ªéAÁÇπÂºÄÂßã
    53   1          //    {
    54   1          //        memcpy(&(m_deSdOpenparam->BreakPTSave->breakPointInfor), &m_SdbreakPointInfo, sizeof(decBre
              -akPointInfor_t));
@@ -86,7 +86,7 @@ stmt  level    source
    70          //    g_decControlInfor.PlayMode = PLAY_MODE_BREAK;
    71          //    memcpy(&g_decBreakPointInfor, &m_SdbreakPointInfo, sizeof(decBreakPointInfor_t));
    72          //    SD_FSeek(0, FS_SEEK_FFROMSTART, m_deSd_Fp);
-   73          //    decInit();//º∆À„ ±º‰≤ªµ≠»Î
+   73          //    decInit();//ËÆ°ÁÆóÊó∂Èó¥‰∏çÊ∑°ÂÖ•
    74          //    decstart();
    75          //    return TRUE;
    76          //}

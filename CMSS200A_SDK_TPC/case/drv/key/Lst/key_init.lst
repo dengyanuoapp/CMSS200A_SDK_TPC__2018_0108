@@ -22,12 +22,12 @@ stmt  level    source
    12   1          SFR_BANK = BANK_PMU;
    13   1          PMUADC_CTL |= 0xa0; //enable LRADC1,ADC FREQUENCY 128Hz
    14   1          _nop_();
-   15   1          delay(); //enable LRADC1ºóĞèÒªµÈ´ı×î³¤10ms²ÅÄÜ¶Á³öÕıÈ·µÄÊı¾İ£¬·ñÔò¿ÉÄÜÊÇÈ«0
-   16   1          SYSTEM_CTL &= 0x7f; //ÉèÖÃplay°´¼üÊ±¼ä=2S
+   15   1          delay(); //enable LRADC1åéœ€è¦ç­‰å¾…æœ€é•¿10msæ‰èƒ½è¯»å‡ºæ­£ç¡®çš„æ•°æ®ï¼Œå¦åˆ™å¯èƒ½æ˜¯å…¨0
+   16   1          SYSTEM_CTL &= 0x7f; //è®¾ç½®playæŒ‰é”®æ—¶é—´=2S
    17   1      
    18   1              adjust_key_sequence();
    19   1              
-   20   1          TM_SetTimer((uint32) key_scan, 2); //ÉèÖÃRTCÖĞ¶Ïº¯ÊıÈë¿Ú
+   20   1          TM_SetTimer((uint32) key_scan, 2); //è®¾ç½®RTCä¸­æ–­å‡½æ•°å…¥å£
    21   1          //   TM_SetClock((int) (uint16) key_scan, 1);
    22   1      
    23   1          //ctc set
@@ -36,7 +36,7 @@ stmt  level    source
    26   1          CTCCNTL = 0x1a; //0x52;
    27   1          CTCCTL = 0xc0; //0xc8;       /256  hosc
    28   1      
-   29   1          IRQ_Intercept((uint32) ctc_isr, IRQ_CTC); //ÉèÖÃCTCÖĞ¶Ïº¯ÊıÈë¿Ú
+   29   1          IRQ_Intercept((uint32) ctc_isr, IRQ_CTC); //è®¾ç½®CTCä¸­æ–­å‡½æ•°å…¥å£
    30   1          CTCCTL |= 1 << 7; //enable ctc
    31   1          IE0 |= 1 << 1; //enable IE.1
    32   1      
@@ -63,7 +63,7 @@ stmt  level    source
    53          void key_exit(uint8 api_no)
    54          {
    55   1          api_no = api_no;
-   56   1          TM_KillTimer(0x02); //¹Ø±ÕRTC
+   56   1          TM_KillTimer(0x02); //å…³é—­RTC
    57   1          IE0 &= ~(1 << 1); //disable IE.1
    58   1          IRQ_Release((uint16) ctc_isr, IRQ_CTC);
 C251 COMPILER V4.55,  key_init                                                             13/12/18  16:28:33  PAGE 2   
@@ -124,7 +124,7 @@ stmt  level    source
   112   1          SFR_BANK = sfr_temp;
   113   1      
   114   1      }
-  115          //³õÊ¼ºìÍâÒ£¿ØÆ÷°´¼üÏà¹ØµÄ¼Ä´æÆ÷
+  115          //åˆå§‹çº¢å¤–é¥æ§å™¨æŒ‰é”®ç›¸å…³çš„å¯„å­˜å™¨
   116          void init_ir(void)
   117          {
   118   1      #if 0
@@ -139,8 +139,8 @@ stmt  level    source
                    CLKENCTL1 |= 0x20;
                
                    SFR_BANK = BANK_GPIO;
-                   //Êı×ÖºìÍâÖ¸Íâ½ÓºìÍâÍ·
-                   //Ä£ÄâºìÍâÖ¸Íâ½Ó¶ş¼«¹Ü
+                   //æ•°å­—çº¢å¤–æŒ‡å¤–æ¥çº¢å¤–å¤´
+                   //æ¨¡æ‹Ÿçº¢å¤–æŒ‡å¤–æ¥äºŒæç®¡
                    //set GPIO_c5 as IR_RX
                    GPIOCOUTEN &= 0xDF;
                    GPIOCINEN &= 0xDF;
@@ -154,7 +154,7 @@ stmt  level    source
                    IR_HUC = 0xbf; //IRC high user code
                    IE0 |= 0x10; //enable IRC interrupt
                    SFR_BANK = sfr_bak;
-                   //×¢²áIRÖĞ¶Ï
+                   //æ³¨å†ŒIRä¸­æ–­
                    IRQ_Intercept((uint32) IR_Interrupt, IRQ_UART);
                #endif
   146   1      }
@@ -171,15 +171,15 @@ stmt  level    source
   157   1          uint8 sfr_bak;
   158   1          sfr_bak = SFR_BANK;
   159   1          SFR_BANK = BANK_GPIO;
-  160   1          //Ê¹ÄÜbat¼ì²â,½«GPIO A6ÇĞ»»µ½LCD_seg2Ä£Ê½
+  160   1          //ä½¿èƒ½batæ£€æµ‹,å°†GPIO A6åˆ‡æ¢åˆ°LCD_seg2æ¨¡å¼
   161   1          BAT_CHECK_GPIO_INPUT &= ~ (1 << BAT_CHECK_GPIO_NUM);
   162   1          MFP_CTL0 &= 0xEF;
   163   1          MFP_CTL0 |= 0x08;
-  164   1          //Ê¹ÄÜred light¿ª¹ØGPIO ¿Ú
+  164   1          //ä½¿èƒ½red lightå¼€å…³GPIO å£
   165   1          RED_LIGHT_GPIO_OUTPUT |= (1 << RED_LIGHT_GPIO_NUM);
   166   1          RED_LIGHT_GPIO_DAT &= ~(1 << RED_LIGHT_GPIO_NUM);
   167   1      #if 0
-                   //Ê¹ÄÜblue light¿ª¹ØGPIO ¿Ú
+                   //ä½¿èƒ½blue lightå¼€å…³GPIO å£
                    BLUE_LIGHT_GPIO_OUTPUT |= (1 << BLUE_LIGHT_GPIO_NUM);
                    BLUE_LIGHT_GPIO_DAT &= ~(1 << BLUE_LIGHT_GPIO_NUM);
                #endif
@@ -244,8 +244,8 @@ stmt  level    source
 *** WARNING C47 IN LINE 210 OF KEY_INIT.C: 'api_no': unreferenced parameter
 *** WARNING C47 IN LINE 210 OF KEY_INIT.C: 'light_type': unreferenced parameter
 *** WARNING C47 IN LINE 210 OF KEY_INIT.C: 'flag': unreferenced parameter
-  227          //½«GPIOC6ÇĞ»»µ½AVCC1Ä£Ê½£¬ÒÔ±ã¸ømic¶Ë¹©µç
-  228          //½«GPIOC7ÇĞ»»µ½LRADC5,ÓÃÓÚ×÷ÎªLRADC°´¼üÊ¹ÓÃ
+  227          //å°†GPIOC6åˆ‡æ¢åˆ°AVCC1æ¨¡å¼ï¼Œä»¥ä¾¿ç»™micç«¯ä¾›ç”µ
+  228          //å°†GPIOC7åˆ‡æ¢åˆ°LRADC5,ç”¨äºä½œä¸ºLRADCæŒ‰é”®ä½¿ç”¨
   229          void init_ADSelect0(void)
   230          {
   231   1          uint8 sfr_bak;

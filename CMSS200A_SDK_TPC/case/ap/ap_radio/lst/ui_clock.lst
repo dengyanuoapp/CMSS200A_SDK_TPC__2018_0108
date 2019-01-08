@@ -60,7 +60,7 @@ stmt  level    source
    49          {
    50   1          switch (set_what)
    51   1          {
-   52   2          case 0://ÉèÖÃÄê·İ
+   52   2          case 0://è®¾ç½®å¹´ä»½
    53   2              if (show_what == 0)
    54   2              {
    55   3                  memset(temp_buffer, 0xff, 0x04);
@@ -78,7 +78,7 @@ stmt  level    source
    65   3                  itoa4(date.year, temp_buffer);
    66   3              }
    67   2              break;
-   68   2          case 1://ÉèÖÃÔÂ·İ
+   68   2          case 1://è®¾ç½®æœˆä»½
    69   2              if (show_what == 0)
    70   2              {
    71   3                  memset(temp_buffer, 0xff, 0x02);
@@ -97,7 +97,7 @@ stmt  level    source
    84   3              }
    85   2              itoa2(date.day, &temp_buffer[2]);
    86   2              break;
-   87   2          case 2://ÉèÖÃÈÕÆÚ(Ê±¼äÉèÖÃ)»òÉèÖÃÄÖÖÓ¿ª¹Ø(ÄÖÖÓÉèÖÃ)
+   87   2          case 2://è®¾ç½®æ—¥æœŸ(æ—¶é—´è®¾ç½®)æˆ–è®¾ç½®é—¹é’Ÿå¼€å…³(é—¹é’Ÿè®¾ç½®)
    88   2              if (CurUI_Type == TimeSet_UI)
    89   2              {
    90   3                  itoa2(date.month, temp_buffer);
@@ -130,7 +130,7 @@ stmt  level    source
   117   3                  return;
   118   3              }
   119   2              break;
-  120   2          case 3://ÉèÖÃÊ±¼äÖĞµÄÊ±
+  120   2          case 3://è®¾ç½®æ—¶é—´ä¸­çš„æ—¶
   121   2              if (show_what == 0)
   122   2              {
   123   3                  memset(temp_buffer, 0xff, 0x02);
@@ -153,7 +153,7 @@ stmt  level    source
   138   3              }
   139   2              itoa2(time.minute, &temp_buffer[2]);
   140   2              break;
-  141   2          case 4://ÉèÖÃÊ±¼äÖĞµÄ·Ö
+  141   2          case 4://è®¾ç½®æ—¶é—´ä¸­çš„åˆ†
   142   2              itoa2(time.hour, temp_buffer);
   143   2              if (show_what == 0)
   144   2              {
@@ -183,12 +183,12 @@ stmt  level    source
   168   1          switch(CurUI_Type)
   169   1          {
   170   2          case Clock_UI:
-  171   2              //ÏÔÊ¾µ±Ç°µÄÏµÍ³Ê±¼ä
+  171   2              //æ˜¾ç¤ºå½“å‰çš„ç³»ç»Ÿæ—¶é—´
   172   2              ShowTimer();
   173   2              break;
   174   2          case TimeSet_UI:
   175   2          case AlarmSet_UI:
-  176   2              //ÏÔÊ¾Ê±¼äÉèÖÃ»òÄÖÖÓÉèÖÃ½çÃæ
+  176   2              //æ˜¾ç¤ºæ—¶é—´è®¾ç½®æˆ–é—¹é’Ÿè®¾ç½®ç•Œé¢
   177   2              show_time_setting();
   178   2              break;
   179   2          default:
@@ -207,7 +207,7 @@ stmt  level    source
   190   3                  show_clock_ui();
   191   3                  need_draw = FALSE;
   192   3              }
-  193   2              key = ap_get_message(); //¶Á¼üÖµ
+  193   2              key = ap_get_message(); //è¯»é”®å€¼
   194   2              switch (key)
   195   2              {
   196   3              case AP_MSG_RTC:
@@ -279,7 +279,7 @@ stmt  level    source
                            }
                            if (g_comval.volume != 0)
                            {
-                               fmSendCommand(FM_MUTE, releaseMUTE, NULL); //½â³ı¾²Òô
+                               fmSendCommand(FM_MUTE, releaseMUTE, NULL); //è§£é™¤é™éŸ³
                            }
                            fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
                            break;

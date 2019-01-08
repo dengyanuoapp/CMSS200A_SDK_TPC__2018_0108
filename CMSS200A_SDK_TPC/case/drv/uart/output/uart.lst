@@ -23,9 +23,9 @@ stmt  level    source
    13           * \brief    .
    14           * \author   dengtaiping
    15           * \par      GENERAL DESCRIPTION:
-   16           *               usb、AUDIO等模块初始化
+   16           *               usb銆丄UDIO绛夋ā鍧楀垵濮嬪寲
    17           * \par      EXTERNALIZED FUNCTIONS:
-   18           *               这里描述调用到外面的模块
+   18           *               杩欓噷鎻忚堪璋冪敤鍒板闈㈢殑妯″潡
    19           *
    20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
    21           *

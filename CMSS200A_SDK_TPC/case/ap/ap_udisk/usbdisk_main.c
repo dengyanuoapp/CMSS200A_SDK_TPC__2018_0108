@@ -13,9 +13,9 @@
  * \brief
  * \author   wanghaijing
  * \par      GENERAL DESCRIPTION:
- *               ÕâÀï¶ÔÎÄ¼ş½øĞĞÃèÊö
+ *               è¿™é‡Œå¯¹æ–‡ä»¶è¿›è¡Œæè¿°
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
  *
@@ -43,10 +43,10 @@ int16 main(void)
     uint8 dispIndibak = 0xff;
     DisplayIndi = 0x00;
     IRUSBExit = 0;
-    /*AP³õÊ¼»¯*/
+    /*APåˆå§‹åŒ–*/
     if (!UDiskInitAll(para))
     {
-        //ÌáÇ°°ÎÏßÍË³ö
+        //æå‰æ‹”çº¿é€€å‡º
         UdiskStatus = 0x40;
         return UdiskExitAll();
     }
@@ -61,11 +61,11 @@ int16 main(void)
             IsCardOut = 0;
         }
 
-        //µ÷ÓÃ×´Ì¬»úÖ´ĞĞÃüÁî
+        //è°ƒç”¨çŠ¶æ€æœºæ‰§è¡Œå‘½ä»¤
         UDiskHandle();
-        //»ñÈ¡USB×´Ì¬
-        //0:¿ÕÏĞ  10h:ÉÏ´«  20h:ÏÂ´«  30h:µ¯³öÒªÇóÍË³ö  40h:°ÎÏßÒªÇóÍË³ö  50h:ÇĞ»»µ½ÈÍ¼şÉı¼¶Ó¦ÓÃ
-        //60h:·ÖÇø´¦Àí×´Ì¬  70h:³ö´íÒªÇóÍË³ö  80h:½øÈëSuspend×´Ì¬  90h:ÍË³öSuspend×´Ì¬
+        //è·å–USBçŠ¶æ€
+        //0:ç©ºé—²  10h:ä¸Šä¼   20h:ä¸‹ä¼   30h:å¼¹å‡ºè¦æ±‚é€€å‡º  40h:æ‹”çº¿è¦æ±‚é€€å‡º  50h:åˆ‡æ¢åˆ°éŸ§ä»¶å‡çº§åº”ç”¨
+        //60h:åˆ†åŒºå¤„ç†çŠ¶æ€  70h:å‡ºé”™è¦æ±‚é€€å‡º  80h:è¿›å…¥SuspendçŠ¶æ€  90h:é€€å‡ºSuspendçŠ¶æ€
         UdiskStatus = UDiskGetStatus();
         if ((DisplayIndi == 0xff) && (UdiskStatus != 0x80))
         {
@@ -78,7 +78,7 @@ int16 main(void)
 
         switch (UdiskStatus)
         {
-        case 0: //¿ÕÏĞ
+        case 0: //ç©ºé—²
             if (DisplayIndi != 0x00)
             {
                 DisplayIndi = 0x00;
@@ -93,18 +93,18 @@ int16 main(void)
 #endif
             break;
 
-        case 0x10: //ÉÏ´«
+        case 0x10: //ä¸Šä¼ 
             if (DisplayIndi != 0x01)
             {
                 DisplayIndi = 0x01;
             }
             break;
 
-        case 0x11://ÏÔÊ¾Commu
-        case 0x21://ÏÔÊ¾DownLoad
-        case 0x31://ÏÔÊ¾UpLoad
-        case 0x41://ÏÔÊ¾Succ
-        case 0x61://ÏÔÊ¾Succ£¬ÍË³ö
+        case 0x11://æ˜¾ç¤ºCommu
+        case 0x21://æ˜¾ç¤ºDownLoad
+        case 0x31://æ˜¾ç¤ºUpLoad
+        case 0x41://æ˜¾ç¤ºSucc
+        case 0x61://æ˜¾ç¤ºSuccï¼Œé€€å‡º
             DisplayIndi = UdiskStatus >> 4;
             if (UdiskStatus == 0x61)
             {
@@ -117,18 +117,18 @@ int16 main(void)
             }
             break;
 
-        case 0x51: //ÇĞ»»µ½adfu
-            //¹Ø¼üÅÌºÍRTCÖĞ¶Ï
+        case 0x51: //åˆ‡æ¢åˆ°adfu
+            //å…³é”®ç›˜å’ŒRTCä¸­æ–­
             IE0 = IE0 & 0xf7;
             DisplayIndi = 0x10;
-            //±£Ö¤Ö»ÏÔÊ¾Ò»´Î
+            //ä¿è¯åªæ˜¾ç¤ºä¸€æ¬¡
             if (dispIndibak != DisplayIndi)
             {
                 dispIndibak = DisplayIndi;
             }
             break;
 
-        case 0x20: //ÏÂ´«
+        case 0x20: //ä¸‹ä¼ 
             if (DisplayIndi != 0x02)
             {
                 DisplayIndi = 0x02;
@@ -136,11 +136,11 @@ int16 main(void)
             }
             break;
 
-        case 0x80: //½øÈësuspend
+        case 0x80: //è¿›å…¥suspend
             DisplayIndi = 0xff;
             break;
 
-        case 0x90: //ÍË³öSuspend×´Ì¬
+        case 0x90: //é€€å‡ºSuspendçŠ¶æ€
             //StandbyScreen(1);
             //SetContrast(g_comval.DisplayContrast);
             break;
@@ -148,7 +148,7 @@ int16 main(void)
         default:
             break;
         }
-        if (((MenuKeyPress == 1) && (UdiskStatus == 0)) || (UdiskStatus == 0x90) || (IRUSBExit == 1))// ¶ÔÓ¦ºìÍâÒ£¿ØÉÏÃæµÄPower¼ü
+        if (((MenuKeyPress == 1) && (UdiskStatus == 0)) || (UdiskStatus == 0x90) || (IRUSBExit == 1))// å¯¹åº”çº¢å¤–é¥æ§ä¸Šé¢çš„Poweré”®
         {
             longkey_flag = 1;
             break;

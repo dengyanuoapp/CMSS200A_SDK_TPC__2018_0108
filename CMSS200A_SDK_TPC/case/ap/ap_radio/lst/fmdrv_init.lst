@@ -40,7 +40,7 @@ stmt  level    source
    29          };
    30          
    31          /**********************************************************************
-   32           * Description: ³õÊ¼»¯FMÄ£×é
+   32           * Description: åˆå§‹åŒ–FMæ¨¡ç»„
    33           *
    34           * Arguments: none
    35           *
@@ -52,15 +52,15 @@ stmt  level    source
    41          uint8 QN_ChipInitialization(void)
    42          {
    43   1          //reset all registers, CCA_CH_DIS =1
-   44   1          QND_WriteReg(0x00, 0x81);//¶ÔËùÓĞ¼Ä´æÆ÷¸´Î»
-   45   1          TM_DelayMS(20); //ÑÓÊ±10MSÒÔÉÏ£¬µÈ´ı¸´Î»Íê³É
+   44   1          QND_WriteReg(0x00, 0x81);//å¯¹æ‰€æœ‰å¯„å­˜å™¨å¤ä½
+   45   1          TM_DelayMS(20); //å»¶æ—¶10MSä»¥ä¸Šï¼Œç­‰å¾…å¤ä½å®Œæˆ
    46   1      
    47   1          // change crystal frequency setting here
-   48   1          //ÉèÖÃbit7Ñ¡ÔñÊ±ÖÓÔ´
+   48   1          //è®¾ç½®bit7é€‰æ‹©æ—¶é’Ÿæº
    49   1          QNF_SetRegBit(0x01, 0x80, 0x00);//setting clock source type:  0  sine-wave clock or  1  digital clock
-   50   1          //ÒÔ0x15,0x16,0x17½øĞĞÉèÖÃÀ´Ñ¡ÔñÊ±ÖÓÆµÂÊ
-   51   1          //Èç¹ûÊ±ÖÓÆµÂÊÎª32.768KHzÔò¿ÉÒÔ²»¶ÔÕâ3¸ö¼Ä´æÆ÷½øĞĞ²Ù×÷(Ê¹ÓÃÄ¬ÈÏÖµ)
-   52   1          QND_WriteReg(XTAL_DIV0, QND_XTAL_DIV0); //ÉèÖÃÊ±ÖÓÆµÂÊ
+   50   1          //ä»¥0x15,0x16,0x17è¿›è¡Œè®¾ç½®æ¥é€‰æ‹©æ—¶é’Ÿé¢‘ç‡
+   51   1          //å¦‚æœæ—¶é’Ÿé¢‘ç‡ä¸º32.768KHzåˆ™å¯ä»¥ä¸å¯¹è¿™3ä¸ªå¯„å­˜å™¨è¿›è¡Œæ“ä½œ(ä½¿ç”¨é»˜è®¤å€¼)
+   52   1          QND_WriteReg(XTAL_DIV0, QND_XTAL_DIV0); //è®¾ç½®æ—¶é’Ÿé¢‘ç‡
    53   1          QND_WriteReg(XTAL_DIV1, QND_XTAL_DIV1);
    54   1          QND_WriteReg(XTAL_DIV2, QND_XTAL_DIV2);
    55   1      
@@ -72,11 +72,11 @@ stmt  level    source
    59   1          QND_WriteReg(0x2d, 0xD6);//notch filter threshold adjusting
    60   1          QND_WriteReg(0x43, 0x10);//notch filter threshold enable
    61   1      
-   62   1          //·¢ËÍÓĞÏŞ×´Ì¬»úĞ£ÑéÃüÁî¸øqn8035
+   62   1          //å‘é€æœ‰é™çŠ¶æ€æœºæ ¡éªŒå‘½ä»¤ç»™qn8035
    63   1          QND_WriteReg(0x00, 0x51);//reset the FSM
-   64   1          //·¢ËÍÓĞÏŞ×´Ì¬»ú¼ìÑéÃüÁîÍê³É
+   64   1          //å‘é€æœ‰é™çŠ¶æ€æœºæ£€éªŒå‘½ä»¤å®Œæˆ
    65   1          QND_WriteReg(0x00, 0x21);//enter standby mode
-   66   1          //µÈ´ıÓĞÏŞ×´Ì¬»ú¼ìÑéÍê³É
+   66   1          //ç­‰å¾…æœ‰é™çŠ¶æ€æœºæ£€éªŒå®Œæˆ
    67   1          TM_DelayMS(100);
    68   1      
    69   1          //these variables are used in QNF_SetCh() function.
@@ -161,13 +161,13 @@ stmt  level    source
   146           ********************************************************************************
   147           *             uint8 FMdrv_Init(uint8 mode)
   148           *
-  149           * Description : FM ³õÊ¼»¯º¯Êı
+  149           * Description : FM åˆå§‹åŒ–å‡½æ•°
   150           *
-  151           * Arguments   : mode: Ôİ²»Ê¹ÓÃ
+  151           * Arguments   : mode: æš‚ä¸ä½¿ç”¨
   152           *
-  153           * Returns     : Èô³õÊ¼»¯³É¹¦,Ôò·µ»Ø1,·ñÔò,·µ»Ø0
+  153           * Returns     : è‹¥åˆå§‹åŒ–æˆåŠŸ,åˆ™è¿”å›1,å¦åˆ™,è¿”å›0
   154           *
-  155           * Notes       : ÓÉÇı¶¯°²×°º¯Êıµ÷ÓÃ
+  155           * Notes       : ç”±é©±åŠ¨å®‰è£…å‡½æ•°è°ƒç”¨
   156           *
   157           ********************************************************************************
   158           */
@@ -189,15 +189,15 @@ stmt  level    source
   174           ********************************************************************************
   175           *             uint8 FMdrv_hardware(uint8 onoff,  uint8 PA_mode)
   176           *
-  177           * Description : FM Ïà¹ØÓ²¼ş²Ù×÷, ÈçAIN, PAµÈ
+  177           * Description : FM ç›¸å…³ç¡¬ä»¶æ“ä½œ, å¦‚AIN, PAç­‰
   178           *
-  179           * Arguments   : onoff:  1--´ò¿ªFMÊ±    0--¹Ø±ÕFMÊ±
-  180           *               PA_mode:   1-- Òª²Ù×÷PA    0--²»²Ù×÷PA
+  179           * Arguments   : onoff:  1--æ‰“å¼€FMæ—¶    0--å…³é—­FMæ—¶
+  180           *               PA_mode:   1-- è¦æ“ä½œPA    0--ä¸æ“ä½œPA
   181           *
-  182           * Returns     : Èô³É¹¦,Ôò·µ»Ø1,·ñÔò,·µ»Ø0
+  182           * Returns     : è‹¥æˆåŠŸ,åˆ™è¿”å›1,å¦åˆ™,è¿”å›0
   183           *
-  184           * Notes       : 1. ´Ëº¯ÊıÒª½áºÏÇı¶¯µÄ°²×°Ğ¶ÔØÀ´µ÷ÓÃ
-  185           *               2. PA_mode Ö÷ÒªÊÇÎª¼æÈİÄ³Ğ©Ä£×é, ÔÚmain AP ÖĞĞèÒª½østandby¶øÓÃ
+  184           * Notes       : 1. æ­¤å‡½æ•°è¦ç»“åˆé©±åŠ¨çš„å®‰è£…å¸è½½æ¥è°ƒç”¨
+  185           *               2. PA_mode ä¸»è¦æ˜¯ä¸ºå…¼å®¹æŸäº›æ¨¡ç»„, åœ¨main AP ä¸­éœ€è¦è¿›standbyè€Œç”¨
   186           ********************************************************************************
   187           */
   188          uint8 FMdrv_hardware(uint8 onoff, uint8 PA_mode)
@@ -213,13 +213,13 @@ stmt  level    source
   196           ********************************************************************************
   197           *             uint8 FMdrv_Exit(uint8 mode)
   198           *
-  199           * Description : FMÇı¶¯ÍË³öº¯Êı
+  199           * Description : FMé©±åŠ¨é€€å‡ºå‡½æ•°
   200           *
-  201           * Arguments   : mode: ÎŞÊµ¼Ê×÷ÓÃ
+  201           * Arguments   : mode: æ— å®é™…ä½œç”¨
   202           *
-  203           * Returns     : ÎŞÊµ¼Ê×÷ÓÃ
+  203           * Returns     : æ— å®é™…ä½œç”¨
   204           *
-  205           * Notes       : ÓÉÇı¶¯Ğ¶ÔØº¯Êıµ÷ÓÃ
+  205           * Notes       : ç”±é©±åŠ¨å¸è½½å‡½æ•°è°ƒç”¨
   206           *
   207           ********************************************************************************
   208           */
@@ -233,7 +233,7 @@ stmt  level    source
   216   1          return 1;
   217   1      }
   218          
-  219          /* FM Ä£×é½øÈëStandby */
+  219          /* FM æ¨¡ç»„è¿›å…¥Standby */
   220          uint8 FMdrv_Standby(void)
   221          {
   222   1          //first, enter standby

@@ -41,16 +41,16 @@ void API_IRQ_Release(uint8 cmd, uint32 oldisrptr, uint8 IRQType);
 //#define disable_interrupt() EA=0;
 
 
-//ÉèÖÃMURAMµØÖ·ºÍÊ±ÖÓ
+//è®¾ç½®MURAMåœ°å€å’Œæ—¶é’Ÿ
 #define SetMemBankCtl_CODE(tmpval) 	{tmpval=SFR_BANK;SFR_BANK=BANK_CMU_RMU;MEMCLKSELCTL0&=0x3F;SFR_BANK=tmpval;tmpval=MemBankCtl;MemBankCtl_MURAM_ADDR = 0;}
 #define SetMemBankCtl_DATA(tmpval) 	{tmpval=MemBankCtl;MemBankCtl_MURAM_ADDR = 1;}
 #define RestoreMemBankCtl(tmpval)	{MemBankCtl=tmpval;}
 
-//¿ª¹ØÖĞ¶Ï£¬Çå¹· ºê¶¨Òå
+//å¼€å…³ä¸­æ–­ï¼Œæ¸…ç‹— å®å®šä¹‰
 #define mEI()  			{(*((char data*)0x007f))--;if(!(*((char data*)0x007f))) EA=1;}
 #define mDI() 			{EA=0; (*((char data*)0x007f))++;}
 #define mCLRWD(tmpval) 	{tmpval=SFR_BANK;SFR_BANK=BANK_RTC;WDCTL |=0x08;SFR_BANK=tmpval;}
-//¿ª¹ØÖĞ¶Ï£¬Çå¹· ¹Ì»¯´úÂë¶¨Òå
+//å¼€å…³ä¸­æ–­ï¼Œæ¸…ç‹— å›ºåŒ–ä»£ç å®šä¹‰
 void romDI(void);
 void romEI(void);
 void ClearWatchDog(void);
@@ -71,7 +71,7 @@ MOV      R11, #APINO_IRQ_Release
 LCALL	 RSTSYSAPI
 endm
 
-//¿ª¹ØÖĞ¶Ï£¬Çå¹· ºê¶¨Òå
+//å¼€å…³ä¸­æ–­ï¼Œæ¸…ç‹— å®å®šä¹‰
 mDI       macro
 CLR	EA
 INC	0x7F //IntFlag

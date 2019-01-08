@@ -27,15 +27,15 @@ int16 deal_key_msg(void)
         result = deal_timeout_msg();
         break;
 
-    case AP_KEY_PLAY | AP_KEY_UP: //play°´¼ü×÷·µ»Ø´¦Àí
+    case AP_KEY_PLAY | AP_KEY_UP: //playæŒ‰é”®ä½œè¿”å›žå¤„ç†
         result = deal_play_key();
         break;
 
-    case AP_KEY_MODE | AP_KEY_UP: //APÇÐ»»ÈÈ¼ü
+    case AP_KEY_MODE | AP_KEY_UP: //APåˆ‡æ¢çƒ­é”®
         result = deal_mode_key();
         break;
 
-    case AP_KEY_MUTE | AP_KEY_UP: //muteÉèÖÃ
+    case AP_KEY_MUTE | AP_KEY_UP: //muteè®¾ç½®
         mute_flag = !mute_flag;
         if (!mute_flag)
         {
@@ -64,7 +64,7 @@ int16 deal_key_msg(void)
         result = deal_next_prev_longkey(AP_KEY_PREV);
         break;
 
-    case AP_KEY_VOL | AP_KEY_UP: //µ÷½ÚÒôÁ¿
+    case AP_KEY_VOL | AP_KEY_UP: //è°ƒèŠ‚éŸ³é‡
         result = deal_radio_vol_msg(NULL);
         break;
 
@@ -83,7 +83,7 @@ int16 deal_key_msg(void)
         deal_long_mode_key();
         break;
 
-    case AP_KEY_CLOCK | AP_KEY_UP: //ÉèÖÃµ±Ç°Ê±¼ä
+    case AP_KEY_CLOCK | AP_KEY_UP: //è®¾ç½®å½“å‰æ—¶é—´
         result = set_clock_ui(1);
         if (result != 0)
         {
@@ -130,7 +130,7 @@ int16 deal_key_msg(void)
         }
         if (g_comval.volume != 0)
         {
-            fmSendCommand(FM_MUTE, releaseMUTE, NULL); //½â³ý¾²Òô
+            fmSendCommand(FM_MUTE, releaseMUTE, NULL); //è§£é™¤é™éŸ³
         }
         fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
         break;
@@ -139,7 +139,7 @@ int16 deal_key_msg(void)
         set_autosleep_time(Key_None);
         break;
 
-    default: //ÈÈ¼ü´¦Àí
+    default: //çƒ­é”®å¤„ç†
         if ((key >= (AP_KEY_NUM0 | AP_KEY_UP)) && (key <= (AP_KEY_NUM9 | AP_KEY_UP)))
         {
             deal_digital_key(key);
@@ -154,12 +154,12 @@ int16 deal_key_msg(void)
 }
 
 /********************************************************************************
- * Description : ´¦Àímode¼ü
+ * Description : å¤„ç†modeé”®
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎÞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -178,12 +178,12 @@ uint8 deal_mode_key(void)
 }
 
 /********************************************************************************
- * Description : ´¦Àí³¤°´mode¼ü
+ * Description : å¤„ç†é•¿æŒ‰modeé”®
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎÞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -198,20 +198,20 @@ uint8 deal_long_mode_key(void)
         g_radio_config.band_mode = Bank_US_Europe;
         radio_param.param1 = g_radio_config.fmstation_us;
 
-        memcpy(&FMStatusJP, &g_FMStatus, sizeof(g_FMStatus)); //±¸·ÝjpÆµµÀÊý¾Ý
-        memcpy(&g_FMStatus, &FMStatusUS, sizeof(g_FMStatus)); //¼ÓÔØusÆµµÀÊý¾Ý
+        memcpy(&FMStatusJP, &g_FMStatus, sizeof(g_FMStatus)); //å¤‡ä»½jpé¢‘é“æ•°æ®
+        memcpy(&g_FMStatus, &FMStatusUS, sizeof(g_FMStatus)); //åŠ è½½usé¢‘é“æ•°æ®
     }
     else if (g_radio_config.band_mode == Bank_US_Europe)
     {
         g_radio_config.band_mode = Bank_Japan;
         radio_param.param1 = g_radio_config.fmstation_jp;
 
-        memcpy(&FMStatusUS, &g_FMStatus, sizeof(fm_status_t)); //±¸·ÝusÆµµÀÊý¾Ý
-        memcpy(&g_FMStatus, &FMStatusJP, sizeof(fm_status_t)); //¼ÓÔØjsÆµµÀÊý¾Ý
+        memcpy(&FMStatusUS, &g_FMStatus, sizeof(fm_status_t)); //å¤‡ä»½usé¢‘é“æ•°æ®
+        memcpy(&g_FMStatus, &FMStatusJP, sizeof(fm_status_t)); //åŠ è½½jsé¢‘é“æ•°æ®
     }
 
-    fmSendCommand(FM_MUTE, SetMUTE, NULL); //ÉèÖÃ¾²Òô
-    fmSendCommand(FM_MID_PLAY, NULL, NULL); //²¥·ÅµçÌ¨
+    fmSendCommand(FM_MUTE, SetMUTE, NULL); //è®¾ç½®é™éŸ³
+    fmSendCommand(FM_MID_PLAY, NULL, NULL); //æ’­æ”¾ç”µå°
     fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
 
     need_draw = TRUE;
@@ -219,12 +219,12 @@ uint8 deal_long_mode_key(void)
 }
 
 /********************************************************************************
- * Description : ´¦Àíchan + ºÍ - ¼ü
+ * Description : å¤„ç†chan + å’Œ - é”®
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎÞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -264,14 +264,14 @@ uint8 deal_chan_msg(uint8 key)
             g_FMStatus.freq = JPFREQ_MAX;
         }
     }
-    //mute FM Ä£¿é£¬±ÜÃâÇÐBANKÔì³É¸ÉÈÅ
+    //mute FM æ¨¡å—ï¼Œé¿å…åˆ‡BANKé€ æˆå¹²æ‰°
     fmSendCommand(FM_MUTE, SetMUTE, NULL);
 
     fmSendCommand(FM_SETFREQ, (void *) g_FMStatus.freq, NULL);
     //release mute
     if (g_comval.volume != 0)
     {
-        fmSendCommand(FM_MUTE, releaseMUTE, NULL); //½â³ý¾²Òô
+        fmSendCommand(FM_MUTE, releaseMUTE, NULL); //è§£é™¤é™éŸ³
     }
     fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
     fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
@@ -283,25 +283,25 @@ uint8 deal_chan_msg(uint8 key)
 }
 
 /********************************************************************************
- * Description : ´¦ÀíÒôÁ¿¼ü
+ * Description : å¤„ç†éŸ³é‡é”®
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎÞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
 uint8 deal_radio_vol_msg(uint8 key)
 {
-    //×Ô¶¯ËÑÌ¨ºÍÊÖ¶¯ËÑÌ¨²»ÏìÓ¦ÒôÁ¿°´¼ü
+    //è‡ªåŠ¨æœå°å’Œæ‰‹åŠ¨æœå°ä¸å“åº”éŸ³é‡æŒ‰é”®
     if ((CurUI_Type == FMAutoSearch_UI) || (CurUI_Type == FMManualSearch_UI))
     {
         return NULL;
     }
     if((key == Key_Next) && (g_comval.volume == 0))
     {
-        fmSendCommand(FM_MUTE, releaseMUTE, NULL); //½â³ý¾²?
+        fmSendCommand(FM_MUTE, releaseMUTE, NULL); //è§£é™¤é™?
     }
     return deal_vol_msg(key, FMFreq_UI);
 #if 0
@@ -343,12 +343,12 @@ uint8 deal_radio_vol_msg(uint8 key)
 #endif
 }
 /********************************************************************************
- * Description : ´¦ÀíÊäÈëµÄÆµÂÊ
+ * Description : å¤„ç†è¾“å…¥çš„é¢‘çŽ‡
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎÞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -359,14 +359,14 @@ uint8 deal_with_input_freq(void)
     if (check_freq_valid(freq))
     {
         g_FMStatus.freq = freq;
-        //mute FM Ä£¿é£¬±ÜÃâÇÐBANKÔì³É¸ÉÈÅ
+        //mute FM æ¨¡å—ï¼Œé¿å…åˆ‡BANKé€ æˆå¹²æ‰°
         fmSendCommand(FM_MUTE, SetMUTE, NULL);
 
         fmSendCommand(FM_SETFREQ, (void *) g_FMStatus.freq, NULL);
         //release mute
         if (g_comval.volume != 0)
         {
-            fmSendCommand(FM_MUTE, releaseMUTE, NULL); //½â³ý¾²Òô
+            fmSendCommand(FM_MUTE, releaseMUTE, NULL); //è§£é™¤é™éŸ³
         }
         fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
         fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
@@ -378,7 +378,7 @@ uint8 deal_with_input_freq(void)
     return 0;
 }
 /********************************************************************************
- * Description : ¼ì²éÆµÂÊÖµÊÇ·ñÊÇÓÐÐ§Öµ
+ * Description : æ£€æŸ¥é¢‘çŽ‡å€¼æ˜¯å¦æ˜¯æœ‰æ•ˆå€¼
  *
  * Arguments  :
  *
@@ -402,18 +402,18 @@ uint8 check_freq_valid(uint16 freq)
     return FALSE;
 }
 /********************************************************************************
- * Description : ´¦Àí³¬Ê±ÏûÏ¢
+ * Description : å¤„ç†è¶…æ—¶æ¶ˆæ¯
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎÞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
 uint8 deal_timeout_msg(void)
 {
-    //×Ô¶¯ËÑÌ¨ºÍÊÖ¶¯ËÑÌ¨²»ÏìÓ¦³¬Ê±ÏûÏ¢
+    //è‡ªåŠ¨æœå°å’Œæ‰‹åŠ¨æœå°ä¸å“åº”è¶…æ—¶æ¶ˆæ¯
     if ((CurUI_Type == FMAutoSearch_UI) || (CurUI_Type == FMManualSearch_UI))
     {
         return NULL;
@@ -429,12 +429,12 @@ uint8 deal_timeout_msg(void)
     return NULL;
 }
 /********************************************************************************
- * Description : ´¦Àíplay°´¼ü£¬×Ô¶¯ËÑÌ¨ºÍ·Ç×Ô¶¯ËÑÌ¨Ö®¼äÇÐ»»
+ * Description : å¤„ç†playæŒ‰é”®ï¼Œè‡ªåŠ¨æœå°å’Œéžè‡ªåŠ¨æœå°ä¹‹é—´åˆ‡æ¢
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎÞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -454,7 +454,7 @@ uint8 deal_play_key(void)
 
         if (g_comval.volume != 0)
         {
-            fmSendCommand(FM_MUTE, releaseMUTE, NULL); //½â³ý¾²Òô
+            fmSendCommand(FM_MUTE, releaseMUTE, NULL); //è§£é™¤é™éŸ³
         }
         fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
         fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
@@ -477,12 +477,12 @@ uint8 deal_play_key(void)
 }
 
 /********************************************************************************
- * Description : ´¦ÀíprevºÍnext¼ü
+ * Description : å¤„ç†prevå’Œnexté”®
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎÞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -528,12 +528,12 @@ uint8 deal_next_prev_key(uint8 key)
 }
 
 /********************************************************************************
- * Description : ´¦ÀíprevºÍnext³¤°´¼ü
+ * Description : å¤„ç†prevå’Œnexté•¿æŒ‰é”®
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎÞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -562,7 +562,7 @@ uint8 deal_next_prev_longkey(uint8 key)
         }
         if (g_comval.volume != 0)
         {
-            fmSendCommand(FM_MUTE, releaseMUTE, NULL); //½â³ý¾²Òô
+            fmSendCommand(FM_MUTE, releaseMUTE, NULL); //è§£é™¤é™éŸ³
         }
         fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
         fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
@@ -591,12 +591,12 @@ uint8 deal_next_prev_longkey(uint8 key)
     return NULL;
 }
 /********************************************************************************
- * Description : ´¦ÀíÊý×Ö°´¼ü
+ * Description : å¤„ç†æ•°å­—æŒ‰é”®
  *
  * Arguments  :
  *
  * Returns     :
- *            ÎÞ
+ *            æ— 
  * Notes       :
  *
  ********************************************************************************/
@@ -609,7 +609,7 @@ uint8 deal_digital_key(uint8 key)
         SetCurUI_Type(FMInputFreq_UI);
         memset(DigitalBuf, 0x0, 4);
     }
-    key_val = (key & ~AP_KEY_UP) - AP_KEY_NUM0;//½«Êý×Ö°´¼üÏûÏ¢×ª»»³ÉÊý×Ö
+    key_val = (key & ~AP_KEY_UP) - AP_KEY_NUM0;//å°†æ•°å­—æŒ‰é”®æ¶ˆæ¯è½¬æ¢æˆæ•°å­—
     for (i = 0; i < 3; i++)
     {
         DigitalBuf[i] = DigitalBuf[i + 1];
@@ -624,9 +624,9 @@ uint8 deal_digital_key(uint8 key)
  ********************************************************************************
  *             void    volume_callback(uint16 Vol)
  *
- * Description : ÒôÁ¿ÉèÖÃµÄCALLBACKº¯Êý
+ * Description : éŸ³é‡è®¾ç½®çš„CALLBACKå‡½æ•°
  *
- * Arguments   :    µ±Ç°ÐèÉèÖÃµÄÒôÁ¿Öµ
+ * Arguments   :    å½“å‰éœ€è®¾ç½®çš„éŸ³é‡å€¼
  *
  * Returns     :
  *
@@ -636,7 +636,7 @@ uint8 deal_digital_key(uint8 key)
  */
 /*void volume_callback(uint16 Vol)
  {
- //ÊµÊ±¸Ä±äÒôÁ¿µÄÖµ
+ //å®žæ—¶æ”¹å˜éŸ³é‡çš„å€¼
  g_comval.vol_display = (uint8) Vol;
  if (g_comval.VolumeMax != 0)
  {
@@ -657,9 +657,9 @@ uint8 deal_digital_key(uint8 key)
  ********************************************************************************
  *             void DealFadeIn(uint8 Volume)
  *
- * Description : ÒôÁ¿µ­Èë´¦Àíº¯Êý
+ * Description : éŸ³é‡æ·¡å…¥å¤„ç†å‡½æ•°
  *
- * Arguments   :    µ±Ç°ÒôÁ¿
+ * Arguments   :    å½“å‰éŸ³é‡
  *
  * Returns     :
  *
@@ -685,7 +685,7 @@ void DealFadeIn(uint8 Volume)
  ********************************************************************************
  *             void delay1(void)
  *
- * Description : ÑÓÊ±º¯Êý
+ * Description : å»¶æ—¶å‡½æ•°
  *
  * Arguments   :
  *
@@ -700,7 +700,7 @@ void delay1(void)
     uint16 i;
     for (i = 0; i < 1000; i++)
     {
-        ; //µ­³öÊ±¶ÌÔÝÑÓÊ±
+        ; //æ·¡å‡ºæ—¶çŸ­æš‚å»¶æ—¶
     }
 
 }
@@ -708,7 +708,7 @@ void delay1(void)
  ********************************************************************************
  *             void DealFadeInOut(void)
  *
- * Description : ÍË³öFMÊ±£¬µ­³ö´¦Àíº¯Êý
+ * Description : é€€å‡ºFMæ—¶ï¼Œæ·¡å‡ºå¤„ç†å‡½æ•°
  *
  * Arguments   :
  *

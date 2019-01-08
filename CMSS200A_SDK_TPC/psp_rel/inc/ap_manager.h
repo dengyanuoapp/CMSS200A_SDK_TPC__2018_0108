@@ -18,21 +18,21 @@ typedef struct
     unsigned char     major_version;      //3, for ACTOS 3.0
     unsigned char     minor_version;      //0
     unsigned char     magic[4];           //'W', 'G', 0x19, 0x97
-    unsigned long     text_offset;		    //´úÂë¶ÎÎÄ¼şÄÚÆ«ÒÆ
-    unsigned short    text_length;				//´úÂë¶Î³¤¶È
-    unsigned short    text_addr;          //´úÂë¶ÎÔÚÄÚ´æÖĞµÄµØÖ·
-    unsigned long     data_offset;					//Êı¾İ¶ÎÎÄ¼şÄÚÆ«ÒÆ
-    unsigned short    data_length;				//Êı¾İ¶Î³¤¶È£¨²»°üÀ¨BSS¶Î£©
-    unsigned short    data_addr;          //Êı¾İ¶ÎÔÚÄÚ´æÖĞµÄµØÖ·
-    unsigned short    bss_length;						//Bss¶Î³¤¶È
-    unsigned short    bss_addr;						//BssÆğÊ¼µØÖ·
+    unsigned long     text_offset;		    //ä»£ç æ®µæ–‡ä»¶å†…åç§»
+    unsigned short    text_length;				//ä»£ç æ®µé•¿åº¦
+    unsigned short    text_addr;          //ä»£ç æ®µåœ¨å†…å­˜ä¸­çš„åœ°å€
+    unsigned long     data_offset;					//æ•°æ®æ®µæ–‡ä»¶å†…åç§»
+    unsigned short    data_length;				//æ•°æ®æ®µé•¿åº¦ï¼ˆä¸åŒ…æ‹¬BSSæ®µï¼‰
+    unsigned short    data_addr;          //æ•°æ®æ®µåœ¨å†…å­˜ä¸­çš„åœ°å€
+    unsigned short    bss_length;						//Bssæ®µé•¿åº¦
+    unsigned short    bss_addr;						//Bssèµ·å§‹åœ°å€
     //	unsigned long     control_bank_offset;  //can save space for nor_base
     //	unsigned long     ui_bank_offset;		//because has the bank_Info, so need't it
     //	unsigned long     basal_bank_offset;
     //	unsigned long     codec_bank_offset;
     //	unsigned long     enhanced1_bank_offset;
     //	unsigned long     enhanced2_bank_offset;
-    unsigned long     entry;              //ap Èë¿Ú
+    unsigned long     entry;              //ap å…¥å£
 
 } ap_head_t;
 
@@ -65,9 +65,9 @@ typedef struct
 #define ExecAP(strName,Param) 		API_ExecAP(APINO_ExecAP,strName,Param)
 #define BankSwitch(epc) 			API_BankSwitch(APINO_BankSwitch,epc)
 
-//ÇĞ»»µ½ BankNo, ·µ»Ø¾ÉµÄ bank ºÅÂë
+//åˆ‡æ¢åˆ° BankNo, è¿”å›æ—§çš„ bank å·ç 
 int16 API_BankSwitch(uint8 cmd, uint32 epc);
-//Ö´ĞĞ strName ap, ·µ»ØapµÄ·µ»ØÖµ
+//æ‰§è¡Œ strName ap, è¿”å›apçš„è¿”å›å€¼
 int16 API_ExecAP(uint8 cmd, int8 *strName, int16 Param);
 //void BankFlush(uint8 cmd,uint8 gindex);
 

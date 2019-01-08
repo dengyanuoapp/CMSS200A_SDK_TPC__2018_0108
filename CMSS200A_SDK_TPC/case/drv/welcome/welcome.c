@@ -59,7 +59,7 @@ void DispStarting(void)
 
     SFR_BANK = BANK_GPIO;
     MFP_CTL2 |= 0x01; //SET UDI
-    //¼ì²âÓ²¿ª¹ØÊÇ·ñ¹Ø±Õ
+    //æ£€æµ‹ç¡¬å¼€å…³æ˜¯å¦å…³é—­
     SFR_BANK = BANK_PMU;
     onoff_status = SYSTEM_ONOFF & 0x10;
     SFR_BANK = sfrbak;
@@ -67,10 +67,10 @@ void DispStarting(void)
     {
         return;
     }
-    //ÅĞ¶ÏÊÇ·ñÁ¬½ÓUSBÏß
+    //åˆ¤æ–­æ˜¯å¦è¿æ¥USBçº¿
     if ((GetUsbCableStatus() & 0x40) == 0x40)
     {
-        //¿ª»ú³¤°´mode¼ü½øADFU
+        //å¼€æœºé•¿æŒ‰modeé”®è¿›ADFU
         SFR_BANK = BANK_GPIO;
 		AD_Select  &= 0xCC;
 		AD_Select  |= 0x11;/*gpio_c7 mapping to LRADC5, gpio_a6 mapping to LRADC4*/

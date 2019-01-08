@@ -13,9 +13,9 @@
  * \brief    .
  * \author   dengtaiping
  * \par      GENERAL DESCRIPTION:
- *               usb¼°AudioÄ£¿éĞ¶ÔØ
+ *               usbåŠAudioæ¨¡å—å¸è½½
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
  *
@@ -30,7 +30,7 @@
 /******************************************************************************/
 /*!
  * \par  Description:
- *     ADC¡¢DAC deinit.
+ *     ADCã€DAC deinit.
  * \param[in]    none.
  * \param[out]   none.
  * \return       none
@@ -96,7 +96,7 @@ void usound_exit(void)
     Ep03tokien = 0x00;
 
     SFR_BANK = BANK_CMU_RMU;
-    MEMCLKSELCTL1 &= 0x70;//link pcmram¡¢fir_rds_ram¡¢uram to cpu_clock
+    MEMCLKSELCTL1 &= 0x70;//link pcmramã€fir_rds_ramã€uram to cpu_clock
     MemBankCtl |= muram_addr;
 
     SFR_BANK = BANK_USB;
@@ -117,7 +117,7 @@ void usound_exit(void)
         ; /*do nothing*/
     }
     USB_PHYCTRL |= 0xc0; //phy disable
-    DPDMCTRL = 0x10; // »Ö¸´uhost¼ì²â
+    DPDMCTRL = 0x10; // æ¢å¤uhostæ£€æµ‹
     MULTI_USED &= (~0x80); //disable UVDD
 
     SFR_BANK = BANK_CMU_RMU;

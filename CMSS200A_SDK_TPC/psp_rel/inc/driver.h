@@ -7,22 +7,22 @@
 
 
 //****************************
-//  Çı¶¯³ÌĞòÀàĞÍ
-#define DRV_VM          0x00    //ĞéÄâÄÚ´æÇı¶¯
-#define DRV_STG         0x01    //ÓÃ»§´æ´¢Æ÷Çı¶¯
-#define DRV_KY          0x02    //¼üÅÌÇı¶¯
-#define DRV_UI          0x03    //ÏÔÊ¾Çı¶¯
-#define DRV_FS          0x04    //ÎÄ¼şÏµÍ³Çı¶¯
-#define DRV_SDFF        0x05    //SD¿¨¿ìËÙÇı¶¯
-#define DRV_FM          0x06    //FMÇı¶¯
-#define DRV_SDRAM       0x07    //USB HostÇı¶¯
+//  é©±åŠ¨ç¨‹åºç±»å‹
+#define DRV_VM          0x00    //è™šæ‹Ÿå†…å­˜é©±åŠ¨
+#define DRV_STG         0x01    //ç”¨æˆ·å­˜å‚¨å™¨é©±åŠ¨
+#define DRV_KY          0x02    //é”®ç›˜é©±åŠ¨
+#define DRV_UI          0x03    //æ˜¾ç¤ºé©±åŠ¨
+#define DRV_FS          0x04    //æ–‡ä»¶ç³»ç»Ÿé©±åŠ¨
+#define DRV_SDFF        0x05    //SDå¡å¿«é€Ÿé©±åŠ¨
+#define DRV_FM          0x06    //FMé©±åŠ¨
+#define DRV_SDRAM       0x07    //USB Hosté©±åŠ¨
 #define DRV_MFS			0x08    //MFS for data exchange
 //****************************
-// ÓÃ»§´æ´¢Æ÷ÀàĞÍ
+// ç”¨æˆ·å­˜å‚¨å™¨ç±»å‹
 #define STG_NAF         0x00            //nand type flash
 #define STG_SMC         0x10            //smc
 #define STG_MMC         0x20            //mmc
-#define STG_UHOST       0x50            //Íâ½ÓUÅÌ
+#define STG_UHOST       0x50            //å¤–æ¥Uç›˜
 #define STG_CFC         0x30            //cfc
 #define STG_HD          0x40            //hd
 #define STG_NAF_SB      0x00 | STG_NAF  //small block nand type flash
@@ -63,22 +63,22 @@
 #define APINO_DRV_UnInstall        0x0000 + RAMAPI_DRV_UD
 #ifdef __C251__
 
-//Çı¶¯³ÌĞòÍ·ĞÅÏ¢
+//é©±åŠ¨ç¨‹åºå¤´ä¿¡æ¯
 
 typedef struct
 {
-    int8    filetype;               //ÎÄ¼şÀàĞÍ 'D'
-    uint8    drvtype;                //Çı¶¯ÀàĞÍ
-    uint16    RcodeStartAddr;         //³£×¤ÄÚ´æ´úÂë¶ÎÆğÊ¼µØÖ·
-    uint16    RcodeLength;            //³£×¤ÄÚ´æ´úÂë¶Î³¤¶È
-    uint16    Rcode2StartAddr;         //³£×¤ÄÚ´æ´úÂë¶ÎÆğÊ¼µØÖ·
-    uint16    Rcode2Length;            //³£×¤ÄÚ´æ´úÂë¶Î³¤¶È
-    uint16    RdataStartAddr;         //³£×¤ÄÚ´æ´úÂë¶ÎÆğÊ¼µØÖ·
-    uint16    RdataLength;            //³£×¤ÄÚ´æ´úÂë¶Î³¤¶È
-    uint16    InitAPI;                //Çı¶¯³õÊ¼»¯³ÌĞòapi
-    uint16    ExitAPI;                //Çı¶¯¹Ø±Õ³ÌĞòapi
-    uint32   BnkAOffset;             //Çı¶¯³ÌĞòbanka´úÂëÔÚÎÄ¼şÖĞµÄµØÖ·
-    uint32   BnkBOffset;             //Çı¶¯³ÌĞòbankb´úÂëÔÚÎÄ¼şÖĞµÄµØÖ·
+    int8    filetype;               //æ–‡ä»¶ç±»å‹ 'D'
+    uint8    drvtype;                //é©±åŠ¨ç±»å‹
+    uint16    RcodeStartAddr;         //å¸¸é©»å†…å­˜ä»£ç æ®µèµ·å§‹åœ°å€
+    uint16    RcodeLength;            //å¸¸é©»å†…å­˜ä»£ç æ®µé•¿åº¦
+    uint16    Rcode2StartAddr;         //å¸¸é©»å†…å­˜ä»£ç æ®µèµ·å§‹åœ°å€
+    uint16    Rcode2Length;            //å¸¸é©»å†…å­˜ä»£ç æ®µé•¿åº¦
+    uint16    RdataStartAddr;         //å¸¸é©»å†…å­˜ä»£ç æ®µèµ·å§‹åœ°å€
+    uint16    RdataLength;            //å¸¸é©»å†…å­˜ä»£ç æ®µé•¿åº¦
+    uint16    InitAPI;                //é©±åŠ¨åˆå§‹åŒ–ç¨‹åºapi
+    uint16    ExitAPI;                //é©±åŠ¨å…³é—­ç¨‹åºapi
+    uint32   BnkAOffset;             //é©±åŠ¨ç¨‹åºbankaä»£ç åœ¨æ–‡ä»¶ä¸­çš„åœ°å€
+    uint32   BnkBOffset;             //é©±åŠ¨ç¨‹åºbankbä»£ç åœ¨æ–‡ä»¶ä¸­çš„åœ°å€
 } DRV_HEADINFO;
 
 
@@ -91,60 +91,60 @@ typedef struct
 #define DRV_FormatDrive(DiskACapacity,type,cardornot) 	API_DRV_FormatDrive(APINO_DRV_FormatDrive,DiskACapacity,type,cardornot)
 #define DRV_GetActiveUD() 								API_DRV_GetActiveUD(APINO_DRV_GetActiveUD)
 #define DRV_CheckCard(cardno)							API_DRV_CheckCard(APINO_DRV_CheckCard,cardno)
-//°²×°Çı¶¯³ÌĞò
-//para: Çı¶¯ÎÄ¼şÃû£¬Çı¶¯ÊäÈë²ÎÊı
-//ret: Çı¶¯ÀàĞÍ
+//å®‰è£…é©±åŠ¨ç¨‹åº
+//para: é©±åŠ¨æ–‡ä»¶åï¼Œé©±åŠ¨è¾“å…¥å‚æ•°
+//ret: é©±åŠ¨ç±»å‹
 
 int8 API_DRV_Install(uint8 cmd, const int8 *filename, uint8 param);
 
-//Ğ¶ÔØÇı¶¯³ÌĞò
-//para: Çı¶¯ÀàĞÍ(¼ûÇ°Ãæ¶¨Òå)
+//å¸è½½é©±åŠ¨ç¨‹åº
+//para: é©±åŠ¨ç±»å‹(è§å‰é¢å®šä¹‰)
 //ret:  true/false
 bool API_DRV_UnInstall(uint8 cmd, uint8 drivertype);
 
-//Ì½²âÎïÀí´æ´¢Éè±¸ÊÇ·ñ´æÔÚ
-//para: ÎïÀíÇı¶¯Æ÷ºÅ
-//ret:  Çı¶¯ÀàĞÍ(¼ûÇ°Ãæ¶¨Òå) 0xff means no ud detected£¬0x20 if(UDNo==1) means has card, 0xfe if(UDNo==1) means capacity err
+//æ¢æµ‹ç‰©ç†å­˜å‚¨è®¾å¤‡æ˜¯å¦å­˜åœ¨
+//para: ç‰©ç†é©±åŠ¨å™¨å·
+//ret:  é©±åŠ¨ç±»å‹(è§å‰é¢å®šä¹‰) 0xff means no ud detectedï¼Œ0x20 if(UDNo==1) means has card, 0xfe if(UDNo==1) means capacity err
 uint8 API_DRV_DetectUD(uint8 cmd, uint8 UDNo);
 
-//¼¤»îÎïÀí´æ´¢Éè±¸ÊÇ·ñ´æÔÚ
-//para: ÎïÀíÇı¶¯Æ÷ºÅ£¨0-f£©£¬¹¤×÷Ä£Ê½£¨Í¨³£=0£©
+//æ¿€æ´»ç‰©ç†å­˜å‚¨è®¾å¤‡æ˜¯å¦å­˜åœ¨
+//para: ç‰©ç†é©±åŠ¨å™¨å·ï¼ˆ0-fï¼‰ï¼Œå·¥ä½œæ¨¡å¼ï¼ˆé€šå¸¸=0ï¼‰
 //ret:  true/false
 bool API_DRV_ActiveUD(uint8 cmd, uint8 UDNo, uint8 workmod);
 
 
-//Ì½²âÎÄ¼şÏµÍ³·ÖÇøÊÇ·ñ´æÔÚ£¬Èô´æÔÚ£¬·µ»Ø·ÖÇø×´Ì¬£¨ÎÄ¼şÏµÍ³ÀàĞÍ£¬ÊÇ·ñ¸ñÊ½»¯£©
-//para: Âß¼­Çı¶¯Æ÷ºÅ
-//  'A','B'  --------------------------±£Áô
+//æ¢æµ‹æ–‡ä»¶ç³»ç»Ÿåˆ†åŒºæ˜¯å¦å­˜åœ¨ï¼Œè‹¥å­˜åœ¨ï¼Œè¿”å›åˆ†åŒºçŠ¶æ€ï¼ˆæ–‡ä»¶ç³»ç»Ÿç±»å‹ï¼Œæ˜¯å¦æ ¼å¼åŒ–ï¼‰
+//para: é€»è¾‘é©±åŠ¨å™¨å·
+//  'A','B'  --------------------------ä¿ç•™
 //  'C','D','E','F'--------------------on board flash
-//  'H','I','J','K'--------------------ÒÆ¶¯´æ´¢Éè±¸
-//  ÆäËû±£Áô
-//ret:  bit7: 0/1 ÊÇ·ñ´æÔÚ£¬
-//      bit6: 0/1 ¸ñÊ½»¯£¬
-//      bit5-bit0 fsÀàĞÍ 0: fat12 1: fat16,2 fat32
+//  'H','I','J','K'--------------------ç§»åŠ¨å­˜å‚¨è®¾å¤‡
+//  å…¶ä»–ä¿ç•™
+//ret:  bit7: 0/1 æ˜¯å¦å­˜åœ¨ï¼Œ
+//      bit6: 0/1 æ ¼å¼åŒ–ï¼Œ
+//      bit5-bit0 fsç±»å‹ 0: fat12 1: fat16,2 fat32
 int8 API_DRV_DetectDrive(uint8 cmd, int8 letter);
 
 
-//¼¤»îÎÄ¼şÏµÍ³·ÖÇøÊÇ·ñ´æÔÚ£¬Èô´æÔÚ£¬·µ»Ø·ÖÇø×´Ì¬£¨ÎÄ¼şÏµÍ³ÀàĞÍ£¬ÊÇ·ñ¸ñÊ½»¯£©
-//para: Âß¼­Çı¶¯Æ÷ºÅ£¬¹¤×÷Ä£Ê½£¨0x00:FS&¿ìËÙ£¬0x01:FS&ÂıËÙ£¬0x10:MFS&¿ìËÙ£¬0x11:MFS&ÂıËÙ£©
+//æ¿€æ´»æ–‡ä»¶ç³»ç»Ÿåˆ†åŒºæ˜¯å¦å­˜åœ¨ï¼Œè‹¥å­˜åœ¨ï¼Œè¿”å›åˆ†åŒºçŠ¶æ€ï¼ˆæ–‡ä»¶ç³»ç»Ÿç±»å‹ï¼Œæ˜¯å¦æ ¼å¼åŒ–ï¼‰
+//para: é€»è¾‘é©±åŠ¨å™¨å·ï¼Œå·¥ä½œæ¨¡å¼ï¼ˆ0x00:FS&å¿«é€Ÿï¼Œ0x01:FS&æ…¢é€Ÿï¼Œ0x10:MFS&å¿«é€Ÿï¼Œ0x11:MFS&æ…¢é€Ÿï¼‰
 //ret:  true/false
 bool API_DRV_ActiveDrive(uint8 cmd, int8 letter, uint8 workmod);
 
 
-//MtpÖĞ¼¤»îÎÄ¼şÏµÍ³·ÖÇøÊÇ·ñ´æÔÚ£¬Èô´æÔÚ£¬·µ»Ø·ÖÇø×´Ì¬£¨ÎÄ¼şÏµÍ³ÀàĞÍ£¬ÊÇ·ñ¸ñÊ½»¯£©
-//para: Âß¼­Çı¶¯Æ÷ºÅ£¬¹¤×÷Ä£Ê½£¨Í¨³£=0£©
+//Mtpä¸­æ¿€æ´»æ–‡ä»¶ç³»ç»Ÿåˆ†åŒºæ˜¯å¦å­˜åœ¨ï¼Œè‹¥å­˜åœ¨ï¼Œè¿”å›åˆ†åŒºçŠ¶æ€ï¼ˆæ–‡ä»¶ç³»ç»Ÿç±»å‹ï¼Œæ˜¯å¦æ ¼å¼åŒ–ï¼‰
+//para: é€»è¾‘é©±åŠ¨å™¨å·ï¼Œå·¥ä½œæ¨¡å¼ï¼ˆé€šå¸¸=0ï¼‰
 //ret:  true/false
 // bool API_DRV_MActiveDrive(uint8 cmd,int8 letter,uint8 workmod);
 
 
-//±¾»úÇı¶¯Æ÷¸ñÊ½»¯£¬Ö§³ÖFAT16ºÍFAT32¸ñÊ½»¯£¬Ö§³Öµ¥ÅÌ¸ñÊ½»¯£¨¸ñÊ½»¯µÄÎïÀíÇøÓò´ÓÎïÀí´ÅÅÌÊ×²¿¿ªÊ¼£©£¬
-//²»Éú³ÉMBR£¬Ö»ÓĞDBR£¬²»Ö§³Ö·ÖÇø
-//DiskACapacity: ´ÅÅÌµÄÈİÁ¿£¬ÓÃÉÈÇø±íÊ¾
-//type:¸ñÊ½»¯µÄÎÄ¼şÏµÍ³ÀàĞÍ£¬1±íÊ¾FAT16£¬2±íÊ¾FAT32
+//æœ¬æœºé©±åŠ¨å™¨æ ¼å¼åŒ–ï¼Œæ”¯æŒFAT16å’ŒFAT32æ ¼å¼åŒ–ï¼Œæ”¯æŒå•ç›˜æ ¼å¼åŒ–ï¼ˆæ ¼å¼åŒ–çš„ç‰©ç†åŒºåŸŸä»ç‰©ç†ç£ç›˜é¦–éƒ¨å¼€å§‹ï¼‰ï¼Œ
+//ä¸ç”ŸæˆMBRï¼Œåªæœ‰DBRï¼Œä¸æ”¯æŒåˆ†åŒº
+//DiskACapacity: ç£ç›˜çš„å®¹é‡ï¼Œç”¨æ‰‡åŒºè¡¨ç¤º
+//type:æ ¼å¼åŒ–çš„æ–‡ä»¶ç³»ç»Ÿç±»å‹ï¼Œ1è¡¨ç¤ºFAT16ï¼Œ2è¡¨ç¤ºFAT32
 //ret:  true/false
 bool API_DRV_FormatDrive(uint8 cmd, uint32 DiskACapacity, int8 type, int8 cardornot);
 
-//ret: high uint8=WorkMode:¹¤×÷Ä£Ê½£¨0=MODE_FAST,1=MODE_SLOW£©  low uint8=UDNo:ÎïÀíÇı¶¯Æ÷ºÅ£¨0-f£©
+//ret: high uint8=WorkMode:å·¥ä½œæ¨¡å¼ï¼ˆ0=MODE_FAST,1=MODE_SLOWï¼‰  low uint8=UDNo:ç‰©ç†é©±åŠ¨å™¨å·ï¼ˆ0-fï¼‰
 uint16 API_DRV_GetActiveUD(uint8 cmd);
 
 
@@ -154,15 +154,15 @@ uint8 API_DRV_CheckCard(uint8 cmd, uint8 cardno);
 
 /*
 *********************************************************************************************************
-*Function    £ºactive drive and initialize FS        2008-9-19 14:45
+*Function    ï¼šactive drive and initialize FS        2008-9-19 14:45
 *
-*Description£ºused specially for data copying
+*Descriptionï¼šused specially for data copying
 *
 *Arguments    : letter   ---- drive letter, such as C--Flash, H--Card, L--HideDisk.
-*             workmode ---- high uint8 is slow mode or fast mode,for data copying, default fast mode, MODE_FAST£¬that is 0x00.
+*             workmode ---- high uint8 is slow mode or fast mode,for data copying, default fast mode, MODE_FASTï¼Œthat is 0x00.
 *                           low uint8 is source disk or destination disk.
 *
-*Rerurns    £º0            failed
+*Rerurns    ï¼š0            failed
 *              1            successful
 *
 *Other        :

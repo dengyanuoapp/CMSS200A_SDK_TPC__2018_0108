@@ -42,8 +42,8 @@ stmt  level    source
    31          #pragma renamecode(MW_BS_AD_CMD1_TTS)
    32          
    33          /*************************************************************************
-   34           * SdLoadCommand ³õÊ¼»¯codecÓÃµÄÈ«¾Ö±äÁ¿g_decInitPara£¬
-   35           * °üÀ¨codecµÄbuffer¡¢dmaÖĞ¶ÏµÄhookº¯Êı¡¢¸èÇúÎÄ¼şµÄµÚÒ»Ö¡Êı¾İµØÖ·µÈµÈ
+   34           * SdLoadCommand åˆå§‹åŒ–codecç”¨çš„å…¨å±€å˜é‡g_decInitParaï¼Œ
+   35           * åŒ…æ‹¬codecçš„bufferã€dmaä¸­æ–­çš„hookå‡½æ•°ã€æ­Œæ›²æ–‡ä»¶çš„ç¬¬ä¸€å¸§æ•°æ®åœ°å€ç­‰ç­‰
    36           ****************************************************************************/
    37          bool TTSLoadCommand(BYTE music_type, void *param)
    38          {
@@ -72,7 +72,7 @@ stmt  level    source
    59   2              TTSplay_status.status = PLAYING_ERROR;
    60   2              return FALSE;
    61   2          }
-   62   1          /* ³õÊ¼»¯TTSµÄÍ· */
+   62   1          /* åˆå§‹åŒ–TTSçš„å¤´ */
    63   1          SD_FSeek(info_TTS_Fp, SEEK_SET, 0);
    64   1          SD_FRead(info_TTS_Fp, &tts_info_head, sizeof(tts_header_t));
    65   1          fix_head_data(&tts_info_head);
@@ -86,8 +86,8 @@ stmt  level    source
    73          
    74          #if 0
                /*************************************************************************
-                * SdStopCommand Í£Ö¹²¥·Å
-                *1 g_decReadFilePara.ReadFilePagesÔÚdma hookÖĞ±»¸³Öµ = deSdBreakPointSave
+                * SdStopCommand åœæ­¢æ’­æ”¾
+                *1 g_decReadFilePara.ReadFilePagesåœ¨dma hookä¸­è¢«èµ‹å€¼ = deSdBreakPointSave
                 ****************************************************************************/
                
                bool TTSStopCommand(void *param)
@@ -111,7 +111,7 @@ stmt  level    source
                #endif
    99          
   100          /*************************************************************************
-  101           * SdPlayCommand ²¥·Å
+  101           * SdPlayCommand æ’­æ”¾
   102           *
   103           ****************************************************************************/
   104          bool TTSPlayCommand(void *param)
@@ -122,13 +122,13 @@ stmt  level    source
   109   1          {
   110   2              return FALSE;
   111   2          }
-  112   1          TTSplay_status.status = PLAYING_PLAYING;//Ä¬ÈÏÎª²¥·Å×´Ì¬
+  112   1          TTSplay_status.status = PLAYING_PLAYING;//é»˜è®¤ä¸ºæ’­æ”¾çŠ¶æ€
   113   1      
-  114   1          //Òª´ÓÍ·¿ªÊ¼·Å
+  114   1          //è¦ä»å¤´å¼€å§‹æ”¾
   115   1          g_decControlInfor.PlayMode = PLAY_MODE_NORMAL;
   116   1          //SD_FSeek(m_de_TTS_Fp, 0, 0);
   117   1      
-  118   1          //³õÊ¼»¯¶ÁÈ¡Êı¾İ±äÁ¿
+  118   1          //åˆå§‹åŒ–è¯»å–æ•°æ®å˜é‡
   119   1          deTTSSecCount = 0;
   120   1          deTTSSecOffset = 0;
   121   1          prev_next_flag = 1;

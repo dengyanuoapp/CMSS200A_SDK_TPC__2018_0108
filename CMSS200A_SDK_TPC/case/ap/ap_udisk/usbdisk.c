@@ -13,9 +13,9 @@
  * \brief
  * \author   wanghaijing
  * \par      GENERAL DESCRIPTION:
- *               ÕâÀï¶ÔÎÄ¼ş½øĞĞÃèÊö
+ *               è¿™é‡Œå¯¹æ–‡ä»¶è¿›è¡Œæè¿°
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
  *
@@ -51,13 +51,13 @@ int main(void)
     //    ChargeCheckCounter = 0;
 
 
-    //    /*µÍµçÄ£Ê½ÏÂ½øĞĞ³äµç*/
+    //    /*ä½ç”µæ¨¡å¼ä¸‹è¿›è¡Œå……ç”µ*/
     //    if(GetBattery() < 0x13)
     //    {
     //       sKY_ChargeSet(1);
     //       sKY_ChargeGetandSet();
     //    }
-    /*AP³õÊ¼»¯*/
+    /*APåˆå§‹åŒ–*/
 
     if (!UDiskInitAll(para))
     {
@@ -75,11 +75,11 @@ int main(void)
             IsCardOut = 0;
         }
 
-        //µ÷ÓÃ×´Ì¬»úÖ´ĞĞÃüÁî
+        //è°ƒç”¨çŠ¶æ€æœºæ‰§è¡Œå‘½ä»¤
         UDiskHandle();
-        //»ñÈ¡USB×´Ì¬
-        //0:¿ÕÏĞ  10h:ÉÏ´«  20h:ÏÂ´«  30h:µ¯³öÒªÇóÍË³ö  40h:°ÎÏßÒªÇóÍË³ö  50h:ÇĞ»»µ½ÈÍ¼şÉı¼¶Ó¦ÓÃ
-        //60h:·ÖÇø´¦Àí×´Ì¬  70h:³ö´íÒªÇóÍË³ö  80h:½øÈëSuspend×´Ì¬  90h:ÍË³öSuspend×´Ì¬
+        //è·å–USBçŠ¶æ€
+        //0:ç©ºé—²  10h:ä¸Šä¼   20h:ä¸‹ä¼   30h:å¼¹å‡ºè¦æ±‚é€€å‡º  40h:æ‹”çº¿è¦æ±‚é€€å‡º  50h:åˆ‡æ¢åˆ°éŸ§ä»¶å‡çº§åº”ç”¨
+        //60h:åˆ†åŒºå¤„ç†çŠ¶æ€  70h:å‡ºé”™è¦æ±‚é€€å‡º  80h:è¿›å…¥SuspendçŠ¶æ€  90h:é€€å‡ºSuspendçŠ¶æ€
         UdiskStatus = UDiskGetStatus();
         if ((DisplayIndi == 0xff) && (UdiskStatus != 0x80))
         {
@@ -93,7 +93,7 @@ int main(void)
 
         switch (UdiskStatus)
         {
-        case 0: //¿ÕÏĞ
+        case 0: //ç©ºé—²
             if (DisplayIndi != 0x00)
             {
                 DisplayIndi = 0x00;
@@ -101,7 +101,7 @@ int main(void)
             }
             break;
 
-        case 0x10: //ÉÏ´«
+        case 0x10: //ä¸Šä¼ 
             if (DisplayIndi != 0x01)
             {
                 DisplayIndi = 0x01;
@@ -109,11 +109,11 @@ int main(void)
             }
             break;
 
-        case 0x11://ÏÔÊ¾Commu
-        case 0x21://ÏÔÊ¾DownLoad
-        case 0x31://ÏÔÊ¾UpLoad
-        case 0x41://ÏÔÊ¾Succ
-        case 0x61://ÏÔÊ¾Succ£¬ÍË³ö
+        case 0x11://æ˜¾ç¤ºCommu
+        case 0x21://æ˜¾ç¤ºDownLoad
+        case 0x31://æ˜¾ç¤ºUpLoad
+        case 0x41://æ˜¾ç¤ºSucc
+        case 0x61://æ˜¾ç¤ºSuccï¼Œé€€å‡º
             DisplayIndi = UdiskStatus >> 4;
             if (UdiskStatus == 0x61)
             {
@@ -127,29 +127,29 @@ int main(void)
             }
             break;
 
-        case 0x51: //ÇĞ»»µ½adfu
-            //¹Ø¼üÅÌºÍRTCÖĞ¶Ï
+        case 0x51: //åˆ‡æ¢åˆ°adfu
+            //å…³é”®ç›˜å’ŒRTCä¸­æ–­
             //output8(0x27, input8(0x27) & 0x9f);
             DisplayIndi = 0x10;
-            //±£Ö¤Ö»ÏÔÊ¾Ò»´Î
+            //ä¿è¯åªæ˜¾ç¤ºä¸€æ¬¡
             if (dispIndibak != DisplayIndi)
             {
                 dispIndibak = DisplayIndi;
             }
             break;
 
-        case 0x20: //ÏÂ´«
+        case 0x20: //ä¸‹ä¼ 
             if (DisplayIndi != 0x02)
             {
                 DisplayIndi = 0x02;
             }
             break;
 
-        case 0x80: //½øÈësuspend
+        case 0x80: //è¿›å…¥suspend
             DisplayIndi = 0xff;
             break;
 
-        case 0x90: //ÍË³öSuspend×´Ì¬
+        case 0x90: //é€€å‡ºSuspendçŠ¶æ€
             //                StandbyScreen(1);
             //                SetContrast(g_comval.DisplayContrast);
             break;
@@ -170,7 +170,7 @@ int main(void)
 
     UDiskExit();
     ResClose(res_fp);
-    /*°ÎÏßÍË³öusbÄ£Ê½ÓÉÓÚVCCÓĞ100mv²¨¶¯£¬ĞèÖØĞÂ³õÊ¼»¯´¥Ãş°´¼üµÄ×´Ì¬*/
+    /*æ‹”çº¿é€€å‡ºusbæ¨¡å¼ç”±äºVCCæœ‰100mvæ³¢åŠ¨ï¼Œéœ€é‡æ–°åˆå§‹åŒ–è§¦æ‘¸æŒ‰é”®çš„çŠ¶æ€*/
     //#ifdef  Use_RotateKey
     ////    Interrupt27Reg=input8(0x27);
     ////    output8(0x27, 0x00);
@@ -186,19 +186,19 @@ int main(void)
     //#endif
     DRV_ActiveUD(0x00, MODE_SLOW);
 
-    //°´ModeÍË³ö
+    //æŒ‰Modeé€€å‡º
     if (UdiskStatus == 0x00)
     {
         return RESULT_MAIN;
     }
-    //Éı¼¶ÍË³ö
+    //å‡çº§é€€å‡º
     else if (UdiskStatus == 0x50)
     {
         return RESULT_UPGRADE;
     }
     else
     {
-        //°ÎÏß,µ¯³ö
+        //æ‹”çº¿,å¼¹å‡º
         return 0;
     }
     return 0;

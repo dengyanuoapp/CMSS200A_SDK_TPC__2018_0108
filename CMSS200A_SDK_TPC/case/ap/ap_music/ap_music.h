@@ -14,10 +14,10 @@
  */
 #ifndef _AP_MUSIC_H
 #define _AP_MUSIC_H
-#include "ap_common.h"//¿Ø¼şÍ·ÎÄ¼ş
-#include "mmcmd.h"//Ä£¿é²ãÃüÁîÃû¶¨Òå
-#include "ap_option.h"//AP¹¦ÄÜ¿ª¹ØÑ¡Ôñ
-#include "basal.h"//basal module Í·ÎÄ¼ş
+#include "ap_common.h"//æ§ä»¶å¤´æ–‡ä»¶
+#include "mmcmd.h"//æ¨¡å—å±‚å‘½ä»¤åå®šä¹‰
+#include "ap_option.h"//APåŠŸèƒ½å¼€å…³é€‰æ‹©
+#include "basal.h"//basal module å¤´æ–‡ä»¶
 #include "uhdrv.h"
 #include "ap_report.h"
 #include "eqtool.h"
@@ -25,32 +25,32 @@
 #define CARD_KERNEL 1
 //#define USE_CARDBASE
 
-#define RESULT_CURR_UI NULL//ÔÚµ±Ç°½çÃæ
-#define RESULT_LAST_UI RESULT_USER1+1//»ØÉÏÒ»½çÃæ
-#define RESULT_UI_STOP RESULT_USER1+2//»Ø STOP ½çÃæ
-//µÚ¶şÖÖ·½Ê½»Øµ½ STOP ½çÃæ,ÕâÖÖ·½Ê½ÊÇÏÈÍ£Ö¹²¥·Å
+#define RESULT_CURR_UI NULL//åœ¨å½“å‰ç•Œé¢
+#define RESULT_LAST_UI RESULT_USER1+1//å›ä¸Šä¸€ç•Œé¢
+#define RESULT_UI_STOP RESULT_USER1+2//å› STOP ç•Œé¢
+//ç¬¬äºŒç§æ–¹å¼å›åˆ° STOP ç•Œé¢,è¿™ç§æ–¹å¼æ˜¯å…ˆåœæ­¢æ’­æ”¾
 #define RESULT_UI_STOP2 RESULT_USER1+3
-#define RESULT_UI_PLAY  RESULT_USER1+4//»Ø PLAY ½çÃæ
-#define RESULT_LIST         RESULT_USER1+5  //ÁĞ±í²¥·ÅÏûÏ¢
-#define RESULT_LIST_ERR     RESULT_USER1+6  //ÁĞ±í²»´æÔÚ»òÕßÀà±í´íÎó
-#define RESULT_PLAYLIST_PLAY     RESULT_USER1+7  //²¥·ÅÁĞ±íÖĞµÄÎÄ¼şÏûÏ¢
+#define RESULT_UI_PLAY  RESULT_USER1+4//å› PLAY ç•Œé¢
+#define RESULT_LIST         RESULT_USER1+5  //åˆ—è¡¨æ’­æ”¾æ¶ˆæ¯
+#define RESULT_LIST_ERR     RESULT_USER1+6  //åˆ—è¡¨ä¸å­˜åœ¨æˆ–è€…ç±»è¡¨é”™è¯¯
+#define RESULT_PLAYLIST_PLAY     RESULT_USER1+7  //æ’­æ”¾åˆ—è¡¨ä¸­çš„æ–‡ä»¶æ¶ˆæ¯
 #define RESULT_USERLIST     RESULT_USER1+8
 
-/* ÌáÊ¾ĞÅÏ¢µÄY×ø±ê */
+/* æç¤ºä¿¡æ¯çš„Yåæ ‡ */
 #define MSG_Y_POSITION     24
 
-/*ÇĞ»»ÉÏÏÂÇúµÄÎåÖÖ·½Ê½*/
+/*åˆ‡æ¢ä¸Šä¸‹æ›²çš„äº”ç§æ–¹å¼*/
 #define Music_Reset_Head 0
 #define Music_Reset_End 1
-#define Music_Cur   2//Ñ¡µ±Ç°
-#define Music_Next  3//Ñ¡ÏÂÒ»Ê×
-#define Music_Prev  4//Ñ¡ÉÏÒ»Ê×
-/*Ö§³ÖµÄÑ­»·Ä£Ê½Êı*/
+#define Music_Cur   2//é€‰å½“å‰
+#define Music_Next  3//é€‰ä¸‹ä¸€é¦–
+#define Music_Prev  4//é€‰ä¸Šä¸€é¦–
+/*æ”¯æŒçš„å¾ªç¯æ¨¡å¼æ•°*/
 #define REPEATMODE_NUM      5
 
 #define MAX_REPEAT_MODE  4
 
-/*µ­Èëµ­³öÊ±¼äÉè¶¨*/
+/*æ·¡å…¥æ·¡å‡ºæ—¶é—´è®¾å®š*/
 #define FADE_0MS         0
 #define FADE_100MS     1
 #define FADE_200MS     2
@@ -58,56 +58,56 @@
 #define FADE_25MS       4
 #define FADE_50MS       5
 
-/* Êµ¼ÊÊ¹ÓÃµÄµ­ÈëºÍµ­³öÊ±¼ä */
+/* å®é™…ä½¿ç”¨çš„æ·¡å…¥å’Œæ·¡å‡ºæ—¶é—´ */
 #define USE_FADEIN_TIME      FADE_100MS
 #define USE_FADEOUT_TIME     FADE_100MS
 
-/* ¸èÇúÇĞ»»ºó¿ªÊ¼¹öÆÁµÄÊ±¼ä */
+/* æ­Œæ›²åˆ‡æ¢åå¼€å§‹æ»šå±çš„æ—¶é—´ */
 #define BEGINE_SCROLL_TIME    1
 
-//#define POSITION_LRCBG     (0)//¸è´ÊÏÔÊ¾±³¾°Í¼×ø±ê
+//#define POSITION_LRCBG     (0)//æ­Œè¯æ˜¾ç¤ºèƒŒæ™¯å›¾åæ ‡
 //#define POSITIONY_LRCBG     (0)
 //
-//#define POSITION_LRCTOP     (6)//¸è´ÊÏÔÊ¾ÎÄ±¾×ø±ê
+//#define POSITION_LRCTOP     (6)//æ­Œè¯æ˜¾ç¤ºæ–‡æœ¬åæ ‡
 //#define POSITIONY_LRCTOP     90//(93)
-//#define POSITION_LRCMID     (0)//¸è´ÊÏÔÊ¾ÎÄ±¾×ø±ê
+//#define POSITION_LRCMID     (0)//æ­Œè¯æ˜¾ç¤ºæ–‡æœ¬åæ ‡
 //#define POSITIONY_LRCMID    (74)//(57)
-//#define POSITION_LRCBOT     (6)//¸è´ÊÏÔÊ¾ÎÄ±¾×ø±ê
+//#define POSITION_LRCBOT     (6)//æ­Œè¯æ˜¾ç¤ºæ–‡æœ¬åæ ‡
 //#define POSITIONY_LRCBOT    20// (21)
-#define SOFTVOLUMEMAX     40  //Êı×ÖÒôÁ¿×î´ó¼¶Êı
-//#define MENU_GROUP         5  //Ò»ÆÁÏÔÊ¾µÄ²Ëµ¥Ïî
+#define SOFTVOLUMEMAX     40  //æ•°å­—éŸ³é‡æœ€å¤§çº§æ•°
+//#define MENU_GROUP         5  //ä¸€å±æ˜¾ç¤ºçš„èœå•é¡¹
 
 #define MAX_ERR_MUSIC_NUM  30
 
 #define MIC_GAIN_VAL         15
 typedef enum
 {
-    NormalPlay, //ÆÕÍ¨Ä£Ê½µÄÏÔÊ¾(0)
-    WaitSetAPointForAB, //AB·ÅµÄ´ıÉèAµã(1)
-    WaitSetBPointForAB, //AB·ÅµÄ´ıÉèBµã(2)
+    NormalPlay, //æ™®é€šæ¨¡å¼çš„æ˜¾ç¤º(0)
+    WaitSetAPointForAB, //ABæ”¾çš„å¾…è®¾Aç‚¹(1)
+    WaitSetBPointForAB, //ABæ”¾çš„å¾…è®¾Bç‚¹(2)
     ABLoopPlay
-    //ABÑ­»·²¥·Å(3)
+    //ABå¾ªç¯æ’­æ”¾(3)
 } Replay_status_t;
 
 typedef enum
 {
-    StopSta, //Í£Ö¹(0)
-    PauseSta, //ÔİÍ£(1)
-    PlaySta, //ÆÕÍ¨Ä£Ê½µÄÏÔÊ¾(2)
-    FFPlaySta, //¿ì½ø×´Ì¬(3)
+    StopSta, //åœæ­¢(0)
+    PauseSta, //æš‚åœ(1)
+    PlaySta, //æ™®é€šæ¨¡å¼çš„æ˜¾ç¤º(2)
+    FFPlaySta, //å¿«è¿›çŠ¶æ€(3)
     FBPlaySta
-    //¿ìÍË×´Ì¬(4)
+    //å¿«é€€çŠ¶æ€(4)
 } Play_status_t;
 
 typedef enum
 {
-    LoopNor, //ÆÕÍ¨Ñ­»·
-    LoopOne, //Ñ­»··Åµ±Ç°Ê×
-    LoopOneDir, //Ñ­»··Åµ±Ç°Ä¿Â¼
-    LoopDir, //Ñ­»··ÅÄ¿Â¼
-    LoopAll, //Ñ­»·ËùÓĞ
-    RandomMod, //Ëæ»ú²¥·Å
-    Intro, //ä¯ÀÀ²¥·Å
+    LoopNor, //æ™®é€šå¾ªç¯
+    LoopOne, //å¾ªç¯æ”¾å½“å‰é¦–
+    LoopOneDir, //å¾ªç¯æ”¾å½“å‰ç›®å½•
+    LoopDir, //å¾ªç¯æ”¾ç›®å½•
+    LoopAll, //å¾ªç¯æ‰€æœ‰
+    RandomMod, //éšæœºæ’­æ”¾
+    Intro, //æµè§ˆæ’­æ”¾
     FolderShift,
     MaxRepeatMod
 } Repeat_Mode_t;
@@ -128,9 +128,9 @@ typedef enum
 
 typedef enum
 {
-    Manu_Sel, //ÊÖ¶¯ÇĞ»»ÏÂÒ»Ê×
+    Manu_Sel, //æ‰‹åŠ¨åˆ‡æ¢ä¸‹ä¸€é¦–
     Auto_Sel
-    //×Ô¶¯ÇĞ»»ÏÂÒ»Ê×
+    //è‡ªåŠ¨åˆ‡æ¢ä¸‹ä¸€é¦–
 } Music_sel_mod_t;
 
 typedef enum
@@ -138,58 +138,58 @@ typedef enum
     Left_EQ_Set, Right_EQ_Set, All_EQ_Set = 0xff
 } EQ_set_mod_t;
 
-//AP_MUSICÊ¹ÓÃµÄÏµÍ³±äÁ¿
+//AP_MUSICä½¿ç”¨çš„ç³»ç»Ÿå˜é‡
 typedef struct
 {
     uint8 Wow;
     uint8 Bass;
     uint8 Srs;
-    uint8 Center; //»·ÈÆ
-    uint8 Definition; //Æµ¶ÎÍ»³ö
+    uint8 Center; //ç¯ç»•
+    uint8 Definition; //é¢‘æ®µçªå‡º
     uint8 Speakersize;
     uint8 Limiter;
     uint8 GainSetting;
     uint8 IsNewFlag;
-} SRSMod_t; //SRS WOW ÒôĞ§
+} SRSMod_t; //SRS WOW éŸ³æ•ˆ
 typedef struct
 {
     int16 TimeMs;
     int16 TimeSecond;
 } Lyric_time_t;//add by Rcmai
-//AP_MUSICÊ¹ÓÃµÄÏµÍ³±äÁ¿
+//AP_MUSICä½¿ç”¨çš„ç³»ç»Ÿå˜é‡
 typedef struct
 {
     uint16 magic; // +0
-    uint8 acc_vol;//¿¨À­OK °é×àÒôÁ¿
-    uint8 karaoke_flag; //¿¨À­OK¿ª¹Ø±êÖ¾
-    Repeat_Mode_t repeat_mode; //repeat ²Ëµ¥µÄĞòºÅ  //+1
-    Open_mod_t MusicOpenMod; //´ò¿ª·½Ê½ +6
-    breakPT_t BreakPTSave; //¶Ïµã²ÎÊı +36
-    time_t BreakPTDisTime; //¶ÏµãÊ±¼ä±¸·İ + //
-    uint8 fselmod; //ÎÄ¼şÑ¡ÔñÆ÷µÄÄ£Ê½
-    uint16 check_sum[2];//ÎÄ¼şÃûĞ£ÑéºÍ£¬Ö»¶ÔexfatÓĞĞ§
-    uint8 cur_disk;//µ±Ç°ÕıÔÚÊ¹ÓÃµÄÅÌ·û
+    uint8 acc_vol;//å¡æ‹‰OK ä¼´å¥éŸ³é‡
+    uint8 karaoke_flag; //å¡æ‹‰OKå¼€å…³æ ‡å¿—
+    Repeat_Mode_t repeat_mode; //repeat èœå•çš„åºå·  //+1
+    Open_mod_t MusicOpenMod; //æ‰“å¼€æ–¹å¼ +6
+    breakPT_t BreakPTSave; //æ–­ç‚¹å‚æ•° +36
+    time_t BreakPTDisTime; //æ–­ç‚¹æ—¶é—´å¤‡ä»½ + //
+    uint8 fselmod; //æ–‡ä»¶é€‰æ‹©å™¨çš„æ¨¡å¼
+    uint16 check_sum[2];//æ–‡ä»¶åæ ¡éªŒå’Œï¼Œåªå¯¹exfatæœ‰æ•ˆ
+    uint8 cur_disk;//å½“å‰æ­£åœ¨ä½¿ç”¨çš„ç›˜ç¬¦
     file_location_t location[2]; //+ 9
     breakPT_t BreakPoit[2];
-    uint16 BP_checksum[2];//¶ÏµãĞÅÏ¢Ğ£ÑéºÍ
+    uint16 BP_checksum[2];//æ–­ç‚¹ä¿¡æ¯æ ¡éªŒå’Œ
 } music_vars_t;
 
 typedef struct
 {
-    //×÷ÓÃÊÇÔÚ¸ú¶ÁÂ¼ÒôºÍ¶Ô±È·ÅÒô¶¼ÏÔÊ¾Ô­ÒôµÄ
-    uint8 Bitrate_sav[3]; //±ÈÌØÂÊ
-    uint8 TotalTime_sav[3]; //×ÜÊ±¼ä
+    //ä½œç”¨æ˜¯åœ¨è·Ÿè¯»å½•éŸ³å’Œå¯¹æ¯”æ”¾éŸ³éƒ½æ˜¾ç¤ºåŸéŸ³çš„
+    uint8 Bitrate_sav[3]; //æ¯”ç‰¹ç‡
+    uint8 TotalTime_sav[3]; //æ€»æ—¶é—´
 } TimeRateData_sav_t;
 
 //typedef struct
 //{
-//    uint16 HeadIcon;//Í·²¿Í¼±êµÄIDÖµ
-//    uint16 HeadStr;//Í·²¿ĞÅÏ¢µÄIDÖµ
-//    uint8 *string;//ĞÅÏ¢ÏÔÊ¾ÇøµÄÏÔÊ¾µÄ×Ö´®Ê×Ö·
-//} dialog_t; //¶Ô»°¿ò
+//    uint16 HeadIcon;//å¤´éƒ¨å›¾æ ‡çš„IDå€¼
+//    uint16 HeadStr;//å¤´éƒ¨ä¿¡æ¯çš„IDå€¼
+//    uint8 *string;//ä¿¡æ¯æ˜¾ç¤ºåŒºçš„æ˜¾ç¤ºçš„å­—ä¸²é¦–å€
+//} dialog_t; //å¯¹è¯æ¡†
 
 //===========================================================
-//ÏÂÃæÉùÃûÍâ²¿±äÁ¿
+//ä¸‹é¢å£°åå¤–éƒ¨å˜é‡
 //===========================================================
 extern music_vars_t g_music_vars;
 extern Play_status_t PlayStatus;
@@ -202,25 +202,25 @@ extern bool Read_VMflag;
 extern uint8 disk_char[];
 extern uint8 first_init;
 
-extern char report_buf[60 + 4]; //´æÖî²¥±¨Êı¾İµÄbuffer, 60=TIT1(30)+TPE1(30)+¾²ÒôÊı¾İÖ¡(4)
+extern char report_buf[60 + 4]; //å­˜è¯¸æ’­æŠ¥æ•°æ®çš„buffer, 60=TIT1(30)+TPE1(30)+é™éŸ³æ•°æ®å¸§(4)
 
 extern uint8 g_eq_channal;
 
 extern uint8 FF_flag;
 extern uint8 get_fileinfo_flag;
-extern uint8 auto_switch_device_flag;//×Ô¶¯ÇĞ»»´ÅÅÌ±êÖ¾
-extern uint8 no_device_flag;//ÎŞ´ÅÅÌ»ò´ÅÅÌÎŞÎÄ¼ş±êÖ¾
-extern file_location_t CurUselocation;//µ±Ç°ÕıÔÚÊ¹ÓÃµÄlocationĞÅÏ¢
-extern uint16 dir_no;//µ±Ç°Ä¿Â¼ĞòºÅ
+extern uint8 auto_switch_device_flag;//è‡ªåŠ¨åˆ‡æ¢ç£ç›˜æ ‡å¿—
+extern uint8 no_device_flag;//æ— ç£ç›˜æˆ–ç£ç›˜æ— æ–‡ä»¶æ ‡å¿—
+extern file_location_t CurUselocation;//å½“å‰æ­£åœ¨ä½¿ç”¨çš„locationä¿¡æ¯
+extern uint16 dir_no;//å½“å‰ç›®å½•åºå·
 extern Play_status_t prev_PlayStatus;
-extern uint8 scan_flag;//ÊÇ·ñĞèÒªÉ¨ÃèÈ«ÅÌ±êÖ¾
-extern uint8 prev_key_direc;//¼ÇÂ¼ÉÏÒ»´ÎÊÇÏòÉÏ»¹ÊÇÏòÏÂÇĞ»»¸èÇú
+extern uint8 scan_flag;//æ˜¯å¦éœ€è¦æ‰«æå…¨ç›˜æ ‡å¿—
+extern uint8 prev_key_direc;//è®°å½•ä¸Šä¸€æ¬¡æ˜¯å‘ä¸Šè¿˜æ˜¯å‘ä¸‹åˆ‡æ¢æ­Œæ›²
 extern uint8 load_str[5];
 extern uint8 err_str[5];
-extern uint8 micin_status;//µ±Ç°micÏß²åÈë×´Ì¬
+extern uint8 micin_status;//å½“å‰micçº¿æ’å…¥çŠ¶æ€
 extern uint16 err_music_count;
 extern uint16 max_music_err;
-extern uint8 g_power_flag;//ÊÇ·ñÍ»È»¶Ïµç±êÖ¾
+extern uint8 g_power_flag;//æ˜¯å¦çªç„¶æ–­ç”µæ ‡å¿—
 extern EQ_VM_t g_eq_para;
 
 /**********************bank code functions**************************/

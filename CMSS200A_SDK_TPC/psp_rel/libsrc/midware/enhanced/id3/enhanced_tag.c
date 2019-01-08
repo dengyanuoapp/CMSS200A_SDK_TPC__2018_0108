@@ -45,9 +45,9 @@ void DealStrEndSpace(char *str);
  ********************************************************************************
  *             mp3GetTiltle
  * Description :
- * Arguments   :  string_id is language id(0:¼òÌå 1 Ó¢ÎÄ 2 ·±Ìå),ÓÃÓÚ¶Ô×îºóµÄ²»ÍêÕû×Ö·û½øĞĞ´¦Àí¡£
- ÒòÎª×î¶àÈ¡30¸ö×Ö·û¡£¶øÓĞĞ©Ê±ºòºº×ÖÀïÃæÓĞ¿ÉÄÜ»ì·ÅÓ¢ÎÄµÄ¡£Òò´Ë»á³öÏÖ×îºó×Ö·ûÖ»ÊÇºº×ÖÒ»°ëµÄÇé¿ö
- * Returns     : ID3ExistFlag = 0 ±íÊ¾Ã»ÓĞID3ĞÅÏ¢£¬1±íÊ¾ÓĞ
+ * Arguments   :  string_id is language id(0:ç®€ä½“ 1 è‹±æ–‡ 2 ç¹ä½“),ç”¨äºå¯¹æœ€åçš„ä¸å®Œæ•´å­—ç¬¦è¿›è¡Œå¤„ç†ã€‚
+ å› ä¸ºæœ€å¤šå–30ä¸ªå­—ç¬¦ã€‚è€Œæœ‰äº›æ—¶å€™æ±‰å­—é‡Œé¢æœ‰å¯èƒ½æ··æ”¾è‹±æ–‡çš„ã€‚å› æ­¤ä¼šå‡ºç°æœ€åå­—ç¬¦åªæ˜¯æ±‰å­—ä¸€åŠçš„æƒ…å†µ
+ * Returns     : ID3ExistFlag = 0 è¡¨ç¤ºæ²¡æœ‰ID3ä¿¡æ¯ï¼Œ1è¡¨ç¤ºæœ‰
  * Notes       :
  ********************************************************************************
  */
@@ -70,7 +70,7 @@ bool mp3GetID3Info(const char *filename, ID3Info_t *ID3Info, int string_id)
         return FALSE;
     }
 
-    //ÏÂÃæ´¦ÀíµÃ³öµÄ ĞÅÏ¢µÄÒ»Ğ©ÌØÊâÇé¿ö
+    //ä¸‹é¢å¤„ç†å¾—å‡ºçš„ ä¿¡æ¯çš„ä¸€äº›ç‰¹æ®Šæƒ…å†µ
     if (ID3Info->TIT2_length != 0)
     {
         DealStringEnd(ID3Info->TIT2_buffer, string_id);
@@ -120,7 +120,7 @@ bool mp3GetID3Info(const char *filename, ID3Info_t *ID3Info, int string_id)
  ********************************************************************************
  *             DealStringEnd
  *
- * Description :  ´¦Àí¶¨·û´®Î²µÄ²»ÍêÕûºº×ÖÎÊÌâ
+ * Description :  å¤„ç†å®šç¬¦ä¸²å°¾çš„ä¸å®Œæ•´æ±‰å­—é—®é¢˜
  *
  * Arguments   :
  *
@@ -144,7 +144,7 @@ void DealStringEnd(uint8 *str, int16 string_id)
     {
         return;
     }
-    //ÈçÊÇ¿Õ´®²»ÓÃ´¦Àí
+    //å¦‚æ˜¯ç©ºä¸²ä¸ç”¨å¤„ç†
     if (str[0] == 0) //0 means '\0'
     {
         return;
@@ -161,7 +161,7 @@ void DealStringEnd(uint8 *str, int16 string_id)
             half = FALSE;
         }
 
-        //ÊÇ·ñ½«½áÊø
+        //æ˜¯å¦å°†ç»“æŸ
         if (str[i + 1] == 0)
         {
             if (FALSE != half)
@@ -174,7 +174,7 @@ void DealStringEnd(uint8 *str, int16 string_id)
         if (FALSE != half)
         {
             i++;
-            if (str[i + 1] == 0) //¸ÕºÃÊÇÍêÕûµÄ
+            if (str[i + 1] == 0) //åˆšå¥½æ˜¯å®Œæ•´çš„
             {
                 return;
             }
@@ -188,7 +188,7 @@ void DealStringEnd(uint8 *str, int16 string_id)
  ********************************************************************************
  *             DealStringEnd
  *
- * Description :  ´¦Àí×Ö·û´®ºóµÄ¿Õ¸ñµÄÎÊÌâ
+ * Description :  å¤„ç†å­—ç¬¦ä¸²åçš„ç©ºæ ¼çš„é—®é¢˜
  *
  * Arguments   :
  *
@@ -201,9 +201,9 @@ void DealStringEnd(uint8 *str, int16 string_id)
 void DealStrEndSpace(char *str)
 {
     BYTE i, j;
-    /*Í³¼Æ×Ö·û´®Î²²¿µÄ¿Õ¸ñ·ûºÅ*/
+    /*ç»Ÿè®¡å­—ç¬¦ä¸²å°¾éƒ¨çš„ç©ºæ ¼ç¬¦å·*/
     BYTE space_num = 0;
-    /*´¦Àíunicode±àÂëbig endianµÄÇé¿ö,È¥µôÈ«ÊÇ¿Õ¸ñµÄÎÊÌâ*/
+    /*å¤„ç†unicodeç¼–ç big endiançš„æƒ…å†µ,å»æ‰å…¨æ˜¯ç©ºæ ¼çš„é—®é¢˜*/
     if (*((WORD *) &str[0]) == 0xfffe)
     {
         WORD codeChar;
@@ -214,7 +214,7 @@ void DealStrEndSpace(char *str)
             {
                 break;
             }
-            /*Ö»È¥µô×Ö·ûÎ²²¿µÄ¿Õ¸ñ·û*/
+            /*åªå»æ‰å­—ç¬¦å°¾éƒ¨çš„ç©ºæ ¼ç¬¦*/
             if (codeChar != 0x2000)
             {
                 j = i;
@@ -225,15 +225,15 @@ void DealStrEndSpace(char *str)
                 space_num++;
             }
         }
-        /*´¦Àí×Ö·ûÈ«ÊÇ¿Õ¸ñµÄÇé¿ö*/
+        /*å¤„ç†å­—ç¬¦å…¨æ˜¯ç©ºæ ¼çš„æƒ…å†µ*/
         if (j == 0)
         {
             *((WORD *) &str[0]) = 0x0000;
         }
-        /*È¥µô×Ö·û´®Î²²¿µÄ¿Õ¸ñ*/
+        /*å»æ‰å­—ç¬¦ä¸²å°¾éƒ¨çš„ç©ºæ ¼*/
         else if (j == (i - (space_num + 1) * 2))
         {
-            /*Î²²¿¿Õ¸ñÊı²»Îª0²Å´¦Àí*/
+            /*å°¾éƒ¨ç©ºæ ¼æ•°ä¸ä¸º0æ‰å¤„ç†*/
             if (space_num != 0)
             {
                 *((WORD *) &str[j + 2]) = 0x0000;
@@ -252,7 +252,7 @@ void DealStrEndSpace(char *str)
             {
                 break;
             }
-            /*Ö»È¥µô×Ö·ûÎ²²¿µÄ¿Õ¸ñ·û*/
+            /*åªå»æ‰å­—ç¬¦å°¾éƒ¨çš„ç©ºæ ¼ç¬¦*/
             if (str[i] != ' ')
             {
                 j = i;
@@ -267,10 +267,10 @@ void DealStrEndSpace(char *str)
         {
             str[j] = 0;
         }
-        /*È¥µô×Ö·û´®Î²²¿µÄ¿Õ¸ñ·ûºÅ*/
+        /*å»æ‰å­—ç¬¦ä¸²å°¾éƒ¨çš„ç©ºæ ¼ç¬¦å·*/
         else if (j == (i - (space_num + 1)))
         {
-            /*Î²²¿¿Õ¸ñÊı²»Îª0²Å´¦Àí*/
+            /*å°¾éƒ¨ç©ºæ ¼æ•°ä¸ä¸º0æ‰å¤„ç†*/
             if (space_num != 0)
             {
                 str[j + 1] = 0;
@@ -287,9 +287,9 @@ void DealStrEndSpace(char *str)
  *
  * Description :
  *
- * Arguments   :  »ñÈ¡fileName¸èÇúµÄID3ĞÅÏ¢£¬·Åµ½ID3Info_tÊı¾İ½á¹¹ÖĞ
+ * Arguments   :  è·å–fileNameæ­Œæ›²çš„ID3ä¿¡æ¯ï¼Œæ”¾åˆ°ID3Info_tæ•°æ®ç»“æ„ä¸­
  *
- * Returns     : ID3ExistFlag = 0 ±íÊ¾Ã»ÓĞID3ĞÅÏ¢£¬1±íÊ¾ÓĞ
+ * Returns     : ID3ExistFlag = 0 è¡¨ç¤ºæ²¡æœ‰ID3ä¿¡æ¯ï¼Œ1è¡¨ç¤ºæœ‰
  *
  * Notes       :
  *
@@ -298,16 +298,16 @@ void DealStrEndSpace(char *str)
 
 bool FectchID3Info(const char *filename, ID3Info_t *ID3Info)
 {
-    handle TagFileHandle;//¶ÁÎÄ¼şÖ¸Õë
-    int LastPageLen; //×îºóÒ»Ò³µÄÓĞĞ§½ÚÊı
+    handle TagFileHandle;//è¯»æ–‡ä»¶æŒ‡é’ˆ
+    int LastPageLen; //æœ€åä¸€é¡µçš„æœ‰æ•ˆèŠ‚æ•°
     long FileLen;
     bool Fectch_ret;
-    char TAGString[] = "TAG"; //ID3V1µÄÍ·Ó¦¸ÃÊÇ"tag"
+    char TAGString[] = "TAG"; //ID3V1çš„å¤´åº”è¯¥æ˜¯"tag"
 
     ClearWatchDog();
     // TempBuf = ID3_BUFFER;
     TempBuf = GET_REAL_ADDR(ID3_BUFFER);
-    TagFileHandle = FS_FOpen(filename, FS_OPEN_NORMAL);//´ò¿ªÎÄ¼ş
+    TagFileHandle = FS_FOpen(filename, FS_OPEN_NORMAL);//æ‰“å¼€æ–‡ä»¶
     if (TagFileHandle == NULL)
     {
         return FALSE;
@@ -326,11 +326,11 @@ bool FectchID3Info(const char *filename, ID3Info_t *ID3Info)
     }
 
     ClearWatchDog();
-    //LastPageLenÊÇÎÄ¼ş×îºóÒ»¸ö´ØµÄ×Ö½ÚÊı
+    //LastPageLenæ˜¯æ–‡ä»¶æœ€åä¸€ä¸ªç°‡çš„å­—èŠ‚æ•°
     LastPageLen = FS_GetUnalignedLen(TagFileHandle);
-    //FileLenÊÇÎÄ¼şµÄ×Ü´ØÊı£¬Ã¿¸ö´Ø512×Ö½Ú
+    //FileLenæ˜¯æ–‡ä»¶çš„æ€»ç°‡æ•°ï¼Œæ¯ä¸ªç°‡512å­—èŠ‚
     FileLen = FS_GetFileLen(TagFileHandle);
-    FS_FSeek(FileLen - 2, 0, TagFileHandle); //ÏÈ¶ÁÒ»¸öPAGE
+    FS_FSeek(FileLen - 2, 0, TagFileHandle); //å…ˆè¯»ä¸€ä¸ªPAGE
     FS_FRead(TempBuf, 1, TagFileHandle); //
 
     if(LastPageLen == 0)
@@ -338,10 +338,10 @@ bool FectchID3Info(const char *filename, ID3Info_t *ID3Info)
         LastPageLen = 512;
     }
 
-    //Õâ¶ÎÊÇ¿ÉÒÔÓÅ»¯µÄ£¬ÏÈÅĞ¶ÏÊÇ·ñĞ¡ÓÚ128ÔÙ¶Á¡£Èç¹û×îºóÒ»¸öÉÈÇø´óÓÚ128£¬ÔòÖ»¶ÁÒ»´Î
+    //è¿™æ®µæ˜¯å¯ä»¥ä¼˜åŒ–çš„ï¼Œå…ˆåˆ¤æ–­æ˜¯å¦å°äº128å†è¯»ã€‚å¦‚æœæœ€åä¸€ä¸ªæ‰‡åŒºå¤§äº128ï¼Œåˆ™åªè¯»ä¸€æ¬¡
     if (LastPageLen < 128)
     {
-        //È¡128bytes·ÅÈë 128bytesµÄBUFFERÖĞ
+        //å–128bytesæ”¾å…¥ 128bytesçš„BUFFERä¸­
         memcpy(TagBuf, TempBuf + 512 - 128 + LastPageLen, ((uint16)(128 - LastPageLen)));
         FS_FRead(TempBuf, 1, TagFileHandle);
         memcpy((TagBuf + 128 - LastPageLen), TempBuf, ((uint16)LastPageLen));
@@ -356,15 +356,15 @@ bool FectchID3Info(const char *filename, ID3Info_t *ID3Info)
     if (memcmp(TagBuf, TAGString, 3) == 0)
     {
         memcpy(ID3Info->TIT2_buffer, (char *) &TagBuf[3], ID3Info->TIT2_length - 2);
-        *((BYTE *) (ID3Info->TIT2_buffer) + ID3Info->TIT2_length - 2) = 0x00; //ÕâÀï²¹×Ö·û´®½áÊø
+        *((BYTE *) (ID3Info->TIT2_buffer) + ID3Info->TIT2_length - 2) = 0x00; //è¿™é‡Œè¡¥å­—ç¬¦ä¸²ç»“æŸ
 
 
         memcpy(ID3Info->TPE1_buffer, (char *) &TagBuf[33], ID3Info->TPE1_length - 2);
-        *((BYTE *) (ID3Info->TPE1_buffer) + ID3Info->TPE1_length - 2) = 0x00; //ÕâÀï²¹×Ö·û´®½áÊø
+        *((BYTE *) (ID3Info->TPE1_buffer) + ID3Info->TPE1_length - 2) = 0x00; //è¿™é‡Œè¡¥å­—ç¬¦ä¸²ç»“æŸ
 
 
         memcpy(ID3Info->TALB_buffer, (char *) &TagBuf[63], ID3Info->TALB_length - 2);
-        *((BYTE *) (ID3Info->TALB_buffer) + ID3Info->TALB_length - 2) = 0x00; //ÕâÀï²¹×Ö·û´®½áÊø
+        *((BYTE *) (ID3Info->TALB_buffer) + ID3Info->TALB_length - 2) = 0x00; //è¿™é‡Œè¡¥å­—ç¬¦ä¸²ç»“æŸ
 
 
         return 1;

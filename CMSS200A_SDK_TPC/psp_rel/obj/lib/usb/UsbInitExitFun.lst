@@ -30,7 +30,7 @@ stmt  level    source
    17          static void USB_EP_Reset(void);
    18          #pragma renamecode(?PR?INITEXITFUN_C)
    19          
-   20          //´Ë¶¨ÒåÎª±ÜÃâÆÁ±Îµô´òÓ¡ºó£¬udiskÓ¦ÓÃ±àÒë³£Á¿¶Î¶¨ÒåÎ´Ê¹ÓÃµ¼ÖÂµÄ±àÒë´íÎó¡£
+   20          //æ­¤å®šä¹‰ä¸ºé¿å…å±è”½æ‰æ‰“å°åï¼Œudiskåº”ç”¨ç¼–è¯‘å¸¸é‡æ®µå®šä¹‰æœªä½¿ç”¨å¯¼è‡´çš„ç¼–è¯‘é”™è¯¯ã€‚
    21          #ifndef _PRINT_DEBUG_
    22          const uint8 ConstSeg2 = 'A';
    23          #endif
@@ -46,7 +46,7 @@ stmt  level    source
    32           *
    33           * Returns    : None.
    34           *
-   35           * Note(s)    : UÅÌ¿ªÊ¼ÓëPCÍ¨ĞÅ
+   35           * Note(s)    : Uç›˜å¼€å§‹ä¸PCé€šä¿¡
    36           ********************************************************************************************************
              -*
    37           */
@@ -59,20 +59,20 @@ stmt  level    source
    44   1          //word USB_Isr_Addr;
    45   1          para++;
    46   1      
-   47   1          //ÇåÈ«¾Ö±äÁ¿,·ÀÖ¹¼ÓÃÜÅÌÈ«¾Ö±äÁ¿ÓĞÎó
+   47   1          //æ¸…å…¨å±€å˜é‡,é˜²æ­¢åŠ å¯†ç›˜å…¨å±€å˜é‡æœ‰è¯¯
    48   1          Suspend_Flag = 0x00;
    49   1          PrevRTCTimerValue1 = 0x00;
    50   1          PrevRTCTimerValue2 = 0x00;
    51   1          prv_connect_idle_tm = 0x00;
    52   1      
-   53   1          //Çå³ıUSBÁ¬Ïß¶¯×÷ÎÈ¶¨±ê¼Ç,·ÀÖ¹¼ÓÃÜÅÌÓ¦ÓÃÖĞ½øÈë´íÎóµÄsuspend×´Ì¬
+   53   1          //æ¸…é™¤USBè¿çº¿åŠ¨ä½œç¨³å®šæ ‡è®°,é˜²æ­¢åŠ å¯†ç›˜åº”ç”¨ä¸­è¿›å…¥é”™è¯¯çš„suspendçŠ¶æ€
 C251 COMPILER V4.55,  UsbInitExitFun                                                       15/07/16  16:03:52  PAGE 2   
 
    54   1          usb_pwr_suspnd_fnsh = 0x00;
-   55   1          //Çåreset¼ÆÊı,·ÀÖ¹´íÎóµÄ½øÈëFull speedÄ£Ê½ */
+   55   1          //æ¸…resetè®¡æ•°,é˜²æ­¢é”™è¯¯çš„è¿›å…¥Full speedæ¨¡å¼ */
    56   1          usb_reset_enter_cnt = 0x00;
-   57   1          //Çåidle×´Ì¬(ÎŞbus reset)Ê±¼ä¼ÆÊı,
-   58   1          //·ÀÖ¹Òòusb_reset_enter_cnt±»Çåµôµ¼ÖÂÖØĞÂ¶Ôidle×´Ì¬Ê±¼ä¼ÆÊıÀÛ¼Ó½ø¶øÈÏÎªÊÇ²åÈëµ½³äµçÆ÷ÖĞ
+   57   1          //æ¸…idleçŠ¶æ€(æ— bus reset)æ—¶é—´è®¡æ•°,
+   58   1          //é˜²æ­¢å› usb_reset_enter_cntè¢«æ¸…æ‰å¯¼è‡´é‡æ–°å¯¹idleçŠ¶æ€æ—¶é—´è®¡æ•°ç´¯åŠ è¿›è€Œè®¤ä¸ºæ˜¯æ’å…¥åˆ°å……ç”µå™¨ä¸­
    59   1          connect_idle_cnt = 0x00;
    60   1      
    61   1          sfrbak = SFR_BANK;
@@ -121,7 +121,7 @@ stmt  level    source
   103   2          }
   104   1      
   105   1          SFR_BANK = BANK_PMU;
-  106   1          MULTI_USED = MULTI_USED | 0x80; //USBVDD LDO Èí¼ş enable
+  106   1          MULTI_USED = MULTI_USED | 0x80; //USBVDD LDO è½¯ä»¶ enable
   107   1      
   108   1          SFR_BANK = BANK_USB;
   109   1          DPDMCTRL = 0x1f; //enable DP DM 500K pull-up & disable DP DM pull-down
@@ -133,7 +133,7 @@ stmt  level    source
   115   1          
   116   1          IDVBUSCTRL = 0x1f; //enable software Vbus, enable PHY clock
   117   1      
-  118   1          //phy disable,FPGA invalid,note:disable is open        //Î»ÖÃ×¢ÒâÔÚ USBResetÖ®Ç°ÅäÖÃ
+  118   1          //phy disable,FPGA invalid,note:disable is open        //ä½ç½®æ³¨æ„åœ¨ USBResetä¹‹å‰é…ç½®
 C251 COMPILER V4.55,  UsbInitExitFun                                                       15/07/16  16:03:52  PAGE 3   
 
   119   1          USB_PHYCTRL = USB_PHYCTRL & 0x3f;
@@ -220,7 +220,7 @@ stmt  level    source
              -*
   198           *                                           UDiskExit
   199           *
-  200           * Description: ÍË³öÓëPCÍ¨ĞÅ.
+  200           * Description: é€€å‡ºä¸PCé€šä¿¡.
   201           *
   202           * Arguments  : None.
   203           *
@@ -288,29 +288,29 @@ stmt  level    source
   262   2              /*fixme:need*/
   263   2              IRQ_Release(OldIsrPtr, IRQ_USB);
   264   2      
-  265   2              //Ğ¶ÔØsd¿¨µÄÇı¶¯³ÌĞò,¿¨´¦ÓÚmultiread»òmultiwrite×´Ì¬£¬ÔÙ´Î³õÊ¼»¯¿¨Ê±»áÊ§°Ü£¬vicky 20051121
-  266   2              //bankbº¯Êı,Éı¼¶Íê²»ÄÜµ÷ÓÃ
+  265   2              //å¸è½½sdå¡çš„é©±åŠ¨ç¨‹åº,å¡å¤„äºmultireadæˆ–multiwriteçŠ¶æ€ï¼Œå†æ¬¡åˆå§‹åŒ–å¡æ—¶ä¼šå¤±è´¥ï¼Œvicky 20051121
+  266   2              //bankbå‡½æ•°,å‡çº§å®Œä¸èƒ½è°ƒç”¨
   267   2              DRV_UnInstall(DRV_SDFF);
   268   2      
   269   2              if (EjectFlag == 0x00)
   270   2              {
   271   3                  Udisk_Exit_Handle();
-  272   3                  //bankbº¯Êı£¬ÍË³öapÊ±µ÷ÓÃ£¬2006-1-14 16:39¸ü»»
+  272   3                  //bankbå‡½æ•°ï¼Œé€€å‡ºapæ—¶è°ƒç”¨ï¼Œ2006-1-14 16:39æ›´æ¢
   273   3                  UD_Exit();
   274   3              }
   275   2              else
   276   2              {
-  277   3                  //Èç¹û·¢ÉúĞ´²Ù×÷,°Ñ×îºóÒ»´Î´«ÊäÊı¾İĞ´ÈëFlash
+  277   3                  //å¦‚æœå‘ç”Ÿå†™æ“ä½œ,æŠŠæœ€åä¸€æ¬¡ä¼ è¾“æ•°æ®å†™å…¥Flash
   278   3                  UD_Update();
   279   3              }
   280   2          }
   281   1          else
   282   1          {
-  283   2              //Èç¹û·¢ÉúĞ´²Ù×÷,°Ñ×îºóÒ»´Î´«ÊäÊı¾İĞ´ÈëFlash
+  283   2              //å¦‚æœå‘ç”Ÿå†™æ“ä½œ,æŠŠæœ€åä¸€æ¬¡ä¼ è¾“æ•°æ®å†™å…¥Flash
   284   2              UD_Update();
   285   2          }
   286   1      
-  287   1          DPDMCTRL = 0x10; // »Ö¸´uhost¼ì²â
+  287   1          DPDMCTRL = 0x10; // æ¢å¤uhostæ£€æµ‹
   288   1      
   289   1          //open globle interrupt
   290   1          IE0 = IE0bak;

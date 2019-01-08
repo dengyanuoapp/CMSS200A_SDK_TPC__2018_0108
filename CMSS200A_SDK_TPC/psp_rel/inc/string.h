@@ -101,9 +101,9 @@ extern void prints(const int8 *str);
 extern void printh(const int16 hexdata);
 extern void printd(const int16 decdata);
 
-// UNICODE ×Ö·û´®³¤¶È
+// UNICODE å­—ç¬¦ä¸²é•¿åº¦
 int16 *strlenuni (int8 *s1);
-// UNICODE ×Ö·û´®¿½±´
+// UNICODE å­—ç¬¦ä¸²æ‹·è´
 int8 *strcpyuni (int8 *s1, int8 *s2);
 
 #endif /* #ifndef PC */

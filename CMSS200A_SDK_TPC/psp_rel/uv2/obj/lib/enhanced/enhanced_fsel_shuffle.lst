@@ -22,10 +22,10 @@ stmt  level    source
    10           *******************************************************************************/
    11          /*!
    12           * \file     *.c
-   13           * \brief    Ëæ»ú»úÖÆ
+   13           * \brief    éšæœºæœºåˆ¶
    14           * \author   liminxian
    15           * \par      GENERAL DESCRIPTION:
-   16           *               ÕâÀï¶ÔÎÄ¼ş½øĞĞÃèÊö
+   16           *               è¿™é‡Œå¯¹æ–‡ä»¶è¿›è¡Œæè¿°
    17           * \par      EXTERNALIZED FUNCTIONS:
    18           *
    19           * \version 1.0
@@ -37,7 +37,7 @@ stmt  level    source
    25          #include <stringH.h>
    26          #include <rand.h>
    27          
-   28          //#define  OVERTURN_DEF  //·´×ªbitmap²¥·Å¹¦ÄÜ
+   28          //#define  OVERTURN_DEF  //åè½¬bitmapæ’­æ”¾åŠŸèƒ½
    29          #define SET_GROUP_MAX   64
    30          #define SET_MEMBER_MAX  256
    31          #define SET_PREV_MAX    10
@@ -46,8 +46,8 @@ stmt  level    source
    34          
    35          #pragma name(MW_EH_FSEL_SHUFFLE)
    36          extern uint8 fselError; // store error id;
-   37          extern uint16 fselTotalInDisk;// È«ÅÌÎÄ¼ş×ÜÊı
-   38          extern uint16 fselFileNoInDisk;// ÎÄ¼şÔÚÈ«ÅÌµÄĞòºÅ
+   37          extern uint16 fselTotalInDisk;// å…¨ç›˜æ–‡ä»¶æ€»æ•°
+   38          extern uint16 fselFileNoInDisk;// æ–‡ä»¶åœ¨å…¨ç›˜çš„åºå·
    39          extern uint8 fselPLOrCommonDir;
    40          
    41          #ifdef _ACTIVE_USERPL
@@ -59,25 +59,25 @@ stmt  level    source
    47          extern uint16 shuffle_plist_total;
    48          #endif
    49          
-   50          uint16 shuffle_total;//shuffleµÄ×Ü¸öÊı
-   51          uint8 group_map[SET_GROUP_MAX / 8];//·Ö×é£¬¹²64×é
-   52          uint8 member_map[SET_MEMBER_MAX / 8];//×éÄÚ³ÉÔ±£¬¹²256
-   53          uint8 member_avg;//³ÉÔ±Æ½¾ùÖµ£¬ÉÌÖµ
-   54          uint8 member_avg_group;//Æ½¾ùÖµ³ÉÔ±µÄ×éºÅÆğÊ¼
-   55          uint8 group_max;//ÓĞĞ§µÄ×éºÅ
-   56          uint8 member_max;//µ±Ç°×éµÄ×î´ó³ÉÔ±¸öÊı
+   50          uint16 shuffle_total;//shuffleçš„æ€»ä¸ªæ•°
+   51          uint8 group_map[SET_GROUP_MAX / 8];//åˆ†ç»„ï¼Œå…±64ç»„
+   52          uint8 member_map[SET_MEMBER_MAX / 8];//ç»„å†…æˆå‘˜ï¼Œå…±256
+   53          uint8 member_avg;//æˆå‘˜å¹³å‡å€¼ï¼Œå•†å€¼
+   54          uint8 member_avg_group;//å¹³å‡å€¼æˆå‘˜çš„ç»„å·èµ·å§‹
+   55          uint8 group_max;//æœ‰æ•ˆçš„ç»„å·
+   56          uint8 member_max;//å½“å‰ç»„çš„æœ€å¤§æˆå‘˜ä¸ªæ•°
 C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 2   
 
-   57          uint8 use_member_flag;//Ê¹ÓÃ×éÄÚshuffle¹¦ÄÜ
-   58          uint8 cur_group;//µ±Ç°µÄ×éºÅ£¨1£¬2£¬¡£¡£¡£
-   59          uint16 cur_member;//µ±Ç°×éÄÚµÄ³ÉÔ±ºÅ£¨1£¬2£¬¡£¡£¡£
-   60          uint16 filtrate_shuffle_no; //shuffle¹ıÂË²¥·ÅĞòºÅ£¬±ÜÃâÖØ¸´
+   57          uint8 use_member_flag;//ä½¿ç”¨ç»„å†…shuffleåŠŸèƒ½
+   58          uint8 cur_group;//å½“å‰çš„ç»„å·ï¼ˆ1ï¼Œ2ï¼Œã€‚ã€‚ã€‚
+   59          uint16 cur_member;//å½“å‰ç»„å†…çš„æˆå‘˜å·ï¼ˆ1ï¼Œ2ï¼Œã€‚ã€‚ã€‚
+   60          uint16 filtrate_shuffle_no; //shuffleè¿‡æ»¤æ’­æ”¾åºå·ï¼Œé¿å…é‡å¤
    61          
    62          uint16 play_num_list[SET_PREV_MAX];
-   63          uint8 cur_save_pt; //µ±Ç°´æµÄÖ¸Õë
+   63          uint8 cur_save_pt; //å½“å‰å­˜çš„æŒ‡é’ˆ
    64          uint8 cur_save_prev_count;
    65          uint8 cur_save_next_count;
-   66          uint8 cur_overturn_flag; //±í·­×ª±ê¼Ç
+   66          uint8 cur_overturn_flag; //è¡¨ç¿»è½¬æ ‡è®°
    67          
    68          static const uint8 byte_set_val[8] =
    69          { 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff };
@@ -96,7 +96,7 @@ stmt  level    source
    82          #pragma renamecode(MW_EH_FSEL_SHUFFLE)
    83          /******************************************************************************/
    84          /*
-   85           * \par  Description:¸ù¾İ×éºÅ³õÊ¼»¯×éÄÚ³ÉÔ±µÄmap×´Ì¬
+   85           * \par  Description:æ ¹æ®ç»„å·åˆå§‹åŒ–ç»„å†…æˆå‘˜çš„mapçŠ¶æ€
    86           *
    87           * \param[in]
    88          
@@ -121,7 +121,7 @@ stmt  level    source
   107   1      
   108   1          if (cur_group < member_avg_group)
   109   1          {
-  110   2              //×éºÅÔÚÆ½¾ùÖµ×éµÄÇ°ÃæÊ±
+  110   2              //ç»„å·åœ¨å¹³å‡å€¼ç»„çš„å‰é¢æ—¶
   111   2              j++;
   112   2              member_max++;
   113   2          }
@@ -139,7 +139,7 @@ stmt  level    source
   123          
   124          /******************************************************************************/
   125          /*
-  126           * \par  Description:³õÊ¼shuffle»úÖÆ
+  126           * \par  Description:åˆå§‹shuffleæœºåˆ¶
   127           *
   128           * \param[in]
   129          
@@ -189,14 +189,14 @@ stmt  level    source
   173   1      
   174   1          if (num_total > SET_GROUP_MAX)
   175   1          {
-  176   2              //¸öÊı´óÓÚ×éÊı,ÆôÓÃ×éÄÚ³ÉÔ±shuffle
+  176   2              //ä¸ªæ•°å¤§äºç»„æ•°,å¯ç”¨ç»„å†…æˆå‘˜shuffle
   177   2              use_member_flag = TRUE;
   178   2              memset(group_map, 0xff, sizeof(group_map));
   179   2              group_max = SET_GROUP_MAX;
   180   2          }
   181   1          else
   182   1          {
-  183   2              //¸öÊıÉÙÓÚ×éÊı,Ö»ÓÃ×éshuffle¾Í¿ÉÒÔÁË
+  183   2              //ä¸ªæ•°å°‘äºç»„æ•°,åªç”¨ç»„shuffleå°±å¯ä»¥äº†
   184   2              group_max = (uint8) num_total;
   185   2              for (i = 0; i < (num_total / 8); i++)
   186   2              {
@@ -228,7 +228,7 @@ stmt  level    source
   210          
   211          /******************************************************************************/
   212          /*
-  213           * \par  Description:°Ñmap·­×ª
+  213           * \par  Description:æŠŠmapç¿»è½¬
   214           *
   215           * \param[in]
   216          
@@ -264,7 +264,7 @@ stmt  level    source
                
                    if(cur_group < member_avg_group)
                    {
-                       //×éºÅÔÚÆ½¾ùÖµ×éµÄÇ°ÃæÊ±
+                       //ç»„å·åœ¨å¹³å‡å€¼ç»„çš„å‰é¢æ—¶
                        temp8++;
                    }
                
@@ -288,7 +288,7 @@ stmt  level    source
   268          
   269          /******************************************************************************/
   270          /*
-  271           * \par  Description:»ñÈ¡shuffleµÄ×éºÅ
+  271           * \par  Description:è·å–shuffleçš„ç»„å·
   272           *
   273           * \param[in]
   274          
@@ -312,7 +312,7 @@ stmt  level    source
   292   1          while (i != 0)
   293   1          {
   294   2              i--;
-  295   2              //try 3´Î
+  295   2              //try 3æ¬¡
   296   2              rand_num = (rand() % group_max) + 1;
   297   2              if (FALSE != set_bitmap_bit(group_map, rand_num))
   298   2              {
@@ -325,7 +325,7 @@ stmt  level    source
   305          
   306          /******************************************************************************/
   307          /*
-  308           * \par  Description:»ñÈ¡×éÄÚ³ÉÔ±µÄshuffleºÅ
+  308           * \par  Description:è·å–ç»„å†…æˆå‘˜çš„shuffleå·
   309           *
   310           * \param[in]
   311          
@@ -353,14 +353,14 @@ stmt  level    source
   331   1      
   332   1          if (cur_group < member_avg_group)
   333   1          {
-  334   2              //×éºÅÔÚÆ½¾ùÖµ×éµÄÇ°ÃæÊ±
+  334   2              //ç»„å·åœ¨å¹³å‡å€¼ç»„çš„å‰é¢æ—¶
   335   2              temp8++;
   336   2          }
   337   1      
   338   1          while (i != 0)
   339   1          {
   340   2              i--;
-  341   2              //try 3´Î
+  341   2              //try 3æ¬¡
   342   2              rand_num = (rand() % temp8) + 1;
   343   2              if (FALSE != set_bitmap_bit(member_map, rand_num))
   344   2              {
@@ -374,10 +374,10 @@ stmt  level    source
   352          
   353          /******************************************************************************/
   354          /*
-  355           * \par  Description: ÉèÖÃÕ¼ÓÃ×éµÄ×´Ì¬
+  355           * \par  Description: è®¾ç½®å ç”¨ç»„çš„çŠ¶æ€
   356           *
-  357           * \param[in]    bitmap-Î»Í¼±íµØÖ·
-  358           num-µÚ¼¸¸öbit(1~8)
+  357           * \param[in]    bitmap-ä½å›¾è¡¨åœ°å€
+  358           num-ç¬¬å‡ ä¸ªbit(1~8)
   359          
   360           * \param[out]
   361          
@@ -390,7 +390,7 @@ stmt  level    source
   368          {
   369   1          uint8 i, j;
   370   1      
-  371   1          num--;//±äÎª´Ó0¿ªÊ¼
+  371   1          num--;//å˜ä¸ºä»0å¼€å§‹
   372   1          i = num / 8;
   373   1          j = num % 8;
   374   1      
@@ -405,7 +405,7 @@ stmt  level    source
   383          
   384          /******************************************************************************/
   385          /*
-  386           * \par  Description:²éÕÒÎ´²¥·Å¹ıµÄ³ÉÔ±
+  386           * \par  Description:æŸ¥æ‰¾æœªæ’­æ”¾è¿‡çš„æˆå‘˜
 C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 7   
 
   387           *
@@ -424,7 +424,7 @@ stmt  level    source
   400   1      
   401   1          if ((rand_num & 0x01) > 0)
   402   1          {
-  403   2              //´ÓÍ·ÍùÇ°ÕÒ
+  403   2              //ä»å¤´å¾€å‰æ‰¾
   404   2              for (i = 1; i < (count_max + 1); i++)
   405   2              {
   406   3                  if (FALSE != set_bitmap_bit(bitmap, i))
@@ -435,7 +435,7 @@ stmt  level    source
   411   2          }
   412   1          else
   413   1          {
-  414   2              //´ÓÄ©Íù»ØÕÒ
+  414   2              //ä»æœ«å¾€å›æ‰¾
   415   2              for (i = count_max; i > 0; i--)
   416   2              {
   417   3                  if (FALSE != set_bitmap_bit(bitmap, i))
@@ -451,7 +451,7 @@ stmt  level    source
   427          
   428          /******************************************************************************/
   429          /*
-  430           * \par  Description:»ñÈ¡»ØËİ¶ÓÁĞÖĞµÄÏÂÒ»¸ö
+  430           * \par  Description:è·å–å›æº¯é˜Ÿåˆ—ä¸­çš„ä¸‹ä¸€ä¸ª
   431           *
   432           * \param[in]
   433          
@@ -466,7 +466,7 @@ stmt  level    source
   442          {
   443   1          if (cur_save_pt >= (SET_PREV_MAX - 1))
   444   1          {
-  445   2              //Ñ­»·bufferµÄ·½Ê½´æ·Å
+  445   2              //å¾ªç¯bufferçš„æ–¹å¼å­˜æ”¾
   446   2              cur_save_pt = 0;
   447   2          }
   448   1          else
@@ -489,7 +489,7 @@ stmt  level    source
   463          
   464          /******************************************************************************/
   465          /*
-  466           * \par  Description:»ñÈ¡»ØËİ¶ÓÁĞÖĞµÄÉÏÒ»¸ö
+  466           * \par  Description:è·å–å›æº¯é˜Ÿåˆ—ä¸­çš„ä¸Šä¸€ä¸ª
   467           *
   468           * \param[in]
   469          
@@ -504,7 +504,7 @@ stmt  level    source
   478          {
   479   1          if (cur_save_pt == 0)
   480   1          {
-  481   2              //Ñ­»·bufferµÄ·½Ê½´æ·Å
+  481   2              //å¾ªç¯bufferçš„æ–¹å¼å­˜æ”¾
   482   2              cur_save_pt = SET_PREV_MAX - 1;
   483   2          }
   484   1          else
@@ -524,7 +524,7 @@ stmt  level    source
   498          
   499          /******************************************************************************/
   500          /*
-  501           * \par  Description:»ñÈ¡²¥·ÅµÄshuffleµÄnumber
+  501           * \par  Description:è·å–æ’­æ”¾çš„shuffleçš„number
   502           *
   503           * \param[in]
   504          
@@ -541,22 +541,22 @@ stmt  level    source
   515   1      
   516   1          if (FALSE == use_member_flag)
   517   1          {
-  518   2              //Ö»Ê¹ÓÃ×éºÅshuffle
+  518   2              //åªä½¿ç”¨ç»„å·shuffle
 C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 9   
 
   519   2              cur_group = (uint8) get_group_num();
   520   2              return (uint16) cur_group;
   521   2          }
   522   1      
-  523   1          //Ê¹ÓÃ×éÄÚshuffle
+  523   1          //ä½¿ç”¨ç»„å†…shuffle
   524   1      
   525   1          if (0 == cur_group)
   526   1          {
-  527   2              //Ê×´Î½øÈë
+  527   2              //é¦–æ¬¡è¿›å…¥
   528   2              cur_group = (uint8) get_group_num();
   529   2              if (0 == cur_group)
   530   2              {
-  531   3                  //ËùÓĞ×éÒÑ¾­²¥·ÅÍê
+  531   3                  //æ‰€æœ‰ç»„å·²ç»æ’­æ”¾å®Œ
   532   3                  return 0;
   533   3              }
   534   2              init_member_map();
@@ -565,11 +565,11 @@ stmt  level    source
   537   1          cur_member = get_member_num();
   538   1          if (0 == cur_member)
   539   1          {
-  540   2              //µ±Ç°×é³ÉÔ±ÒÑÈ«²¿²¥·ÅÍê
+  540   2              //å½“å‰ç»„æˆå‘˜å·²å…¨éƒ¨æ’­æ”¾å®Œ
   541   2              cur_group = (uint8) get_group_num();
   542   2              if (0 == cur_group)
   543   2              {
-  544   3                  //ËùÓĞ×éÒÑ¾­²¥·ÅÍê
+  544   3                  //æ‰€æœ‰ç»„å·²ç»æ’­æ”¾å®Œ
   545   3                  return 0;
   546   3              }
   547   2              init_member_map();
@@ -587,7 +587,7 @@ stmt  level    source
   559          
   560          /******************************************************************************/
   561          /*
-  562           * \par  Description:»ñÈ¡shuffle»úÖÆµÄÏÂÒ»¸ö
+  562           * \par  Description:è·å–shuffleæœºåˆ¶çš„ä¸‹ä¸€ä¸ª
   563           *
   564           * \param[in]
   565          
@@ -660,7 +660,7 @@ stmt  level    source
   630   1      
   631   1          //list can't find,use shuffle al
   632   1      
-  633   1          //±£Ö¤Ëæ»ú³öÀ´µÄÖµÔÚshuffle_total·¶Î§ÄÚ,²¢Óëfile_no²»ÏàÍ¬
+  633   1          //ä¿è¯éšæœºå‡ºæ¥çš„å€¼åœ¨shuffle_totalèŒƒå›´å†…,å¹¶ä¸file_noä¸ç›¸åŒ
   634   1          do
   635   1          {
   636   2              temp_num = get_shuffle_num();
@@ -677,7 +677,7 @@ stmt  level    source
   647   2              //SAVE TO PLAY_NUM_LIST
   648   2              if (cur_save_pt >= (SET_PREV_MAX - 1))
   649   2              {
-  650   3                  //Ñ­»·bufferµÄ·½Ê½´æ·Å
+  650   3                  //å¾ªç¯bufferçš„æ–¹å¼å­˜æ”¾
 C251 COMPILER V4.55,  enhanced_fsel_shuffle                                                13/12/18  16:27:39  PAGE 11  
 
   651   3                  cur_save_pt = 0;
@@ -700,7 +700,7 @@ stmt  level    source
   668          
   669          /******************************************************************************/
   670          /*
-  671           * \par  Description:»ñÈ¡shuffle»úÖÆµÄÉÏÒ»¸ö
+  671           * \par  Description:è·å–shuffleæœºåˆ¶çš„ä¸Šä¸€ä¸ª
   672           *
   673           * \param[in]
   674          
@@ -774,7 +774,7 @@ stmt  level    source
   740   1      
   741   1          //list can't find, use shuffle al
   742   1      
-  743   1          //±£Ö¤Ëæ»ú³öÀ´µÄÖµÔÚshuffle_total·¶Î§ÄÚ,²¢Óëfile_no²»ÏàÍ¬
+  743   1          //ä¿è¯éšæœºå‡ºæ¥çš„å€¼åœ¨shuffle_totalèŒƒå›´å†…,å¹¶ä¸file_noä¸ç›¸åŒ
   744   1          do
   745   1          {
   746   2              temp_num = get_shuffle_num();
@@ -791,7 +791,7 @@ stmt  level    source
   757   2              //SAVE TO PLAY_NUM_LIST
   758   2              if (cur_save_pt == 0)
   759   2              {
-  760   3                  //Ñ­»·bufferµÄ·½Ê½´æ·Å
+  760   3                  //å¾ªç¯bufferçš„æ–¹å¼å­˜æ”¾
   761   3                  cur_save_pt = SET_PREV_MAX - 1;
   762   3              }
   763   2              else

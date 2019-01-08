@@ -20,10 +20,10 @@
 
 typedef struct
 {
-    uint16 x;//x×ø±ê
-    uint16 y;//y×ø±ê
-    uint16 w;//¿í
-    uint16 h;//¸ß
+    uint16 x;//xåæ ‡
+    uint16 y;//yåæ ‡
+    uint16 w;//å®½
+    uint16 h;//é«˜
 } VideoRegion_t;
 
 
@@ -32,10 +32,10 @@ typedef  struct
     uint16 LcmWidth;// Displaying deviece width;
     uint16 LcmHeigh;// Displaying deviece height;
     uint8 RGBScale;//RGB 565
-    uint8 FadeoutPara;// 0,ÎŞµ­³ö; 1-0.1s;2-0.
-    uint8 ShowProgressBar;//½ø¶ÈÌõÏÔÊ¾
-    uint8 USetW_spare1;//ÈíÒôÁ¿
-    uint8 Reserve;//±£Áô
+    uint8 FadeoutPara;// 0,æ— æ·¡å‡º; 1-0.1s;2-0.
+    uint8 ShowProgressBar;//è¿›åº¦æ¡æ˜¾ç¤º
+    uint8 USetW_spare1;//è½¯éŸ³é‡
+    uint8 Reserve;//ä¿ç•™
 } ColorLcmInfor_t;
 
 

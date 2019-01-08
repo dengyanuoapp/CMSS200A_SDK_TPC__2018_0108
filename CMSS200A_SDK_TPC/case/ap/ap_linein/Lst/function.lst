@@ -13,7 +13,7 @@ stmt  level    source
     3          #include "ap_common.h"
     4          
     5          #pragma name(FUNCTION)
-    6          //´ÓVRAMÖĞ¶Á³öµÄEQ,SRS²ÎÊı±í£¬Í¨¹ıEQ¹¤¾ßÉèÖÃ
+    6          //ä»VRAMä¸­è¯»å‡ºçš„EQ,SRSå‚æ•°è¡¨ï¼Œé€šè¿‡EQå·¥å…·è®¾ç½®
     7          EQ_VM_t g_eq_para;
     8          const uint8 EQtemp[eq_max][10] =
     9          {
@@ -29,7 +29,7 @@ stmt  level    source
    19          
    20          void volume_callback(uint16 Vol)
    21          {
-   22   1          //ÊµÊ±¸Ä±äÒôÁ¿µÄÖµ
+   22   1          //å®æ—¶æ”¹å˜éŸ³é‡çš„å€¼
    23   1          //   g_comval.volume = (uint8) Vol * SOFTVOL_MAX / g_comval.VolumeMax;
    24   1          OutPutVolume(g_comval.volume);
    25   1      }
@@ -37,9 +37,9 @@ stmt  level    source
    26          
    27          /*===========================================
    28           functions: OutPutVolume(int vol)
-   29           input:    int vol: ÒªÊä³öµÄÒôÁ¿
+   29           input:    int vol: è¦è¾“å‡ºçš„éŸ³é‡
    30           output:  void
-   31           ¹¦ÄÜ£º °ÑÒôÁ¿ÖµËÍµ½IO¿Ú£¬
+   31           åŠŸèƒ½ï¼š æŠŠéŸ³é‡å€¼é€åˆ°IOå£ï¼Œ
    32           ============================================*/
    33          void OutPutVolume(uint16 vol)
    34          {
@@ -51,7 +51,7 @@ stmt  level    source
    40           * Arguments  :
    41           *
    42           * Returns     :
-   43           *            ÎŞ
+   43           *            æ— 
    44           * Notes       :
    45           *
    46           ********************************************************************************/
@@ -70,18 +70,18 @@ stmt  level    source
 
    58   2              if (buf == NULL)
    59   2              {
-   60   3                  //´ÓVRAM¶Á£¬±£´æµÄ²ÎÊı¼°Ê±ÉúĞ§
+   60   3                  //ä»VRAMè¯»ï¼Œä¿å­˜çš„å‚æ•°åŠæ—¶ç”Ÿæ•ˆ
    61   3                  VMRead(&g_eq_para, VM_PCSET_EQ, sizeof(EQ_VM_t));
    62   3      
    63   3                  if (g_eq_para.magic != EQ_VRAM_MAGIC)
    64   3                  {
-   65   4                      //Ê¹ÓÃ´úÂëÄ¬ÈÏEQ±í
+   65   4                      //ä½¿ç”¨ä»£ç é»˜è®¤EQè¡¨
    66   4                      memcpy(g_decControlInfor.EQVal, (void *) EQtemp[(uint8) eq_type],
    67   4                             sizeof(g_decControlInfor.EQVal));
    68   4                  }
    69   3                  else
    70   3                  {
-   71   4                      //Ê¹ÓÃ¹¤¾ßÉèÖÃEQ±í
+   71   4                      //ä½¿ç”¨å·¥å…·è®¾ç½®EQè¡¨
    72   4                      memcpy(g_decControlInfor.EQVal, (void *) &g_eq_para.left_eq_para[(uint8) ONE_EQPARA_BYTE 
              -* eq_type],
    73   4                             ONE_EQPARA_BYTE);
@@ -101,13 +101,13 @@ stmt  level    source
    87   2              {
    88   3                  if (g_eq_para.magic != EQ_VRAM_MAGIC)
    89   3                  {
-   90   4                      //Ê¹ÓÃ´úÂëÄ¬ÈÏEQ±í
+   90   4                      //ä½¿ç”¨ä»£ç é»˜è®¤EQè¡¨
    91   4                      memcpy(g_decControlInfor.EQVal, (void *) EQtemp[(uint8) eq_type],
    92   4                             sizeof(g_decControlInfor.EQVal));
    93   4                  }
    94   3                  else
    95   3                  {
-   96   4                      //Ê¹ÓÃ¹¤¾ßÉèÖÃEQ±í
+   96   4                      //ä½¿ç”¨å·¥å…·è®¾ç½®EQè¡¨
    97   4                      memcpy(g_decControlInfor.EQVal, (void *) &g_eq_para.right_eq_para[(uint8) ONE_EQPARA_BYTE
              - * eq_type],
    98   4                             ONE_EQPARA_BYTE);
@@ -130,7 +130,7 @@ stmt  level    source
   115           * Arguments  :
   116           *
   117           * Returns     :
-  118           *            ÎŞ
+  118           *            æ— 
   119           * Notes       :
   120           *
   121           ********************************************************************************/
@@ -148,7 +148,7 @@ stmt  level    source
   131           ********************************************************************************
   132           *             void deal_eq_msg(void)
   133           *
-  134           * Description : ´¦ÀíEQÄ£Ê½µ÷½ÚÏûÏ¢
+  134           * Description : å¤„ç†EQæ¨¡å¼è°ƒèŠ‚æ¶ˆæ¯
   135           *
   136           *
   137           * Arguments   :
@@ -206,12 +206,12 @@ stmt  level    source
 
   188          #if 0
                /********************************************************************************
-                * Description : ´¦ÀíÒôÁ¿¼ü
+                * Description : å¤„ç†éŸ³é‡é”®
                 *
                 * Arguments  :
                 *
                 * Returns     :
-                *            ÎŞ
+                *            æ— 
                 * Notes       :
                 *
                 ********************************************************************************/

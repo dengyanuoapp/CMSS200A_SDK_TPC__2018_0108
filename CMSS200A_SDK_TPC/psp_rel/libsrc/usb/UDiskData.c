@@ -15,7 +15,7 @@
 #include "udisklib.h"
 
 #pragma userclass(hconst=FDATA)
-//note:´Ë±äÁ¿·ÅÔÚAP bank 0xa0µÄÆğÊ¼µÄ¹Ì¶¨Î»ÖÃ,À©Èİ¹¤¾ß½âÎöudisk.apÎÄ¼ş,ÌîĞ´À©ÈİÈİÁ¿
+//note:æ­¤å˜é‡æ”¾åœ¨AP bank 0xa0çš„èµ·å§‹çš„å›ºå®šä½ç½®,æ‰©å®¹å·¥å…·è§£æudisk.apæ–‡ä»¶,å¡«å†™æ‰©å®¹å®¹é‡
 uint16 const far fake_udisk_cap = 0x00;
 #pragma userclass(hconst=default)
 
@@ -25,29 +25,29 @@ const uint8 FFMSCardDrvName[] = "UD_FFMS.DRV"; //MS card driver name
 const uint8 FFCardBaseDrvName[] = "UD_FF648.DRV"; //MS card driver name
 const uint8 ActionsFlag[11] =
 { 'A', 'C', 'T', 'I', 'O', 'N', 'S', 'U', 'S', 'B', 'D' };
-/*actions_solution_flag±äÁ¿µÄµÄÊı¾İ½á¹¹ÈçÏÂ
+/*actions_solution_flagå˜é‡çš„çš„æ•°æ®ç»“æ„å¦‚ä¸‹
  struct system_info
  {
  char reserved_id;
- char company_id;         //¡¯C¡¯ stands for ¡°Öéº£¾æÁ¦¡±; ¡®E¡¯ stands for ¡°±±·½¾æÁ¦¡±
- // ¡®F¡¯ stands for ¡°ÉîÛÚ¾æ²Å¡±; Others reserved;
- char device_id[5];         //¡¯ADFUD¡¯ stands for ¡°Actions firmware update device¡±;
- //¡¯USBD ¡¯ stands for ¡°mass storage USB disk¡±;
- unsigned short brom_pid;            // Èç0x5005
- char brom_version;      //  Èç¡®A¡¯;
- unsigned short ext_brom_id;      // À©Õ¹ brom id£¬Õë¶ÔÍ¬Ò»ÏµÁĞIC£¬»»ÁËÊĞ³¡±àºÅ¶øĞŞ¸Äbrom id
- char ext_brom_version;      //À©Õ¹ brom °æ±¾£¬Õë¶ÔÍ¬Ò»ÏµÁĞIC£¬»»ÁËÊĞ³¡±àºÅ¶øĞŞ¸Ä
- char case_type;           //Çø·Ö¸÷¸ö²»Í¬µÄ·½°¸£¬adfuÊ±·µ»Ø¸ø¹¤¾ßÎª0£¬±íÊ¾²»ÓÃÇø·Ö·½°¸ĞÅÏ¢
- //case_type¶ÔÓ¦¸÷¸ö·½°¸µÄ±àºÅ£º
+ char company_id;         //â€™Câ€™ stands for â€œç æµ·ç‚¬åŠ›â€; â€˜Eâ€™ stands for â€œåŒ—æ–¹ç‚¬åŠ›â€
+ // â€˜Fâ€™ stands for â€œæ·±åœ³ç‚¬æ‰â€; Others reserved;
+ char device_id[5];         //â€™ADFUDâ€™ stands for â€œActions firmware update deviceâ€;
+ //â€™USBD â€™ stands for â€œmass storage USB diskâ€;
+ unsigned short brom_pid;            // å¦‚0x5005
+ char brom_version;      //  å¦‚â€˜Aâ€™;
+ unsigned short ext_brom_id;      // æ‰©å±• brom idï¼Œé’ˆå¯¹åŒä¸€ç³»åˆ—ICï¼Œæ¢äº†å¸‚åœºç¼–å·è€Œä¿®æ”¹brom id
+ char ext_brom_version;      //æ‰©å±• brom ç‰ˆæœ¬ï¼Œé’ˆå¯¹åŒä¸€ç³»åˆ—ICï¼Œæ¢äº†å¸‚åœºç¼–å·è€Œä¿®æ”¹
+ char case_type;           //åŒºåˆ†å„ä¸ªä¸åŒçš„æ–¹æ¡ˆï¼Œadfuæ—¶è¿”å›ç»™å·¥å…·ä¸º0ï¼Œè¡¨ç¤ºä¸ç”¨åŒºåˆ†æ–¹æ¡ˆä¿¡æ¯
+ //case_typeå¯¹åº”å„ä¸ªæ–¹æ¡ˆçš„ç¼–å·ï¼š
  //5105/5101                          0x0a
  //5102                               0x0b
  //3976/5103/5107/5108                0x0c
- char reserved[4];        //Ä¬ÈÏÎª0
+ char reserved[4];        //é»˜è®¤ä¸º0
  };
  */
 const uint8 actions_solution_flag[18] =
 { 0, 'C', 'U', 'S', 'B', 'D', ' ', 0x02, 0x51, 'A', 0, 0, 0, 'B', 0, 0, 0, 0 };
-uint8 const MBR_Bak[224] = //0xE0¸ö×Ö½Ú,Master Boot Record
+uint8 const MBR_Bak[224] = //0xE0ä¸ªå­—èŠ‚,Master Boot Record
 {
     0xfa, 0x33, 0xc0, 0x8e, 0xd0, 0xbc, 0x00, 0x7c, 0x8b, 0xf4, 0x50, 0x07, 0x50, 0x1f, 0xfb, 0xfc, 0xbf, 0x00,
     0x06, 0xb9, 0x00, 0x01, 0xf2, 0xa5, 0xea, 0x1d, 0x06, 0x00, 0x00, 0xbe, 0xbe, 0x07, 0xb3, 0x04, 0x80,
@@ -101,60 +101,60 @@ uint8 MCSR4_bak = 0;
  *********************************************************************************************************
  */
 
-uint8 OSType = 0; //0: mac OSX system    1: windows system  ÓÃÓÚÊµÏÖÔÚÆ»¹ûÏµÍ³ÏÂ¿¨°ÎµôºóÅÌ·ûÏûÊ§Ğ§¹û
-uint8 MaxLUN = 0; //ÉÏ±¨PCµÄÅÌ·ûÊı
-uint8 DiskAppearSelect = 0; //ÓÃ»§µÄÅÌ·ûÑ¡Ôñ  0:¶àÅÌ·û(Ä¬ÈÏ)  01h:ÆÕÍ¨ÅÌ  02h:¼ÓÃÜÅÌ  03h:²å¿¨
+uint8 OSType = 0; //0: mac OSX system    1: windows system  ç”¨äºå®ç°åœ¨è‹¹æœç³»ç»Ÿä¸‹å¡æ‹”æ‰åç›˜ç¬¦æ¶ˆå¤±æ•ˆæœ
+uint8 MaxLUN = 0; //ä¸ŠæŠ¥PCçš„ç›˜ç¬¦æ•°
+uint8 DiskAppearSelect = 0; //ç”¨æˆ·çš„ç›˜ç¬¦é€‰æ‹©  0:å¤šç›˜ç¬¦(é»˜è®¤)  01h:æ™®é€šç›˜  02h:åŠ å¯†ç›˜  03h:æ’å¡
 
-uint8 AutoRunDiskFlag = 0; //AutoRun¹âÅÌ´æÔÚ±êÖ¾: 0:²»´æÔÚ; ·Ç0:´æÔÚ
-uint8 bWriteCD_ROM = 0; //AutoRun¹âÅÌĞ´ÊôĞÔ 0:²»ÔÊĞíĞ´ 0x80:ÔÊĞíĞ´
+uint8 AutoRunDiskFlag = 0; //AutoRunå…‰ç›˜å­˜åœ¨æ ‡å¿—: 0:ä¸å­˜åœ¨; é0:å­˜åœ¨
+uint8 bWriteCD_ROM = 0; //AutoRunå…‰ç›˜å†™å±æ€§ 0:ä¸å…è®¸å†™ 0x80:å…è®¸å†™
 
-uint32 SDDiskCap = 0x00; //SDÇøÈİÁ¿,ÒÔ512bytesÎªµ¥Î»
-uint32 VMCap = 0x00; //VRAMÇøÈİÁ¿,ÒÔ512bytesÎªµ¥Î»
-uint32 MICap = 0x00; //MIÇøÈİÁ¿,ÒÔ512bytesÎªµ¥Î»
-uint32 UICap = 0x00; //UIÇøÈİÁ¿,ÒÔ512bytesÎªµ¥Î»
-uint32 AutoRunDiskCapacity = 0; //AutoRun¹âÅÌÈİÁ¿,ÒÔ512bytesÎªµ¥Î»
-uint32 udisk_total_capacity = 0; //UDISKÇø,ÒÔ512bytesÎªµ¥Î»
+uint32 SDDiskCap = 0x00; //SDåŒºå®¹é‡,ä»¥512bytesä¸ºå•ä½
+uint32 VMCap = 0x00; //VRAMåŒºå®¹é‡,ä»¥512bytesä¸ºå•ä½
+uint32 MICap = 0x00; //MIåŒºå®¹é‡,ä»¥512bytesä¸ºå•ä½
+uint32 UICap = 0x00; //UIåŒºå®¹é‡,ä»¥512bytesä¸ºå•ä½
+uint32 AutoRunDiskCapacity = 0; //AutoRunå…‰ç›˜å®¹é‡,ä»¥512bytesä¸ºå•ä½
+uint32 udisk_total_capacity = 0; //UDISKåŒº,ä»¥512bytesä¸ºå•ä½
 
-uint32 AutoRunDiskStartAddr = 0; //AutoRun¹âÅÌÆğÊ¼ÉÈÇø(512bytes)Æ«ÒÆµØÖ·
-uint32 UdiskStartAddr = 0; //UDISKÇøÆğÊ¼ÉÈÇø(512bytes)Æ«ÒÆµØÖ·
-uint32 EncryptInfoSector = 0x00; //¼ÓÃÜÅÌĞÅÏ¢ÆğÊ¼ÉÈÇø(512bytes)Æ«ÒÆµØÖ·(ÔÚUIÇøÄÚ)
-uint32 EncryptDiskBStartAddr = 0; //¼ÓÃÜÅÌBÅÌÆğÊ¼ÉÈÇø(512bytes)Æ«ÒÆµØÖ·(¼ÓÃÜÅÌ½âÃÜºóµÄ´ÅÅÌ»òÃ»¼ÓÃÜµÄ¼ÓÃÜÅÌ)
-uint32 EncryptDiskCStartAddr = 0; //¼ÓÃÜÅÌCÅÌÆğÊ¼ÉÈÇø(512bytes)Æ«ÒÆµØÖ·(¼ÓÃÜÅÌ½âÃÜÇ°µÄ´ÅÅÌ)
+uint32 AutoRunDiskStartAddr = 0; //AutoRunå…‰ç›˜èµ·å§‹æ‰‡åŒº(512bytes)åç§»åœ°å€
+uint32 UdiskStartAddr = 0; //UDISKåŒºèµ·å§‹æ‰‡åŒº(512bytes)åç§»åœ°å€
+uint32 EncryptInfoSector = 0x00; //åŠ å¯†ç›˜ä¿¡æ¯èµ·å§‹æ‰‡åŒº(512bytes)åç§»åœ°å€(åœ¨UIåŒºå†…)
+uint32 EncryptDiskBStartAddr = 0; //åŠ å¯†ç›˜Bç›˜èµ·å§‹æ‰‡åŒº(512bytes)åç§»åœ°å€(åŠ å¯†ç›˜è§£å¯†åçš„ç£ç›˜æˆ–æ²¡åŠ å¯†çš„åŠ å¯†ç›˜)
+uint32 EncryptDiskCStartAddr = 0; //åŠ å¯†ç›˜Cç›˜èµ·å§‹æ‰‡åŒº(512bytes)åç§»åœ°å€(åŠ å¯†ç›˜è§£å¯†å‰çš„ç£ç›˜)
 
-//Ö÷´æ´¢½éÖÊÀàĞÍ£º·ÇMLC flash:0; MLC flash:1; 2:SPI Nor flash; 3:LBA flash; 4:card base; 5:TLC flash
+//ä¸»å­˜å‚¨ä»‹è´¨ç±»å‹ï¼šéMLC flash:0; MLC flash:1; 2:SPI Nor flash; 3:LBA flash; 4:card base; 5:TLC flash
 uint8 flash_type = 0;
-uint32 flash_capacity = 0; //Ö÷´æ´¢½éÖÊÈİÁ¿,º¬¹Ì¼şÇøµÈÆäËûÇø×ÜÈİÁ¿,ÒÔ128KÎªµ¥Î»
-//Ö÷´æ´¢½éÖÊµÄpage´óĞ¡,µÍbyte±íÊ¾page´óĞ¡£¬pageÄÚsectorÊıÎª2µÄÕû´ÎÃİ;¸ßbyte±íÊ¾sector´óĞ¡,0:512bytes ÆäËûÖµ£º1024bytes
+uint32 flash_capacity = 0; //ä¸»å­˜å‚¨ä»‹è´¨å®¹é‡,å«å›ºä»¶åŒºç­‰å…¶ä»–åŒºæ€»å®¹é‡,ä»¥128Kä¸ºå•ä½
+//ä¸»å­˜å‚¨ä»‹è´¨çš„pageå¤§å°,ä½byteè¡¨ç¤ºpageå¤§å°ï¼Œpageå†…sectoræ•°ä¸º2çš„æ•´æ¬¡å¹‚;é«˜byteè¡¨ç¤ºsectorå¤§å°,0:512bytes å…¶ä»–å€¼ï¼š1024bytes
 uint16 flash_page_sctrnum = 0;
-uint8 FlashWPFlag = 0; //¿¨Ğ´±£»¤±êÖ¾
+uint8 FlashWPFlag = 0; //å¡å†™ä¿æŠ¤æ ‡å¿—
 //uint8 flash_vram_vld = 0;
 
-uint8 ShowMultiDiskFlag = 0; //²åÏß¼´ÏÔÊ¾¿¨ÅÌ·û  0:²»ÏÔÊ¾¿¨ÅÌ·û 1:ÏÔÊ¾¿¨ÅÌ·û
-uint32 CardCapacity = 0; //¿¨ÈİÁ¿,ÒÔ512bytesÎªµ¥Î»
-uint8 CardExistFlag = 0; //¿¨ÊÇ·ñ´æÔÚ±êÖ¾
-uint8 CardWPFlag = 0; //¿¨Ğ´±£»¤±êÖ¾
-uint8 RWCardError = 0; //ÅĞ¶Ï¶ÁĞ´¿¨ÊÇ·ñ³ö´í£¬0£ºÎŞ´í£¬Ö±½Ó·µ»ØCSW£»1£ºÓĞ´í£¬ĞèÒªÖØĞÂÌ½²â¿¨
+uint8 ShowMultiDiskFlag = 0; //æ’çº¿å³æ˜¾ç¤ºå¡ç›˜ç¬¦  0:ä¸æ˜¾ç¤ºå¡ç›˜ç¬¦ 1:æ˜¾ç¤ºå¡ç›˜ç¬¦
+uint32 CardCapacity = 0; //å¡å®¹é‡,ä»¥512bytesä¸ºå•ä½
+uint8 CardExistFlag = 0; //å¡æ˜¯å¦å­˜åœ¨æ ‡å¿—
+uint8 CardWPFlag = 0; //å¡å†™ä¿æŠ¤æ ‡å¿—
+uint8 RWCardError = 0; //åˆ¤æ–­è¯»å†™å¡æ˜¯å¦å‡ºé”™ï¼Œ0ï¼šæ— é”™ï¼Œç›´æ¥è¿”å›CSWï¼›1ï¼šæœ‰é”™ï¼Œéœ€è¦é‡æ–°æ¢æµ‹å¡
 
-uint8 flashorcard_rwflag = 0; //Flash»ò¿¨¶ÁĞ´±êÖ¾: 0,Flash; 1:Card
-ud_rw_struct_t SD_UDRWStruct = //Flash²Ù×÷½á¹¹
+uint8 flashorcard_rwflag = 0; //Flashæˆ–å¡è¯»å†™æ ‡å¿—: 0,Flash; 1:Card
+ud_rw_struct_t SD_UDRWStruct = //Flashæ“ä½œç»“æ„
 { 0x00, 0x00, 0x00, 0x00, };
 uint32 LBA = 0;
 uint32 sectors_trans_once = 0;
 uint32 udisk_rw_sctr_num = 0;
-uint8 illegalLBAFlag = 0; //LBAÊÇ·ñ·Ç·¨,Èç¶Á·Ç·¨SDÇø»òÔ½¹ıFlashÈİÁ¿µÈ,´Ë±êÖ¾Ö»¶ÔFlash¶ÁĞ´ÓĞĞ§
-uint8 flash_normal_rw_sctrs = 0; //UdiskÆÕÍ¨¶ÁĞ´FlashÉÈÇøÊı
-uint8 flash_disk_write_flag = 0; //FlashÅÌ(AÅÌ)Ğ´±ê¼Ç,ÈçĞ´¹ı±íÊ¾ĞèÒª¸üĞÂFAT´ØÁ´
-uint8 fifo_trans_mode = 0; //0:nomal Ä£Ê½; 1:fifoÖ±Í¨Ä£Ê½
+uint8 illegalLBAFlag = 0; //LBAæ˜¯å¦éæ³•,å¦‚è¯»éæ³•SDåŒºæˆ–è¶Šè¿‡Flashå®¹é‡ç­‰,æ­¤æ ‡å¿—åªå¯¹Flashè¯»å†™æœ‰æ•ˆ
+uint8 flash_normal_rw_sctrs = 0; //Udiskæ™®é€šè¯»å†™Flashæ‰‡åŒºæ•°
+uint8 flash_disk_write_flag = 0; //Flashç›˜(Aç›˜)å†™æ ‡è®°,å¦‚å†™è¿‡è¡¨ç¤ºéœ€è¦æ›´æ–°FATç°‡é“¾
+uint8 fifo_trans_mode = 0; //0:nomal æ¨¡å¼; 1:fifoç›´é€šæ¨¡å¼
 
 uint8 IsNotFormat = 0x00;
 uint8 bMediaChange = 0;
-uint8 MediaChgFlag = 0; //´ÅÅÌ½éÖÊ±ä»»±êÖ¾£¬ÓÃÓÚ´ÅÅÌÇĞ»»
+uint8 MediaChgFlag = 0; //ç£ç›˜ä»‹è´¨å˜æ¢æ ‡å¿—ï¼Œç”¨äºç£ç›˜åˆ‡æ¢
 
-udisk_fs_info_t UdiskFSInfo = //8k page¶ÔÆë
+udisk_fs_info_t UdiskFSInfo = //8k pageå¯¹é½
 { 0xffffffff, 0, 0, 0, 0, 0, 0, 0, 0, };
 
-uint8 set_fake_ucap_flag = 0; //uÅÌÀ©Èİ±êÖ¾,0:ÕæÊµflashÈİÁ¿£»1:À©ÈİÈİÁ¿
-uint8 SectorType = 0; //flashÉÈÇø´óĞ¡,1=512bytes/sector, 2=1024bytes/sector,4=2048bytes/sector;
+uint8 set_fake_ucap_flag = 0; //uç›˜æ‰©å®¹æ ‡å¿—,0:çœŸå®flashå®¹é‡ï¼›1:æ‰©å®¹å®¹é‡
+uint8 SectorType = 0; //flashæ‰‡åŒºå¤§å°,1=512bytes/sector, 2=1024bytes/sector,4=2048bytes/sector;
 
 /*
  *********************************************************************************************************
@@ -164,78 +164,78 @@ uint8 SectorType = 0; //flashÉÈÇø´óĞ¡,1=512bytes/sector, 2=1024bytes/sector,4=20
 uint8 USB_State = 0;
 uint8 TransferFlag = 0;
 
-uint8 StatusCheckFlag = 0; //¿ªÊ¼×´Ì¬²éÑ¯±êÖ¾
-uint8 USBBusy = 0; //½øÈëEp1²Ù×÷
+uint8 StatusCheckFlag = 0; //å¼€å§‹çŠ¶æ€æŸ¥è¯¢æ ‡å¿—
+uint8 USBBusy = 0; //è¿›å…¥Ep1æ“ä½œ
 
-uint8 SwitchToADFUFlag = 0; //ÔÊĞíÇĞ»»µ½ADFU
+uint8 SwitchToADFUFlag = 0; //å…è®¸åˆ‡æ¢åˆ°ADFU
 uint8 CanSwitchToADFU = 0x00;
 uint8 detach_cmd_rcv = 0;
 uint8 FWOpStatus = 0;
 uint8 IsAdfuCondition = 0;
 uint8 IsInAdfuState = 0;
-uint8 PartiEjectFlag = 0; //·ÖÇøµ¯³ö±êÖ¾
-uint8 PullLineFlag = 0; //°ÎÏß±êÖ¾
-uint8 PcEjectFlag = 0; //PCµ¯³ö±êÖ¾
-uint8 SplitDiskFlag = 0; //ÊÇ·ñÎªDiskA,B,C½á¹¹
-uint8 EjectFlag = 0; //ÊÇ·ñÒÑ·ÖÇøµ¯³ö
-uint8 usb_pwr_suspnd_fnsh = 0; //USBÁ¬ÏßÊ±µÄsuspendÒÑ¾­½áÊø
+uint8 PartiEjectFlag = 0; //åˆ†åŒºå¼¹å‡ºæ ‡å¿—
+uint8 PullLineFlag = 0; //æ‹”çº¿æ ‡å¿—
+uint8 PcEjectFlag = 0; //PCå¼¹å‡ºæ ‡å¿—
+uint8 SplitDiskFlag = 0; //æ˜¯å¦ä¸ºDiskA,B,Cç»“æ„
+uint8 EjectFlag = 0; //æ˜¯å¦å·²åˆ†åŒºå¼¹å‡º
+uint8 usb_pwr_suspnd_fnsh = 0; //USBè¿çº¿æ—¶çš„suspendå·²ç»ç»“æŸ
 uint8 Suspend_Flag = 0; //bit[7]:1 need process suspend,0 don't process suspend; bit[1:0]:0 no suspend; 1 recieve suspend; 2 has handle suspend
 uint8 DisableSuspendFlag = 0; //0:enable suspend   01h:disable suspend
-uint8 UpOrDownLoad = 0; //ÉÏÔØ»¹ÊÇÏÂÔØ  01h:ÉÏÔØ 02:ÏÂÔØ
-uint8 UpOrDownLoadBak = 0; //ÉÏÔØ»¹ÊÇÏÂÔØ±¸·İ  01h:ÉÏÔØ 02:ÏÂÔØ
+uint8 UpOrDownLoad = 0; //ä¸Šè½½è¿˜æ˜¯ä¸‹è½½  01h:ä¸Šè½½ 02:ä¸‹è½½
+uint8 UpOrDownLoadBak = 0; //ä¸Šè½½è¿˜æ˜¯ä¸‹è½½å¤‡ä»½  01h:ä¸Šè½½ 02:ä¸‹è½½
 
-uint8 UsbIdleCounter = 0; //Õı³£½øÈë¿ÕÏĞ¼ÆÊı
-uint8 EjectTimeCtr = 0; //·ÖÇøµ¯³öÑÓÊ±¼ÆÊı
+uint8 UsbIdleCounter = 0; //æ­£å¸¸è¿›å…¥ç©ºé—²è®¡æ•°
+uint8 EjectTimeCtr = 0; //åˆ†åŒºå¼¹å‡ºå»¶æ—¶è®¡æ•°
 uint8 AdfuTimerCtl = 0;
-uint8 connect_idle_cnt = 0; //USBÁ¬½Óºó³öÓÚIdle×´Ì¬Ê±¼ä¼ÆÊı(2Hz)
-uint8 Counter_30s = 0; //³¬Ê±½øÈë¿ÕÏĞ¼ÆÊı
-uint8 PrevRTCTimerValue1 = 0; //RTCTimerÊıÖµ,UsbIdleCounter,EjectTimeCtr,AdfuTimerCtl¼ÆÊıÊ¹ÓÃ
-uint8 PrevRTCTimerValue2 = 0; //RTCTimerÊıÖµ,30s¼ÆÊıÊ¹ÓÃ
-uint8 prv_connect_idle_tm = 0; //USBÁ¬½Óºó³öÓÚIdle×´Ì¬ÉÏ´ÎTimerµÄÊıÖµ
+uint8 connect_idle_cnt = 0; //USBè¿æ¥åå‡ºäºIdleçŠ¶æ€æ—¶é—´è®¡æ•°(2Hz)
+uint8 Counter_30s = 0; //è¶…æ—¶è¿›å…¥ç©ºé—²è®¡æ•°
+uint8 PrevRTCTimerValue1 = 0; //RTCTimeræ•°å€¼,UsbIdleCounter,EjectTimeCtr,AdfuTimerCtlè®¡æ•°ä½¿ç”¨
+uint8 PrevRTCTimerValue2 = 0; //RTCTimeræ•°å€¼,30sè®¡æ•°ä½¿ç”¨
+uint8 prv_connect_idle_tm = 0; //USBè¿æ¥åå‡ºäºIdleçŠ¶æ€ä¸Šæ¬¡Timerçš„æ•°å€¼
 
-uint8 cbw_count = 0; //ÓÃÓÚ¼ÇÂ¼µÚÒ»¸öCBW£¬ÓÃÓÚÆ»¹ûÓëwindowsÏµÍ³ÅĞ±ğ£¬Æ»¹ûÏµÍ³µÚÒ»¸öCBW¿Ï¶¨ÊÇInquire
+uint8 cbw_count = 0; //ç”¨äºè®°å½•ç¬¬ä¸€ä¸ªCBWï¼Œç”¨äºè‹¹æœä¸windowsç³»ç»Ÿåˆ¤åˆ«ï¼Œè‹¹æœç³»ç»Ÿç¬¬ä¸€ä¸ªCBWè‚¯å®šæ˜¯Inquire
 uint8 bTestNoready = 0;
 uint8 short_pckt_flag = 0;
-uint8 ErrorReportFlag = 0; //³ö´í·µ»Ø±êÖ¾
-uint8 ErrorIndicator = 0; //³ö´íÀàĞÍ
+uint8 ErrorReportFlag = 0; //å‡ºé”™è¿”å›æ ‡å¿—
+uint8 ErrorIndicator = 0; //å‡ºé”™ç±»å‹
 uint8 IsReadCapAndReadRec0 = 0;
-uint8 Removable = 0; //ÊÇ·ñ¿ÉÒÔ°ÎÏß 0:²»¿É°ÎÏß£¬01h:¿É°ÎÏß
+uint8 Removable = 0; //æ˜¯å¦å¯ä»¥æ‹”çº¿ 0:ä¸å¯æ‹”çº¿ï¼Œ01h:å¯æ‹”çº¿
 
 /*
  *********************************************************************************************************
  for adfu
  *********************************************************************************************************
  */
-uint8 LogicOrPhy = 0; //ADFU Âß¼­ºÍÎïÀí¶ÁĞ´±êÖ¾   0:Âß¼­·ÖÇø¶ÁĞ´ 1:ÎïÀí·ÖÇø¶ÁĞ´
-uint8 AccessFlash = 0; //ADFU Ğ´Âß¼­Çø²Ù×÷ 0:ÎŞĞ´²Ù×÷ 1:ÓĞĞ´²Ù×÷
+uint8 LogicOrPhy = 0; //ADFU é€»è¾‘å’Œç‰©ç†è¯»å†™æ ‡å¿—   0:é€»è¾‘åˆ†åŒºè¯»å†™ 1:ç‰©ç†åˆ†åŒºè¯»å†™
+uint8 AccessFlash = 0; //ADFU å†™é€»è¾‘åŒºæ“ä½œ 0:æ— å†™æ“ä½œ 1:æœ‰å†™æ“ä½œ
 
-uint8 brec_count = 0; //BRECÂß¼­±àºÅ£¬0-3
-uint8 first_brec_sector = 0; //Ã¿·İBRECµÄµÚÒ»¸öÉÈÇø±êÖ¾£¬0:Ğ´Ê×ÉÈÇø£¬ÆäËûÖµ£º·ÇÊ×ÉÈÇø
-uint16 total_breclogo_sector = 0; //BRECLOGO length£ºBREC length + LOGO length
-uint16 phy_block_addr = 0; //FlashÎïÀíÇø±àºÅ£¬MBRC:0-3;BREC:4-7
-uint16 brec_check_sum = 0; //BRECµÄĞ£ÑéºÍ,²»º¬LOGO
+uint8 brec_count = 0; //BRECé€»è¾‘ç¼–å·ï¼Œ0-3
+uint8 first_brec_sector = 0; //æ¯ä»½BRECçš„ç¬¬ä¸€ä¸ªæ‰‡åŒºæ ‡å¿—ï¼Œ0:å†™é¦–æ‰‡åŒºï¼Œå…¶ä»–å€¼ï¼šéé¦–æ‰‡åŒº
+uint16 total_breclogo_sector = 0; //BRECLOGO lengthï¼šBREC length + LOGO length
+uint16 phy_block_addr = 0; //Flashç‰©ç†åŒºç¼–å·ï¼ŒMBRC:0-3;BREC:4-7
+uint16 brec_check_sum = 0; //BRECçš„æ ¡éªŒå’Œ,ä¸å«LOGO
 
-uint32 CallingTaskAdd = 0; //¹¦ÄÜµ÷ÓÃÈë¿ÚµØÖ·
-uint8 CallingTaskFlag = 0; //¹¦ÄÜµ÷ÓÃÈÎÎñ±êÖ¾Î»£¬0£ºÎŞ¹¦ÄÜµ÷ÓÃÈÎÎñ£»1£ºÓĞ¹¦ÄÜµ÷ÓÃÈÎÎñ
-uint16 CallingTaskResult = 0; //×´Ì¬½á¹¹µÄµØÖ·
-uint16 StatusLength = 0; //×´Ì¬½á¹¹µÄ³¤¶È
+uint32 CallingTaskAdd = 0; //åŠŸèƒ½è°ƒç”¨å…¥å£åœ°å€
+uint8 CallingTaskFlag = 0; //åŠŸèƒ½è°ƒç”¨ä»»åŠ¡æ ‡å¿—ä½ï¼Œ0ï¼šæ— åŠŸèƒ½è°ƒç”¨ä»»åŠ¡ï¼›1ï¼šæœ‰åŠŸèƒ½è°ƒç”¨ä»»åŠ¡
+uint16 CallingTaskResult = 0; //çŠ¶æ€ç»“æ„çš„åœ°å€
+uint16 StatusLength = 0; //çŠ¶æ€ç»“æ„çš„é•¿åº¦
 
-uint8 adfu_flag = 0; // 1:ÒÑ¿ªÊ¼Á¿²ú
+uint8 adfu_flag = 0; // 1:å·²å¼€å§‹é‡äº§
 
 /*
  *********************************************************************************************************
  for EnDecrypt
  *********************************************************************************************************
  */
-uint8 AccessFlashPhySec1 = 0; //·ÃÎÊÎïÀíÉÈÇø1
-uint8 EncryptFlag = 0; //ÊÇ·ñ¼ÓÃÜ  0:Ã»¼ÓÃÜ  1:Ã»¼ÓÃÜ
-uint8 PasswdPassOk = 0; //ÃÜÂëĞ£ÑéÊÇ·ñÍ¨¹ı  0:Ã»Í¨¹ı  1:Í¨¹ı
-uint8 CMDPerformCondition = 0; //Act UÅÌĞ­ÒéÖ´ĞĞÇé¿ö¼ÇÂ¼
-uint16 ActWRLength = 0; //·ÖÇøÈí¼şÒªĞ´ÉÈÇøÊıÄ¿
-uint32 ActWRLBA = 0; //·ÖÇøÈí¼şÒªĞ´µÄFlashµØÖ·
-uint8 Phy0Sec1RdCounter1 = 0; //Á¬Ğø¶ÁPhy0Sec1¼ÆÊıÆ÷1,ÓÃÓÚÕÒUÅÌ
-uint8 Phy0Sec1RdCounter2 = 0; //Á¬Ğø¶ÁPhy0Sec1¼ÆÊıÆ÷2,ÓÃÓÚĞ­Òé½»Á÷
-uint8 Phy0EquLog0Flag = 0; //ÎïÀí0ÊÇ·ñÓëÂß¼­0ÖØºÏ
+uint8 AccessFlashPhySec1 = 0; //è®¿é—®ç‰©ç†æ‰‡åŒº1
+uint8 EncryptFlag = 0; //æ˜¯å¦åŠ å¯†  0:æ²¡åŠ å¯†  1:æ²¡åŠ å¯†
+uint8 PasswdPassOk = 0; //å¯†ç æ ¡éªŒæ˜¯å¦é€šè¿‡  0:æ²¡é€šè¿‡  1:é€šè¿‡
+uint8 CMDPerformCondition = 0; //Act Uç›˜åè®®æ‰§è¡Œæƒ…å†µè®°å½•
+uint16 ActWRLength = 0; //åˆ†åŒºè½¯ä»¶è¦å†™æ‰‡åŒºæ•°ç›®
+uint32 ActWRLBA = 0; //åˆ†åŒºè½¯ä»¶è¦å†™çš„Flashåœ°å€
+uint8 Phy0Sec1RdCounter1 = 0; //è¿ç»­è¯»Phy0Sec1è®¡æ•°å™¨1,ç”¨äºæ‰¾Uç›˜
+uint8 Phy0Sec1RdCounter2 = 0; //è¿ç»­è¯»Phy0Sec1è®¡æ•°å™¨2,ç”¨äºåè®®äº¤æµ
+uint8 Phy0EquLog0Flag = 0; //ç‰©ç†0æ˜¯å¦ä¸é€»è¾‘0é‡åˆ
 
 /*
  *********************************************************************************************************
@@ -254,7 +254,7 @@ uint8 CMD_Inquiry_information_FOB[60] =
     0x00, //Direct-access device
     0x80, //removable
     0x00, 0x01, //response data format as this spec
-    0x1f, //(92¸ö)additional length
+    0x1f, //(92ä¸ª)additional length
     0x00, 0x00, 0x00, //reserved
     'A', 'C', 'T', 'I', 'O', 'N', 'S', 0x20, //Vendor information
     'U', 'S', 'B', ' ', 'D', 'I', 'S', 'K', 0x20, 'F', 'O', 'B', ' ', ' ', ' ', 0x20, //product identification
@@ -268,7 +268,7 @@ uint8 CMD_Inquiry_information_CDROM[] =
     0x05, //Direct-access device
     0x80, //removable
     0x02, 0x02, //response data format as this spec
-    0x1f, //(92¸ö)additional length
+    0x1f, //(92ä¸ª)additional length
     0x00, 0x00, 0x00, //reserved
     'A', 'C', 'T', 'I', 'O', 'N', 'S', 0x20, //Vendor information
     'U', 'S', 'B', ' ', 'D', 'I', 'S', 'K', 0x20, 'C', 'D', 'R', 'O', 'M', ' ', 0x20, //product identification
@@ -381,8 +381,8 @@ uint8 CDRom_Request_DISCINFORMATION[28] =
  for setup
  *********************************************************************************************************
  */
-//bit0~bit1: UdiskĞòÁĞºÅÖ§³Ö:0:no sn; 1:unified sn; 2:random sn;
-//bit4: UdiskÈÏÖ¤Ä£Ê½Ö§³Ö: 1:½øÈëUdiskÈÏÖ¤Ä£Ê½,Æô¶¯Ê±¼ä¼Ó¿ì,Ö§³ÖsuspendºÍresumeµÈUSBÈÏÖ¤¹¦ÄÜ
+//bit0~bit1: Udiskåºåˆ—å·æ”¯æŒ:0:no sn; 1:unified sn; 2:random sn;
+//bit4: Udiskè®¤è¯æ¨¡å¼æ”¯æŒ: 1:è¿›å…¥Udiskè®¤è¯æ¨¡å¼,å¯åŠ¨æ—¶é—´åŠ å¿«,æ”¯æŒsuspendå’Œresumeç­‰USBè®¤è¯åŠŸèƒ½
 uint8 udisk_setting = 0;
 uint8 set_pkt_size = 0;
 uint8 usb_reset_enter_cnt = 0;
@@ -434,11 +434,11 @@ usb_serialnum_descriptor SerialNumber =
 
 /*
  *********************************************************************************************************
- *                                           ¸ßËÙÉè±¸ÃèÊö·û
+ *                                           é«˜é€Ÿè®¾å¤‡æè¿°ç¬¦
  *
- * Description: ¸ßËÙÉè±¸Éè±¸ÃèÊö·û(USB2.0).
+ * Description: é«˜é€Ÿè®¾å¤‡è®¾å¤‡æè¿°ç¬¦(USB2.0).
  *
- * Note(s)    : °üº¬Ò»¸öÅäÖÃ, Ò»¸ö½Ó¿Ú, Á½¸öBulk¶Ëµã.
+ * Note(s)    : åŒ…å«ä¸€ä¸ªé…ç½®, ä¸€ä¸ªæ¥å£, ä¸¤ä¸ªBulkç«¯ç‚¹.
  *********************************************************************************************************
  */
 usb_device_descriptor HS_Device_Dscrptr =
@@ -446,7 +446,7 @@ usb_device_descriptor HS_Device_Dscrptr =
     sizeof(usb_device_descriptor), //bLength
     USB_DT_DEVICE, //bDescriptorType
 
-    0x0002, //bcdUSB, USB release version 2.0,0x200×ªĞ¡¶ËÄ£Ê½,
+    0x0002, //bcdUSB, USB release version 2.0,0x200è½¬å°ç«¯æ¨¡å¼,
     0x00, //bDeviceClass, class code
     0x00, //bDeviceSubClass, sub-class code
     0x00, //bDeviceProtocol, protocol
@@ -513,11 +513,11 @@ usb_endpoint_descriptor HS_EndpointB_Dscrptr =
 
 /*
  *********************************************************************************************************
- *                                           ÏŞ¶¨¸ßËÙÉè±¸ÃèÊö·û
+ *                                           é™å®šé«˜é€Ÿè®¾å¤‡æè¿°ç¬¦
  *
- * Description: ÏŞ¶¨¸ßËÙÉè±¸Éè±¸ÃèÊö·û(USB2.0).
+ * Description: é™å®šé«˜é€Ÿè®¾å¤‡è®¾å¤‡æè¿°ç¬¦(USB2.0).
  *
- * Note(s)    : °üº¬Ò»¸öÅäÖÃ, Ò»¸ö½Ó¿Ú, Á½¸öBulk¶Ëµã.
+ * Note(s)    : åŒ…å«ä¸€ä¸ªé…ç½®, ä¸€ä¸ªæ¥å£, ä¸¤ä¸ªBulkç«¯ç‚¹.
  *********************************************************************************************************
  */
 usb_qualifier_descriptor HS_Device_Qualifier_Dscrptr =

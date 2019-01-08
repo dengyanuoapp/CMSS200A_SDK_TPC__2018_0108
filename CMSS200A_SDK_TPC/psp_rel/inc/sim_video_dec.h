@@ -66,7 +66,7 @@ extern uint32 near allframes   ;
 extern uint16 near decHigh ;
 extern uint16 near decWide ;
 
-// ±äÁ¿ÀàĞÍ³åÍ»£¬ÔÚÍ¼Æ¬APÖĞ²»Ê¹ÓÃ¸ÃÉêÃ÷
+// å˜é‡ç±»å‹å†²çªï¼Œåœ¨å›¾ç‰‡APä¸­ä¸ä½¿ç”¨è¯¥ç”³æ˜
 #ifndef AP_PHOTO_EXPORTS
 extern uint8  near showlines;
 #endif
@@ -78,9 +78,9 @@ extern int32  near blockcnt ;
 extern handle near  vidfp;
 extern uint8 near downscale;
 extern uint8 near RGBScale;//RGB 565
-extern uint8 near FadeoutPara;// 0,ÎŞµ­³ö; 1£¬1Sµ­³ö; 2,2Sµ­³ö
-extern uint8 near ShowProgressBar;//½ø¶ÈÌõÏÔÊ¾
-extern uint8 near USetW_spare1;//ÈíÒôÁ¿
+extern uint8 near FadeoutPara;// 0,æ— æ·¡å‡º; 1ï¼Œ1Sæ·¡å‡º; 2,2Sæ·¡å‡º
+extern uint8 near ShowProgressBar;//è¿›åº¦æ¡æ˜¾ç¤º
+extern uint8 near USetW_spare1;//è½¯éŸ³é‡
 
 extern uint8   near reg_adh_bak;//mcsr5
 extern uint8   near reg_aeh_bak;//mcsr6

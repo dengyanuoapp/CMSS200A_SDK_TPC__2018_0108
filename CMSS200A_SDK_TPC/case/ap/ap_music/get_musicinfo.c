@@ -48,9 +48,9 @@ uint8 deal_change_music_msg(uint8 key)
 
 /*
  *******************************************************************************
- * Description : »»ÇúÊ±Òª×öµÄÑ¡Çú£¬³õÊ¼»¯¶¯×÷
+ * Description : æ¢æ›²æ—¶è¦åšçš„é€‰æ›²ï¼Œåˆå§‹åŒ–åŠ¨ä½œ
  * Arguments   :
- * Returns     : ÕæÊ±±íÊ¾¿É¼ÌĞø·Å£¬¼ÙÊ±±íÊ¾ÒªÍ£Ö¹·Å(²¥·Å×´Ì¬)
+ * Returns     : çœŸæ—¶è¡¨ç¤ºå¯ç»§ç»­æ”¾ï¼Œå‡æ—¶è¡¨ç¤ºè¦åœæ­¢æ”¾(æ’­æ”¾çŠ¶æ€)
  * Notes       :
  *******************************************************************************
  */
@@ -62,10 +62,10 @@ uint8 ChangeMusic(uint8 Direct, Music_sel_mod_t mod)
 
     ClearTimePara();
 
-    //±¸·İ
+    //å¤‡ä»½
     memcpy(&location_tmp, &CurUselocation, sizeof(file_location_t));
 
-    /*²¥·ÅÊ±ÊÖ¶¯ÇĞ»»°´¼üµÄÇé¿ö*/
+    /*æ’­æ”¾æ—¶æ‰‹åŠ¨åˆ‡æ¢æŒ‰é”®çš„æƒ…å†µ*/
     if (mod == Manu_Sel)
     {
         switch (g_music_vars.repeat_mode)
@@ -80,7 +80,7 @@ uint8 ChangeMusic(uint8 Direct, Music_sel_mod_t mod)
     }
     else
     {
-        //Õı³£²¥·ÅµÄÇé¿ö
+        //æ­£å¸¸æ’­æ”¾çš„æƒ…å†µ
         if (g_music_vars.repeat_mode == FSEL_ALL_REPEATONE)
         {
             return 2;
@@ -116,12 +116,12 @@ uint8 ChangeMusic(uint8 Direct, Music_sel_mod_t mod)
  ******************************************************************************
  *             Music_type_t CheckMusicType(uint8   *filename)
  *
- * Description : »ñÈ¡ÏÂÒ»Ê×»òÉÏÒ»Ê×¸èÇú
+ * Description : è·å–ä¸‹ä¸€é¦–æˆ–ä¸Šä¸€é¦–æ­Œæ›²
  *
- * Arguments   : direct:  ÎÄ¼şÃû
+ * Arguments   : direct:  æ–‡ä»¶å
  *				 mod:
  *
- * Returns     : Music_type_t ÎÄ¼şÀàĞÍ
+ * Returns     : Music_type_t æ–‡ä»¶ç±»å‹
  *
  * Notes       :
  *
@@ -131,16 +131,16 @@ uint8 ChangeMusic(uint8 Direct, Music_sel_mod_t mod)
 uint8 get_next_prev_music(uint8 direct, Music_sel_mod_t mod)
 {
     uint8 g_result;
-    /* ¸ñÊ½´íÎóÌøµ½ÏÂÒ»Çú¼ÌĞø²¥·Å*/
+    /* æ ¼å¼é”™è¯¯è·³åˆ°ä¸‹ä¸€æ›²ç»§ç»­æ’­æ”¾*/
 findfileagain:
     ClearWatchDog();
     write_poweroff_flag(0);
     g_result = ChangeMusic(direct, mod);
     if (g_result == FALSE)
     {
-        return RESULT_UI_STOP;//»Øµ½Í£Ö¹½çÃæ
+        return RESULT_UI_STOP;//å›åˆ°åœæ­¢ç•Œé¢
     }
-    //µ¥ÇúÑ­»·ºó×Ô¶¯¼ÌĞøÑ­»·²¥·ÅÊ±£¬²»ÔÙ»ñÈ¡ÎÄ¼şĞÅÏ¢
+    //å•æ›²å¾ªç¯åè‡ªåŠ¨ç»§ç»­å¾ªç¯æ’­æ”¾æ—¶ï¼Œä¸å†è·å–æ–‡ä»¶ä¿¡æ¯
     if (g_result != 2)
     {
         get_music_location(FALSE);
@@ -154,7 +154,7 @@ findfileagain:
     {
         if(FS_GetInfo() != 0)
         {
-            return RESULT_UI_STOP;//»Øµ½Í£Ö¹½çÃæ
+            return RESULT_UI_STOP;//å›åˆ°åœæ­¢ç•Œé¢
         }
         show_fileno_ui();
         ap_sleep(4);
@@ -170,7 +170,7 @@ findfileagain:
                 PlayStatus = StopSta;
                 if (CurUselocation.disk == disk_char[0])
                 {
-                    //Èç¹û¼ì²â²»µ½¿¨»òÕß¿¨ÓëuÅÌÒÑ¾­×Ô¶¯ÇĞ»»¹ıÒ»ÂÖ£¬ÔòÖ±½ÓÍË³ömusicÓ¦ÓÃ
+                    //å¦‚æœæ£€æµ‹ä¸åˆ°å¡æˆ–è€…å¡ä¸uç›˜å·²ç»è‡ªåŠ¨åˆ‡æ¢è¿‡ä¸€è½®ï¼Œåˆ™ç›´æ¥é€€å‡ºmusicåº”ç”¨
                     if((DRV_DetectUD(1) != 0x20) || (first_init == FALSE))
                     {
                         no_device_flag = TRUE;
@@ -184,7 +184,7 @@ findfileagain:
                 }
                 else if (CurUselocation.disk == disk_char[1])
                 {
-                    //Èç¹û¼ì²â²»µ½uÅÌ»òÕß¿¨ÓëuÅÌÒÑ¾­×Ô¶¯ÇĞ»»¹ıÒ»ÂÖ£¬ÔòÖ±½ÓÍË³ömusicÓ¦ÓÃ
+                    //å¦‚æœæ£€æµ‹ä¸åˆ°uç›˜æˆ–è€…å¡ä¸uç›˜å·²ç»è‡ªåŠ¨åˆ‡æ¢è¿‡ä¸€è½®ï¼Œåˆ™ç›´æ¥é€€å‡ºmusicåº”ç”¨
                     if((USBH_Check_Udisk() == 0) || (first_init == FALSE))
                     {
                         no_device_flag = TRUE;
@@ -208,7 +208,7 @@ findfileagain:
         SetCurUI_Type(FileNo_UI);
         RefreshMainScreen();
 #ifdef MUSIC_AP
-        //ÓĞtts²¥±¨Ê±£¬²»Ôö¼ÓÑÓÊ±ÏÔÊ¾ÎÄ¼şĞòºÅ
+        //æœ‰ttsæ’­æŠ¥æ—¶ï¼Œä¸å¢åŠ å»¶æ—¶æ˜¾ç¤ºæ–‡ä»¶åºå·
         if((g_TagInfoBuf[0] != 0x0) && (FF_flag == 0) && (prev_PlayStatus == PlaySta))
         {
             SetCurUI_Type(Music_UI);
@@ -224,11 +224,11 @@ findfileagain:
  ******************************************************************************
  *             Music_type_t CheckMusicType(uint8   *filename)
  *
- * Description : ¼ì²âµ±Ç°ÊÇÄÄÖÖÀàĞÍµÄMUSICÎÄ¼ş
+ * Description : æ£€æµ‹å½“å‰æ˜¯å“ªç§ç±»å‹çš„MUSICæ–‡ä»¶
  *
- * Arguments   : uint8   *filename  ÎÄ¼şÃû
+ * Arguments   : uint8   *filename  æ–‡ä»¶å
  *
- * Returns     : Music_type_t ÎÄ¼şÀàĞÍ
+ * Returns     : Music_type_t æ–‡ä»¶ç±»å‹
  *
  * Notes       :
  *
@@ -267,7 +267,7 @@ Music_type_t near CheckMusicType(uint8 *filename)
  ********************************************************************************
  *             uint16 GetInformation(void)
  *
- * Description : ¶ÁÈ¡¸èÇúĞÅÏ¢,¸è´Ê
+ * Description : è¯»å–æ­Œæ›²ä¿¡æ¯,æ­Œè¯
  *
  * Arguments   : void
  *
@@ -303,9 +303,9 @@ void GetInformation(void)
 WMA_check:
         g_Openparam.typeerror = wmaCheckType(NULL, &g_Openparam.musicframeoffset,
                                              &g_Openparam.musictotaltime, &pFormat, &ID3);
-        //ÀàĞÍ¼ì²é³ö´íºó£¬ÔÙÓÃmp3¸ñÊ½¼ì²éÒ»´Î£¬ÒÔ·ÀÊÇºó×º¸Ä¶¯ËùÖÂ
+        //ç±»å‹æ£€æŸ¥å‡ºé”™åï¼Œå†ç”¨mp3æ ¼å¼æ£€æŸ¥ä¸€æ¬¡ï¼Œä»¥é˜²æ˜¯åç¼€æ”¹åŠ¨æ‰€è‡´
 
-        if (g_Openparam.typeerror != 0) //Õı³£ÎÄ¼ş²Å²Ù×÷
+        if (g_Openparam.typeerror != 0) //æ­£å¸¸æ–‡ä»¶æ‰æ“ä½œ
         {
             if (first_check == TRUE)
             {
@@ -314,7 +314,7 @@ WMA_check:
             }
 
 #if 0
-            /* ÅĞ¶ÏÊÇ·ñÎªMP3ÎÄ¼ş, ºó×º¸ÄÎªÁËWMA */
+            /* åˆ¤æ–­æ˜¯å¦ä¸ºMP3æ–‡ä»¶, åç¼€æ”¹ä¸ºäº†WMA */
             g_Openparam.typeerror = mp3CheckType(NULL, &g_Openparam.musicframeoffset, &g_Openparam.musictotaltime,
                                                  &pFormat);
             if (g_Openparam.typeerror == 0)
@@ -345,7 +345,7 @@ WMA_check:
 MP3_check:
         g_Openparam.typeerror = mp3CheckType(NULL, &g_Openparam.musicframeoffset,
                                              &g_Openparam.musictotaltime, &pFormat);
-        //ÀàĞÍ¼ì²é³ö´íºó£¬ÔÙÓÃWMA¸ñÊ½¼ì²éÒ»´Î£¬ÒÔ·ÀÊÇºó×º¸Ä¶¯ËùÖÂ
+        //ç±»å‹æ£€æŸ¥å‡ºé”™åï¼Œå†ç”¨WMAæ ¼å¼æ£€æŸ¥ä¸€æ¬¡ï¼Œä»¥é˜²æ˜¯åç¼€æ”¹åŠ¨æ‰€è‡´
 
         if (g_Openparam.typeerror != 0)
         {
@@ -356,7 +356,7 @@ MP3_check:
             }
 
 #if 0
-            /* ÅĞ¶ÏÊÇ·ñÎªWMAÎÄ¼ş, ºó×º¸ÄÎªÁËMP3 */
+            /* åˆ¤æ–­æ˜¯å¦ä¸ºWMAæ–‡ä»¶, åç¼€æ”¹ä¸ºäº†MP3 */
             g_Openparam.typeerror = wmaCheckType(NULL, &g_Openparam.musicframeoffset, &g_Openparam.musictotaltime,
                                                  &pFormat, &ID3);
             if (g_Openparam.typeerror == 0)

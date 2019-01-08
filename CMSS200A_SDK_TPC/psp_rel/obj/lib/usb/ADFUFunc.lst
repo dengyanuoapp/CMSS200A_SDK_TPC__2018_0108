@@ -40,7 +40,7 @@ stmt  level    source
    28           */
    29          void Access_Internal_RAM_Command(void)
    30          {
-   31   1          //¶ÁÈ¡»¹ÊÇĞ´Èë 0:Ğ´Èë  01:¶ÁÈ¡
+   31   1          //è¯»å–è¿˜æ˜¯å†™å…¥ 0:å†™å…¥  01:è¯»å–
    32   1          if ((CBW_data_buffer._CBWCB[1] & 0x80) == 0)
    33   1          {
    34   2              Write_Internal_RAM();
@@ -75,12 +75,12 @@ stmt  level    source
    59   1          uint8 tmp;
    60   1          LogicOrPhy = CBW_data_buffer._CBWCB[0];
    61   1      
-   62   1          //ÅĞ¶ÏÊÇ·ñÊÇSPINor
+   62   1          //åˆ¤æ–­æ˜¯å¦æ˜¯SPINor
    63   1          if (flash_type != 0x02)
    64   1          {
-   65   2              //ÒòÁ¿²ú¹¤¾ß¶ÔÍ¬Ò»Éè±¸µÄ²»Í¬LUN¾ù·¢ËÍ¶ÁĞ´ÃüÁî,¶øADFUÏÂÓÖÃ»ÓĞÈ¥Çø·ÖLUNºÅ
-   66   2              //¹¤¾ß¶ÔÓÚÃ¿¸öLUNµÄ¶ÁĞ´¾ùÊÇ²Ù×÷Flash,µ¼ÖÂ¶ÔFlash½øĞĞ¶à´ÎÍ¬Ò»sectorºÅµÄ¶ÁĞ´
-   67   2              //ADFUÏÂÖ»ÈÏÎª¶ÔLUN=1(FlashÅÌ)µÄ¶ÁĞ´ºÏ·¨,¶ÔÆäËûLUN·ÇÁãµÄ¶ÁĞ´×÷²»×÷·´Ó¦;
+   65   2              //å› é‡äº§å·¥å…·å¯¹åŒä¸€è®¾å¤‡çš„ä¸åŒLUNå‡å‘é€è¯»å†™å‘½ä»¤,è€ŒADFUä¸‹åˆæ²¡æœ‰å»åŒºåˆ†LUNå·
+   66   2              //å·¥å…·å¯¹äºæ¯ä¸ªLUNçš„è¯»å†™å‡æ˜¯æ“ä½œFlash,å¯¼è‡´å¯¹Flashè¿›è¡Œå¤šæ¬¡åŒä¸€sectorå·çš„è¯»å†™
+   67   2              //ADFUä¸‹åªè®¤ä¸ºå¯¹LUN=1(Flashç›˜)çš„è¯»å†™åˆæ³•,å¯¹å…¶ä»–LUNéé›¶çš„è¯»å†™ä½œä¸ä½œååº”;
    68   2              illegalLBAFlag = CBW_data_buffer._bCBWLUN - 1;
    69   2          }
    70   1      
@@ -181,7 +181,7 @@ stmt  level    source
   157           */
   158          void Polling_Ready_Command(void)
   159          {
-  160   1          //°Ñ±êÖ¾ÉÏ´«
+  160   1          //æŠŠæ ‡å¿—ä¸Šä¼ 
   161   1          CBW_data_buffer._dCBWDataTransferLength = 2;
   162   1          Send_Data_To_PC((uint8 *) &StatusLength, CBW_data_buffer._dCBWDataTransferLength);
   163   1      
@@ -207,7 +207,7 @@ stmt  level    source
   179           */
   180          void Get_Status_Command(void)
   181          {
-  182   1          //°Ñ×´Ì¬ÉÏ´«,Òª´«ÊäµÄÊı¾İ³¤¶È
+  182   1          //æŠŠçŠ¶æ€ä¸Šä¼ ,è¦ä¼ è¾“çš„æ•°æ®é•¿åº¦
   183   1          CBW_data_buffer._dCBWDataTransferLength = *((uint16 *) &CBW_data_buffer._CBWCB[7]);
   184   1          EndianReverse((uint8 *) (&CBW_data_buffer._dCBWDataTransferLength), 4);
   185   1      
@@ -233,7 +233,7 @@ stmt  level    source
   203          {
   204   1          uint8 tmp;
   205   1      
-  206   1          //CallingTaskÆğÊ¼µØÖ·
+  206   1          //CallingTaskèµ·å§‹åœ°å€
   207   1          tmp = *((uint8 *) &CBW_data_buffer._CBWCB[2]);
   208   1      
   209   1          if (tmp < 0x90)
@@ -241,34 +241,34 @@ stmt  level    source
   211   2              CallingTaskFlag = 1;
   212   2      
   213   2              EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[1]), 2);
-  214   2              CallingTaskAdd = (uint32) (*((uint16 *) &CBW_data_buffer._CBWCB[1])) + 0xff0000; //×ªÎª³ÌĞòµØÖ·
+  214   2              CallingTaskAdd = (uint32) (*((uint16 *) &CBW_data_buffer._CBWCB[1])) + 0xff0000; //è½¬ä¸ºç¨‹åºåœ°å€
   215   2          }
   216   1          else if (tmp == 0x90) //9000h
   217   1          {
-  218   2              TransferFlag = 0x21; //ÏÔÊ¾DownLoad
+  218   2              TransferFlag = 0x21; //æ˜¾ç¤ºDownLoad
   219   2          }
   220   1          else if (tmp == 0x91) //9100h
   221   1          {
   222   2              //prints("callentry exit-");
-  223   2              detach_cmd_rcv = 1; //Íê³ÉÉı¼¶²¢ÊÕµ½detachÃüÁî
-  224   2              TransferFlag = 0x41; //ÏÔÊ¾Succ
+  223   2              detach_cmd_rcv = 1; //å®Œæˆå‡çº§å¹¶æ”¶åˆ°detachå‘½ä»¤
+  224   2              TransferFlag = 0x41; //æ˜¾ç¤ºSucc
   225   2          }
   226   1          else if (tmp == 0x92) //9200h
   227   1          {
-  228   2              TransferFlag = 0x31; //ÏÔÊ¾UpLoad
+  228   2              TransferFlag = 0x31; //æ˜¾ç¤ºUpLoad
   229   2          }
   230   1          else if (tmp == 0x93) //9300h
   231   1          {
   232   2              FWOpStatus = 2;
-  233   2              TransferFlag = 0x41; //ÏÔÊ¾Succ
+  233   2              TransferFlag = 0x41; //æ˜¾ç¤ºSucc
   234   2          }
   235   1          else if (tmp == 0x95) //9500h
   236   1          {
-  237   2              TransferFlag = 0x11; //ÏÔÊ¾Commu
+  237   2              TransferFlag = 0x11; //æ˜¾ç¤ºCommu
   238   2          }
   239   1          else //9600h
   240   1          {
-  241   2              TransferFlag = 0x51; //ÏÔÊ¾Ready
+  241   2              TransferFlag = 0x51; //æ˜¾ç¤ºReady
   242   2          }
 C251 COMPILER V4.55,  ADFUFunc                                                             15/07/16  16:03:48  PAGE 5   
 
@@ -299,7 +299,7 @@ stmt  level    source
   265   1      
   266   1          EPB_OutRdy_FIFOFullNAK();
   267   1      
-  268   1          //Òª´«ÊäµÄÊı¾İ³¤¶È
+  268   1          //è¦ä¼ è¾“çš„æ•°æ®é•¿åº¦
   269   1          EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[7]), 2);
   270   1          sendLength = *((uint16 *) &CBW_data_buffer._CBWCB[7]);
   271   1      
@@ -329,7 +329,7 @@ stmt  level    source
   294           *
   295           * Returns    : None.
   296           *
-  297           * Note(s)    : ÃüÁîÖĞ¶ÁÊı¾İ¸öÊı²»ÄÜ³¬¹ı0xC0.
+  297           * Note(s)    : å‘½ä»¤ä¸­è¯»æ•°æ®ä¸ªæ•°ä¸èƒ½è¶…è¿‡0xC0.
   298           ********************************************************************************************************
              -*
   299           */
@@ -346,8 +346,8 @@ stmt  level    source
   308   1          EndianReverse((uint8 *) (&CBW_data_buffer._CBWCB[7]), 2);
   309   1      
   310   1          adfuSysInfo = (ADFU_SysInfo_t *) URAMYADDR;
-  311   1          //Òª´«ÊäµÄÊı¾İ³¤¶ÈÖ»ÄÜ´ÓRamÖĞ×î¶à¶Á512×Ö½Ú¸öÕæÊı¾İ,·ñÔòÎªÎ±Êı¾İ,Òª´«ÊäµÄÊı¾İÆğÊ¼µØÖ·Ö»ÄÜÊÇdata¿Õ¼äµÄ0
-             -x800µÄÎ»ÖÃ
+  311   1          //è¦ä¼ è¾“çš„æ•°æ®é•¿åº¦åªèƒ½ä»Ramä¸­æœ€å¤šè¯»512å­—èŠ‚ä¸ªçœŸæ•°æ®,å¦åˆ™ä¸ºä¼ªæ•°æ®,è¦ä¼ è¾“çš„æ•°æ®èµ·å§‹åœ°å€åªèƒ½æ˜¯dataç©ºé—´çš„0
+             -x800çš„ä½ç½®
   312   1          if ((*((uint16 *) &CBW_data_buffer._CBWCB[7]) <= 0x200) && (*((uint16 *) &CBW_data_buffer._CBWCB[2]) 
              -== 0x800))
   313   1          {
@@ -355,13 +355,13 @@ stmt  level    source
   315   2              GetSysInfo((ADFU_SysInfo_t *) URAMYADDR);
   316   2      
   317   2              adfu_flag = 1;
-  318   2              phy_block_addr = BREC_START_BLOCK; //BRECµÚÒ»·İÔÚFlash ÎïÀíblock 4
+  318   2              phy_block_addr = BREC_START_BLOCK; //BRECç¬¬ä¸€ä»½åœ¨Flash ç‰©ç†block 4
   319   2              sectors_trans_once = 1;
   320   2      
-  321   2              //×Ü¹²4·İBREC,ÕÒµ½Ğ£ÑéºÍÕıÈ·µÄÄÇÒ»·İ,¶Á³öÆäID±íºÍDowngradeĞÅÏ¢
+  321   2              //æ€»å…±4ä»½BREC,æ‰¾åˆ°æ ¡éªŒå’Œæ­£ç¡®çš„é‚£ä¸€ä»½,è¯»å‡ºå…¶IDè¡¨å’ŒDowngradeä¿¡æ¯
   322   2              for (i = 1; i <= 1; i++)
   323   2              {
-  324   3                  //Return: BRECĞ£ÑéºÍ,»áÓÃµ½DATABUFFER×÷Êı¾İbufferÀ´¼ÆËãĞ£ÑéºÍ
+  324   3                  //Return: BRECæ ¡éªŒå’Œ,ä¼šç”¨åˆ°DATABUFFERä½œæ•°æ®bufferæ¥è®¡ç®—æ ¡éªŒå’Œ
   325   3                  if (Calculate_BREC_Checksum() == 0)
   326   3                  {
   327   4                      break;
@@ -369,7 +369,7 @@ stmt  level    source
   329   3                  phy_block_addr++;
   330   3              }
   331   2      
-  332   2              //ÅĞ¶ÏÊÇ·ñÊÇSPINor,¶ÔÓÚNor Base·½°¸Ã¿´Î¾ù¸üĞÂMBREC,BREC
+  332   2              //åˆ¤æ–­æ˜¯å¦æ˜¯SPINor,å¯¹äºNor Baseæ–¹æ¡ˆæ¯æ¬¡å‡æ›´æ–°MBREC,BREC
   333   2              if (flash_type == 0x02)
   334   2              {
   335   3                  adfuSysInfo->adfu_fwscaninfo.BrecCheckSum[1] = 0;
@@ -393,12 +393,12 @@ stmt  level    source
   353   3                  adfuSysInfo->adfu_hwscaninfo.BootDiskType[6] = 0xf6;
   354   3                  adfuSysInfo->adfu_hwscaninfo.BootDiskType[7] = 0x48;
   355   3              }
-  356   2              //BREC×îºóÒ»¸öÉÈÇøµÄÍ·64byteÊÇFlash ID±íĞÅÏ¢,Ö®ºó32byteÊÇDowngradeĞÅÏ¢
+  356   2              //BRECæœ€åä¸€ä¸ªæ‰‡åŒºçš„å¤´64byteæ˜¯Flash IDè¡¨ä¿¡æ¯,ä¹‹å32byteæ˜¯Downgradeä¿¡æ¯
   357   2              //memcpy(URAMYADDR+160, DATABUFFER, 64);
   358   2              //memcpy(URAMYADDR+160+64, DATABUFFER+64, 32);
   359   2      
-  360   2              //uÅÌÏÂĞ¡·É»úÉı¼¶Ê±,¹¤¾ß·ÖÎö¹Ì¼şĞÅÏ¢»ú²úÆ·¼°Éè±¸ĞÅÏ¢Ê±°´z80Æ½Ì¨µÄÊı¾İ½á¹¹»ñÈ¡
-  361   2              //¹ÊĞ¡»ú¶ËÅĞ¶Ïµ½ÊÇ¹¤¾ßÔÚ¶ÁÈ¡ĞÅÏ¢Ê±,ÌîĞ´ÏàÓ¦Î»ÖÃËÍ¸ø¹¤¾ß.
+  360   2              //uç›˜ä¸‹å°é£æœºå‡çº§æ—¶,å·¥å…·åˆ†æå›ºä»¶ä¿¡æ¯æœºäº§å“åŠè®¾å¤‡ä¿¡æ¯æ—¶æŒ‰z80å¹³å°çš„æ•°æ®ç»“æ„è·å–
+  361   2              //æ•…å°æœºç«¯åˆ¤æ–­åˆ°æ˜¯å·¥å…·åœ¨è¯»å–ä¿¡æ¯æ—¶,å¡«å†™ç›¸åº”ä½ç½®é€ç»™å·¥å…·.
   362   2              if (CBW_data_buffer._dCBWDataTransferLength == 0xc0)
   363   2              {
   364   3                  memcpy(&adfuSysInfo->SysinfoFlag[0] + 8 + 64 + 6, &adfuSysInfo->adfu_fwscaninfo.FirmwareVersi
@@ -466,7 +466,7 @@ stmt  level    source
   419   2              if (memcmp(DATABUFFER, URAMYADDR, udisk_rw_sctr_num * 512) != 0)
   420   2              {
   421   3                  //prints("mrec err-");
-  422   3                  //Ğ´MBREC·İÊı
+  422   3                  //å†™MBRECä»½æ•°
   423   3                  count = 4;
   424   3              }
   425   2              else
@@ -480,8 +480,8 @@ stmt  level    source
   431   2          }
   432   1          else if (flash_type == 2)//spi nor base
   433   1          {
-  434   2              //ÊÇ·ñSnor,Nor·½°¸Ã¿´Î¾ù¸üĞÂMBREC,ÓÃÓÚ²Á³ıÕûÆ¬Nor,SPI NorFlashÖ»Ğ´Ò»·İMBRECºÍBREC
-  435   2              //ÇÒÒòSPI NorÕûÆ¬²Á³ı,ËùÒÔ×ÜĞèĞ´MBRECºÍBREC
+  434   2              //æ˜¯å¦Snor,Noræ–¹æ¡ˆæ¯æ¬¡å‡æ›´æ–°MBREC,ç”¨äºæ“¦é™¤æ•´ç‰‡Nor,SPI NorFlashåªå†™ä¸€ä»½MBRECå’ŒBREC
+  435   2              //ä¸”å› SPI Noræ•´ç‰‡æ“¦é™¤,æ‰€ä»¥æ€»éœ€å†™MBRECå’ŒBREC
   436   2              count = 1;
   437   2          }
   438   1          else
@@ -501,7 +501,7 @@ stmt  level    source
              - 0x200) != 0))
   452   2              {
   453   3                  //prints("flash mrec err-");
-  454   3                  //Ğ´MBREC·İÊı
+  454   3                  //å†™MBRECä»½æ•°
   455   3                  count = 4;
   456   3              }
   457   2              else
@@ -523,7 +523,7 @@ stmt  level    source
   473   3                  phy_block_addr++;
   474   3              }
   475   2      
-  476   2              //Ğ´ÍêºóÔÙÖØĞ£Ñéblock0ÖĞ MBRECĞ´ÈëÊÇ·ñÕıÈ·
+  476   2              //å†™å®Œåå†é‡æ ¡éªŒblock0ä¸­ MBRECå†™å…¥æ˜¯å¦æ­£ç¡®
   477   2              phy_block_addr = 0;
   478   2              sFlash_Phy_Read(DATABUFFER);
   479   2      
@@ -596,7 +596,7 @@ stmt  level    source
   541   2              udisk_rw_sctr_num--;
   542   2          }
   543   1      
-  544   1          //Return: BRECĞ£ÑéºÍ,²¢¶ÔÆä×÷Ğ£Ñé: 0:Ò»ÖÂ; 1:²»Ò»ÖÂ.
+  544   1          //Return: BRECæ ¡éªŒå’Œ,å¹¶å¯¹å…¶ä½œæ ¡éªŒ: 0:ä¸€è‡´; 1:ä¸ä¸€è‡´.
   545   1          ret = Calculate_BREC_Checksum();
   546   1      
   547   1          return ret;
@@ -615,7 +615,7 @@ stmt  level    source
   557           *
   558           * Returns    : a: if BREC verify success: 0: yes; 1:no; hl: Brec checksum;
   559           *
-  560           * Note(s)    : ×¢Òâphy_block_addr²ÎÊıÖµ,±íÊ¾FlashÎïÀíblockµØÖ·.
+  560           * Note(s)    : æ³¨æ„phy_block_addrå‚æ•°å€¼,è¡¨ç¤ºFlashç‰©ç†blockåœ°å€.
   561           ********************************************************************************************************
              -*
   562           */
@@ -638,7 +638,7 @@ stmt  level    source
   579   2              brecCount--;
   580   2          }
   581   1      
-  582   1          //Ğ£ÑéºÍ¶à¼ÓÁË×îºóÁ½¸öbyte(×îºóÁ½¸öbyteÊÇÔ­ÓĞµÄĞ£ÑéºÍ)
+  582   1          //æ ¡éªŒå’Œå¤šåŠ äº†æœ€åä¸¤ä¸ªbyte(æœ€åä¸¤ä¸ªbyteæ˜¯åŸæœ‰çš„æ ¡éªŒå’Œ)
   583   1          if (*((uint16 *) ((uint8 *) DATABUFFER + 0x1fc)) == 0xaa55)
   584   1          {
   585   2              if (brec_check_sum == (*((uint16 *) ((uint8 *) DATABUFFER + 0x1fe)) * 2))
@@ -658,7 +658,7 @@ stmt  level    source
              -*
   599           *                                           sFlash_Phy_Write
   600           *
-  601           * Description: ½«BufferÖĞÒ»¸öÉÈÇøÊı¾İĞ´ÈëFlashÎïÀí¿Õ¼ä.
+  601           * Description: å°†Bufferä¸­ä¸€ä¸ªæ‰‡åŒºæ•°æ®å†™å…¥Flashç‰©ç†ç©ºé—´.
   602           *
   603           * Arguments  : ix: Uram Address.
   604           *
@@ -685,7 +685,7 @@ stmt  level    source
              -*
   622           *                                           sFlash_Phy_Read
   623           *
-  624           * Description: °ÑÒ»¸öÉÈÇøÊı¾İ´ÓFlashÎïÀíÇø¶Áµ½BufferÈ¥.
+  624           * Description: æŠŠä¸€ä¸ªæ‰‡åŒºæ•°æ®ä»Flashç‰©ç†åŒºè¯»åˆ°Bufferå».
   625           *
   626           * Arguments  : ix: Uram Address.
   627           *
@@ -710,7 +710,7 @@ stmt  level    source
              -*
   645           *             Caculate_CheckSum
   646           *
-  647           * Description : ¼ÆËãzramÄÚÖ¸¶¨µØÖ·¿ªÊ¼´¦Ö¸¶¨³¤¶ÈÊı¾İµÄĞ£ÑéºÍ(2byte add)
+  647           * Description : è®¡ç®—zramå†…æŒ‡å®šåœ°å€å¼€å§‹å¤„æŒ‡å®šé•¿åº¦æ•°æ®çš„æ ¡éªŒå’Œ(2byte add)
   648           *
   649           * Arguments   : de: data start address; bc: data length
   650           *
@@ -721,7 +721,7 @@ stmt  level    source
   655           ********************************************************************************************************
              -*
   656           */
-  657          static uint16 Caculate_CheckSum(uint16 *addr, uint16 length)//length°´Á½×Ö½ÚÎªÒ»µ¥Î»
+  657          static uint16 Caculate_CheckSum(uint16 *addr, uint16 length)//lengthæŒ‰ä¸¤å­—èŠ‚ä¸ºä¸€å•ä½
   658          {
   659   1          uint16 tmp, checksum = 0;
   660   1      

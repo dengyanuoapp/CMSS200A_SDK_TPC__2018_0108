@@ -24,9 +24,9 @@ stmt  level    source
    13           * \brief    .
    14           * \author   dengtaiping
    15           * \par      GENERAL DESCRIPTION:
-   16           *               usbº∞Audioƒ£øÈ–∂‘ÿ
+   16           *               usbÂèäAudioÊ®°ÂùóÂç∏ËΩΩ
    17           * \par      EXTERNALIZED FUNCTIONS:
-   18           *               ’‚¿Ô√Ë ˆµ˜”√µΩÕ‚√Êµƒƒ£øÈ
+   18           *               ËøôÈáåÊèèËø∞Ë∞ÉÁî®Âà∞Â§ñÈù¢ÁöÑÊ®°Âùó
    19           *
    20           *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
    21           *
@@ -41,7 +41,7 @@ stmt  level    source
    30          /******************************************************************************/
    31          /*!
    32           * \par  Description:
-   33           *     ADC°¢DAC deinit.
+   33           *     ADC„ÄÅDAC deinit.
    34           * \param[in]    none.
    35           * \param[out]   none.
    36           * \return       none
@@ -109,7 +109,7 @@ stmt  level    source
    96   1          Ep03tokien = 0x00;
    97   1      
    98   1          SFR_BANK = BANK_CMU_RMU;
-   99   1          MEMCLKSELCTL1 &= 0x70;//link pcmram°¢fir_rds_ram°¢uram to cpu_clock
+   99   1          MEMCLKSELCTL1 &= 0x70;//link pcmram„ÄÅfir_rds_ram„ÄÅuram to cpu_clock
   100   1          MemBankCtl |= muram_addr;
   101   1      
   102   1          SFR_BANK = BANK_USB;
@@ -130,7 +130,7 @@ stmt  level    source
   117   2              ; /*do nothing*/
   118   2          }
   119   1          USB_PHYCTRL |= 0xc0; //phy disable
-  120   1          DPDMCTRL = 0x10; // ª÷∏¥uhostºÏ≤‚
+  120   1          DPDMCTRL = 0x10; // ÊÅ¢Â§çuhostÊ£ÄÊµã
   121   1          MULTI_USED &= (~0x80); //disable UVDD
   122   1      
   123   1          SFR_BANK = BANK_CMU_RMU;

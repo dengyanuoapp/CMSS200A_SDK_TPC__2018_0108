@@ -17,25 +17,25 @@
 
 
 
-//½Ó¿Ú±äÁ¿
+//æ¥å£å˜é‡
 //FIXME:
 
-extern  decControlInfor_t g_decControlInfor;     //codecĞèÒªµÄ¿ØÖÆĞÅÏ¢£¬°üÀ¨¿ì½ø¿ìÍË£¬µ­Èëµ­³ö
+extern  decControlInfor_t g_decControlInfor;     //codecéœ€è¦çš„æ§åˆ¶ä¿¡æ¯ï¼ŒåŒ…æ‹¬å¿«è¿›å¿«é€€ï¼Œæ·¡å…¥æ·¡å‡º
 #ifndef PC
-extern decSongInfor_t g_decSongInfor;  //codec¼ÆËãµÄÊ±¼äºÍ±ÈÌØÂÊ¶¼´æÔÚÕâ¸ö±äÁ¿ÀïÃæ,audio½âÂëÖĞ¶ÏÊ±»á¸üĞÂ
+extern decSongInfor_t g_decSongInfor;  //codecè®¡ç®—çš„æ—¶é—´å’Œæ¯”ç‰¹ç‡éƒ½å­˜åœ¨è¿™ä¸ªå˜é‡é‡Œé¢,audioè§£ç ä¸­æ–­æ—¶ä¼šæ›´æ–°
 #else
-extern  _declspec(dllimport) decSongInfor_t g_decSongInfor;  //codec¼ÆËãµÄÊ±¼äºÍ±ÈÌØÂÊ¶¼´æÔÚÕâ¸ö±äÁ¿ÀïÃæ,audio½âÂëÖĞ¶ÏÊ±»á¸üĞÂ
+extern  _declspec(dllimport) decSongInfor_t g_decSongInfor;  //codecè®¡ç®—çš„æ—¶é—´å’Œæ¯”ç‰¹ç‡éƒ½å­˜åœ¨è¿™ä¸ªå˜é‡é‡Œé¢,audioè§£ç ä¸­æ–­æ—¶ä¼šæ›´æ–°
 #endif
-extern  decCurStatus_t g_decCurStatus;  // codec½âÂëÖĞ¶Ï»á¸üĞÂ×´Ì¬songµÈ£¬InitCodecType¸üĞÂstatus¸ù¾İg_decInitµÄsongtypeÀ´¸üĞÂ,f1±íÊ¾´íÎó£¬Ê±¼äÖĞ¶Ï¸üĞÂÊ±¼äĞÅÏ¢
+extern  decCurStatus_t g_decCurStatus;  // codecè§£ç ä¸­æ–­ä¼šæ›´æ–°çŠ¶æ€songç­‰ï¼ŒInitCodecTypeæ›´æ–°statusæ ¹æ®g_decInitçš„songtypeæ¥æ›´æ–°,f1è¡¨ç¤ºé”™è¯¯ï¼Œæ—¶é—´ä¸­æ–­æ›´æ–°æ—¶é—´ä¿¡æ¯
 
-extern  decReadFilePara_t g_decReadFilePara;    //»ñµÃÎÄ¼şµÄĞÅÏ¢£¬°üÀ¨¶ÏµãĞÅÏ¢£¬codec¸ù¾İ¸Ã²ÎÊı½øĞĞÎÄ¼ş¶ÁĞ´£¬read hook¸ù¾İÕâ¸ö±äÁ¿À´¶ÁÊı¾İ
+extern  decReadFilePara_t g_decReadFilePara;    //è·å¾—æ–‡ä»¶çš„ä¿¡æ¯ï¼ŒåŒ…æ‹¬æ–­ç‚¹ä¿¡æ¯ï¼Œcodecæ ¹æ®è¯¥å‚æ•°è¿›è¡Œæ–‡ä»¶è¯»å†™ï¼Œread hookæ ¹æ®è¿™ä¸ªå˜é‡æ¥è¯»æ•°æ®
 
-extern  decBreakPointInfor_t g_decBreakPointInfor;  //¶Ïµã¿ØÖÆĞÅÏ¢£¬decode½á¹¹Ìå±äÁ¿£¬½âÂëÖĞ¶ÏÊ±±£´æ¶ÏµãµÄ¿ØÖÆĞÅÏ¢
+extern  decBreakPointInfor_t g_decBreakPointInfor;  //æ–­ç‚¹æ§åˆ¶ä¿¡æ¯ï¼Œdecodeç»“æ„ä½“å˜é‡ï¼Œè§£ç ä¸­æ–­æ—¶ä¿å­˜æ–­ç‚¹çš„æ§åˆ¶ä¿¡æ¯
 extern  decEffectInfor_t   g_decEffectInfor;
 extern uint8 InputMode;
 
 
-//½Ó¿Úº¯Êı
+//æ¥å£å‡½æ•°
 
 extern void decInit(void);
 extern bool decstart(void);

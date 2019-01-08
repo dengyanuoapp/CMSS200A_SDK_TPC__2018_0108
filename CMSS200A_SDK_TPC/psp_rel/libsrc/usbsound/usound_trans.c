@@ -13,9 +13,9 @@
  * \brief    .
  * \author   dengtaiping
  * \par      GENERAL DESCRIPTION:
- *               Êı¾İ´«Êä´úÂë
+ *               æ•°æ®ä¼ è¾“ä»£ç 
  * \par      EXTERNALIZED FUNCTIONS:
- *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+ *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
  *
  *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
  *
@@ -31,7 +31,7 @@
 /*!
  * \par  Description:
  *     access usb fifo data
- * \param[in]    ep_select:endp NO.¡¢address:buff address¡¢data_lenth:data length
+ * \param[in]    ep_select:endp NO.ã€address:buff addressã€data_lenth:data length
  * \param[out]   none.
  * \return       none
 
@@ -49,14 +49,14 @@ void usb_fifo_access(uint8 ep_select, uint8 *address, uint16 data_lenth)
     {
         if (EP1IN == ep_select)
         {
-            //address += 2; //ÉÏ´«×óÉùµÀÊı¾İ
+            //address += 2; //ä¸Šä¼ å·¦å£°é“æ•°æ®
             //i += 2;
             Fifo1dat = *address;
             address++;
             Fifo1dat = *address;
             address++;
             i++;
-            address += 2; //ÉÏ´«ÓÒÉùµÀÊı¾İ
+            address += 2; //ä¸Šä¼ å³å£°é“æ•°æ®
             i += 2;
         }
         else if (EP2OUT == ep_select)

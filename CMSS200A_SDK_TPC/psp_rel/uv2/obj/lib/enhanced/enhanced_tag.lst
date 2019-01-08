@@ -56,9 +56,9 @@ stmt  level    source
    45           ********************************************************************************
    46           *             mp3GetTiltle
    47           * Description :
-   48           * Arguments   :  string_id is language id(0:¼òÌå 1 Ó¢ÎÄ 2 ·±Ìå),ÓÃÓÚ¶Ô×îºóµÄ²»ÍêÕû×Ö·û½øĞĞ´¦Àí¡£
-   49           ÒòÎª×î¶àÈ¡30¸ö×Ö·û¡£¶øÓĞĞ©Ê±ºòºº×ÖÀïÃæÓĞ¿ÉÄÜ»ì·ÅÓ¢ÎÄµÄ¡£Òò´Ë»á³öÏÖ×îºó×Ö·ûÖ»ÊÇºº×ÖÒ»°ëµÄÇé¿ö
-   50           * Returns     : ID3ExistFlag = 0 ±íÊ¾Ã»ÓĞID3ĞÅÏ¢£¬1±íÊ¾ÓĞ
+   48           * Arguments   :  string_id is language id(0:ç®€ä½“ 1 è‹±æ–‡ 2 ç¹ä½“),ç”¨äºå¯¹æœ€åçš„ä¸å®Œæ•´å­—ç¬¦è¿›è¡Œå¤„ç†ã€‚
+   49           å› ä¸ºæœ€å¤šå–30ä¸ªå­—ç¬¦ã€‚è€Œæœ‰äº›æ—¶å€™æ±‰å­—é‡Œé¢æœ‰å¯èƒ½æ··æ”¾è‹±æ–‡çš„ã€‚å› æ­¤ä¼šå‡ºç°æœ€åå­—ç¬¦åªæ˜¯æ±‰å­—ä¸€åŠçš„æƒ…å†µ
+   50           * Returns     : ID3ExistFlag = 0 è¡¨ç¤ºæ²¡æœ‰ID3ä¿¡æ¯ï¼Œ1è¡¨ç¤ºæœ‰
    51           * Notes       :
    52           ********************************************************************************
    53           */
@@ -83,7 +83,7 @@ stmt  level    source
    70   2              return FALSE;
    71   2          }
    72   1      
-   73   1          //ÏÂÃæ´¦ÀíµÃ³öµÄ ĞÅÏ¢µÄÒ»Ğ©ÌØÊâÇé¿ö
+   73   1          //ä¸‹é¢å¤„ç†å¾—å‡ºçš„ ä¿¡æ¯çš„ä¸€äº›ç‰¹æ®Šæƒ…å†µ
    74   1          if (ID3Info->TIT2_length != 0)
    75   1          {
    76   2              DealStringEnd(ID3Info->TIT2_buffer, string_id);
@@ -133,7 +133,7 @@ stmt  level    source
   120           ********************************************************************************
   121           *             DealStringEnd
   122           *
-  123           * Description :  ´¦Àí¶¨·û´®Î²µÄ²»ÍêÕûºº×ÖÎÊÌâ
+  123           * Description :  å¤„ç†å®šç¬¦ä¸²å°¾çš„ä¸å®Œæ•´æ±‰å­—é—®é¢˜
 C251 COMPILER V4.55,  enhanced_tag                                                         13/12/18  16:27:42  PAGE 3   
 
   124           *
@@ -159,7 +159,7 @@ stmt  level    source
   144   1          {
   145   2              return;
   146   2          }
-  147   1          //ÈçÊÇ¿Õ´®²»ÓÃ´¦Àí
+  147   1          //å¦‚æ˜¯ç©ºä¸²ä¸ç”¨å¤„ç†
   148   1          if (str[0] == 0) //0 means '\0'
   149   1          {
   150   2              return;
@@ -176,7 +176,7 @@ stmt  level    source
   161   3                  half = FALSE;
   162   3              }
   163   2      
-  164   2              //ÊÇ·ñ½«½áÊø
+  164   2              //æ˜¯å¦å°†ç»“æŸ
   165   2              if (str[i + 1] == 0)
   166   2              {
   167   3                  if (FALSE != half)
@@ -189,7 +189,7 @@ stmt  level    source
   174   2              if (FALSE != half)
   175   2              {
   176   3                  i++;
-  177   3                  if (str[i + 1] == 0) //¸ÕºÃÊÇÍêÕûµÄ
+  177   3                  if (str[i + 1] == 0) //åˆšå¥½æ˜¯å®Œæ•´çš„
   178   3                  {
   179   4                      return;
   180   4                  }
@@ -205,7 +205,7 @@ stmt  level    source
 C251 COMPILER V4.55,  enhanced_tag                                                         13/12/18  16:27:42  PAGE 4   
 
   190           *
-  191           * Description :  ´¦Àí×Ö·û´®ºóµÄ¿Õ¸ñµÄÎÊÌâ
+  191           * Description :  å¤„ç†å­—ç¬¦ä¸²åçš„ç©ºæ ¼çš„é—®é¢˜
   192           *
   193           * Arguments   :
   194           *
@@ -218,9 +218,9 @@ stmt  level    source
   201          void DealStrEndSpace(char *str)
   202          {
   203   1          BYTE i, j;
-  204   1          /*Í³¼Æ×Ö·û´®Î²²¿µÄ¿Õ¸ñ·ûºÅ*/
+  204   1          /*ç»Ÿè®¡å­—ç¬¦ä¸²å°¾éƒ¨çš„ç©ºæ ¼ç¬¦å·*/
   205   1          BYTE space_num = 0;
-  206   1          /*´¦Àíunicode±àÂëbig endianµÄÇé¿ö,È¥µôÈ«ÊÇ¿Õ¸ñµÄÎÊÌâ*/
+  206   1          /*å¤„ç†unicodeç¼–ç big endiançš„æƒ…å†µ,å»æ‰å…¨æ˜¯ç©ºæ ¼çš„é—®é¢˜*/
   207   1          if (*((WORD *) &str[0]) == 0xfffe)
   208   1          {
   209   2              WORD codeChar;
@@ -231,7 +231,7 @@ stmt  level    source
   214   3                  {
   215   4                      break;
   216   4                  }
-  217   3                  /*Ö»È¥µô×Ö·ûÎ²²¿µÄ¿Õ¸ñ·û*/
+  217   3                  /*åªå»æ‰å­—ç¬¦å°¾éƒ¨çš„ç©ºæ ¼ç¬¦*/
   218   3                  if (codeChar != 0x2000)
   219   3                  {
   220   4                      j = i;
@@ -242,15 +242,15 @@ stmt  level    source
   225   4                      space_num++;
   226   4                  }
   227   3              }
-  228   2              /*´¦Àí×Ö·ûÈ«ÊÇ¿Õ¸ñµÄÇé¿ö*/
+  228   2              /*å¤„ç†å­—ç¬¦å…¨æ˜¯ç©ºæ ¼çš„æƒ…å†µ*/
   229   2              if (j == 0)
   230   2              {
   231   3                  *((WORD *) &str[0]) = 0x0000;
   232   3              }
-  233   2              /*È¥µô×Ö·û´®Î²²¿µÄ¿Õ¸ñ*/
+  233   2              /*å»æ‰å­—ç¬¦ä¸²å°¾éƒ¨çš„ç©ºæ ¼*/
   234   2              else if (j == (i - (space_num + 1) * 2))
   235   2              {
-  236   3                  /*Î²²¿¿Õ¸ñÊı²»Îª0²Å´¦Àí*/
+  236   3                  /*å°¾éƒ¨ç©ºæ ¼æ•°ä¸ä¸º0æ‰å¤„ç†*/
   237   3                  if (space_num != 0)
   238   3                  {
   239   4                      *((WORD *) &str[j + 2]) = 0x0000;
@@ -269,7 +269,7 @@ stmt  level    source
   252   3                  {
   253   4                      break;
   254   4                  }
-  255   3                  /*Ö»È¥µô×Ö·ûÎ²²¿µÄ¿Õ¸ñ·û*/
+  255   3                  /*åªå»æ‰å­—ç¬¦å°¾éƒ¨çš„ç©ºæ ¼ç¬¦*/
 C251 COMPILER V4.55,  enhanced_tag                                                         13/12/18  16:27:42  PAGE 5   
 
   256   3                  if (str[i] != ' ')
@@ -286,10 +286,10 @@ stmt  level    source
   267   2              {
   268   3                  str[j] = 0;
   269   3              }
-  270   2              /*È¥µô×Ö·û´®Î²²¿µÄ¿Õ¸ñ·ûºÅ*/
+  270   2              /*å»æ‰å­—ç¬¦ä¸²å°¾éƒ¨çš„ç©ºæ ¼ç¬¦å·*/
   271   2              else if (j == (i - (space_num + 1)))
   272   2              {
-  273   3                  /*Î²²¿¿Õ¸ñÊı²»Îª0²Å´¦Àí*/
+  273   3                  /*å°¾éƒ¨ç©ºæ ¼æ•°ä¸ä¸º0æ‰å¤„ç†*/
   274   3                  if (space_num != 0)
   275   3                  {
   276   4                      str[j + 1] = 0;
@@ -306,9 +306,9 @@ stmt  level    source
   287           *
   288           * Description :
   289           *
-  290           * Arguments   :  »ñÈ¡fileName¸èÇúµÄID3ĞÅÏ¢£¬·Åµ½ID3Info_tÊı¾İ½á¹¹ÖĞ
+  290           * Arguments   :  è·å–fileNameæ­Œæ›²çš„ID3ä¿¡æ¯ï¼Œæ”¾åˆ°ID3Info_tæ•°æ®ç»“æ„ä¸­
   291           *
-  292           * Returns     : ID3ExistFlag = 0 ±íÊ¾Ã»ÓĞID3ĞÅÏ¢£¬1±íÊ¾ÓĞ
+  292           * Returns     : ID3ExistFlag = 0 è¡¨ç¤ºæ²¡æœ‰ID3ä¿¡æ¯ï¼Œ1è¡¨ç¤ºæœ‰
   293           *
   294           * Notes       :
   295           *
@@ -317,16 +317,16 @@ stmt  level    source
   298          
   299          bool FectchID3Info(const char *filename, ID3Info_t *ID3Info)
   300          {
-  301   1          handle TagFileHandle;//¶ÁÎÄ¼şÖ¸Õë
-  302   1          int LastPageLen; //×îºóÒ»Ò³µÄÓĞĞ§½ÚÊı
+  301   1          handle TagFileHandle;//è¯»æ–‡ä»¶æŒ‡é’ˆ
+  302   1          int LastPageLen; //æœ€åä¸€é¡µçš„æœ‰æ•ˆèŠ‚æ•°
   303   1          long FileLen;
   304   1          bool Fectch_ret;
-  305   1          char TAGString[] = "TAG"; //ID3V1µÄÍ·Ó¦¸ÃÊÇ"tag"
+  305   1          char TAGString[] = "TAG"; //ID3V1çš„å¤´åº”è¯¥æ˜¯"tag"
   306   1      
   307   1          ClearWatchDog();
   308   1          // TempBuf = ID3_BUFFER;
   309   1          TempBuf = GET_REAL_ADDR(ID3_BUFFER);
-  310   1          TagFileHandle = FS_FOpen(filename, FS_OPEN_NORMAL);//´ò¿ªÎÄ¼ş
+  310   1          TagFileHandle = FS_FOpen(filename, FS_OPEN_NORMAL);//æ‰“å¼€æ–‡ä»¶
   311   1          if (TagFileHandle == NULL)
   312   1          {
   313   2              return FALSE;
@@ -347,11 +347,11 @@ stmt  level    source
   326   2          }
   327   1      
   328   1          ClearWatchDog();
-  329   1          //LastPageLenÊÇÎÄ¼ş×îºóÒ»¸ö´ØµÄ×Ö½ÚÊı
+  329   1          //LastPageLenæ˜¯æ–‡ä»¶æœ€åä¸€ä¸ªç°‡çš„å­—èŠ‚æ•°
   330   1          LastPageLen = FS_GetUnalignedLen(TagFileHandle);
-  331   1          //FileLenÊÇÎÄ¼şµÄ×Ü´ØÊı£¬Ã¿¸ö´Ø512×Ö½Ú
+  331   1          //FileLenæ˜¯æ–‡ä»¶çš„æ€»ç°‡æ•°ï¼Œæ¯ä¸ªç°‡512å­—èŠ‚
   332   1          FileLen = FS_GetFileLen(TagFileHandle);
-  333   1          FS_FSeek(FileLen - 2, 0, TagFileHandle); //ÏÈ¶ÁÒ»¸öPAGE
+  333   1          FS_FSeek(FileLen - 2, 0, TagFileHandle); //å…ˆè¯»ä¸€ä¸ªPAGE
   334   1          FS_FRead(TempBuf, 1, TagFileHandle); //
   335   1      
   336   1          if(LastPageLen == 0)
@@ -359,10 +359,10 @@ stmt  level    source
   338   2              LastPageLen = 512;
   339   2          }
   340   1      
-  341   1          //Õâ¶ÎÊÇ¿ÉÒÔÓÅ»¯µÄ£¬ÏÈÅĞ¶ÏÊÇ·ñĞ¡ÓÚ128ÔÙ¶Á¡£Èç¹û×îºóÒ»¸öÉÈÇø´óÓÚ128£¬ÔòÖ»¶ÁÒ»´Î
+  341   1          //è¿™æ®µæ˜¯å¯ä»¥ä¼˜åŒ–çš„ï¼Œå…ˆåˆ¤æ–­æ˜¯å¦å°äº128å†è¯»ã€‚å¦‚æœæœ€åä¸€ä¸ªæ‰‡åŒºå¤§äº128ï¼Œåˆ™åªè¯»ä¸€æ¬¡
   342   1          if (LastPageLen < 128)
   343   1          {
-  344   2              //È¡128bytes·ÅÈë 128bytesµÄBUFFERÖĞ
+  344   2              //å–128bytesæ”¾å…¥ 128bytesçš„BUFFERä¸­
   345   2              memcpy(TagBuf, TempBuf + 512 - 128 + LastPageLen, ((uint16)(128 - LastPageLen)));
   346   2              FS_FRead(TempBuf, 1, TagFileHandle);
   347   2              memcpy((TagBuf + 128 - LastPageLen), TempBuf, ((uint16)LastPageLen));
@@ -377,15 +377,15 @@ stmt  level    source
   356   1          if (memcmp(TagBuf, TAGString, 3) == 0)
   357   1          {
   358   2              memcpy(ID3Info->TIT2_buffer, (char *) &TagBuf[3], ID3Info->TIT2_length - 2);
-  359   2              *((BYTE *) (ID3Info->TIT2_buffer) + ID3Info->TIT2_length - 2) = 0x00; //ÕâÀï²¹×Ö·û´®½áÊø
+  359   2              *((BYTE *) (ID3Info->TIT2_buffer) + ID3Info->TIT2_length - 2) = 0x00; //è¿™é‡Œè¡¥å­—ç¬¦ä¸²ç»“æŸ
   360   2      
   361   2      
   362   2              memcpy(ID3Info->TPE1_buffer, (char *) &TagBuf[33], ID3Info->TPE1_length - 2);
-  363   2              *((BYTE *) (ID3Info->TPE1_buffer) + ID3Info->TPE1_length - 2) = 0x00; //ÕâÀï²¹×Ö·û´®½áÊø
+  363   2              *((BYTE *) (ID3Info->TPE1_buffer) + ID3Info->TPE1_length - 2) = 0x00; //è¿™é‡Œè¡¥å­—ç¬¦ä¸²ç»“æŸ
   364   2      
   365   2      
   366   2              memcpy(ID3Info->TALB_buffer, (char *) &TagBuf[63], ID3Info->TALB_length - 2);
-  367   2              *((BYTE *) (ID3Info->TALB_buffer) + ID3Info->TALB_length - 2) = 0x00; //ÕâÀï²¹×Ö·û´®½áÊø
+  367   2              *((BYTE *) (ID3Info->TALB_buffer) + ID3Info->TALB_length - 2) = 0x00; //è¿™é‡Œè¡¥å­—ç¬¦ä¸²ç»“æŸ
   368   2      
   369   2      
   370   2              return 1;

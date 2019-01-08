@@ -5,7 +5,7 @@
 #define PIC_X_B_UDISKRDY	0
 #define PIC_Y_B_UDISKRDY	0
 
-//¸ù¾İËø¾ö¶¨ÊÇ·ñÏÔÊ¾
+//æ ¹æ®é”å†³å®šæ˜¯å¦æ˜¾ç¤º
 #define PIC_ID_UDLOCK UDLOCK_S
 #define PIC_X_UDLOCK	37
 #define PIC_Y_UDLOCK	34

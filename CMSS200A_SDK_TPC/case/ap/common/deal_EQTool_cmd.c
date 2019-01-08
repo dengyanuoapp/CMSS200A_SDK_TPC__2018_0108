@@ -20,7 +20,7 @@ void callback_pc_eq(EQ_Channel_e left_right, uint8 *buf, uint8 aptype)
 {
     if (buf == NULL)
     {
-        //¹Ø±ÕEQ
+        //å…³é—­EQ
         g_decControlInfor.EQFlag = 0x00;
         decEffectDeal();
     }
@@ -90,7 +90,7 @@ void deal_pc_eqsrs_sub(uint8 aptype)
     else if (eqcmd == VOLUMESET)
     {
 
-        //add: Íâ¹ÒPAÒôÁ¿ÉèÖÃ
+        //add: å¤–æŒ‚PAéŸ³é‡è®¾ç½®
         usbtestcmd_p++;
         volume_callback(*usbtestcmd_p * 32 / 100);
         //}
@@ -103,9 +103,9 @@ void deal_pc_eqsrs_sub(uint8 aptype)
     {
     }
 
-    //´¦ÀíÍêÃüÁî
+    //å¤„ç†å®Œå‘½ä»¤
     usbtestcmd_p = (uint8 *) USBTESTABUFFER;
-    *usbtestcmd_p = 0x00; //Çå³ıcmd
+    *usbtestcmd_p = 0x00; //æ¸…é™¤cmd
     *(usbtestcmd_p + 1) = status;
 
     return;

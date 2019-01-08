@@ -1,27 +1,27 @@
 #ifndef REPORT_RES_H
 #define REPORT_RES_H
 
-//TTSÀ©Õ¹´ÊÌõË÷Òý(ÒÔ´ÅÌõ·½Ê½Ìí¼ÓÔÚTTS¿â)
-//µçÌ¨£¬ÆµÂÊ£¬MHZ
+//TTSæ‰©å±•è¯æ¡ç´¢å¼•(ä»¥ç£æ¡æ–¹å¼æ·»åŠ åœ¨TTSåº“)
+//ç”µå°ï¼Œé¢‘çŽ‡ï¼ŒMHZ
 #define EXTEND_STATION      11
 #define EXTEND_FREQUENCY    17
 #define EXTEND_MHZ          20
-//Áè³¿£¬ÔçÉÏ£¬ÏÂÎç£¬ÍíÉÏ
+//å‡Œæ™¨ï¼Œæ—©ä¸Šï¼Œä¸‹åˆï¼Œæ™šä¸Š
 #define EXTEND_DAWN         16
 #define EXTEND_MORNING      15
 #define EXTEND_AFTERNOON    12
 #define EXTEND_NIGHT        14
-//Ð¡Ê±£¬·Ö
+//å°æ—¶ï¼Œåˆ†
 #define EXTEND_HOUR         18
 #define EXTEND_MINUTE       13
-//ÏÖÔÚÊ±¼äÊÇ
+//çŽ°åœ¨æ—¶é—´æ˜¯
 #define  EXTEND_TIME_INFO	19
-//²¥·Åsd¿¨£¬½øÈëÂ¼Òô£¬²¥·ÅUÅÌ£¬ÒôÆµÊäÈë
+//æ’­æ”¾sdå¡ï¼Œè¿›å…¥å½•éŸ³ï¼Œæ’­æ”¾Uç›˜ï¼ŒéŸ³é¢‘è¾“å…¥
 #define EXTEND_SDCARD       26
 #define EXTEND_RECORD       27
 #define EXTEND_UDISK        28
 #define EXTEND_LINEIN       29
-//Êý×Ö0¡«9£¬10£¬20£¬30£¬ 40£¬ 50
+//æ•°å­—0ï½ž9ï¼Œ10ï¼Œ20ï¼Œ30ï¼Œ 40ï¼Œ 50
 #define EXTEND_ZERO         1
 #define EXTEND_ONE          2
 #define EXTEND_TWO          3

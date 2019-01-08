@@ -24,9 +24,9 @@ stmt  level    source
    13           * \brief
    14           * \author   wanghaijing
    15           * \par      GENERAL DESCRIPTION:
-   16           *               ÕâÀï¶ÔÎÄ¼ş½øĞĞÃèÊö
+   16           *               è¿™é‡Œå¯¹æ–‡ä»¶è¿›è¡Œæè¿°
    17           * \par      EXTERNALIZED FUNCTIONS:
-   18           *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+   18           *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
    19           *
    20           *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
    21           *
@@ -119,9 +119,9 @@ stmt  level    source
   106          };
   107          
   108          usound_param ud_param =
-  109          //{SAMPLE_96K, SAMPLE_48K, BIT_DEPTH16}; //ÏÂ´«98k, ÉÏ´«48k, Î»Éî24
-  110          //{SAMPLE_96K, SAMPLE_48K, BIT_DEPTH24}; //ÏÂ´«98k, ÉÏ´«48k, Î»Éî24
-  111          {SAMPLE_48K,SAMPLE_48K,BIT_DEPTH24}; //ÏÂ´«48k, ÉÏ´«48k, Î»Éî16
+  109          //{SAMPLE_96K, SAMPLE_48K, BIT_DEPTH16}; //ä¸‹ä¼ 98k, ä¸Šä¼ 48k, ä½æ·±24
+  110          //{SAMPLE_96K, SAMPLE_48K, BIT_DEPTH24}; //ä¸‹ä¼ 98k, ä¸Šä¼ 48k, ä½æ·±24
+  111          {SAMPLE_48K,SAMPLE_48K,BIT_DEPTH24}; //ä¸‹ä¼ 48k, ä¸Šä¼ 48k, ä½æ·±16
   112          
   113          int16 main(int16 para)
   114          {
@@ -138,7 +138,7 @@ stmt  level    source
 
   124   1          //    LEDClearScreen();
   125   1          //    LEDPuts(NUMBER1, p_device_name, 1);
-  126   1          //×¢Ïú¿¨²å°Î¼ì²â¶¨Ê±Æ÷, ±ÜÃâÔÓÒô
+  126   1          //æ³¨é”€å¡æ’æ‹”æ£€æµ‹å®šæ—¶å™¨, é¿å…æ‚éŸ³
   127   1          //CardSetParam(0x01, 100, CARD_UNDEC);
   128   1      
   129   1          read_var();
@@ -153,15 +153,15 @@ stmt  level    source
   138   1      //    TM_DelayMS(200);
   139   1      
   140   1      start_check_usound:
-  141   1          if(usound_init(&ud_param) == 0)  //AP³õÊ¼»¯
+  141   1          if(usound_init(&ud_param) == 0)  //APåˆå§‹åŒ–
   142   1          {
   143   2              usound_exit();
   144   2              //        DisablePA();
-  145   2              //ÖØĞÂ¹Ò¿¨²å°Î¼ì²â¶¨Ê±Æ÷
+  145   2              //é‡æ–°æŒ‚å¡æ’æ‹”æ£€æµ‹å®šæ—¶å™¨
   146   2              //CardSetParam(0x01, 100, CARD_DEC);
   147   2              return RESULT_NULL;//RESULT_MUSIC;
   148   2          }
-  149   1          // ChangeVolume();   //ÉèÖÃÄ¬ÈÏÒôÁ¿Öµ
+  149   1          // ChangeVolume();   //è®¾ç½®é»˜è®¤éŸ³é‡å€¼
   150   1      //      SetPAVolume_LR(dac_vol[g_comval.volume], dac_vol[g_comval.volume]);
   151   1          OutPutVolume(g_comval.volume);
   152   1          //~~~~~~~~~~~~~~~~~~~~~
@@ -172,14 +172,14 @@ stmt  level    source
   157   1              TM_KillTimer(key_timer_id);
   158   1          usound_exit();
   159   1          //  DisablePA();
-  160   1          VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval)); //»ØĞ´ÒôÁ¿ÖµµÈĞÅÏ¢
+  160   1          VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval)); //å›å†™éŸ³é‡å€¼ç­‰ä¿¡æ¯
   161   1          VMWrite(&g_record_vars, VM_AP_AMV, sizeof(record_vars_t));
   162   1      
   163   1              if(g_result==RESULT_MAIN)
   164   1              {
   165   2                      goto start_check_usound;
   166   2              }
-  167   1          //ÖØĞÂ¹Ò¿¨²å°Î¼ì²â¶¨Ê±Æ÷
+  167   1          //é‡æ–°æŒ‚å¡æ’æ‹”æ£€æµ‹å®šæ—¶å™¨
   168   1          //CardSetParam(0x01, 100, CARD_DEC);
   169   1          if(g_result != RESULT_STANDBY)
   170   1          {
@@ -219,7 +219,7 @@ stmt  level    source
   202   1          result = VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval));
   203   1          //ASSERT(result);
   204   1      
-  205   1          //Usound Â¼ÒôËùÓÃVRAMÇø
+  205   1          //Usound å½•éŸ³æ‰€ç”¨VRAMåŒº
   206   1          result = VMRead(&g_record_vars, VM_AP_AMV, sizeof(g_record_vars));
   207   1          if ((FALSE == result) || (g_record_vars.maigc != MAGIC_RECORD))
   208   1          {
@@ -268,11 +268,11 @@ stmt  level    source
   251          
   252          /*===========================================
   253           functions: OutPutVolume(int vol)
-  254           input:    int vol: ÒªÊä³öµÄÒôÁ¿
+  254           input:    int vol: è¦è¾“å‡ºçš„éŸ³é‡
   255           output:  void
 C251 COMPILER V4.55,  usound_main                                                          13/12/18  16:28:55  PAGE 5   
 
-  256           ¹¦ÄÜ£º °ÑÒôÁ¿ÖµËÍµ½IO¿Ú£¬
+  256           åŠŸèƒ½ï¼š æŠŠéŸ³é‡å€¼é€åˆ°IOå£ï¼Œ
   257           ============================================*/
   258          void OutPutVolume(uint8 vol)
   259          {

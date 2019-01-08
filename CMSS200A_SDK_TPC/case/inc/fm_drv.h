@@ -13,47 +13,47 @@
 #define  SNR_THRESHOLD      0x06        // 0x09
 #define  PILOT_CCA       //disable stereo judgement for the country has many mono FM stations      
 
-/* FM ËÑÌ¨·½ÏòÃ¶¾Ù */
+/* FM æœå°æ–¹å‘æšä¸¾ */
 typedef enum
 {
-    DOWN, //[0]ÏÂ½µ
-    UP //[1]ÉÏÉı
+    DOWN, //[0]ä¸‹é™
+    UP //[1]ä¸Šå‡
 } FM_direct_e;
 
-/* FM Á¢ÌåÉù×´Ì¬Ã¶¾Ù */
+/* FM ç«‹ä½“å£°çŠ¶æ€æšä¸¾ */
 typedef enum
 {
-    Stereo, //[0]Á¢ÌåÉù
-    Mono //[1]µ¥ÉùµÀ
+    Stereo, //[0]ç«‹ä½“å£°
+    Mono //[1]å•å£°é“
 } FM_Audio_e;
 
-/* FM ÉùÒôÉèÖÃÃ¶¾Ù */
+/* FM å£°éŸ³è®¾ç½®æšä¸¾ */
 typedef enum
 {
-    releaseMUTE, //½â³ı¾²Òô
-    SetMUTE //¾²Òô
+    releaseMUTE, //è§£é™¤é™éŸ³
+    SetMUTE //é™éŸ³
 } FM_MUTE_e;
 
 
-/* FM ²¨¶ÎÄ£Ê½Ã¶¾Ù,  Band_CITY ±íÊ¾µ±Ç°²¥·ÅÎª³ÇÊĞµçÌ¨Ä£Ê½ */
+/* FM æ³¢æ®µæ¨¡å¼æšä¸¾,  Band_CITY è¡¨ç¤ºå½“å‰æ’­æ”¾ä¸ºåŸå¸‚ç”µå°æ¨¡å¼ */
 typedef enum
 {
-    Bank_US_Europe,     //ÆÕÍ¨Æµ¶Î
-    Bank_Japan,            //ÈÕ±¾Æµ¶Î
-    Band_CITY              //³ÇÊĞµçÌ¨Ä£Ê½
+    Bank_US_Europe,     //æ™®é€šé¢‘æ®µ
+    Bank_Japan,            //æ—¥æœ¬é¢‘æ®µ
+    Band_CITY              //åŸå¸‚ç”µå°æ¨¡å¼
 } radio_band_e;
 
-/* µçÌ¨×´Ì¬½á¹¹ */
+/* ç”µå°çŠ¶æ€ç»“æ„ */
 typedef struct
 {
-    uint16 freq;  //µ±Ç°µçÌ¨µÄÆµÂÊ¡£µ¥Î»Îªkhz
-    uint8 station; //µ±Ç°µçÌ¨¶ÔÓ¦µÄµçÌ¨±íÏîºÅ£¬from 1 to station_count£¬µ±Ç°µçÌ¨Î´±£´æÊ±Îª0
-    uint8 station_count; //µçÌ¨±íÖĞµÄ±£´æµçÌ¨Êı¡£
-    FM_Audio_e stereo_status;    //µ±Ç°µçÌ¨µÄÁ¢ÌåÉù×´Ì¬
+    uint16 freq;  //å½“å‰ç”µå°çš„é¢‘ç‡ã€‚å•ä½ä¸ºkhz
+    uint8 station; //å½“å‰ç”µå°å¯¹åº”çš„ç”µå°è¡¨é¡¹å·ï¼Œfrom 1 to station_countï¼Œå½“å‰ç”µå°æœªä¿å­˜æ—¶ä¸º0
+    uint8 station_count; //ç”µå°è¡¨ä¸­çš„ä¿å­˜ç”µå°æ•°ã€‚
+    FM_Audio_e stereo_status;    //å½“å‰ç”µå°çš„ç«‹ä½“å£°çŠ¶æ€
 } fm_status_t;
 
 
-// ³£×¤ÄÚ´æ³ÌĞò
+// å¸¸é©»å†…å­˜ç¨‹åº
 /* I2C.c */
 uint8 I2C_Trans_Bytes(uint8 *buf, uint8 length);
 uint8 I2C_Recev_Bytes(uint8 *buf, uint8 Regaddress, uint8 length);
@@ -67,7 +67,7 @@ uint8 QND_ReadReg(uint8 RegAddr);
 uint16 ChanToFreq(uint16 chan);
 uint16 FreqToChan(uint16 freq);
 
-//BANK³ÌĞò¶Î
+//BANKç¨‹åºæ®µ
 /* fmdrv_init.c */
 uint8 QN_ChipInitialization(void);
 void QND_RXSetTH(uint8 db);
@@ -91,12 +91,12 @@ uint8 FMdrv_getseekflag(uint8 *flag);
 uint8 FMdrv_getintensity(uint8 *pvalue);
 uint8 FMdrv_mute(FM_MUTE_e mode);
 
-// Çı¶¯È«¾Ö±äÁ¿ÉùÃ÷
+// é©±åŠ¨å…¨å±€å˜é‡å£°æ˜
 extern uint8 qnd_R16;
 extern uint8 qnd_R17;
 extern uint8 qnd_R46;
 
-extern uint8 FM_Slevel;	//ËÑÌ¨ÃÅÏŞ
+extern uint8 FM_Slevel;	//æœå°é—¨é™
 
 extern uint8 hardseek_flag;
 

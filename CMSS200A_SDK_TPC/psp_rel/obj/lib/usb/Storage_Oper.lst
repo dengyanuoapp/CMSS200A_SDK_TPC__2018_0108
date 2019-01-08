@@ -39,9 +39,9 @@ stmt  level    source
              -*
    26           *                                           sFlash_Lgcl_Wrts
    27           *
-   28           * Description: Ğ´FlashÂß¼­ÉÈÇø.
+   28           * Description: å†™Flashé€»è¾‘æ‰‡åŒº.
    29           *
-   30           * Arguments  : ix: data Address; hlde: ÆğÊ¼ÉÈÇø;
+   30           * Arguments  : ix: data Address; hlde: èµ·å§‹æ‰‡åŒº;
    31           *
    32           * Returns    : None.
    33           *
@@ -58,7 +58,7 @@ stmt  level    source
    43   2          }
    44   1          else
    45   1          {
-   46   2              //ÅĞ¶ÏÊÇ·ñÊÇSPINor
+   46   2              //åˆ¤æ–­æ˜¯å¦æ˜¯SPINor
    47   2              if (flash_type == 0x02)
    48   2              {
    49   3                  return;
@@ -83,9 +83,9 @@ stmt  level    source
              -*
    66           *                                           sFlash_Lgcl_Rds
    67           *
-   68           * Description: ¶ÁFlash.
+   68           * Description: è¯»Flash.
    69           *
-   70           * Arguments  : ix: data Address; hlde: ÆğÊ¼ÉÈÇø;
+   70           * Arguments  : ix: data Address; hlde: èµ·å§‹æ‰‡åŒº;
    71           *
    72           * Returns    : None.
    73           *
@@ -102,7 +102,7 @@ stmt  level    source
    83   2          }
    84   1          else
    85   1          {
-   86   2              //ÅĞ¶ÏÊÇ·ñÊÇSPINor
+   86   2              //åˆ¤æ–­æ˜¯å¦æ˜¯SPINor
    87   2              if (flash_type == 0x02)
    88   2              {
    89   3                  return;
@@ -125,7 +125,7 @@ stmt  level    source
              -*
   106           *                                           sCardWriteDynamic
   107           *
-  108           * Description: Ğ´Èô¸ÉÉÈÇøÊı¾İµ½SDCardÖĞ.
+  108           * Description: å†™è‹¥å¹²æ‰‡åŒºæ•°æ®åˆ°SDCardä¸­.
   109           *
   110           * Arguments  : ix: data Address;
   111           *
@@ -142,7 +142,7 @@ stmt  level    source
   119   1          SD_UDRWStruct.lba = LBA;
   120   1          SD_UDRWStruct.sectornum = (uint8) sectors_trans_once;
   121   1          SD_UDRWStruct.dstaddr = (uint16) dst_buffer;
-  122   1          //·µ»Ø0: ÕıÈ·£¬ 1: ²»ÕıÈ·£¬
+  122   1          //è¿”å›0: æ­£ç¡®ï¼Œ 1: ä¸æ­£ç¡®ï¼Œ
   123   1          RWCardError = (uint8) UD_SDCardSectorWrite((UD_RW *) &SD_UDRWStruct);
   124   1      }
   125          
@@ -151,7 +151,7 @@ stmt  level    source
              -*
   128           *                                           sCardRead
   129           *
-  130           * Description: ¶ÁÈô¸ÉÉÈÇøSDCardÊı¾İµ½Ö¸¶¨UramµØÖ·.
+  130           * Description: è¯»è‹¥å¹²æ‰‡åŒºSDCardæ•°æ®åˆ°æŒ‡å®šUramåœ°å€.
   131           *
   132           * Arguments  : ix: data Address.
   133           *
@@ -166,7 +166,7 @@ stmt  level    source
   141   1          SD_UDRWStruct.lba = LBA;
   142   1          SD_UDRWStruct.sectornum = (uint8) sectors_trans_once;
   143   1          SD_UDRWStruct.dstaddr = (uint16) dst_buffer;
-  144   1          //·µ»Ø0: ÕıÈ·£¬ 1: ²»ÕıÈ·£¬
+  144   1          //è¿”å›0: æ­£ç¡®ï¼Œ 1: ä¸æ­£ç¡®ï¼Œ
   145   1          RWCardError = (uint8) UD_SDCardSectorRead((UD_RW *) &SD_UDRWStruct);
   146   1          if (RWCardError != 0x00)
   147   1          {
@@ -179,7 +179,7 @@ stmt  level    source
              -*
   154           *                                           sFlashDrvCheck
   155           *
-  156           * Description: ÊÇ·ñÒªÇĞ»»Driver.
+  156           * Description: æ˜¯å¦è¦åˆ‡æ¢Driver.
   157           *
   158           * Arguments  : None.
   159           *
@@ -198,9 +198,9 @@ stmt  level    source
              -*
   171           *                                           sProgramSectorsToStorage
   172           *
-  173           * Description: Ğ´BlockNumInUramÉÈÇøÊı¾İµ½Flash.
+  173           * Description: å†™BlockNumInUramæ‰‡åŒºæ•°æ®åˆ°Flash.
   174           *
-  175           * Arguments  : ix: Êı¾İÔ´µØÖ·.
+  175           * Arguments  : ix: æ•°æ®æºåœ°å€.
   176           *
 C251 COMPILER V4.55,  Storage_Oper                                                         15/07/16  16:03:49  PAGE 4   
 
@@ -212,17 +212,17 @@ stmt  level    source
   181           */
   182          void sProgramSectorsToStorage(uint8 *dst_buffer)
   183          {
-  184   1          //Flash»ò¿¨¶ÁĞ´±êÖ¾: 0,Flash; 1:Card
+  184   1          //Flashæˆ–å¡è¯»å†™æ ‡å¿—: 0,Flash; 1:Card
   185   1          if (flashorcard_rwflag != 0)
   186   1          {
-  187   2              //¶ÁFlashÊı¾İµ½Buffer²»Í¬Î»ÖÃ,ÊäÈë²ÎÊıix
+  187   2              //è¯»Flashæ•°æ®åˆ°Bufferä¸åŒä½ç½®,è¾“å…¥å‚æ•°ix
   188   2              sCardWrite(dst_buffer);
   189   2          }
   190   1          else
   191   1          {
   192   2              sFlash_Wrts(RW_DYNAMIC, LBA, dst_buffer);
   193   2          }
-  194   1          //LBAµØÖ·ÀÛ¼Ó
+  194   1          //LBAåœ°å€ç´¯åŠ 
   195   1          LBA = LBA + (uint32) sectors_trans_once;
   196   1      }
   197          
@@ -231,9 +231,9 @@ stmt  level    source
              -*
   200           *                                           sReadSectorsToBuff
   201           *
-  202           * Description: °ÑÊı¾İ´ÓFlash¶Áµ½Buffer.
+  202           * Description: æŠŠæ•°æ®ä»Flashè¯»åˆ°Buffer.
   203           *
-  204           * Arguments  : ix: Êı¾İÄ¿µÄRamµØÖ·.
+  204           * Arguments  : ix: æ•°æ®ç›®çš„Ramåœ°å€.
   205           *
   206           * Returns    : None.
   207           *
@@ -243,17 +243,17 @@ stmt  level    source
   210           */
   211          void sReadSectorsToBuff(uint8 *dst_buffer)
   212          {
-  213   1          //Flash»ò¿¨¶ÁĞ´±êÖ¾: 0,Flash; 1:Card
+  213   1          //Flashæˆ–å¡è¯»å†™æ ‡å¿—: 0,Flash; 1:Card
   214   1          if (flashorcard_rwflag != 0)
   215   1          {
-  216   2              //¶ÁFlashÊı¾İµ½Buffer²»Í¬Î»ÖÃ
+  216   2              //è¯»Flashæ•°æ®åˆ°Bufferä¸åŒä½ç½®
   217   2              sCardRead(dst_buffer);
   218   2          }
   219   1          else
   220   1          {
   221   2              sFlash_Rds(RW_DYNAMIC, LBA, dst_buffer);
   222   2          }
-  223   1          //LBAµØÖ·ÀÛ¼Ó
+  223   1          //LBAåœ°å€ç´¯åŠ 
   224   1          LBA = LBA + (uint32) sectors_trans_once;
   225   1      }
   226          
@@ -262,7 +262,7 @@ stmt  level    source
              -*
   229           *                                           Compute_LBA
   230           *
-  231           * Description: ¼ÆËãFlash/Card¶ÁĞ´µØÖ·ºÍÊı¾İ³¤¶È.
+  231           * Description: è®¡ç®—Flash/Cardè¯»å†™åœ°å€å’Œæ•°æ®é•¿åº¦.
   232           *
   233           * Arguments  : None.
   234           *
@@ -276,10 +276,10 @@ stmt  level    source
   239           */
   240          void Compute_LBA(void)
   241          {
-  242   1          //Flash»ò¿¨¶ÁĞ´±êÖ¾: 0,Flash; 1:Card
+  242   1          //Flashæˆ–å¡è¯»å†™æ ‡å¿—: 0,Flash; 1:Card
   243   1          flashorcard_rwflag = 0x00;
   244   1      
-  245   1          //¶ÁĞ´Flash1ÉÈÇø±êÖ¾,ÓÃÓÚ¼ÓÃÜÅÌ
+  245   1          //è¯»å†™Flash1æ‰‡åŒºæ ‡å¿—,ç”¨äºåŠ å¯†ç›˜
   246   1          AccessFlashPhySec1 = 0x00;
   247   1          UdiskFSInfo.rw_dbr_flag = 0x00;
   248   1      
@@ -295,7 +295,7 @@ stmt  level    source
   258   1          {
   259   2              udisk_rw_sctr_num = *((uint16 *) &CBW_data_buffer._CBWCB[7]);
   260   2              LBA = *((uint32 *) &CBW_data_buffer._CBWCB[2]);
-  261   2              //ÉèÖÃ¼ÙÈİÁ¿ºó²»ÔÙÖ§³Ö¼ÓÃÜ·ÖÇø¹¦ÄÜ
+  261   2              //è®¾ç½®å‡å®¹é‡åä¸å†æ”¯æŒåŠ å¯†åˆ†åŒºåŠŸèƒ½
   262   2              if ((set_fake_ucap_flag == 0x00) && (LBA == 0x00000001))
   263   2              {
   264   3                  AccessFlashPhySec1 = 0x01;
@@ -303,19 +303,19 @@ stmt  level    source
   266   2      
   267   2              if (CBW_data_buffer._bCBWLUN == 0x00)
   268   2              {
-  269   3                  //CDROM²»ÏìÓ¦Èí¼şµÄPhysec0,1¶Á
+  269   3                  //CDROMä¸å“åº”è½¯ä»¶çš„Physec0,1è¯»
   270   3                  AccessFlashPhySec1 = 0x00;
-  271   3                  //µÃµ½CDROMÊ×ÉÈÇøÔÚFlashµÄÊµ¼ÊÉÈÇøµØÖ·
+  271   3                  //å¾—åˆ°CDROMé¦–æ‰‡åŒºåœ¨Flashçš„å®é™…æ‰‡åŒºåœ°å€
   272   3                  LBA = LBA * 4 + AutoRunDiskStartAddr;
   273   3                  udisk_rw_sctr_num = udisk_rw_sctr_num * 4;
   274   3              }
   275   2              else if (CBW_data_buffer._bCBWLUN == 0x01)
   276   2              {
-  277   3                  //½«µØÖ·ºÍ³¤¶È»¹Ô­Îª0x200byteµ¥Î»
+  277   3                  //å°†åœ°å€å’Œé•¿åº¦è¿˜åŸä¸º0x200byteå•ä½
   278   3                  LBA = LBA * SectorType;
   279   3                  udisk_rw_sctr_num = udisk_rw_sctr_num * SectorType;
   280   3      
-  281   3                  if (flash_type != 4)//¿¨base²»×ö8k¶ÔÆë
+  281   3                  if (flash_type != 4)//å¡baseä¸åš8kå¯¹é½
   282   3                  {
   283   4                      //check if is writing the DBR
   284   4                      if (LBA != UdiskFSInfo.DBRStartAddress)
@@ -332,10 +332,10 @@ stmt  level    source
   295   5                      }
   296   4                  }
   297   3      
-  298   3                  //ÅĞ¶Ï¶ÔFlash¶ÁĞ´ÊÇ·ñ³¬¹ıFlashÈİÁ¿
+  298   3                  //åˆ¤æ–­å¯¹Flashè¯»å†™æ˜¯å¦è¶…è¿‡Flashå®¹é‡
   299   3                  Is_BulkRW_illegal();
   300   3      
-  301   3                  //µÃµ½MBRÉÈÇøÔÚFlashµÄÊµ¼ÊÉÈÇøµØÖ·
+  301   3                  //å¾—åˆ°MBRæ‰‡åŒºåœ¨Flashçš„å®é™…æ‰‡åŒºåœ°å€
   302   3                  LBA += UdiskStartAddr;
   303   3              }
 C251 COMPILER V4.55,  Storage_Oper                                                         15/07/16  16:03:49  PAGE 6   
@@ -354,9 +354,9 @@ stmt  level    source
   315   3              }
   316   2              else if (CBW_data_buffer._bCBWLUN == 0x03)
   317   2              {
-  318   3                  //¿¨²»ÏìÓ¦¹¤¾ßÈí¼şµÄPhysec1¶ÁĞ´
+  318   3                  //å¡ä¸å“åº”å·¥å…·è½¯ä»¶çš„Physec1è¯»å†™
   319   3                  AccessFlashPhySec1 = 0x00;
-  320   3                  //Flash»ò¿¨¶ÁĞ´±êÖ¾: 0,Flash; 1:Card
+  320   3                  //Flashæˆ–å¡è¯»å†™æ ‡å¿—: 0,Flash; 1:Card
   321   3                  flashorcard_rwflag = 0x01;
   322   3              }
   323   2              else
@@ -370,11 +370,11 @@ stmt  level    source
              -*
   331           *                                           Is_ADFURW_illegal
   332           *
-  333           * Description: ³ıÁË¶ÔFlash SDÇøDIRºÍDRMINFOµÄ¶ÁºÏ·¨,ÆäËü¶Á¾ù·Ç·¨,·À·¶LFI±»¶Á³ö.
+  333           * Description: é™¤äº†å¯¹Flash SDåŒºDIRå’ŒDRMINFOçš„è¯»åˆæ³•,å…¶å®ƒè¯»å‡éæ³•,é˜²èŒƒLFIè¢«è¯»å‡º.
   334           *
   335           * Arguments  : None.
   336           *
-  337           * Returns    : µØÖ·ÊÇ·ñºÏ·¨: 0: legal;  1:illegal.
+  337           * Returns    : åœ°å€æ˜¯å¦åˆæ³•: 0: legal;  1:illegal.
   338           *
   339           * Note(s)    : None.
   340           ********************************************************************************************************
@@ -388,12 +388,12 @@ stmt  level    source
   347   1          {
   348   2              if (udisk_rw_sctr_num <= 0x20)
   349   2              {
-  350   3                  if (LBA == 0) //¶ÁFlash SDÇøµÄDIRĞÅÏ¢
+  350   3                  if (LBA == 0) //è¯»Flash SDåŒºçš„DIRä¿¡æ¯
   351   3                  {
   352   4                      ret = 0;
   353   4                  }
-  354   3                  //else if((LBA>=DRMINFOADDR) && (LBA <(SDDiskCap/2))) //¶ÁDRMINFO,²»ÄÜ¶Á³¬¹ıSDÇøÄÚÈİ
-  355   3                  else if (LBA < (SDDiskCap / 2)) //¶ÁDRMINFO,²»ÄÜ¶Á³¬¹ıSDÇøÄÚÈİ
+  354   3                  //else if((LBA>=DRMINFOADDR) && (LBA <(SDDiskCap/2))) //è¯»DRMINFO,ä¸èƒ½è¯»è¶…è¿‡SDåŒºå†…å®¹
+  355   3                  else if (LBA < (SDDiskCap / 2)) //è¯»DRMINFO,ä¸èƒ½è¯»è¶…è¿‡SDåŒºå†…å®¹
   356   3                  {
   357   4                      ret = 0;
   358   4                  }
@@ -404,7 +404,7 @@ stmt  level    source
   363   3              }
   364   2              else
   365   2              {
-  366   3                  //×î´óÖ»ÄÜÃ¿´Î¶Á0x20¸öÉÈÇøµÄSDÇøÊı¾İ,·ñÔòÈÏÎª·Ç·¨
+  366   3                  //æœ€å¤§åªèƒ½æ¯æ¬¡è¯»0x20ä¸ªæ‰‡åŒºçš„SDåŒºæ•°æ®,å¦åˆ™è®¤ä¸ºéæ³•
   367   3                  ret = 1;
 C251 COMPILER V4.55,  Storage_Oper                                                         15/07/16  16:03:49  PAGE 7   
 
@@ -412,7 +412,7 @@ stmt  level    source
   369   2          }
   370   1          else
   371   1          {
-  372   2              //Ğ´FlashÎïÀíÇø×ÜÈÏÎªÊÇºÏ·¨
+  372   2              //å†™Flashç‰©ç†åŒºæ€»è®¤ä¸ºæ˜¯åˆæ³•
   373   2              ret = 0;
   374   2          }
   375   1      
@@ -426,11 +426,11 @@ stmt  level    source
              -*
   383           *                                           Is_BulkRW_illegal
   384           *
-  385           * Description: ÅĞ¶Ï¶ÔFlash¶ÁĞ´ÊÇ·ñ³¬¹ıFlashÈİÁ¿,·À·¶LFI±»¶Á³ö.
+  385           * Description: åˆ¤æ–­å¯¹Flashè¯»å†™æ˜¯å¦è¶…è¿‡Flashå®¹é‡,é˜²èŒƒLFIè¢«è¯»å‡º.
   386           *
   387           * Arguments  : None.
   388           *
-  389           * Returns    : µØÖ·ÊÇ·ñºÏ·¨£¬0: legal;  1:illegal.
+  389           * Returns    : åœ°å€æ˜¯å¦åˆæ³•ï¼Œ0: legal;  1:illegal.
   390           *
   391           * Note(s)    : None.
   392           ********************************************************************************************************
@@ -444,7 +444,7 @@ stmt  level    source
   399   2          }
   400   1          else
   401   1          {
-  402   2              //LBAµØÖ·Ô½½ç
+  402   2              //LBAåœ°å€è¶Šç•Œ
   403   2              illegalLBAFlag = 0x01;
   404   2          }
   405   1      

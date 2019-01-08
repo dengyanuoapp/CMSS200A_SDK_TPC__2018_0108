@@ -16,25 +16,25 @@
 #include <midware_BS_EH.h>
 #include <basal.h>
 
-// ÎªÁËºê __C251__     Added by Weimh 2010.03.10
+// ä¸ºäº†å® __C251__     Added by Weimh 2010.03.10
 #include "simulatorpc.h"
 
 #ifdef __C251__
 
-#define CP_ASCII    1         //ÉÏÃæ×¢ÊÍµôµÄ#defineÊÇ´íÎóµÄ!ÓÉÓÚÔ­À´ASCIIºÍCHSÓÃÍ¬Ò»¸öÇı¶¯¶øÃ»ÓĞÌåÏÖ³öÀ´.
-#define CP_CHS      0         //ÔÚ¼ÓÈëLatin1Ö®ºó,´ËBUG½«¸¡ÏÖ!¹Ê±ØĞë×ö´ËĞŞÕı!       modified by ccm.
+#define CP_ASCII    1         //ä¸Šé¢æ³¨é‡Šæ‰çš„#defineæ˜¯é”™è¯¯çš„!ç”±äºåŸæ¥ASCIIå’ŒCHSç”¨åŒä¸€ä¸ªé©±åŠ¨è€Œæ²¡æœ‰ä½“ç°å‡ºæ¥.
+#define CP_CHS      0         //åœ¨åŠ å…¥Latin1ä¹‹å,æ­¤BUGå°†æµ®ç°!æ•…å¿…é¡»åšæ­¤ä¿®æ­£!       modified by ccm.
 #define CP_CHT      2
 #define CP_LATIN1   0xa1      //define CP_LATIN1 for supply interface of the unitochar()
 //add by dongzh for id3.c
 
 
-/* ÊÕ²Ø¼ĞĞÅÏ¢´æÓÚVRAM, Ã¿ÖÖ½éÖÊ×î´óÖ§³Ö20Ê×ÊÕ²Ø¸èÇú */
-#define  VRAM_FAVI_SEC_NUM      5              /* µ¥¸ö½éÖÊÓÃÓÚÊÕ²Ø¼ĞÊı¾İ´æ´¢µÄVRAMÉÈÇøÊı */
-#define  ONE_SEC_FILE          4                        /* Ò»¸öÉÈÇø¿É´æ·ÅµÄÊÕ²Ø¼ĞÊı¾İÏî */
-#define   MAX_FAVOURITE_SONG      20         /* ÊÕ²Ø¼Ğ×î´óÈİÄÉ¸èÇúÊı */
-#define   ITEM_LOCATION_SIZE          33           /* ¼ÇÂ¼¸èÇúÂ·¾¶ĞÅÏ¢ËùÓÃ×Ö½ÚÊı */
+/* æ”¶è—å¤¹ä¿¡æ¯å­˜äºVRAM, æ¯ç§ä»‹è´¨æœ€å¤§æ”¯æŒ20é¦–æ”¶è—æ­Œæ›² */
+#define  VRAM_FAVI_SEC_NUM      5              /* å•ä¸ªä»‹è´¨ç”¨äºæ”¶è—å¤¹æ•°æ®å­˜å‚¨çš„VRAMæ‰‡åŒºæ•° */
+#define  ONE_SEC_FILE          4                        /* ä¸€ä¸ªæ‰‡åŒºå¯å­˜æ”¾çš„æ”¶è—å¤¹æ•°æ®é¡¹ */
+#define   MAX_FAVOURITE_SONG      20         /* æ”¶è—å¤¹æœ€å¤§å®¹çº³æ­Œæ›²æ•° */
+#define   ITEM_LOCATION_SIZE          33           /* è®°å½•æ­Œæ›²è·¯å¾„ä¿¡æ¯æ‰€ç”¨å­—èŠ‚æ•° */
 
-/* µ¥Ïî¼ÇÂ¼ÖĞ¸÷ÏîĞÅÏ¢Æ«ÒÆ */
+/* å•é¡¹è®°å½•ä¸­å„é¡¹ä¿¡æ¯åç§» */
 #define  LAST_OFFSET      (ITEM_LOCATION_SIZE+1)                  // 34
 #define  NEXT_OFFSET      (LAST_OFFSET+1)                               // 35
 #define  CHESUM_OFFSET  (NEXT_OFFSET+1)                            //36
@@ -60,9 +60,9 @@ typedef struct
     uint8 *TENC_buffer;
 
     uint8   GENRE_length;
-    uint8    *GENRE_buffer;	//Á÷ÅÉ£¬·ç¸ñ
+    uint8    *GENRE_buffer;	//æµæ´¾ï¼Œé£æ ¼
     uint8   TrackNum_length;
-    uint8    *TrackNum_buffer; //Òô¹ì
+    uint8    *TrackNum_buffer; //éŸ³è½¨
     uint16    TrackNum;
 
     uint32  APIC_offset;
@@ -86,7 +86,7 @@ typedef struct
 } ID3Info_t;
 #endif
 
-//Ò»ÆÁ×î´ó×Ö·ûÊı, Õâ¸öÔÚ¶¨ÖÆÏµÍ³Ê±¶¨Òå
+//ä¸€å±æœ€å¤§å­—ç¬¦æ•°, è¿™ä¸ªåœ¨å®šåˆ¶ç³»ç»Ÿæ—¶å®šä¹‰
 #define LCD_MAX_CHARS   15
 
 #define USERPL_NUM   101*8
@@ -94,7 +94,7 @@ typedef struct
 #define USER_PLAYLIST_SIZE       128       //64                              //128
 
 
-//µ±Ç°´ÅÅÌ,Ä¿Â¼,ÎÄ¼ş
+//å½“å‰ç£ç›˜,ç›®å½•,æ–‡ä»¶
 typedef struct
 {
     int8 disk; //'C','D','E','F'-internal, 'H','I','J','K'-externel
@@ -108,7 +108,7 @@ typedef struct
     uint8 DirNo[8]; //dir no {1, 255, 36, 10....}
     uint16 fselTotal;
     uint16 fselFileNo;
-    uint8 *ID3buffer; //change by ybfu 2004-2-4 9:44,Ö¸¶¨ID3 BUFFERµØÖ·.
+    uint8 *ID3buffer; //change by ybfu 2004-2-4 9:44,æŒ‡å®šID3 BUFFERåœ°å€.
     //uint8 APE_Cur;
     uint16 PL_Cur;
     uint16 fselFileNoInDisk;
@@ -126,11 +126,11 @@ typedef struct
 typedef struct
 {
     char flag[6];//"USERPL"
-    WORD FirstOffset; //µÚÒ»¸öÆ«ÒÆÁ¿
-    WORD LastOffset; //×îºóÆ«ÒÆÁ¿
-    WORD PlaylistCount; //Item×ÜÊı
-    //WORD FreeHead;   //¿Õ×åÆ«ÒÆÁ¿
-} user_playlist_head_t; //ÓÃ512¸ö×Ö½ÚÀ´´¦Àí
+    WORD FirstOffset; //ç¬¬ä¸€ä¸ªåç§»é‡
+    WORD LastOffset; //æœ€ååç§»é‡
+    WORD PlaylistCount; //Itemæ€»æ•°
+    //WORD FreeHead;   //ç©ºæ—åç§»é‡
+} user_playlist_head_t; //ç”¨512ä¸ªå­—èŠ‚æ¥å¤„ç†
 
 typedef struct
 {
@@ -144,14 +144,14 @@ typedef struct
     uint8 filename[12]; //8.3+'\0'
     uint8 PrevOffset;
     uint8 NextOffset;
-    //WORD PrevOffset; //Ç°Ò»¸öÆ«ÒÆÁ¿
-    //WORD NextOffset; //ÏÂÒ»¸öÆ«ÒÆÁ¿ µ±DelFlag = 1 Ê± Ôò¼ÇÂ¼ÁËÏÂÒ»¸ö¼ÇÂ¼µÄÆ«ÒÆÁ¿
-    //µ±DelFlag = 2 Ê± Ôò¼ÇÂ¼ÁËÏÂÒ»¸ö¿Õ´ØµÄÆ«ÒÆÁ¿
-    //Ö÷ÒªÊÇÓÃÓÚÉ¾³ıÊ±Ê¹ÓÃ£¬µ±É¾³ıÒ»¸öitemÊ±£¬Nextoffset¼ÇÂ¼¿Õ×åĞÅÏ¢£¬ÔòÌæ»»Í·ĞÅÏ¢µÄLastOffset£¬Í¬Ê±LastOffsetÖ¸Ïò¸Ãitem
-    //Ìí¼ÓITEMÊ±£¬ÏÈ´ÓLastOffsetÈ¡³öÆ«ÒÆÁ¿£¬È»ºóÅĞ¶Ïµ±Ç°ÎÄ¼şDelFlag£¬ÈôÊÇ2£¬ÔòLastOffset = Nextoffset
-} user_playlist_t; //ÓÃ64¸ö×Ö½ÚÀ´´¦Àí
+    //WORD PrevOffset; //å‰ä¸€ä¸ªåç§»é‡
+    //WORD NextOffset; //ä¸‹ä¸€ä¸ªåç§»é‡ å½“DelFlag = 1 æ—¶ åˆ™è®°å½•äº†ä¸‹ä¸€ä¸ªè®°å½•çš„åç§»é‡
+    //å½“DelFlag = 2 æ—¶ åˆ™è®°å½•äº†ä¸‹ä¸€ä¸ªç©ºç°‡çš„åç§»é‡
+    //ä¸»è¦æ˜¯ç”¨äºåˆ é™¤æ—¶ä½¿ç”¨ï¼Œå½“åˆ é™¤ä¸€ä¸ªitemæ—¶ï¼ŒNextoffsetè®°å½•ç©ºæ—ä¿¡æ¯ï¼Œåˆ™æ›¿æ¢å¤´ä¿¡æ¯çš„LastOffsetï¼ŒåŒæ—¶LastOffsetæŒ‡å‘è¯¥item
+    //æ·»åŠ ITEMæ—¶ï¼Œå…ˆä»LastOffsetå–å‡ºåç§»é‡ï¼Œç„¶ååˆ¤æ–­å½“å‰æ–‡ä»¶DelFlagï¼Œè‹¥æ˜¯2ï¼Œåˆ™LastOffset = Nextoffset
+} user_playlist_t; //ç”¨64ä¸ªå­—èŠ‚æ¥å¤„ç†
 
-/* ÊÕ²Ø¼ĞÎÄ¼şÍ·½á¹¹ */
+/* æ”¶è—å¤¹æ–‡ä»¶å¤´ç»“æ„ */
 typedef struct
 {
     uint8 magic[6];
@@ -170,10 +170,10 @@ typedef struct
     BYTE DirNo[8]; //dir no {1, 255, 36, 10....}
     long ClusterNo; //cluster no
     BYTE dirLayer;
-    char path[12]; //8.3+'\0' ÉÏ²ãÂ·¾¶Ãû
+    char path[12]; //8.3+'\0' ä¸Šå±‚è·¯å¾„å
     long FileNum;
     long DirNum;
-    WORD Parentoffset; //16µÄ±¶Êı Ö§³Ö4GµÄÎÄ¼şÁ÷ÀÀ
+    WORD Parentoffset; //16çš„å€æ•° æ”¯æŒ4Gçš„æ–‡ä»¶æµè§ˆ
     WORD DelFileNum; //999
 #ifdef NAVI_LONGNAME
     char serv[11 + 16 - 2];
@@ -185,7 +185,7 @@ typedef struct
 {
     char PathorFile; //0 : path info 1: folder info  2 file info
     char filename[12]; //8.3+'\0'
-    WORD Nextoffset; //16µÄ±¶Êı Ö§³Ö4GµÄÎÄ¼şÁ÷ÀÀ
+    WORD Nextoffset; //16çš„å€æ•° æ”¯æŒ4Gçš„æ–‡ä»¶æµè§ˆ
     char serv;
 #ifdef NAVI_LONGNAME
     char LN_Flag;
@@ -201,12 +201,12 @@ typedef struct
 } navi_vars_t;
 
 
-/* ------ÒôÀÖÎÄ¼ştag²Ù×÷ ------*/
+/* ------éŸ³ä¹æ–‡ä»¶tagæ“ä½œ ------*/
 bool mp3GetID3Info(const char *filename, ID3Info_t *ID3Info, int string_id);
 bool wmaGetTAGInfo(const char *filename, ID3Info_t *ID3Info);
 bool oggGetTAGInfo(const char *filename, ID3Info_t *ID3Info, int string_id);
 
-/* ------ ¸è´Ê²Ù×÷ ------*/
+/* ------ æ­Œè¯æ“ä½œ ------*/
 //bool    openlyricfile(const  char *);
 //bool    readlyricfile(const  char *,lyric_con_t *);
 
@@ -244,7 +244,7 @@ bool lyricSeekFor( char *strlyric, const uchar len, const uint32 lTime);
 // Query if exist lyric matching the music file specified by strMusicFile.
 bool lyricQueryExist(const BYTE *strMusicFile);
 
-/* ------ ÎÄ¼şÑ¡Ôñ²Ù×÷ ------*/
+/* ------ æ–‡ä»¶é€‰æ‹©æ“ä½œ ------*/
 
 //////file selector defines
 // max select scope defines
@@ -296,7 +296,7 @@ bool lyricQueryExist(const BYTE *strMusicFile);
 #define FSEL_ERR_SETDIR         3
 #define FSEL_ERR_SETFILE        4
 #define FSEL_ERR_EXCEPTION      5
-#define FSEL_ERR_SHUFFLE        6//shuffle»úÖÆ³ö´í
+#define FSEL_ERR_SHUFFLE        6//shuffleæœºåˆ¶å‡ºé”™
 
 #define FSEL_ERR_FS             20
 #define FSEL_ERR_FAIL           21
@@ -359,7 +359,7 @@ uint16 shuffle_next_file(void);
 
 uint16 shuffle_prev_file(void);
 
-/* ------ UNICODE ×ª»» ------*/
+/* ------ UNICODE è½¬æ¢ ------*/
 bool unitochar(char *str, int len, unsigned char encode); //change by ybfu
 
 

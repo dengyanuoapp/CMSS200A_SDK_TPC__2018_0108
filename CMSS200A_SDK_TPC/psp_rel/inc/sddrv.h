@@ -53,7 +53,7 @@ bool SD_SectorWrite(SD_RW *sdrw);
 bool API_SD_Bre_SectorRead(uint8 cmd, SD_RW *sdrw);
 bool API_SD_Bre_SectorWrite(uint8 cmd, SD_RW *sdrw);
 bool SD_Update(void);
-int8 SetSWAPAddress(int8 page);  //ret: ¦Ì¡À?page
+int8 SetSWAPAddress(int8 page);  //ret: Î¼Â±?page
 
 #endif /* ____C251__ */
 

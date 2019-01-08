@@ -72,12 +72,12 @@ bool UDiskInitAll(int para)
 {
     //	int i;
 
-    //°²×°udÇı¶¯
+    //å®‰è£…udé©±åŠ¨
     res_fp = ResOpen("ui30.res");
-    ClearScreen(NULL); //Çå³É°×ÆÁ
+    ClearScreen(NULL); //æ¸…æˆç™½å±
     SetPenColor(Color_WHITE_def);
     //UpdateScreen(NULL);
-    ResShowPic(UDISKRDY, 0, 0); //ÏÔÊ¾¿ÕÏĞ»­Ãæ
+    ResShowPic(UDISKRDY, 0, 0); //æ˜¾ç¤ºç©ºé—²ç”»é¢
 
     if (DRV_DetectUD(0x00) == 0xff)
     {
@@ -85,66 +85,66 @@ bool UDiskInitAll(int para)
     }
     else
     {
-        DRV_ActiveUD(0x00, MODE_FAST); //¿ìËÙÄ£Ê½udÇı¶¯
+        DRV_ActiveUD(0x00, MODE_FAST); //å¿«é€Ÿæ¨¡å¼udé©±åŠ¨
     }
 
     UDiskSetDiskNum(0);
 
-    //UÅÌ³õÊ¼ÖÕ»¯,ÊäÈë²ÎÊı:callbackº¯Êı£¬ÊôĞÔ...
+    //Uç›˜åˆå§‹ç»ˆåŒ–,è¾“å…¥å‚æ•°:callbackå‡½æ•°ï¼Œå±æ€§...
     UDiskInit(0, 3);
-    UDiskRun(para); //Æô¶¯USBÒıÇæ
+    UDiskRun(para); //å¯åŠ¨USBå¼•æ“
     return 1;
 
     //	int i;
     //
-    //	//°²×°udÇı¶¯
+    //	//å®‰è£…udé©±åŠ¨
     //	res_fp = ResOpen("ui30.res");
-    //	ClearScreen(NULL); //Çå³É°×ÆÁ
+    //	ClearScreen(NULL); //æ¸…æˆç™½å±
     //	UpdateScreen(NULL);
-    //	ResShowPic(UDISKRDY, 0, 0); //ÏÔÊ¾¿ÕÏĞ»­Ãæ
+    //	ResShowPic(UDISKRDY, 0, 0); //æ˜¾ç¤ºç©ºé—²ç”»é¢
     //
     //	if (DRV_DetectUD(0x00) == 0xff)
     //		return 0;
     //	else
-    //		DRV_ActiveUD(0x00, MODE_FAST); //¿ìËÙÄ£Ê½udÇı¶¯
+    //		DRV_ActiveUD(0x00, MODE_FAST); //å¿«é€Ÿæ¨¡å¼udé©±åŠ¨
     //
     //	//read comval
-    //	VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval)); //¶ÁVRAM
+    //	VMRead(&g_comval, VM_SYSTEM, sizeof(g_comval)); //è¯»VRAM
     //
     //	//check if valid
-    //	if (g_comval.magic != MAGIC_COMVAL) //È¡Áª»úÄ£Ê½Éè¶¨
+    //	if (g_comval.magic != MAGIC_COMVAL) //å–è”æœºæ¨¡å¼è®¾å®š
     //		COMVAL_INIT(g_comval);
     //
     //	if (g_comval.LightTime != 0)
-    //		sKY_OpenBacklight(); //¿ª±³¹â
+    //		sKY_OpenBacklight(); //å¼€èƒŒå…‰
     //
     //	//==================================================================================
-    //	//**********************ÒÔÏÂº¯Êıµ÷ÓÃ´ÎĞò²»ÄÜ¸Ä¶¯***************************************
+    //	//**********************ä»¥ä¸‹å‡½æ•°è°ƒç”¨æ¬¡åºä¸èƒ½æ”¹åŠ¨***************************************
     //	//==================================================================================
-    //	UDiskSetDiskNum(g_comval.OnlineMode);       //ÉèÖÃÁª»úÄ£Ê½
-    //	//UDiskSetDiskNum(3);                         //ÉèÖÃµ¥¿¨ÅÌÁª»úÄ£Ê½
+    //	UDiskSetDiskNum(g_comval.OnlineMode);       //è®¾ç½®è”æœºæ¨¡å¼
+    //	//UDiskSetDiskNum(3);                         //è®¾ç½®å•å¡ç›˜è”æœºæ¨¡å¼
     //
-    //	AlwaysShowCardDisk(g_comval.SuppCard);      //ÉèÖÃÊÇ·ñÏÔÊ¾¶àÅÌ·û  //reagan modify 2009-1-6 13:39
+    //	AlwaysShowCardDisk(g_comval.SuppCard);      //è®¾ç½®æ˜¯å¦æ˜¾ç¤ºå¤šç›˜ç¬¦  //reagan modify 2009-1-6 13:39
     //
-    //    //UÅÌ³õÊ¼»¯,ÊäÈë²ÎÊı:callbackº¯Êı,ÊÇ·ñÖ§³ÖUdiskĞòÁĞºÅ(Ëæ»úÊı,Ã¿¸öUdisk¾ù²»Ò»ÖÂ),ÊÇ·ñÊÇUdiskÈÏÖ¤Ä£Ê½
+    //    //Uç›˜åˆå§‹åŒ–,è¾“å…¥å‚æ•°:callbackå‡½æ•°,æ˜¯å¦æ”¯æŒUdiskåºåˆ—å·(éšæœºæ•°,æ¯ä¸ªUdiskå‡ä¸ä¸€è‡´),æ˜¯å¦æ˜¯Udiskè®¤è¯æ¨¡å¼
     //	UDiskInit((void *) FlashLed, g_comval.udisk_setting);
     //
-    //	if (sKY_HoldCheck()) //HOLD±íÊ¾ĞèÒªĞ´±£»¤
+    //	if (sKY_HoldCheck()) //HOLDè¡¨ç¤ºéœ€è¦å†™ä¿æŠ¤
     //	{
     //		UDiskSetWP('C');
     //		HoldDispState = 1;
     //		ResShowPic(UDLOCK_S, 115, 16);
     //	}
     //	/*    #ifdef SupportCard
-    //	 if (CardWPCheck())            //sCardWPCheck·µ»ØÖµ£º1:ÓĞ¿¨²¢ÇÒ¿¨Ğ´±£»¤  0:Ã»¿¨»ò¿¨Ã»ÓĞĞ´±£»¤
-    //	 { //ÓĞ¿¨
+    //	 if (CardWPCheck())            //sCardWPCheckè¿”å›å€¼ï¼š1:æœ‰å¡å¹¶ä¸”å¡å†™ä¿æŠ¤  0:æ²¡å¡æˆ–å¡æ²¡æœ‰å†™ä¿æŠ¤
+    //	 { //æœ‰å¡
     //	 UDiskSetWP('H');
     //	 HoldDispState=1;
     //	 ResShowPic(UDLOCK_S,115,16);
     //	 }
     //	 #endif */
     //
-    //	UDiskRun(para); //Æô¶¯USBÒıÇæ
+    //	UDiskRun(para); //å¯åŠ¨USBå¼•æ“
     //
     //	return 1;
 }

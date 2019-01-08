@@ -15,16 +15,16 @@
 #include "ap_common.h"
 #include "ui_alarm.h"
 
-#define PLAYING_TIME   360  //3·ÖÖÓ
-#define PAUSE_TIME      600//5·ÖÖÓ
-#define MAX_PLAY_TIME 3//×îºó²¥·Å´ÎÊı
+#define PLAYING_TIME   360  //3åˆ†é’Ÿ
+#define PAUSE_TIME      600//5åˆ†é’Ÿ
+#define MAX_PLAY_TIME 3//æœ€åæ’­æ”¾æ¬¡æ•°
 #pragma name(ALARM_UI_PLY)
 #define ALARMExtNum  6
 extern uint8 key;
 extern uint8 playing_flag;
 extern uint8 need_draw;
 extern Music_type_a g_currentMusicType;
-extern uint8 g_TagInfoBuf[92];//ÓÃÓÚ·ÅTAGĞÅÏ¢µÄBUF
+extern uint8 g_TagInfoBuf[92];//ç”¨äºæ”¾TAGä¿¡æ¯çš„BUF
 const uint8 Extalarmstr[ALARMExtNum][4] =
 {
     "MP1", "MP2", "MP3", "WMA", /*"ASF",*/
@@ -61,7 +61,7 @@ void ShowTimer(void)
 bool AlarmMusicpSendCommand_bank(BYTE cmd, void *param)
 {
     bool result = FALSE;
-    //¸ù¾İ²»Í¬µÄÒôÀÖÀàĞÍ·¢²»Í¬µÄÃüÁî
+    //æ ¹æ®ä¸åŒçš„éŸ³ä¹ç±»å‹å‘ä¸åŒçš„å‘½ä»¤
     ClearWatchDog();
     switch (cmd)
     {
@@ -133,7 +133,7 @@ Music_type_a ALARMCheckMusicType(uint8 *filename)
     return Music_NON;
 }
 
-/* »ñÈ¡Ê×Ö¡Æ«ÒÆ, ±ÜÃâ½«ÎÄ¼şÍ·Ò²½øĞĞ½âÂë, ²úÉúÔÓÒô */
+/* è·å–é¦–å¸§åç§», é¿å…å°†æ–‡ä»¶å¤´ä¹Ÿè¿›è¡Œè§£ç , äº§ç”Ÿæ‚éŸ³ */
 void AlarmGetInfo(void)
 {
     ID3Info_t ID3;
@@ -249,7 +249,7 @@ uint8 play_alarm_music(uint8 type)
                 playing_count++;
                 if (playing_flag == 1)
                 {
-                    //Èç¹ûÔİÍ£Çé¿öÏÂ£¬Ôò5·ÖÖÓºó¼ÌĞø²¥·Å
+                    //å¦‚æœæš‚åœæƒ…å†µä¸‹ï¼Œåˆ™5åˆ†é’Ÿåç»§ç»­æ’­æ”¾
                     if (playing_count >= PAUSE_TIME)
                     {
                         playing_flag = 0;
@@ -257,7 +257,7 @@ uint8 play_alarm_music(uint8 type)
                 }
                 else
                 {
-                    //²¥·Å×´Ì¬ÏÂ£¬ÃÅÁåÏì3·ÖÖÓºó×Ô¶¯ÍË³ö
+                    //æ’­æ”¾çŠ¶æ€ä¸‹ï¼Œé—¨é“ƒå“3åˆ†é’Ÿåè‡ªåŠ¨é€€å‡º
                     if (playing_count >= PLAYING_TIME)
                     {
                         playing_count = 0;
@@ -304,7 +304,7 @@ uint8 play_alarm_music(uint8 type)
             }
             break;
         case AP_KEY_PLAY | AP_KEY_UP:
-        case AP_KEY_MODE | AP_KEY_UP: //È¡ÏûÍË³ö
+        case AP_KEY_MODE | AP_KEY_UP: //å–æ¶ˆé€€å‡º
         case AP_KEY_MODE | AP_KEY_LONG:
             retval = RESULT_MAIN;
             break;
@@ -355,7 +355,7 @@ uint8 play_alarm_music(uint8 type)
             if (status_buf.status == PLAYING_REACH_END)
             {
                 alarm_stop(type);
-                //Èç¹ûÃÅÁå²»×ã3·ÖÖÓÊ±£¬Ôò¼ÌĞø´ÓÍ·¿ªÊ¼²¥·Å£¬Ö±µ½3·ÖÖÓÊ±¼äµ½
+                //å¦‚æœé—¨é“ƒä¸è¶³3åˆ†é’Ÿæ—¶ï¼Œåˆ™ç»§ç»­ä»å¤´å¼€å§‹æ’­æ”¾ï¼Œç›´åˆ°3åˆ†é’Ÿæ—¶é—´åˆ°
                 if (playing_count < PLAYING_TIME)
                 {
                     playing_flag = 0;

@@ -6,7 +6,7 @@
  *        (c) Copyright, Actions Co,Ld.
  *             All Right Reserved
  *       History Record:
- *         1.Ω‚æˆ◊‘∂ØÀ—Ã® ± ˝◊÷…¡À∏µƒŒ Ã‚£¨by Mars£¨2008-04-15
+ *         1.Ëß£ÂÜ≥Ëá™Âä®ÊêúÂè∞Êó∂Êï∞Â≠óÈó™ÁÉÅÁöÑÈóÆÈ¢òÔºåby MarsÔºå2008-04-15
  *******************************************************************************
  */
 
@@ -16,19 +16,19 @@
 
 extern fm_status_t g_FMStatus;
 
-void ShowFreqInFM(void); //FM÷˜ΩÁ√Êœ‘ æ
-bool Search_Show(FM_direct_e Direct); //◊‘∂ØÀ—Ã® ±µƒœ‘ æ
+void ShowFreqInFM(void); //FM‰∏ªÁïåÈù¢ÊòæÁ§∫
+bool Search_Show(FM_direct_e Direct); //Ëá™Âä®ÊêúÂè∞Êó∂ÁöÑÊòæÁ§∫
 
 /*
  ********************************************************************************
  *             uint16 SearchHandle(uint8 Direct)
  *
- * Description :  ÷∂ØÀ—Ã®
+ * Description : ÊâãÂä®ÊêúÂè∞
  *
- * Arguments   :    Direct,NextªÚLastÀ—À˜.
+ * Arguments   :    Direct,NextÊàñLastÊêúÁ¥¢.
  *
- * Returns     : 	»Áπ˚”–ø… ∂±µƒ»»º¸œ˚œ¢,  ∑µªÿΩ·π˚œ˚œ¢
- »Áπ˚√ª”–ø… ∂±µƒ»»º¸œ˚œ¢,  ∑µªÿ0
+ * Returns     : 	Â¶ÇÊûúÊúâÂèØËØÜÂà´ÁöÑÁÉ≠ÈîÆÊ∂àÊÅØ,  ËøîÂõûÁªìÊûúÊ∂àÊÅØ
+ Â¶ÇÊûúÊ≤°ÊúâÂèØËØÜÂà´ÁöÑÁÉ≠ÈîÆÊ∂àÊÅØ,  ËøîÂõû0
  *
  * Notes       :
  *
@@ -38,16 +38,16 @@ uint16 SearchHandle(BYTE Direct)
 {
     uint16 result = 0;
     uint16 key;
-    uint16 start_freq;//∆ º∆µµ„
+    uint16 start_freq;//Ëµ∑ÂßãÈ¢ëÁÇπ
     flag_r = 1;
-    //∆ º∆µµ„
+    //Ëµ∑ÂßãÈ¢ëÁÇπ
     start_freq = g_FMStatus.freq;
     charge_pump_onoff(0);
     while (1)
     {
         if (Direct != SEARCH_NULL)
         {
-            if (Direct == SEARCH_NEXT) //NEXTÀ—À˜¥¶¿Ì
+            if (Direct == SEARCH_NEXT) //NEXTÊêúÁ¥¢Â§ÑÁêÜ
             {
                 g_FMStatus.freq += 1;
                 if ((g_FMStatus.freq >= USFREQ_MAX) && (g_radio_config.band_mode == Bank_US_Europe))
@@ -69,7 +69,7 @@ uint16 SearchHandle(BYTE Direct)
                     break;
                 }
             }
-            else if (Direct == SEARCH_LAST) //LASTÀ—À˜¥¶¿Ì
+            else if (Direct == SEARCH_LAST) //LASTÊêúÁ¥¢Â§ÑÁêÜ
             {
                 g_FMStatus.freq -= 1;
                 if ((g_FMStatus.freq <= USFREQ_MIN) && (g_radio_config.band_mode == Bank_US_Europe))
@@ -105,11 +105,11 @@ uint16 SearchHandle(BYTE Direct)
             //do nothing
             break;
 
-        case AP_KEY_NEXT | AP_KEY_UP: //NEXTÀ—À˜ ±∞¥NEXTº¸£¨Õ£÷πÀ—À˜
+        case AP_KEY_NEXT | AP_KEY_UP: //NEXTÊêúÁ¥¢Êó∂ÊåâNEXTÈîÆÔºåÂÅúÊ≠¢ÊêúÁ¥¢
             Direct = SEARCH_STOP;
             break;
 
-        case AP_KEY_PREV | AP_KEY_UP: //LASTÀ—À˜ ±∞¥LASTº¸£¨Õ£÷πÀ—À˜
+        case AP_KEY_PREV | AP_KEY_UP: //LASTÊêúÁ¥¢Êó∂ÊåâLASTÈîÆÔºåÂÅúÊ≠¢ÊêúÁ¥¢
             Direct = SEARCH_STOP;
             break;
 
@@ -129,7 +129,7 @@ uint16 SearchHandle(BYTE Direct)
         case AP_MSG_USB_PLUGIN:
             result = 0;
             break;
-        default: //»»º¸¥¶¿Ì
+        default: //ÁÉ≠ÈîÆÂ§ÑÁêÜ
             result = ap_handle_hotkey(key);
             break;
         }
@@ -139,9 +139,9 @@ uint16 SearchHandle(BYTE Direct)
         }
     }
     charge_pump_onoff(1);
-    while (ap_get_message() != AP_KEY_NULL) //«Â≥˝◊‘∂ØÀ—Ã®π˝≥Ã÷–µƒœ˚œ¢
+    while (ap_get_message() != AP_KEY_NULL) //Ê∏ÖÈô§Ëá™Âä®ÊêúÂè∞ËøáÁ®ã‰∏≠ÁöÑÊ∂àÊÅØ
     {
-        ClearWatchDog(); //«Âø’œ˚œ¢≥ÿ
+        ClearWatchDog(); //Ê∏ÖÁ©∫Ê∂àÊÅØÊ±†
     }
     return result;
 }
@@ -150,11 +150,11 @@ uint16 SearchHandle(BYTE Direct)
  ********************************************************************************
  *             bool Search_Show(FM_direct_e Direct)
  *
- * Description : À—À˜œ¬“ª∏ˆ‘⁄µÁÃ®±Ì÷–√ª”–µƒ–¬µÁÃ®.
+ * Description : ÊêúÁ¥¢‰∏ã‰∏Ä‰∏™Âú®ÁîµÂè∞Ë°®‰∏≠Ê≤°ÊúâÁöÑÊñ∞ÁîµÂè∞.
  *
- * Arguments   : Direct,NextªÚLastÀ—À˜.
+ * Arguments   : Direct,NextÊàñLastÊêúÁ¥¢.
  *
- * Returns     : TRUE:À—µΩœ¬“ª∏ˆ–¬µÁÃ®,FALSE:√ª”–À—µΩ.
+ * Returns     : TRUE:ÊêúÂà∞‰∏ã‰∏Ä‰∏™Êñ∞ÁîµÂè∞,FALSE:Ê≤°ÊúâÊêúÂà∞.
  *
  * Notes       :
  *
@@ -170,7 +170,7 @@ bool Search_Show(FM_direct_e Direct)
     fmSendCommand(FM_MID_SETVOLUME, (void *) g_comval.volume, NULL);
 
     Search_Flag = fmSendCommand(FM_SEARCH, (void *) &g_FMStatus, (void *) Direct);
-    if (Search_Flag) //À—Ã®≥…π¶∫Û£¨±£¥ÊµÁÃ®
+    if (Search_Flag) //ÊêúÂè∞ÊàêÂäüÂêéÔºå‰øùÂ≠òÁîµÂè∞
     {
         fmSendCommand(FM_GETSTATUS, &g_FMStatus, NULL);
         if (fmSendCommand(FM_MID_SAVESTATION, NULL, NULL) != FALSE)
@@ -194,7 +194,7 @@ bool Search_Show(FM_direct_e Direct)
  ********************************************************************************
  *             void ShowFreqInFM()
  *
- * Description : œ‘ æµÁÃ® ’Ã˝ΩÁ√Ê
+ * Description : ÊòæÁ§∫ÁîµÂè∞Êî∂Âê¨ÁïåÈù¢
  *
  * Arguments   :
  *

@@ -25,9 +25,9 @@
 #define SEEK_CUR    1
 #define SEEK_END    2
 #define SDFILE_CLOSED           0xFF
-#define  MFSLOCATEPAGE  0xf0        //IPMµÚ0Ò³
+#define  MFSLOCATEPAGE  0xf0        //IPMç¬¬0é¡µ
 #define  MAX_HEANDLE_NUM 4
-#define  SD_DIR_LEN		32 //Ä¿Â¼Ïî³¤¶È
+#define  SD_DIR_LEN		32 //ç›®å½•é¡¹é•¿åº¦
 
 #define APINO_SD_FOpen            0x0000+RAMAPI_SD_BASE
 #define APINO_SD_FClose           0x0001+API_SDFS_Base
@@ -59,7 +59,7 @@ typedef struct
 #define SD_FTell(fp) 					API_SD_FTell(APINO_SD_FTell,fp)
 #define SD_FRead(fp,buffer,Length) 		API_SD_FRead(APINO_SD_FRead,fp,buffer,Length)
 
-//Í¬Ê±¿ÉÒÔ´ò¿ª4¸öÎÄ¼ş
+//åŒæ—¶å¯ä»¥æ‰“å¼€4ä¸ªæ–‡ä»¶
 SD_FILE *API_SD_FOpen(uint8 cmd, int8 *filename, uint8 mode);
 int8 API_SD_FClose(uint8 cmd, SD_FILE *fp);
 int8 API_SD_FSeek(uint8 cmd, SD_FILE *fp, uint8 nFrom, int32 offset);

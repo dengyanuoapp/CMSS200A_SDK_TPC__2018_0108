@@ -26,30 +26,30 @@ stmt  level    source
    15          //========== global field ===============
    16          #pragma name(COM_COM)
    17          
-   18          uint16 g_standby_time = 0; //Ë¯ÃßÊ±¼ä,0.5ÃëÎªµ¥Î»
-   19          uint16 g_rtc_counter = 0; //rtc ÏûÏ¢¼ÆÊı
-   20          uint16 key_count = 0; //µ±Ç°°´¼üÏûÏ¢·¢ÉúµÄ´ÎÊı
-   21          uint8 key_value = Msg_KeyNull; //µ±Ç°°´¼üµÄÖµ
-   22          uint8 lowpower_count;//½ÓÊÜµ½µÍµçµÄ¼ÆÊı
-   23          uint8 file_name[12]; //´æ·ÅÎÄ¼ş¶ÌÃûÊı×Ö
+   18          uint16 g_standby_time = 0; //ç¡çœ æ—¶é—´,0.5ç§’ä¸ºå•ä½
+   19          uint16 g_rtc_counter = 0; //rtc æ¶ˆæ¯è®¡æ•°
+   20          uint16 key_count = 0; //å½“å‰æŒ‰é”®æ¶ˆæ¯å‘ç”Ÿçš„æ¬¡æ•°
+   21          uint8 key_value = Msg_KeyNull; //å½“å‰æŒ‰é”®çš„å€¼
+   22          uint8 lowpower_count;//æ¥å—åˆ°ä½ç”µçš„è®¡æ•°
+   23          uint8 file_name[12]; //å­˜æ”¾æ–‡ä»¶çŸ­åæ•°å­—
    24          
    25          char temp_buffer[9];
    26          time_t time;
-   27          date_t date;//ÈÕÆÚ½á¹¹Ìå
+   27          date_t date;//æ—¥æœŸç»“æ„ä½“
    28          time_t tmp_time;
-   29          uint8 DigitalCount; //µ±Ç°Êı×Ö½¡µÄ¸öÊı
-   30          uint8 DigitalBuf[4]; //´æ´¢Êı×Ö¼ü¼ü¶ÔÓ¦µÄÊı×Ö
-   31          uint8 set_what;//µ±Ç°µÄÉèÖÃÏî
-   32          uint8 show_what;//µ±Ç°ÉèÖÃÏîÉÁ¶¯ÇĞ»»±äÁ¿
-   33          uint8 show_ui_flag;//ÉèÖÃÏî¿ªÊ¼ÉÁ¶¯±êÖ¾
-   34          uint8 show_count;//¿ªÊ¼ÉèÖÃÏîÉÁ¶¯µÄ¼ÆËã
-   35          uint8 CurUI_Type;//µ±Ç°Ëù´¦µÄÏÔÊ¾½çÃæ
+   29          uint8 DigitalCount; //å½“å‰æ•°å­—å¥çš„ä¸ªæ•°
+   30          uint8 DigitalBuf[4]; //å­˜å‚¨æ•°å­—é”®é”®å¯¹åº”çš„æ•°å­—
+   31          uint8 set_what;//å½“å‰çš„è®¾ç½®é¡¹
+   32          uint8 show_what;//å½“å‰è®¾ç½®é¡¹é—ªåŠ¨åˆ‡æ¢å˜é‡
+   33          uint8 show_ui_flag;//è®¾ç½®é¡¹å¼€å§‹é—ªåŠ¨æ ‡å¿—
+   34          uint8 show_count;//å¼€å§‹è®¾ç½®é¡¹é—ªåŠ¨çš„è®¡ç®—
+   35          uint8 CurUI_Type;//å½“å‰æ‰€å¤„çš„æ˜¾ç¤ºç•Œé¢
    36          //alarm_vars_t g_alarm;
-   37          ap_comval_t g_comval; //ÏµÍ³±äÁ¿,ap²»ÄÜ¸ü¸Ä
+   37          ap_comval_t g_comval; //ç³»ç»Ÿå˜é‡,apä¸èƒ½æ›´æ”¹
    38          BOOL need_draw;
    39          uint8 mute_flag = FALSE;
-   40          //uint8 linein_status; //lineinÏß´æÔÚ×´Ì¬¡£0-Ã»ÓĞ²åÉÏlineinÏß£¬1-lineinÏß²å×Å
-   41          uint8 holdkey_flag;//°´¼ü³¤°´±ê¼Ç
+   40          //uint8 linein_status; //lineinçº¿å­˜åœ¨çŠ¶æ€ã€‚0-æ²¡æœ‰æ’ä¸Šlineinçº¿ï¼Œ1-lineinçº¿æ’ç€
+   41          uint8 holdkey_flag;//æŒ‰é”®é•¿æŒ‰æ ‡è®°
    42          /*
    43          uint8 insert_msg[MAX_TYPE] =
    44          { AP_MSG_LINEIN_IN, AP_MSG_MIC_IN,AP_MSG_USB_PLUGIN};
@@ -58,12 +58,12 @@ stmt  level    source
    47          */
    48          
    49          /********************************************************************************
-   50           * Description :ÉèÖÃµ±Ç°Ê¹ÓÃµÄ½çÃæÀàĞÍ²¢ÖÃË¢ĞÂÈ«ÆÁµÄ±ê¼Ç
+   50           * Description :è®¾ç½®å½“å‰ä½¿ç”¨çš„ç•Œé¢ç±»å‹å¹¶ç½®åˆ·æ–°å…¨å±çš„æ ‡è®°
    51           *
    52           * Arguments  :
    53           *
    54           * Returns     :
-   55           *            ÎŞ
+   55           *            æ— 
    56           * Notes       :
    57           *
 C251 COMPILER V4.55,  ap_common                                                            23/05/16  10:42:10  PAGE 2   
@@ -87,12 +87,12 @@ stmt  level    source
    74   2          }
    75   1      }
    76          /********************************************************************************
-   77           * Description :Íâ²¿paµçÔ´¿ª¹Ø¿ØÖÆ
+   77           * Description :å¤–éƒ¨paç”µæºå¼€å…³æ§åˆ¶
    78           *
    79           * Arguments  :
    80           *
    81           * Returns     :
-   82           *            ÎŞ
+   82           *            æ— 
    83           * Notes       :
    84           *
    85           ********************************************************************************/
@@ -148,7 +148,7 @@ stmt  level    source
   133   1      
   134   1          //phy enable,FPGA invalid ,note:enable is close
   135   1          USB_PHYCTRL = USB_PHYCTRL | (uint8) 0xc0;
-  136   1          DPDMCTRL = 0x10; // »Ö¸´uhost¼ì?    //restore SFR_BANK
+  136   1          DPDMCTRL = 0x10; // æ¢å¤uhostæ£€?    //restore SFR_BANK
   137   1          SFR_BANK = sfrbak;
   138   1      #endif
   139   1      }

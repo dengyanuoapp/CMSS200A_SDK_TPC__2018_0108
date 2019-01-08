@@ -29,7 +29,7 @@ stmt  level    source
    17          
    18          #pragma name(MW_EH_FSEL_API)
    19          
-   20          /*Íâ²¿±äÁ¿ºÍº¯Êı*/
+   20          /*å¤–éƒ¨å˜é‡å’Œå‡½æ•°*/
    21          extern bool fselGetNext(uint8 *strFile);
    22          extern bool fselGetPrev(uint8 *strFile);
    23          extern bool GetFilebyItem(uint8 *filename, uint16 ItemNum);
@@ -55,12 +55,12 @@ stmt  level    source
    43          uint8 fselError; // store error id;
    44          int8 fselDiskLetter;
    45          int8 fselDirLayer; //dir  layer
-   46          uint16 fselFileNoInDisk;// ÎÄ¼şÔÚÈ«ÅÌµÄĞòºÅ
-   47          uint16 fselTotalInDisk;// È«ÅÌÎÄ¼ş×ÜÊı
+   46          uint16 fselFileNoInDisk;// æ–‡ä»¶åœ¨å…¨ç›˜çš„åºå·
+   47          uint16 fselTotalInDisk;// å…¨ç›˜æ–‡ä»¶æ€»æ•°
    48          bool select_file_begin_flag;
-   49          uint16 CurDirFileNum; //µ±Ç°Ä¿Â¼ÓĞĞ§¸èÇúÊıÁ¿
-   50          uint32 CurDirClusNo; //µ±Ç°Ä¿Â¼ÆğÊ¼´ØºÅ£¬ÓÃÓÚµ±Ç°Ä¿Â¼Ñ­»·Ä£Ê½
-   51          uint16 fselDirNoInDisk; //µ±Ç°ËùÔÚÄ¿Â¼µÄĞòºÅ
+   49          uint16 CurDirFileNum; //å½“å‰ç›®å½•æœ‰æ•ˆæ­Œæ›²æ•°é‡
+   50          uint32 CurDirClusNo; //å½“å‰ç›®å½•èµ·å§‹ç°‡å·ï¼Œç”¨äºå½“å‰ç›®å½•å¾ªç¯æ¨¡å¼
+   51          uint16 fselDirNoInDisk; //å½“å‰æ‰€åœ¨ç›®å½•çš„åºå·
    52          uint16 fselTotalDir;
    53          uint8 dir_list_flag;
    54          
@@ -107,7 +107,7 @@ stmt  level    source
    93          /********************************************************************************
    94           * Description : Get name buffer of current extend
    95           *
-   96           * Arguments  :  »ñµÃ¸èÇúÀ©Õ¹Ãû
+   96           * Arguments  :  è·å¾—æ­Œæ›²æ‰©å±•å
    97           * Returns     :  the buffer of current file extend name
    98           * Notes       :     None
    99           *
@@ -175,8 +175,8 @@ stmt  level    source
   159   1          fselDirLayer = 0;
   160   1          fselFileNoInDisk = 0;
   161   1          fselDirNoInDisk = 0;
-  162   1          CurDirClusNo = 0xfffffff0; //³õÊ¼»¯ÎÄ¼ş²»¿ÉÄÜÊ¹ÓÃµÄ´ØºÅ
-  163   1          CurDirFileNum = 0; //µ±Ç°Ä¿Â¼Ñ­»·²¥·ÅÊ±Ê¹ÓÃ
+  162   1          CurDirClusNo = 0xfffffff0; //åˆå§‹åŒ–æ–‡ä»¶ä¸å¯èƒ½ä½¿ç”¨çš„ç°‡å·
+  163   1          CurDirFileNum = 0; //å½“å‰ç›®å½•å¾ªç¯æ’­æ”¾æ—¶ä½¿ç”¨
   164   1          select_file_begin_flag = TRUE;
   165   1      }
   166          //uint8 fselScanDiskInfo(file_location_t *location)
@@ -267,7 +267,7 @@ stmt  level    source
   248   2          }
   249   1          if (FS_Dir(fileNameTmp, GetExtBuf(), FS_DIR_FILE, GetExtSize()))
   250   1          {
-  251   2              fselDirNoInDisk = 1; //¸ùÄ¿Â¼ÓĞÎÄ¼ş£¬Ä¿Â¼ĞòºÅÏÈ¼Ó1
+  251   2              fselDirNoInDisk = 1; //æ ¹ç›®å½•æœ‰æ–‡ä»¶ï¼Œç›®å½•åºå·å…ˆåŠ 1
   252   2          }
   253   1          else
 C251 COMPILER V4.55,  enhanced_selector_api                                                13/12/18  16:27:38  PAGE 5   
@@ -281,7 +281,7 @@ stmt  level    source
   260   2              fselTotalInDisk = 0;
   261   2              fselTotalDir = 0;
   262   2              fselDirNoInDisk_bak = fselDirNoInDisk;
-  263   2              if (FALSE == fselScanDiskInfo(location, PlayListOrCommonDir)) //±éÀúÈ«ÅÌ
+  263   2              if (FALSE == fselScanDiskInfo(location, PlayListOrCommonDir)) //éå†å…¨ç›˜
   264   2              {
   265   3                  return FALSE;
   266   3              }
@@ -442,7 +442,7 @@ stmt  level    source
   417   3                  return FALSE;
   418   3              }
   419   2              GetFilebyItem(location->filename, location->PL_Cur);
-  420   2              fp_list = FS_FOpen(location->filename, FS_OPEN_NORMAL); //¼ì²éµ±Ç°ÁĞ±íÎÄ¼şÊÇ·ñ´æÔÚ
+  420   2              fp_list = FS_FOpen(location->filename, FS_OPEN_NORMAL); //æ£€æŸ¥å½“å‰åˆ—è¡¨æ–‡ä»¶æ˜¯å¦å­˜åœ¨
   421   2              if(fp_list == NULL)
   422   2              {
   423   3                  return FALSE;
@@ -599,7 +599,7 @@ stmt  level    source
   570   1      }
   571          
   572          /********************************************************************************
-  573           * Description : Êı×Öµã¸è
+  573           * Description : æ•°å­—ç‚¹æ­Œ
   574           *
   575           * Arguments  : None
   576           * Returns     : Number of current selected file.
@@ -619,7 +619,7 @@ stmt  level    source
   588   1          if (fselPLOrCommonDir == FSEL_TYPE_COMMONDIR)
   589   1          {
   590   2              mode_bak = fselMode;
-  591   2              fselMode = FSEL_ALL_REPEATALL; //µ÷ÓÃfselGetNext»á¸ù¾İ²¥·ÅÄ£Ê½£¬±ØĞëÏÈÇĞ»»Ä£Ê½
+  591   2              fselMode = FSEL_ALL_REPEATALL; //è°ƒç”¨fselGetNextä¼šæ ¹æ®æ’­æ”¾æ¨¡å¼ï¼Œå¿…é¡»å…ˆåˆ‡æ¢æ¨¡å¼
   592   2              result = fselGetFileByNoInDiskC(strFile, Num);
   593   2              fselMode = mode_bak;
   594   2          }
@@ -637,7 +637,7 @@ stmt  level    source
   606   1      }
   607          
   608          /********************************************************************************
-  609           * Description : Ñ¡ÔñÏÂÒ»¸öÎÄ¼şµÄµÚÒ»Ê×¸è
+  609           * Description : é€‰æ‹©ä¸‹ä¸€ä¸ªæ–‡ä»¶çš„ç¬¬ä¸€é¦–æ­Œ
   610           *
   611           * Arguments  : None
   612           * Returns     : Number of current selected file.
@@ -658,7 +658,7 @@ stmt  level    source
   627   1      }
   628          
   629          /********************************************************************************
-  630           * Description : Ñ¡ÔñÉÏÒ»¸öÎÄ¼şµÄµÚÒ»Ê×¸è
+  630           * Description : é€‰æ‹©ä¸Šä¸€ä¸ªæ–‡ä»¶çš„ç¬¬ä¸€é¦–æ­Œ
   631           *
   632           * Arguments  : None
   633           * Returns     : Number of current selected file.
@@ -681,9 +681,9 @@ stmt  level    source
 C251 COMPILER V4.55,  enhanced_selector_api                                                13/12/18  16:27:38  PAGE 11  
 
   650          /**************************************************
-  651           ·µ»ØÖµ£º»ñÈ¡µ±Ç°Ñ¡¶¨µÄ¸èÇúËùÔÚÄ¿Â¼µÄĞòºÅ£¬´Ó1¿ªÊ¼
-  652           Êä³ö²ÎÊı strLName£º»ñÈ¡µ±Ç°ËùÔÚÄ¿Â¼Ãû£¬strLNameµÄµÚÒ»¸ö×Ö½Ú 0£ºÄ¿Â¼ÃûÎªasciiÂë  1£ºÄ¿Â¼ÃûÎªunicodeÂë
-  653           ÊäÈë²ÎÊı LNanmeSize£ºÒª»ñÈ¡µÄ³¤ÃûUnicode×Ö·ûÊıÄ¿
+  651           è¿”å›å€¼ï¼šè·å–å½“å‰é€‰å®šçš„æ­Œæ›²æ‰€åœ¨ç›®å½•çš„åºå·ï¼Œä»1å¼€å§‹
+  652           è¾“å‡ºå‚æ•° strLNameï¼šè·å–å½“å‰æ‰€åœ¨ç›®å½•åï¼ŒstrLNameçš„ç¬¬ä¸€ä¸ªå­—èŠ‚ 0ï¼šç›®å½•åä¸ºasciiç   1ï¼šç›®å½•åä¸ºunicodeç 
+  653           è¾“å…¥å‚æ•° LNanmeSizeï¼šè¦è·å–çš„é•¿åUnicodeå­—ç¬¦æ•°ç›®
   654           ***************************************************/
   655          uint16 fselGetDirNo(uint8 *strLName, uint8 LNameSize)
   656          {
@@ -693,27 +693,27 @@ stmt  level    source
   660   1          {
   661   2              if (fselDirLayer == 0)
   662   2              {
-  663   3                  *strLName = 0; //µÚÒ»¸ö×Ö½Ú0±íÊ¾·µ»ØµÄÄ¿Â¼ÃûÊÇASCII±àÂë
+  663   3                  *strLName = 0; //ç¬¬ä¸€ä¸ªå­—èŠ‚0è¡¨ç¤ºè¿”å›çš„ç›®å½•åæ˜¯ASCIIç¼–ç 
   664   3                  memcpy(strLName + 1, "ROOT", 5);
   665   3              }
   666   2              else
   667   2              {
   668   3                  FS_GetCurDir_layer(dir_buf);
-  669   3                  CurClusNo = FS_GetCurDir();//µ±Ç°Ä¿Â¼ÏîÔÚÎÄ¼şÏµÍ³ÖĞµÄÆ«ÒÆ
-  670   3                  DirEntry = FS_GetCurDirEntry();//ÎÄ¼şÏîÔÚµ±Ç°Ä¿Â¼ÏîÖĞµÄÆ«ÒÆ
+  669   3                  CurClusNo = FS_GetCurDir();//å½“å‰ç›®å½•é¡¹åœ¨æ–‡ä»¶ç³»ç»Ÿä¸­çš„åç§»
+  670   3                  DirEntry = FS_GetCurDirEntry();//æ–‡ä»¶é¡¹åœ¨å½“å‰ç›®å½•é¡¹ä¸­çš„åç§»
   671   3      
   672   3                  FS_DirParNext();
-  673   3                  *(strLName + 1) = 0x20; //»ñÈ¡µ±Ç°ÎÄ¼şÏµÍ³Ö¸ÕëÖ¸ÏòµÄÄ¿Â¼Ãû
+  673   3                  *(strLName + 1) = 0x20; //è·å–å½“å‰æ–‡ä»¶ç³»ç»ŸæŒ‡é’ˆæŒ‡å‘çš„ç›®å½•å
   674   3                  if (!FS_GetName(strLName + 1, (LNameSize - 3) / 2))
   675   3                  {
-  676   4                      FS_GetName(strLName + 1, 0); //²»´æÔÚ³¤ÃûÔò»ñÈ¡¶ÌÃû
-  677   4                      *strLName = 0; //Ö»ÓĞ¶ÌÃû£¬ascii±àÂë
+  676   4                      FS_GetName(strLName + 1, 0); //ä¸å­˜åœ¨é•¿ååˆ™è·å–çŸ­å
+  677   4                      *strLName = 0; //åªæœ‰çŸ­åï¼Œasciiç¼–ç 
   678   4                  }
   679   3                  else
   680   3                  {
-  681   4                      *strLName = 1; //´æÔÚ³¤Ãû£¬unicode±àÂë
+  681   4                      *strLName = 1; //å­˜åœ¨é•¿åï¼Œunicodeç¼–ç 
   682   4                  }
-  683   3                  if (FALSE == FS_CD(":")) //±ÜÃâ´¦ÓÚ×îºóµÄÄ¿Â¼ÏîÊ±µ÷ÓÃFS_SetCurDir³ö´í
+  683   3                  if (FALSE == FS_CD(":")) //é¿å…å¤„äºæœ€åçš„ç›®å½•é¡¹æ—¶è°ƒç”¨FS_SetCurDirå‡ºé”™
   684   3                  {
   685   4                      return FALSE;
   686   4                  }

@@ -11,20 +11,20 @@ typedef struct
 } CDROM_INFO_t;
 
 bool UDiskInit(void *pcallback, char udisk_set);
-void UDiskSetCDROMInfo(CDROM_INFO_t *cdrom_info); //ÉèÖÃCDROMµÄ³§ÉÌ¼°²úÆ·ĞÅÏ¢,ÒªÔÚµ÷ÓÃUdiskInitÇ°µ÷ÓÃ;
-void UDiskSetDiskNum(char selector); //ÉèÖÃ´ÅÅÌ³öÏÖÊıÄ¿,ÒªÔÚµ÷ÓÃUdiskInitÇ°µ÷ÓÃ
-char UDiskGetDiskInfo(void);         //È¡µÃ´ÅÅÌÊıÄ¿Çé¿ö bit7:ÊÇ·ñ·ÖÇø bit6:ÊÇ·ñ¼ÓÃÜ bit5:ÊÇ·ñ²å¿¨
+void UDiskSetCDROMInfo(CDROM_INFO_t *cdrom_info); //è®¾ç½®CDROMçš„å‚å•†åŠäº§å“ä¿¡æ¯,è¦åœ¨è°ƒç”¨UdiskInitå‰è°ƒç”¨;
+void UDiskSetDiskNum(char selector); //è®¾ç½®ç£ç›˜å‡ºç°æ•°ç›®,è¦åœ¨è°ƒç”¨UdiskInitå‰è°ƒç”¨
+char UDiskGetDiskInfo(void);         //å–å¾—ç£ç›˜æ•°ç›®æƒ…å†µ bit7:æ˜¯å¦åˆ†åŒº bit6:æ˜¯å¦åŠ å¯† bit5:æ˜¯å¦æ’å¡
 bool UDiskSetWP(char letter);
 bool UDiskCheckWP(char letter);
-void DisableSuspend(void);           //½ûÖ¹suspend
-bool UDiskRun( int para );           //para=0:Õı³£Æô¶¯£¬=1:Switch from MTPÆô¶¯£¬
+void DisableSuspend(void);           //ç¦æ­¢suspend
+bool UDiskRun( int para );           //para=0:æ­£å¸¸å¯åŠ¨ï¼Œ=1:Switch from MTPå¯åŠ¨ï¼Œ
 bool UDiskExit(void);
 void UDiskHandle(void);
 BYTE UDiskGetStatus(void);
 BYTE CardWPCheck(void);
 bool UDiskPullCardOut(void); //jpu
-void AlwaysShowCardDisk(BYTE para);  //0:²»ÏÔÊ¾CardµÄÅÌ·û 1£º×ÜÏÔÊ¾CardµÄÅÌ·û
-BYTE UDiskGetCardStatus(void);       //»ñÈ¡¿¨ÊÇ·ñ´æÔÚµÄĞÅÏ¢
+void AlwaysShowCardDisk(BYTE para);  //0:ä¸æ˜¾ç¤ºCardçš„ç›˜ç¬¦ 1ï¼šæ€»æ˜¾ç¤ºCardçš„ç›˜ç¬¦
+BYTE UDiskGetCardStatus(void);       //è·å–å¡æ˜¯å¦å­˜åœ¨çš„ä¿¡æ¯
 
 #endif /*__C251__*/
 #endif /*_USBDISK_H*/

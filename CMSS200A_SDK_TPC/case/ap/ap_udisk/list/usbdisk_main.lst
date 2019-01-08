@@ -24,9 +24,9 @@ stmt  level    source
    13           * \brief
    14           * \author   wanghaijing
    15           * \par      GENERAL DESCRIPTION:
-   16           *               ÕâÀï¶ÔÎÄ¼ş½øĞĞÃèÊö
+   16           *               è¿™é‡Œå¯¹æ–‡ä»¶è¿›è¡Œæè¿°
    17           * \par      EXTERNALIZED FUNCTIONS:
-   18           *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+   18           *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
    19           *
    20           *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
    21           *
@@ -54,10 +54,10 @@ stmt  level    source
    43   1          uint8 dispIndibak = 0xff;
    44   1          DisplayIndi = 0x00;
    45   1          IRUSBExit = 0;
-   46   1          /*AP³õÊ¼»¯*/
+   46   1          /*APåˆå§‹åŒ–*/
    47   1          if (!UDiskInitAll(para))
    48   1          {
-   49   2              //ÌáÇ°°ÎÏßÍË³ö
+   49   2              //æå‰æ‹”çº¿é€€å‡º
    50   2              UdiskStatus = 0x40;
    51   2              return UdiskExitAll();
    52   2          }
@@ -74,11 +74,11 @@ stmt  level    source
    61   3                  IsCardOut = 0;
    62   3              }
    63   2      
-   64   2              //µ÷ÓÃ×´Ì¬»úÖ´ĞĞÃüÁî
+   64   2              //è°ƒç”¨çŠ¶æ€æœºæ‰§è¡Œå‘½ä»¤
    65   2              UDiskHandle();
-   66   2              //»ñÈ¡USB×´Ì¬
-   67   2              //0:¿ÕÏĞ  10h:ÉÏ´«  20h:ÏÂ´«  30h:µ¯³öÒªÇóÍË³ö  40h:°ÎÏßÒªÇóÍË³ö  50h:ÇĞ»»µ½ÈÍ¼şÉı¼¶Ó¦ÓÃ
-   68   2              //60h:·ÖÇø´¦Àí×´Ì¬  70h:³ö´íÒªÇóÍË³ö  80h:½øÈëSuspend×´Ì¬  90h:ÍË³öSuspend×´Ì¬
+   66   2              //è·å–USBçŠ¶æ€
+   67   2              //0:ç©ºé—²  10h:ä¸Šä¼   20h:ä¸‹ä¼   30h:å¼¹å‡ºè¦æ±‚é€€å‡º  40h:æ‹”çº¿è¦æ±‚é€€å‡º  50h:åˆ‡æ¢åˆ°éŸ§ä»¶å‡çº§åº”ç”¨
+   68   2              //60h:åˆ†åŒºå¤„ç†çŠ¶æ€  70h:å‡ºé”™è¦æ±‚é€€å‡º  80h:è¿›å…¥SuspendçŠ¶æ€  90h:é€€å‡ºSuspendçŠ¶æ€
    69   2              UdiskStatus = UDiskGetStatus();
    70   2              if ((DisplayIndi == 0xff) && (UdiskStatus != 0x80))
    71   2              {
@@ -92,7 +92,7 @@ stmt  level    source
    78   2      
    79   2              switch (UdiskStatus)
    80   2              {
-   81   3              case 0: //¿ÕÏĞ
+   81   3              case 0: //ç©ºé—²
    82   3                  if (DisplayIndi != 0x00)
    83   3                  {
    84   4                      DisplayIndi = 0x00;
@@ -107,18 +107,18 @@ stmt  level    source
                #endif
    94   3                  break;
    95   3      
-   96   3              case 0x10: //ÉÏ´«
+   96   3              case 0x10: //ä¸Šä¼ 
    97   3                  if (DisplayIndi != 0x01)
    98   3                  {
    99   4                      DisplayIndi = 0x01;
   100   4                  }
   101   3                  break;
   102   3      
-  103   3              case 0x11://ÏÔÊ¾Commu
-  104   3              case 0x21://ÏÔÊ¾DownLoad
-  105   3              case 0x31://ÏÔÊ¾UpLoad
-  106   3              case 0x41://ÏÔÊ¾Succ
-  107   3              case 0x61://ÏÔÊ¾Succ£¬ÍË³ö
+  103   3              case 0x11://æ˜¾ç¤ºCommu
+  104   3              case 0x21://æ˜¾ç¤ºDownLoad
+  105   3              case 0x31://æ˜¾ç¤ºUpLoad
+  106   3              case 0x41://æ˜¾ç¤ºSucc
+  107   3              case 0x61://æ˜¾ç¤ºSuccï¼Œé€€å‡º
   108   3                  DisplayIndi = UdiskStatus >> 4;
   109   3                  if (UdiskStatus == 0x61)
   110   3                  {
@@ -131,20 +131,20 @@ stmt  level    source
   117   4                  }
   118   3                  break;
   119   3      
-  120   3              case 0x51: //ÇĞ»»µ½adfu
-  121   3                  //¹Ø¼üÅÌºÍRTCÖĞ¶Ï
+  120   3              case 0x51: //åˆ‡æ¢åˆ°adfu
+  121   3                  //å…³é”®ç›˜å’ŒRTCä¸­æ–­
   122   3                  IE0 = IE0 & 0xf7;
 C251 COMPILER V4.55,  usbdisk_main                                                         13/12/18  16:28:49  PAGE 3   
 
   123   3                  DisplayIndi = 0x10;
-  124   3                  //±£Ö¤Ö»ÏÔÊ¾Ò»´Î
+  124   3                  //ä¿è¯åªæ˜¾ç¤ºä¸€æ¬¡
   125   3                  if (dispIndibak != DisplayIndi)
   126   3                  {
   127   4                      dispIndibak = DisplayIndi;
   128   4                  }
   129   3                  break;
   130   3      
-  131   3              case 0x20: //ÏÂ´«
+  131   3              case 0x20: //ä¸‹ä¼ 
   132   3                  if (DisplayIndi != 0x02)
   133   3                  {
   134   4                      DisplayIndi = 0x02;
@@ -152,11 +152,11 @@ stmt  level    source
   136   4                  }
   137   3                  break;
   138   3      
-  139   3              case 0x80: //½øÈësuspend
+  139   3              case 0x80: //è¿›å…¥suspend
   140   3                  DisplayIndi = 0xff;
   141   3                  break;
   142   3      
-  143   3              case 0x90: //ÍË³öSuspend×´Ì¬
+  143   3              case 0x90: //é€€å‡ºSuspendçŠ¶æ€
   144   3                  //StandbyScreen(1);
   145   3                  //SetContrast(g_comval.DisplayContrast);
   146   3                  break;
@@ -164,8 +164,8 @@ stmt  level    source
   148   3              default:
   149   3                  break;
   150   3              }
-  151   2              if (((MenuKeyPress == 1) && (UdiskStatus == 0)) || (UdiskStatus == 0x90) || (IRUSBExit == 1))// ¶
-             -ÔÓ¦ºìÍâÒ£¿ØÉÏÃæµÄPower¼ü
+  151   2              if (((MenuKeyPress == 1) && (UdiskStatus == 0)) || (UdiskStatus == 0x90) || (IRUSBExit == 1))// 
+             -æ‚ç„±åº–ï¼Ÿå£å¦å¨´è…œoweré”®
   152   2              {
   153   3                  longkey_flag = 1;
   154   3                  break;

@@ -13,9 +13,9 @@
  * \brief    .
  * \author   dengtaiping
  * \par      GENERAL DESCRIPTION:
- *               usb、AUDIO等模块初始化
+ *               usb銆丄UDIO绛夋ā鍧楀垵濮嬪寲
  * \par      EXTERNALIZED FUNCTIONS:
- *               这里描述调用到外面的模块
+ *               杩欓噷鎻忚堪璋冪敤鍒板闈㈢殑妯″潡
  *
  *      Copyright(c) 2001-2012 Actions Semiconductor, All Rights Reserved.
  *

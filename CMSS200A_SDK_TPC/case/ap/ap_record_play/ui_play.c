@@ -21,9 +21,9 @@ uint8 ui_play(void)
     uint8 key;
 
     memset(&BreakPTSave, 0, sizeof(breakPT_t));
-    g_Openparam.filename = g_record_vars.location.filename;//ÎÄ¼şÃûµØÖ·
-    g_Openparam.BreakPTSave = &BreakPTSave;//±¸·İ²ÎÊıµØÖ·
-    g_Openparam.typeerror = 0;//Ä¬ÈÏÎªÕı³£¸ñÊ½ÎÄ¼ş
+    g_Openparam.filename = g_record_vars.location.filename;//æ–‡ä»¶ååœ°å€
+    g_Openparam.BreakPTSave = &BreakPTSave;//å¤‡ä»½å‚æ•°åœ°å€
+    g_Openparam.typeerror = 0;//é»˜è®¤ä¸ºæ­£å¸¸æ ¼å¼æ–‡ä»¶
     g_Openparam.SoftVolumeMax = 0;
     g_Openparam.FadeInTime = 0x03;
 #ifndef MUSIC_MP3
@@ -36,7 +36,7 @@ uint8 ui_play(void)
         goto play_exit;
     }
     if((g_record_vars.location.disk != 'M') && \
-            (FALSE == FS_CD(FS_CD_ROOT))) //±ÜÃâ´¦ÓÚ×îºóµÄÄ¿Â¼ÏîÊ±µ÷ÓÃFS_SetCurDir³ö´í
+            (FALSE == FS_CD(FS_CD_ROOT))) //é¿å…å¤„äºæœ€åçš„ç›®å½•é¡¹æ—¶è°ƒç”¨FS_SetCurDirå‡ºé”™
     {
         result = RESULT_MAIN;
         goto play_exit;
@@ -152,9 +152,9 @@ play_exit:
 
 /*
  ********************************************************************************
- * Description : ÏÔÊ¾µ±Ç°µÄÊ±¼ä
+ * Description : æ˜¾ç¤ºå½“å‰çš„æ—¶é—´
  *
- * Arguments   : mode   Ë¢ĞÂÄ£Ê½  0--Ö»Ë¢µ±Ç°Ê±¼ä   1--Ë¢µ±Ç°Ê±¼äºÍÊ£Óà¿ÉÂ¼Ê±¼ä
+ * Arguments   : mode   åˆ·æ–°æ¨¡å¼  0--åªåˆ·å½“å‰æ—¶é—´   1--åˆ·å½“å‰æ—¶é—´å’Œå‰©ä½™å¯å½•æ—¶é—´
  *
  * Returns     :  NULL
  *
@@ -169,7 +169,7 @@ void ShowNowTime(void)
     uint8 temp_buffer[5];
 
 #ifdef MUSIC_MP3
-    if (mp3pSendCommand(MC_GETTIME, (void *)&curtime_buf) == 0) //Ö±½Óµ÷ÓÃapSendCommand·ÀÖ¹ÇĞbank£¨AP_UI_PLY±¾Éí±»ÇĞ³öÈ¥£©£¬ÔÚ¸ß±ÈÌØÂÊ¸èÇúÊ±·ÀÖ¹ÓĞ¿¨ÒôÏÖÏó
+    if (mp3pSendCommand(MC_GETTIME, (void *)&curtime_buf) == 0) //ç›´æ¥è°ƒç”¨apSendCommandé˜²æ­¢åˆ‡bankï¼ˆAP_UI_PLYæœ¬èº«è¢«åˆ‡å‡ºå»ï¼‰ï¼Œåœ¨é«˜æ¯”ç‰¹ç‡æ­Œæ›²æ—¶é˜²æ­¢æœ‰å¡éŸ³ç°è±¡
 #else
     if (wavpSendCommand(MC_GETTIME, (void *)&curtime_buf) == 0)
 #endif
@@ -188,7 +188,7 @@ void ShowNowTime(void)
 
 /*
  ********************************************************************************
- * Description : UI½çÃæÏÔÊ¾
+ * Description : UIç•Œé¢æ˜¾ç¤º
  *
  * Arguments   : NULL
  *
@@ -205,7 +205,7 @@ void ui_draw_play_music(void)
     LEDDisplay(LED_PAUSE, 0xff, 0);
     LEDDisplay(LED_PLAY, 0xff, 1);
 
-    /*  ÏÔÊ¾Â¼ÒôÄ¿±ê´æ´¢½éÖÊ */
+    /*  æ˜¾ç¤ºå½•éŸ³ç›®æ ‡å­˜å‚¨ä»‹è´¨ */
     if(g_record_vars.location.disk == 'M')
     {
         LEDDisplay(LED_USB, 0xff, 0);
@@ -239,18 +239,18 @@ bool musicpSendCommand_bank(uint8 cmd, void *param)
  ********************************************************************************
  *             void deal_play_status(void)
  *
- * Description : ´¦Àí²¥·Å¹ı³ÌÖĞµÄÒì³£Çé¿ö
+ * Description : å¤„ç†æ’­æ”¾è¿‡ç¨‹ä¸­çš„å¼‚å¸¸æƒ…å†µ
  *
  *
  * Arguments   : void
  *
  * Returns     : void
  *
- * Notes       :1.Èç¹û·Ç²¥·Å×´Ì¬ÏÂ£¬ÔòÖ±½Ó·µ»Ø
- *			   2.Èç¹û²¥·Å³ö´í£¬Ôò×ªµ½³ö´í´¦Àíº¯Êı´¦Àí
- *			   3.Èç¹û²¥·Åµ½Î²£¬Ôò×ªµ½ÎÄ¼şÎ²´¦Àíº¯Êı´¦Àí
- *			   4.Èç¹û²¥·Åµ½Í·£¬Ôò×ªµ½ÎÄ¼şÍ·´¦Àíº¯Êı´¦Àí
- *			   5.Õı³£Çé¿öÏÂ²»¶ÏË¢ĞÂ²¥·ÅÊ±¼ä
+ * Notes       :1.å¦‚æœéæ’­æ”¾çŠ¶æ€ä¸‹ï¼Œåˆ™ç›´æ¥è¿”å›
+ *			   2.å¦‚æœæ’­æ”¾å‡ºé”™ï¼Œåˆ™è½¬åˆ°å‡ºé”™å¤„ç†å‡½æ•°å¤„ç†
+ *			   3.å¦‚æœæ’­æ”¾åˆ°å°¾ï¼Œåˆ™è½¬åˆ°æ–‡ä»¶å°¾å¤„ç†å‡½æ•°å¤„ç†
+ *			   4.å¦‚æœæ’­æ”¾åˆ°å¤´ï¼Œåˆ™è½¬åˆ°æ–‡ä»¶å¤´å¤„ç†å‡½æ•°å¤„ç†
+ *			   5.æ­£å¸¸æƒ…å†µä¸‹ä¸æ–­åˆ·æ–°æ’­æ”¾æ—¶é—´
  ********************************************************************************
  */
 uint8 deal_play_status(void)
@@ -258,7 +258,7 @@ uint8 deal_play_status(void)
     uint8 retval = 0;
     music_play_status_t status_buf;
 
-    apSendCommand(MC_GETSTATUS, Music_WAV, (void *)(&status_buf)); //Ö±½Óµ÷ÓÃapSendCommand·ÀÖ¹ÇĞbank£¨AP_UI_PLY±¾Éí±»ÇĞ³öÈ¥£©£¬ÔÚ¸ß±ÈÌØÂÊ¸èÇúÊ±·ÀÖ¹ÓĞ¿¨ÒôÏÖÏó
+    apSendCommand(MC_GETSTATUS, Music_WAV, (void *)(&status_buf)); //ç›´æ¥è°ƒç”¨apSendCommandé˜²æ­¢åˆ‡bankï¼ˆAP_UI_PLYæœ¬èº«è¢«åˆ‡å‡ºå»ï¼‰ï¼Œåœ¨é«˜æ¯”ç‰¹ç‡æ­Œæ›²æ—¶é˜²æ­¢æœ‰å¡éŸ³ç°è±¡
     if (status_buf.status == PLAYING_ERROR)
     {
         ap_sleep(3);

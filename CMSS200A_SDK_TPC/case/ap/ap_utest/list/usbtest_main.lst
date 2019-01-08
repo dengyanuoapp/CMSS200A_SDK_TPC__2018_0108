@@ -24,9 +24,9 @@ stmt  level    source
    13           * \brief
    14           * \author   wanghaijing
    15           * \par      GENERAL DESCRIPTION:
-   16           *               ÕâÀï¶ÔÎÄ¼ş½øĞĞÃèÊö
+   16           *               è¿™é‡Œå¯¹æ–‡ä»¶è¿›è¡Œæè¿°
    17           * \par      EXTERNALIZED FUNCTIONS:
-   18           *               ÕâÀïÃèÊöµ÷ÓÃµ½ÍâÃæµÄÄ£¿é
+   18           *               è¿™é‡Œæè¿°è°ƒç”¨åˆ°å¤–é¢çš„æ¨¡å—
    19           *
    20           *      Copyright(c) 2001-2010 Actions Semiconductor, All Rights Reserved.
    21           *

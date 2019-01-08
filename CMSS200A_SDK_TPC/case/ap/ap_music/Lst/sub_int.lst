@@ -29,15 +29,15 @@ stmt  level    source
    19           ********************************************************************************
    20           *             void stop_music_play(void)
    21           *
-   22           * Description : ������״̬�л�����ͣ״̬
+   22           * Description : 将播放状态切换到暂停状态
    23           *
    24           *
    25           * Arguments   : void
    26           *
    27           * Returns     : void
    28           *
-   29           * Notes       :1.�����ֹͣ״̬�£���ֱ�ӷ���
-   30           2.ֹͣ���룬�ر��ļ����
+   29           * Notes       :1.如果是停止状态下，则直接返回
+   30           2.停止解码，关闭文件句柄
    31           ********************************************************************************
    32           */
    33          
@@ -71,7 +71,7 @@ stmt  level    source
    59   2          }
    60   1          VMWrite(&g_comval, VM_SYSTEM, sizeof(g_comval));
    61   1      }
-   62          /*��ʾ��ǰ����ʱ��*/
+   62          /*显示当前播放时间*/
    63          void ShowNowTime(void)
    64          {
    65   1          itoa_2(g_music_vars.BreakPTDisTime.minute, temp_buffer);
@@ -83,14 +83,14 @@ stmt  level    source
    71           ********************************************************************************
    72           *             void RealDisplay(void)
    73           *
-   74           * Description : ������ʱ��ʵ��д��Ĵ����У��Ա�ͻȻ�ϵ���������Խ��жϵ�����
+   74           * Description : 将播放时间实现写入寄存器中，以备突然断电后，重启可以进行断点续播
    75           *
    76           *
    77           * Arguments   : void
    78           *
    79           * Returns     : void
    80           *
-   81           * Notes       :1.��Ҫ�Ǳ���ʱ���֣��룬����������ʱ�����ʾ
+   81           * Notes       :1.主要是备份时，分，秒，用于重启后时间的显示
    82          
    83           ********************************************************************************
    84           */
@@ -99,7 +99,7 @@ stmt  level    source
    87          {
    88   1          uint8 sfr_bak;
    89   1          romDI();
-   90   1          //�ϵ�ʱ��д��Ĵ������Է�Ӳ���ϵ�
+   90   1          //断点时间写入寄存器，以防硬件断电
    91   1          sfr_bak = SFR_BANK;
    92   1          SFR_BANK = 0x0c;
    93   1          RTCRDM19 = g_music_vars.BreakPTDisTime.hour;
@@ -108,13 +108,13 @@ stmt  level    source
    96   1          SFR_BANK = sfr_bak;
    97   1          romEI();
    98   1      }
-   99          /* ��ȡ������ǰ����ʱ�� */
+   99          /* 获取歌曲当前播放时间 */
   100          void BackupCurrentTime(void)
   101          {
   102   1          Full_time_t curtime_buf;
   103   1      
-  104   1          if (apSendCommand(MC_GETTIME, g_currentMusicType, (void *) &curtime_buf) == 0) //ֱ�ӵ���apSendComman
-             -d��ֹ��bank��AP_UI_PLY�������г�ȥ�����ڸ߱����ʸ���ʱ��ֹ�п�������
+  104   1          if (apSendCommand(MC_GETTIME, g_currentMusicType, (void *) &curtime_buf) == 0) //直接调用apSendComman
+             -d防止切bank（AP_UI_PLY本身被切出去），在高比特率歌曲时防止有卡音现象
   105   1          {
   106   2              return;
   107   2          }
@@ -128,7 +128,7 @@ stmt  level    source
   115           ********************************************************************************
   116           *             void deal_play_status(void)
   117           *
-  118           * Description : �������Ź����е��쳣���
+  118           * Description : 处理播放过程中的异常情况
   119           *
   120           *
   121           * Arguments   : void
@@ -137,11 +137,11 @@ stmt  level    source
 C251 COMPILER V4.55,  sub_int                                                              23/05/16  10:41:53  PAGE 3   
 
   124           *
-  125           * Notes       :1.����ǲ���״̬�£���ֱ�ӷ���
-  126           *                         2.������ų�������ת������������������
-  127           *                         3.������ŵ�β����ת���ļ�β������������
-  128           *                         4.������ŵ�ͷ����ת���ļ�ͷ������������
-  129           *                         5.��������²���ˢ�²���ʱ��
+  125           * Notes       :1.如果非播放状态下，则直接返回
+  126           *                         2.如果播放出错，则转到出错处理函数处理
+  127           *                         3.如果播放到尾，则转到文件尾处理函数处理
+  128           *                         4.如果播放到头，则转到文件头处理函数处理
+  129           *                         5.正常情况下不断刷新播放时间
   130           ********************************************************************************
   131           */
   132          
@@ -153,8 +153,8 @@ stmt  level    source
   138   1          {
   139   2              return NULL;
   140   2          }
-  141   1          apSendCommand(MC_GETSTATUS, g_currentMusicType, (void *) (&status_buf)); //ֱ�ӵ���apSendCommand��ֹ�
-             -�bank��AP_UI_PLY�������г�ȥ�����ڸ߱����ʸ���ʱ��ֹ�п�������
+  141   1          apSendCommand(MC_GETSTATUS, g_currentMusicType, (void *) (&status_buf)); //直接调用apSendCommand防止
+             -衎ank（AP_UI_PLY本身被切出去），在高比特率歌曲时防止有卡音现象
   142   1          if (status_buf.status == PLAYING_ERROR)
   143   1          {
   144   2              return deal_playing_err();
@@ -167,13 +167,13 @@ stmt  level    source
   151   3                  return retval;
   152   3              }
   153   2          }
-  154   1          //ע��������Ϊ���һ��������������������⴦������һ������¿ɲ��ֵ�ͷ����β
-  155   1          //     ��־��ͳһ�� PLAYING_REACH_END ��־�Ϳ����ˣ���Ϊ��ͨ�� PlayStatus
-  156   1          //     �����־�ж��ǿ�����ǿ��ˣ��Ϳ�֪���ǵ����ļ�ͷ�����ļ�β���������
-  157   1          //     ���˵���ൽͷʱֹͣ���ˣ���ʱ�ѷ�ֹͣ���������ģ����ڽ������
-  158   1          //     ���������ֹͣ����Ҫ��һ��ʱ���������ʱ����е��ļ�ͷ���绹��
-  159   1          //     �� PLAYING_REACH_END ��־�Ǿͷֲ����ǵ�ͷ���ǵ�β������Ҫ��һ����־
-  160   1          //     PLAYING_REACH_HEAD ��ʾ�ǵ�ͷ��
+  154   1          //注，下面是为解决一种特殊情况而做出的特殊处理，在一般情况下可不分到头，到尾
+  155   1          //     标志，统一用 PLAYING_REACH_END 标志就可以了，因为可通过 PlayStatus
+  156   1          //     这个标志判断是快进还是快退，就可知道是到了文件头还是文件尾，但如果在
+  157   1          //     快退到差不多到头时停止快退，这时已发停止命令，但由于模块层在接收这个
+  158   1          //     命令后到真正停止快退要有一个时间差，如在这个时间差中到文件头，如还是
+  159   1          //     用 PLAYING_REACH_END 标志那就分不清是到头还是到尾，所以要加一个标志
+  160   1          //     PLAYING_REACH_HEAD 表示是到头。
   161   1          else if (status_buf.status == PLAYING_REACH_HEAD)
   162   1          {
   163   2              retval = deal_music_filehead();

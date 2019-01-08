@@ -27,13 +27,13 @@ stmt  level    source
    16          
    17          /*
    18           ********************************************************************************
-   19           * Description : ÔİÍ£½çÃæ
+   19           * Description : æš‚åœç•Œé¢
    20           *
    21           * Arguments   :
    22           *
-   23           * Returns     : ½á¹ûÏûÏ¢»ò0
-   24           RESULT_USER_STOP    //ÓÃ»§°´¼ü½áÊø
-   25           RESULT_LOW_POWER_STOP    //µÍµçÑ¹½áÊø
+   23           * Returns     : ç»“æœæ¶ˆæ¯æˆ–0
+   24           RESULT_USER_STOP    //ç”¨æˆ·æŒ‰é”®ç»“æŸ
+   25           RESULT_LOW_POWER_STOP    //ä½ç”µå‹ç»“æŸ
    26           *
    27           * Notes       :
    28           *
@@ -49,8 +49,8 @@ stmt  level    source
                
                    BOOL need_draw_ui = TRUE;
                
-                   BOOL flash_state = TRUE; //ÉÁË¸µÄ×´Ì¬
-                   BYTE low_power_count = 0; //»ñµÃµÍµçÑ¹µÄ´ÎÊı
+                   BOOL flash_state = TRUE; //é—ªçƒçš„çŠ¶æ€
+                   BYTE low_power_count = 0; //è·å¾—ä½ç”µå‹çš„æ¬¡æ•°
                    //BYTE batt;
                
                    while (1)
@@ -58,7 +58,7 @@ stmt  level    source
                            #if 0
                        if (FALSE != need_draw_ui)
                        {
-                           //ÔİÍ£USOUNDÂ¼Òô×´Ì¬
+                           //æš‚åœUSOUNDå½•éŸ³çŠ¶æ€
                            LEDDisplay(LED_PLAY, 0xff, 0);
                            LEDDisplay(LED_PAUSE, 0xff, 1);
                            need_draw_ui = FALSE;
@@ -72,7 +72,7 @@ stmt  level    source
                        {
                
                        case AP_KEY_PLAY | AP_KEY_UP:
-                           //¼ÌĞøusoundÂ¼Òô
+                           //ç»§ç»­usoundå½•éŸ³
                            //LEDDisplay(LED_PAUSE, 0xff, 0);
                            //LEDDisplay(LED_PLAY, 0xff, 1);
                            mp3rSendCommand(MC_RECORD, 0);
@@ -87,7 +87,7 @@ stmt  level    source
                            break;
                
                        case AP_KEY_MODE | AP_KEY_UP:
-                           /* ±£´æÂ¼ÒôÎÄ¼ş */
+                           /* ä¿å­˜å½•éŸ³æ–‡ä»¶ */
                            mp3rSendCommand(MC_STOP, 0);
                            return RESULT_SAVE_FILE;
                            break;
@@ -103,7 +103,7 @@ stmt  level    source
                        }//switch()
                    }//while(1)
                #endif
-   93   1          return 0; //±ÜÃâ±àÒëÆ÷warning
+   93   1          return 0; //é¿å…ç¼–è¯‘å™¨warning
    94   1      }
    95          
 

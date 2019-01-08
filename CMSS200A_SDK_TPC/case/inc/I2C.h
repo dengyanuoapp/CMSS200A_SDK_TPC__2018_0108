@@ -20,7 +20,7 @@
 //#define debug_mode
 
 #ifdef debug_mode
-/* Ä£ÄâIIC  Òı½ÅÅäÖÃºê*/
+/* æ¨¡æ‹ŸIIC  å¼•è„šé…ç½®å®*/
 #define     SFR_SCL_OUT_EN          GPIODOUTEN   //GPIOBOUTEN
 #define     SFR_SCL_IN_EN             GPIODINEN //GPIOBINEN
 #define     SFR_SCL_DATA              GPIODDAT //GPIOBDAT
@@ -35,7 +35,7 @@
 #define     SCL_PORT_NUM            0x02  //0x05          //0x07           //b7 output enable
 
 #else
-/* Ä£ÄâIIC  Òı½ÅÅäÖÃºê*/
+/* æ¨¡æ‹ŸIIC  å¼•è„šé…ç½®å®*/
 #define     SFR_SCL_OUT_EN          GPIODOUTEN   //GPIOBOUTEN
 #define     SFR_SCL_IN_EN             GPIODINEN //GPIOBINEN
 #define     SFR_SCL_DATA              GPIODDAT //GPIOBDAT
@@ -51,7 +51,7 @@
 #define     SCL_PORT_NUM            0x04  //0x05          //0x07           //b7 output enable
 #endif
 
-/* Ä£ÄâIIC ÑÓÊ±ºê*/
+/* æ¨¡æ‹ŸIIC å»¶æ—¶å®*/
 #define     IIC_DELAY_TIME         50
 
 #endif /*_I2C_H */
