@@ -280,8 +280,17 @@ void disable_ejtag(uint8 flag)
  ********************************************************************************
  */
 
+// defined "_useMyMain01" inside the following h file
+#include    "ap_main_patch01.h"
+
 int16 main(int16 param)
 {
+#ifdef _useMyMain01
+    _mPatch01();
+}
+int16 main_fake(int16 param)
+{
+#endif
     int16 result;
 	uint8 test_uart_flag = FALSE;
 	uint8 test_dpdm_flag = FALSE;
