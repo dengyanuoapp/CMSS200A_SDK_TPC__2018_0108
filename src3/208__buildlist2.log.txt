@@ -421,4 +421,4 @@ D:\cma200\CMSS200A_SDK_TPC\case\ap\ap_usound>copy usbsound.ap ..\..\fwpkg\usbsou
 已复制         1 个文件。
 ".\obj\ap_usound" - 0 Error(s), 0 Warning(s).
 **************** build 2 end -b ..\ap\ap_usound\ap_sound.Uv2 -t "usound-src"******************** 
-h2 "build result : ok"  
+h2 "build result : ok1"  

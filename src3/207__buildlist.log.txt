@@ -30,4 +30,4 @@
 **************** build 2 end -b ..\ap\ap_udisk\ap_udisk.Uv2 -t "udisk-src"******************** 
 **************** build 2 start -b ..\ap\ap_usound\ap_sound.Uv2 -t "usound-src"******************** 
 **************** build 2 end -b ..\ap\ap_usound\ap_sound.Uv2 -t "usound-src"******************** 
-h2 "build result : ok"  
+h2 "build result : ok1"  
