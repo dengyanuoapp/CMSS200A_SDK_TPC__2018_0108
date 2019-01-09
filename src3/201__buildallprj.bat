@@ -87,4 +87,4 @@ msg  %username% "build result : err"
 :finish
  
 :nobuild
-pause
+rem pause
