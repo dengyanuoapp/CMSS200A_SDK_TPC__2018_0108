@@ -75,18 +75,14 @@ findstr "error" %workDir%\buildlist.log >nul
 findstr "error" %workDir%\buildlist2.log >nul
 @echo off
 if "%errorlevel%"=="0" goto builderr
-@echo on
-echo %username% "build result : ok" >>%workDir%\buildlist.log >nul
-echo %username% "build result : ok" >>%workDir%\buildlist2.log >nul
-@echo off
-msg  %username% "build result : ok"
+echo %username% "build result : ok1" >>%workDir%\buildlist.log 
+echo %username% "build result : ok1" >>%workDir%\buildlist2.log 
+msg  %username% "build result : ok1"
 
 goto finish
 :builderr
-@echo on
 echo %username% "build result : err" >>%workDir%\buildlist.log 
 echo %username% "build result : err" >>%workDir%\buildlist2.log 
-@echo off
 msg  %username% "build result : err"
 :finish
  
