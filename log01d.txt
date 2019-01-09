@@ -1,0 +1,14 @@
+--2019-01-09 14:14:09--  ftp://ddcma200:*password*@192.168.1.93/case/fwpkg/buildlist.log
+           => ‘-’
+Connecting to 192.168.1.93:21... connected.
+Logging in as ddcma200 ... Logged in!
+==> SYST ... done.    ==> PWD ... done.
+==> TYPE I ... done.  ==> CWD (1) /case/fwpkg ... done.
+==> SIZE buildlist.log ... 597
+==> PASV ... done.    ==> RETR buildlist.log ... done.
+Length: 597 (unauthoritative)
+
+     0K                                                       100%  235M=0s
+
+2019-01-09 14:14:10 (235 MB/s) - written to stdout [597]
+

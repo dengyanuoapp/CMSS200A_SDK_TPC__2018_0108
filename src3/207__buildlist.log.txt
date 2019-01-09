@@ -1,0 +1,7 @@
+****************build -b ..\drv\fw_cfg\fw_cfg.Uv2 -t "fw_cfg"******************** 
+****************build -b ..\drv\key\drv_key.Uv2 -t "ky_hard"******************** 
+****************build -b ..\drv\uart\uart.Uv2 -t "uart"******************** 
+****************build -b ..\drv\welcome\welcome.Uv2 -t "welcome"******************** 
+****************build -b ..\ap\ap_main\ap_main.Uv2 -t "main"******************** 
+****************build -b ..\ap\ap_udisk\ap_udisk.Uv2 -t "udisk-src"******************** 
+****************build -b ..\ap\ap_usound\ap_sound.Uv2 -t "usound-src"******************** 
