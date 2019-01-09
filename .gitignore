@@ -14,3 +14,9 @@
 /[0-9a-z].txt
 /[0-9a-z].diff
 /[0-9a-z].bak
+
+/src3/207__buildlist.log
+/src3/208__buildlist2.log
+
+/log01d.txt
+/log01u.txt

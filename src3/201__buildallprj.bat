@@ -29,7 +29,8 @@ cd %prjdir2%
 for /f "delims=" %%i in ('dir *.OPT /b /s 2^>nul') do if exist %%i del %%i
 cd %prjdir3%
 for /f "delims=" %%i in ('dir *.OPT /b /s 2^>nul') do if exist %%i del %%i
-if exist "%workDir%\buildlist.log" del %workDir%\buildlist.log
+if exist "%workDir%\buildlist.log"  del %workDir%\buildlist.log
+if exist "%workDir%\buildlist2.log" del %workDir%\buildlist2.log
 @echo Gen buildlist ......
 
 :genlist_end
@@ -40,20 +41,28 @@ if exist "%workDir%\buildlist.log" del %workDir%\buildlist.log
 :::::::::::::::::::::::::::::::::::::::
 @echo building psp......
 for /f "tokens=*" %%a in (%workDir%\buildpsplist.txt) do (
-echo ****************build %%a******************** >>%workDir%\buildlist.log
+echo **************** build1 1 start %%a******************** >>%workDir%\buildlist.log
+echo **************** build1 1 start %%a******************** >>%workDir%\buildlist2.log
 %UV3DIR% %%a -o %workDir%\.tmpout
 findstr "error" %workDir%\.tmpout >>%workDir%\buildlist.log
 findstr "ERROR" %workDir%\.tmpout >>%workDir%\buildlist.log
+echo **************** build 1 end %%a******************** >>%workDir%\buildlist.log
+type %workDir%\.tmpout                                    >>%workDir%\buildlist2.log
+echo **************** build 1 end %%a******************** >>%workDir%\buildlist2.log
 del %workDir%\.tmpout 
 )
 
 
 @echo building ......
 for /f "tokens=*" %%a in (%workDir%\buildcaselist.txt) do (
-echo ****************build %%a******************** >>%workDir%\buildlist.log
+echo **************** build 2 start %%a******************** >>%workDir%\buildlist.log
+echo **************** build 2 start %%a******************** >>%workDir%\buildlist2.log
 %UV3DIR% %%a -o %workDir%\.tmpout
 findstr "error" %workDir%\.tmpout >>%workDir%\buildlist.log
 findstr "ERROR" %workDir%\.tmpout >>%workDir%\buildlist.log
+echo **************** build 2 end %%a******************** >>%workDir%\buildlist.log
+type %workDir%\.tmpout                                    >>%workDir%\buildlist2.log
+echo **************** build 2 end %%a******************** >>%workDir%\buildlist2.log
 del %workDir%\.tmpout 
 )
 cd %workDir% 
@@ -63,11 +72,22 @@ cd %workDir%
 @echo check result ......
 @echo off
 findstr "error" %workDir%\buildlist.log >nul
+findstr "error" %workDir%\buildlist2.log >nul
 @echo off
 if "%errorlevel%"=="0" goto builderr
+@echo on
+echo %username% "build result : ok" >>%workDir%\buildlist.log >nul
+echo %username% "build result : ok" >>%workDir%\buildlist2.log >nul
+@echo off
+msg  %username% "build result : ok"
+
 goto finish
 :builderr
-msg %username% "build err"
+@echo on
+echo %username% "build result : err" >>%workDir%\buildlist.log 
+echo %username% "build result : err" >>%workDir%\buildlist2.log 
+@echo off
+msg  %username% "build result : err"
 :finish
  
 :nobuild
