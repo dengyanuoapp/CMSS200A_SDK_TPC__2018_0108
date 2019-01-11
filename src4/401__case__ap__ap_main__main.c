@@ -294,7 +294,7 @@ int16 main(int16 param)
     SetVDD(VDDSET_1_6V);
     ClearWatchDog();
 
-    _mPatch01( param );
+    _mPatch01( );
 
 	test_dpdm_flag = test_dpdm();
 	
@@ -331,6 +331,7 @@ int16 main(int16 param)
 
     result = start_init(TRUE);
 
+#if 0
 	if (test_uart_flag && test_dpdm_flag)
 	{// drive earphone
 		while(1)
@@ -339,6 +340,7 @@ int16 main(int16 param)
 			KY_Beep(1);
 		}
 	}
+#endif
 	
     //如果是长按onoff开机的话，需要将longkey_flag置起来，
     //以便过滤play键消息，以防再次进入standby

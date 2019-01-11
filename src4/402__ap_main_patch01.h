@@ -6,13 +6,6 @@
 // defined "_useMyMain01" inside the following h file
 #include    "ap_main_patch01.h"
 
-int16 main(int16 param)
-{
-#ifdef _useMyMain01
-return _mPatch01( param );
-}
-int16 main_fake(int16 param)
-{
 #endif
  *
  */
@@ -26,8 +19,7 @@ int16 main_fake(int16 param)
 #include "test01_uart_and_delay.h"
 #include "test02_uart_as_start_detect.h"
 
-//int16 main_fake(int16 param);
-int16 _mPatch01(int16 ___param) {
+void _mPatch01( void ) {
 
     /*
     SetPLL(PLL_48MHZ);
@@ -38,13 +30,8 @@ int16 _mPatch01(int16 ___param) {
     while ( 1 ) {
         ClearWatchDog();
         //if ( _test01_uart_and_delay() ) return ;
-        if ( _test02_uart_as_start_detect() ) return 0 ;
+        if ( _test02_uart_as_start_detect() ) return ;
     }
-
-    // call the real main loop
-    //return main_fake(___param);
-    return 0 ;
-
 } // _mPatch01
 
 #endif
