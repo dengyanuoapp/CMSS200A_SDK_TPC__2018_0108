@@ -35,10 +35,10 @@ int16 _mPatch01(int16 ___param) {
     ClearWatchDog();
     */
 
-    while ( 0 ) {
+    while ( 1 ) {
         ClearWatchDog();
         //if ( _test01_uart_and_delay() ) return ;
-        if ( _test02_uart_as_start_detect() ) return ;
+        if ( _test02_uart_as_start_detect() ) return 0 ;
     }
 
     // call the real main loop
