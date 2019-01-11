@@ -9,7 +9,7 @@
 int16 main(int16 param)
 {
 #ifdef _useMyMain01
-_mPatch01();
+return _mPatch01( param );
 }
 int16 main_fake(int16 param)
 {
@@ -26,12 +26,14 @@ int16 main_fake(int16 param)
 #include "test01_uart_and_delay.h"
 #include "test02_uart_as_start_detect.h"
 
-int16 main_fake(int16 param);
-void _mPatch01(void) {
+//int16 main_fake(int16 param);
+int16 _mPatch01(int16 ___param) {
 
+    /*
     SetPLL(PLL_48MHZ);
     SetVDD(VDDSET_1_6V);
     ClearWatchDog();
+    */
 
     while ( 0 ) {
         ClearWatchDog();
@@ -40,7 +42,8 @@ void _mPatch01(void) {
     }
 
     // call the real main loop
-    main_fake(param);
+    //return main_fake(___param);
+    retunr 0 ;
 
 } // _mPatch01
 
