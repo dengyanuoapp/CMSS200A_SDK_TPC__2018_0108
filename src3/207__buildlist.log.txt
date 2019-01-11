@@ -1,33 +1,231 @@
-**************** build1 1 start -b ..\..\psp_rel\uv2\prj\lib\midware\audioBasal\basal_decode.Uv2 -t "basal"******************** 
-**************** build 1 end -b ..\..\psp_rel\uv2\prj\lib\midware\audioBasal\basal_decode.Uv2 -t "basal"******************** 
-**************** build1 1 start -b ..\..\psp_rel\uv2\prj\lib\midware\audioBasal\basal_decode_sd.Uv2 -t "basal_sd"******************** 
-**************** build 1 end -b ..\..\psp_rel\uv2\prj\lib\midware\audioBasal\basal_decode_sd.Uv2 -t "basal_sd"******************** 
-**************** build1 1 start -b ..\..\psp_rel\uv2\prj\lib\midware\audioBasal\basal_decode_tts.Uv2 -t "basal_tts"******************** 
-**************** build 1 end -b ..\..\psp_rel\uv2\prj\lib\midware\audioBasal\basal_decode_tts.Uv2 -t "basal_tts"******************** 
-**************** build1 1 start -b ..\..\psp_rel\uv2\prj\lib\midware\audioBasal\basal_encode.Uv2 -t "basal"******************** 
-**************** build 1 end -b ..\..\psp_rel\uv2\prj\lib\midware\audioBasal\basal_encode.Uv2 -t "basal"******************** 
-**************** build1 1 start -b ..\..\psp_rel\uv2\prj\lib\midware\audioBasal\basal_encode_urec.Uv2 -t "basal"******************** 
-**************** build 1 end -b ..\..\psp_rel\uv2\prj\lib\midware\audioBasal\basal_encode_urec.Uv2 -t "basal"******************** 
-**************** build1 1 start -b ..\..\psp_rel\uv2\prj\lib\midware\enhanced\fileSelect_api.Uv2 -t "fileSelect"******************** 
-**************** build 1 end -b ..\..\psp_rel\uv2\prj\lib\midware\enhanced\fileSelect_api.Uv2 -t "fileSelect"******************** 
-**************** build1 1 start -b ..\..\psp_rel\uv2\prj\lib\midware\enhanced\fileSelect_api.Uv2 -t "fileSelect_music"******************** 
-**************** build 1 end -b ..\..\psp_rel\uv2\prj\lib\midware\enhanced\fileSelect_api.Uv2 -t "fileSelect_music"******************** 
-**************** build1 1 start -b ..\..\psp_rel\uv2\prj\lib\midware\enhanced\ID3.Uv2 -t "id3"******************** 
-**************** build 1 end -b ..\..\psp_rel\uv2\prj\lib\midware\enhanced\ID3.Uv2 -t "id3"******************** 
-**************** build1 1 start -b ..\..\psp_rel\uv2\prj\lib\midware\enhanced\NAME.Uv2 -t "name"******************** 
-**************** build 1 end -b ..\..\psp_rel\uv2\prj\lib\midware\enhanced\NAME.Uv2 -t "name"******************** 
-**************** build 2 start -b ..\drv\fw_cfg\fw_cfg.Uv2 -t "fw_cfg"******************** 
-**************** build 2 end -b ..\drv\fw_cfg\fw_cfg.Uv2 -t "fw_cfg"******************** 
-**************** build 2 start -b ..\drv\key\drv_key.Uv2 -t "ky_hard"******************** 
-**************** build 2 end -b ..\drv\key\drv_key.Uv2 -t "ky_hard"******************** 
-**************** build 2 start -b ..\drv\uart\uart.Uv2 -t "uart"******************** 
-**************** build 2 end -b ..\drv\uart\uart.Uv2 -t "uart"******************** 
-**************** build 2 start -b ..\drv\welcome\welcome.Uv2 -t "welcome"******************** 
-**************** build 2 end -b ..\drv\welcome\welcome.Uv2 -t "welcome"******************** 
-**************** build 2 start -b ..\ap\ap_main\ap_main.Uv2 -t "main"******************** 
-**************** build 2 end -b ..\ap\ap_main\ap_main.Uv2 -t "main"******************** 
-**************** build 2 start -b ..\ap\ap_udisk\ap_udisk.Uv2 -t "udisk-src"******************** 
-**************** build 2 end -b ..\ap\ap_udisk\ap_udisk.Uv2 -t "udisk-src"******************** 
-**************** build 2 start -b ..\ap\ap_usound\ap_sound.Uv2 -t "usound-src"******************** 
-**************** build 2 end -b ..\ap\ap_usound\ap_sound.Uv2 -t "usound-src"******************** 
-h2 "build result : ok1"  
+00000000  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+00000010  20 62 75 69 6c 64 31 20  31 20 73 74 61 72 74 20  | build1 1 start |
+00000020  2d 62 20 2e 2e 5c 2e 2e  5c 70 73 70 5f 72 65 6c  |-b ..\..\psp_rel|
+00000030  5c 75 76 32 5c 70 72 6a  5c 6c 69 62 5c 6d 69 64  |\uv2\prj\lib\mid|
+00000040  77 61 72 65 5c 61 75 64  69 6f 42 61 73 61 6c 5c  |ware\audioBasal\|
+00000050  62 61 73 61 6c 5f 64 65  63 6f 64 65 2e 55 76 32  |basal_decode.Uv2|
+00000060  20 2d 74 20 22 62 61 73  61 6c 22 2a 2a 2a 2a 2a  | -t "basal"*****|
+00000070  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 20  |*************** |
+00000080  0d 0a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |..**************|
+00000090  2a 2a 20 62 75 69 6c 64  20 31 20 65 6e 64 20 2d  |** build 1 end -|
+000000a0  62 20 2e 2e 5c 2e 2e 5c  70 73 70 5f 72 65 6c 5c  |b ..\..\psp_rel\|
+000000b0  75 76 32 5c 70 72 6a 5c  6c 69 62 5c 6d 69 64 77  |uv2\prj\lib\midw|
+000000c0  61 72 65 5c 61 75 64 69  6f 42 61 73 61 6c 5c 62  |are\audioBasal\b|
+000000d0  61 73 61 6c 5f 64 65 63  6f 64 65 2e 55 76 32 20  |asal_decode.Uv2 |
+000000e0  2d 74 20 22 62 61 73 61  6c 22 2a 2a 2a 2a 2a 2a  |-t "basal"******|
+000000f0  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 20 0d  |************** .|
+00000100  0a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |.***************|
+00000110  2a 20 62 75 69 6c 64 31  20 31 20 73 74 61 72 74  |* build1 1 start|
+00000120  20 2d 62 20 2e 2e 5c 2e  2e 5c 70 73 70 5f 72 65  | -b ..\..\psp_re|
+00000130  6c 5c 75 76 32 5c 70 72  6a 5c 6c 69 62 5c 6d 69  |l\uv2\prj\lib\mi|
+00000140  64 77 61 72 65 5c 61 75  64 69 6f 42 61 73 61 6c  |dware\audioBasal|
+00000150  5c 62 61 73 61 6c 5f 64  65 63 6f 64 65 5f 73 64  |\basal_decode_sd|
+00000160  2e 55 76 32 20 2d 74 20  22 62 61 73 61 6c 5f 73  |.Uv2 -t "basal_s|
+00000170  64 22 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |d"**************|
+00000180  2a 2a 2a 2a 2a 2a 20 0d  0a 2a 2a 2a 2a 2a 2a 2a  |****** ..*******|
+00000190  2a 2a 2a 2a 2a 2a 2a 2a  2a 20 62 75 69 6c 64 20  |********* build |
+000001a0  31 20 65 6e 64 20 2d 62  20 2e 2e 5c 2e 2e 5c 70  |1 end -b ..\..\p|
+000001b0  73 70 5f 72 65 6c 5c 75  76 32 5c 70 72 6a 5c 6c  |sp_rel\uv2\prj\l|
+000001c0  69 62 5c 6d 69 64 77 61  72 65 5c 61 75 64 69 6f  |ib\midware\audio|
+000001d0  42 61 73 61 6c 5c 62 61  73 61 6c 5f 64 65 63 6f  |Basal\basal_deco|
+000001e0  64 65 5f 73 64 2e 55 76  32 20 2d 74 20 22 62 61  |de_sd.Uv2 -t "ba|
+000001f0  73 61 6c 5f 73 64 22 2a  2a 2a 2a 2a 2a 2a 2a 2a  |sal_sd"*********|
+00000200  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 20 0d 0a 2a 2a  |*********** ..**|
+00000210  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 20 62  |************** b|
+00000220  75 69 6c 64 31 20 31 20  73 74 61 72 74 20 2d 62  |uild1 1 start -b|
+00000230  20 2e 2e 5c 2e 2e 5c 70  73 70 5f 72 65 6c 5c 75  | ..\..\psp_rel\u|
+00000240  76 32 5c 70 72 6a 5c 6c  69 62 5c 6d 69 64 77 61  |v2\prj\lib\midwa|
+00000250  72 65 5c 61 75 64 69 6f  42 61 73 61 6c 5c 62 61  |re\audioBasal\ba|
+00000260  73 61 6c 5f 64 65 63 6f  64 65 5f 74 74 73 2e 55  |sal_decode_tts.U|
+00000270  76 32 20 2d 74 20 22 62  61 73 61 6c 5f 74 74 73  |v2 -t "basal_tts|
+00000280  22 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |"***************|
+00000290  2a 2a 2a 2a 2a 20 0d 0a  2a 2a 2a 2a 2a 2a 2a 2a  |***** ..********|
+000002a0  2a 2a 2a 2a 2a 2a 2a 2a  20 62 75 69 6c 64 20 31  |******** build 1|
+000002b0  20 65 6e 64 20 2d 62 20  2e 2e 5c 2e 2e 5c 70 73  | end -b ..\..\ps|
+000002c0  70 5f 72 65 6c 5c 75 76  32 5c 70 72 6a 5c 6c 69  |p_rel\uv2\prj\li|
+000002d0  62 5c 6d 69 64 77 61 72  65 5c 61 75 64 69 6f 42  |b\midware\audioB|
+000002e0  61 73 61 6c 5c 62 61 73  61 6c 5f 64 65 63 6f 64  |asal\basal_decod|
+000002f0  65 5f 74 74 73 2e 55 76  32 20 2d 74 20 22 62 61  |e_tts.Uv2 -t "ba|
+00000300  73 61 6c 5f 74 74 73 22  2a 2a 2a 2a 2a 2a 2a 2a  |sal_tts"********|
+00000310  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 20 0d 0a 2a  |************ ..*|
+00000320  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 20  |*************** |
+00000330  62 75 69 6c 64 31 20 31  20 73 74 61 72 74 20 2d  |build1 1 start -|
+00000340  62 20 2e 2e 5c 2e 2e 5c  70 73 70 5f 72 65 6c 5c  |b ..\..\psp_rel\|
+00000350  75 76 32 5c 70 72 6a 5c  6c 69 62 5c 6d 69 64 77  |uv2\prj\lib\midw|
+00000360  61 72 65 5c 61 75 64 69  6f 42 61 73 61 6c 5c 62  |are\audioBasal\b|
+00000370  61 73 61 6c 5f 65 6e 63  6f 64 65 2e 55 76 32 20  |asal_encode.Uv2 |
+00000380  2d 74 20 22 62 61 73 61  6c 22 2a 2a 2a 2a 2a 2a  |-t "basal"******|
+00000390  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 20 0d  |************** .|
+000003a0  0a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |.***************|
+000003b0  2a 20 62 75 69 6c 64 20  31 20 65 6e 64 20 2d 62  |* build 1 end -b|
+000003c0  20 2e 2e 5c 2e 2e 5c 70  73 70 5f 72 65 6c 5c 75  | ..\..\psp_rel\u|
+000003d0  76 32 5c 70 72 6a 5c 6c  69 62 5c 6d 69 64 77 61  |v2\prj\lib\midwa|
+000003e0  72 65 5c 61 75 64 69 6f  42 61 73 61 6c 5c 62 61  |re\audioBasal\ba|
+000003f0  73 61 6c 5f 65 6e 63 6f  64 65 2e 55 76 32 20 2d  |sal_encode.Uv2 -|
+00000400  74 20 22 62 61 73 61 6c  22 2a 2a 2a 2a 2a 2a 2a  |t "basal"*******|
+00000410  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 20 0d 0a  |************* ..|
+00000420  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+00000430  20 62 75 69 6c 64 31 20  31 20 73 74 61 72 74 20  | build1 1 start |
+00000440  2d 62 20 2e 2e 5c 2e 2e  5c 70 73 70 5f 72 65 6c  |-b ..\..\psp_rel|
+00000450  5c 75 76 32 5c 70 72 6a  5c 6c 69 62 5c 6d 69 64  |\uv2\prj\lib\mid|
+00000460  77 61 72 65 5c 61 75 64  69 6f 42 61 73 61 6c 5c  |ware\audioBasal\|
+00000470  62 61 73 61 6c 5f 65 6e  63 6f 64 65 5f 75 72 65  |basal_encode_ure|
+00000480  63 2e 55 76 32 20 2d 74  20 22 62 61 73 61 6c 22  |c.Uv2 -t "basal"|
+00000490  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+000004a0  2a 2a 2a 2a 20 0d 0a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |**** ..*********|
+000004b0  2a 2a 2a 2a 2a 2a 2a 20  62 75 69 6c 64 20 31 20  |******* build 1 |
+000004c0  65 6e 64 20 2d 62 20 2e  2e 5c 2e 2e 5c 70 73 70  |end -b ..\..\psp|
+000004d0  5f 72 65 6c 5c 75 76 32  5c 70 72 6a 5c 6c 69 62  |_rel\uv2\prj\lib|
+000004e0  5c 6d 69 64 77 61 72 65  5c 61 75 64 69 6f 42 61  |\midware\audioBa|
+000004f0  73 61 6c 5c 62 61 73 61  6c 5f 65 6e 63 6f 64 65  |sal\basal_encode|
+00000500  5f 75 72 65 63 2e 55 76  32 20 2d 74 20 22 62 61  |_urec.Uv2 -t "ba|
+00000510  73 61 6c 22 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |sal"************|
+00000520  2a 2a 2a 2a 2a 2a 2a 2a  20 0d 0a 2a 2a 2a 2a 2a  |******** ..*****|
+00000530  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 20 62 75 69 6c  |*********** buil|
+00000540  64 31 20 31 20 73 74 61  72 74 20 2d 62 20 2e 2e  |d1 1 start -b ..|
+00000550  5c 2e 2e 5c 70 73 70 5f  72 65 6c 5c 75 76 32 5c  |\..\psp_rel\uv2\|
+00000560  70 72 6a 5c 6c 69 62 5c  6d 69 64 77 61 72 65 5c  |prj\lib\midware\|
+00000570  65 6e 68 61 6e 63 65 64  5c 66 69 6c 65 53 65 6c  |enhanced\fileSel|
+00000580  65 63 74 5f 61 70 69 2e  55 76 32 20 2d 74 20 22  |ect_api.Uv2 -t "|
+00000590  66 69 6c 65 53 65 6c 65  63 74 22 2a 2a 2a 2a 2a  |fileSelect"*****|
+000005a0  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 20  |*************** |
+000005b0  0d 0a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |..**************|
+000005c0  2a 2a 20 62 75 69 6c 64  20 31 20 65 6e 64 20 2d  |** build 1 end -|
+000005d0  62 20 2e 2e 5c 2e 2e 5c  70 73 70 5f 72 65 6c 5c  |b ..\..\psp_rel\|
+000005e0  75 76 32 5c 70 72 6a 5c  6c 69 62 5c 6d 69 64 77  |uv2\prj\lib\midw|
+000005f0  61 72 65 5c 65 6e 68 61  6e 63 65 64 5c 66 69 6c  |are\enhanced\fil|
+00000600  65 53 65 6c 65 63 74 5f  61 70 69 2e 55 76 32 20  |eSelect_api.Uv2 |
+00000610  2d 74 20 22 66 69 6c 65  53 65 6c 65 63 74 22 2a  |-t "fileSelect"*|
+00000620  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+00000630  2a 2a 2a 20 0d 0a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |*** ..**********|
+00000640  2a 2a 2a 2a 2a 2a 20 62  75 69 6c 64 31 20 31 20  |****** build1 1 |
+00000650  73 74 61 72 74 20 2d 62  20 2e 2e 5c 2e 2e 5c 70  |start -b ..\..\p|
+00000660  73 70 5f 72 65 6c 5c 75  76 32 5c 70 72 6a 5c 6c  |sp_rel\uv2\prj\l|
+00000670  69 62 5c 6d 69 64 77 61  72 65 5c 65 6e 68 61 6e  |ib\midware\enhan|
+00000680  63 65 64 5c 66 69 6c 65  53 65 6c 65 63 74 5f 61  |ced\fileSelect_a|
+00000690  70 69 2e 55 76 32 20 2d  74 20 22 66 69 6c 65 53  |pi.Uv2 -t "fileS|
+000006a0  65 6c 65 63 74 5f 6d 75  73 69 63 22 2a 2a 2a 2a  |elect_music"****|
+000006b0  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+000006c0  20 0d 0a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  | ..*************|
+000006d0  2a 2a 2a 20 62 75 69 6c  64 20 31 20 65 6e 64 20  |*** build 1 end |
+000006e0  2d 62 20 2e 2e 5c 2e 2e  5c 70 73 70 5f 72 65 6c  |-b ..\..\psp_rel|
+000006f0  5c 75 76 32 5c 70 72 6a  5c 6c 69 62 5c 6d 69 64  |\uv2\prj\lib\mid|
+00000700  77 61 72 65 5c 65 6e 68  61 6e 63 65 64 5c 66 69  |ware\enhanced\fi|
+00000710  6c 65 53 65 6c 65 63 74  5f 61 70 69 2e 55 76 32  |leSelect_api.Uv2|
+00000720  20 2d 74 20 22 66 69 6c  65 53 65 6c 65 63 74 5f  | -t "fileSelect_|
+00000730  6d 75 73 69 63 22 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |music"**********|
+00000740  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 20 0d 0a 2a 2a 2a  |********** ..***|
+00000750  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 20 62 75  |************* bu|
+00000760  69 6c 64 31 20 31 20 73  74 61 72 74 20 2d 62 20  |ild1 1 start -b |
+00000770  2e 2e 5c 2e 2e 5c 70 73  70 5f 72 65 6c 5c 75 76  |..\..\psp_rel\uv|
+00000780  32 5c 70 72 6a 5c 6c 69  62 5c 6d 69 64 77 61 72  |2\prj\lib\midwar|
+00000790  65 5c 65 6e 68 61 6e 63  65 64 5c 49 44 33 2e 55  |e\enhanced\ID3.U|
+000007a0  76 32 20 2d 74 20 22 69  64 33 22 2a 2a 2a 2a 2a  |v2 -t "id3"*****|
+000007b0  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 20  |*************** |
+000007c0  0d 0a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |..**************|
+000007d0  2a 2a 20 62 75 69 6c 64  20 31 20 65 6e 64 20 2d  |** build 1 end -|
+000007e0  62 20 2e 2e 5c 2e 2e 5c  70 73 70 5f 72 65 6c 5c  |b ..\..\psp_rel\|
+000007f0  75 76 32 5c 70 72 6a 5c  6c 69 62 5c 6d 69 64 77  |uv2\prj\lib\midw|
+00000800  61 72 65 5c 65 6e 68 61  6e 63 65 64 5c 49 44 33  |are\enhanced\ID3|
+00000810  2e 55 76 32 20 2d 74 20  22 69 64 33 22 2a 2a 2a  |.Uv2 -t "id3"***|
+00000820  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+00000830  2a 20 0d 0a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |* ..************|
+00000840  2a 2a 2a 2a 20 62 75 69  6c 64 31 20 31 20 73 74  |**** build1 1 st|
+00000850  61 72 74 20 2d 62 20 2e  2e 5c 2e 2e 5c 70 73 70  |art -b ..\..\psp|
+00000860  5f 72 65 6c 5c 75 76 32  5c 70 72 6a 5c 6c 69 62  |_rel\uv2\prj\lib|
+00000870  5c 6d 69 64 77 61 72 65  5c 65 6e 68 61 6e 63 65  |\midware\enhance|
+00000880  64 5c 4e 41 4d 45 2e 55  76 32 20 2d 74 20 22 6e  |d\NAME.Uv2 -t "n|
+00000890  61 6d 65 22 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |ame"************|
+000008a0  2a 2a 2a 2a 2a 2a 2a 2a  20 0d 0a 2a 2a 2a 2a 2a  |******** ..*****|
+000008b0  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 20 62 75 69 6c  |*********** buil|
+000008c0  64 20 31 20 65 6e 64 20  2d 62 20 2e 2e 5c 2e 2e  |d 1 end -b ..\..|
+000008d0  5c 70 73 70 5f 72 65 6c  5c 75 76 32 5c 70 72 6a  |\psp_rel\uv2\prj|
+000008e0  5c 6c 69 62 5c 6d 69 64  77 61 72 65 5c 65 6e 68  |\lib\midware\enh|
+000008f0  61 6e 63 65 64 5c 4e 41  4d 45 2e 55 76 32 20 2d  |anced\NAME.Uv2 -|
+00000900  74 20 22 6e 61 6d 65 22  2a 2a 2a 2a 2a 2a 2a 2a  |t "name"********|
+00000910  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 20 0d 0a 2a  |************ ..*|
+00000920  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 20  |*************** |
+00000930  62 75 69 6c 64 20 32 20  73 74 61 72 74 20 2d 62  |build 2 start -b|
+00000940  20 2e 2e 5c 64 72 76 5c  66 77 5f 63 66 67 5c 66  | ..\drv\fw_cfg\f|
+00000950  77 5f 63 66 67 2e 55 76  32 20 2d 74 20 22 66 77  |w_cfg.Uv2 -t "fw|
+00000960  5f 63 66 67 22 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |_cfg"***********|
+00000970  2a 2a 2a 2a 2a 2a 2a 2a  2a 20 0d 0a 2a 2a 2a 2a  |********* ..****|
+00000980  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 20 62 75 69  |************ bui|
+00000990  6c 64 20 32 20 65 6e 64  20 2d 62 20 2e 2e 5c 64  |ld 2 end -b ..\d|
+000009a0  72 76 5c 66 77 5f 63 66  67 5c 66 77 5f 63 66 67  |rv\fw_cfg\fw_cfg|
+000009b0  2e 55 76 32 20 2d 74 20  22 66 77 5f 63 66 67 22  |.Uv2 -t "fw_cfg"|
+000009c0  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+000009d0  2a 2a 2a 2a 20 0d 0a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |**** ..*********|
+000009e0  2a 2a 2a 2a 2a 2a 2a 20  62 75 69 6c 64 20 32 20  |******* build 2 |
+000009f0  73 74 61 72 74 20 2d 62  20 2e 2e 5c 64 72 76 5c  |start -b ..\drv\|
+00000a00  6b 65 79 5c 64 72 76 5f  6b 65 79 2e 55 76 32 20  |key\drv_key.Uv2 |
+00000a10  2d 74 20 22 6b 79 5f 68  61 72 64 22 2a 2a 2a 2a  |-t "ky_hard"****|
+00000a20  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+00000a30  20 0d 0a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  | ..*************|
+00000a40  2a 2a 2a 20 62 75 69 6c  64 20 32 20 65 6e 64 20  |*** build 2 end |
+00000a50  2d 62 20 2e 2e 5c 64 72  76 5c 6b 65 79 5c 64 72  |-b ..\drv\key\dr|
+00000a60  76 5f 6b 65 79 2e 55 76  32 20 2d 74 20 22 6b 79  |v_key.Uv2 -t "ky|
+00000a70  5f 68 61 72 64 22 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |_hard"**********|
+00000a80  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 20 0d 0a 2a 2a 2a  |********** ..***|
+00000a90  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 20 62 75  |************* bu|
+00000aa0  69 6c 64 20 32 20 73 74  61 72 74 20 2d 62 20 2e  |ild 2 start -b .|
+00000ab0  2e 5c 64 72 76 5c 75 61  72 74 5c 75 61 72 74 2e  |.\drv\uart\uart.|
+00000ac0  55 76 32 20 2d 74 20 22  75 61 72 74 22 2a 2a 2a  |Uv2 -t "uart"***|
+00000ad0  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+00000ae0  2a 20 0d 0a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |* ..************|
+00000af0  2a 2a 2a 2a 20 62 75 69  6c 64 20 32 20 65 6e 64  |**** build 2 end|
+00000b00  20 2d 62 20 2e 2e 5c 64  72 76 5c 75 61 72 74 5c  | -b ..\drv\uart\|
+00000b10  75 61 72 74 2e 55 76 32  20 2d 74 20 22 75 61 72  |uart.Uv2 -t "uar|
+00000b20  74 22 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |t"**************|
+00000b30  2a 2a 2a 2a 2a 2a 20 0d  0a 2a 2a 2a 2a 2a 2a 2a  |****** ..*******|
+00000b40  2a 2a 2a 2a 2a 2a 2a 2a  2a 20 62 75 69 6c 64 20  |********* build |
+00000b50  32 20 73 74 61 72 74 20  2d 62 20 2e 2e 5c 64 72  |2 start -b ..\dr|
+00000b60  76 5c 77 65 6c 63 6f 6d  65 5c 77 65 6c 63 6f 6d  |v\welcome\welcom|
+00000b70  65 2e 55 76 32 20 2d 74  20 22 77 65 6c 63 6f 6d  |e.Uv2 -t "welcom|
+00000b80  65 22 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |e"**************|
+00000b90  2a 2a 2a 2a 2a 2a 20 0d  0a 2a 2a 2a 2a 2a 2a 2a  |****** ..*******|
+00000ba0  2a 2a 2a 2a 2a 2a 2a 2a  2a 20 62 75 69 6c 64 20  |********* build |
+00000bb0  32 20 65 6e 64 20 2d 62  20 2e 2e 5c 64 72 76 5c  |2 end -b ..\drv\|
+00000bc0  77 65 6c 63 6f 6d 65 5c  77 65 6c 63 6f 6d 65 2e  |welcome\welcome.|
+00000bd0  55 76 32 20 2d 74 20 22  77 65 6c 63 6f 6d 65 22  |Uv2 -t "welcome"|
+00000be0  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+00000bf0  2a 2a 2a 2a 20 0d 0a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |**** ..*********|
+00000c00  2a 2a 2a 2a 2a 2a 2a 20  62 75 69 6c 64 20 32 20  |******* build 2 |
+00000c10  73 74 61 72 74 20 2d 62  20 2e 2e 5c 61 70 5c 61  |start -b ..\ap\a|
+00000c20  70 5f 6d 61 69 6e 5c 61  70 5f 6d 61 69 6e 2e 55  |p_main\ap_main.U|
+00000c30  76 32 20 2d 74 20 22 6d  61 69 6e 22 2a 2a 2a 2a  |v2 -t "main"****|
+00000c40  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+00000c50  20 0d 0a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  | ..*************|
+00000c60  2a 2a 2a 20 62 75 69 6c  64 20 32 20 65 6e 64 20  |*** build 2 end |
+00000c70  2d 62 20 2e 2e 5c 61 70  5c 61 70 5f 6d 61 69 6e  |-b ..\ap\ap_main|
+00000c80  5c 61 70 5f 6d 61 69 6e  2e 55 76 32 20 2d 74 20  |\ap_main.Uv2 -t |
+00000c90  22 6d 61 69 6e 22 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |"main"**********|
+00000ca0  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 20 0d 0a 2a 2a 2a  |********** ..***|
+00000cb0  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 20 62 75  |************* bu|
+00000cc0  69 6c 64 20 32 20 73 74  61 72 74 20 2d 62 20 2e  |ild 2 start -b .|
+00000cd0  2e 5c 61 70 5c 61 70 5f  75 64 69 73 6b 5c 61 70  |.\ap\ap_udisk\ap|
+00000ce0  5f 75 64 69 73 6b 2e 55  76 32 20 2d 74 20 22 75  |_udisk.Uv2 -t "u|
+00000cf0  64 69 73 6b 2d 73 72 63  22 2a 2a 2a 2a 2a 2a 2a  |disk-src"*******|
+00000d00  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 20 0d 0a  |************* ..|
+00000d10  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+00000d20  20 62 75 69 6c 64 20 32  20 65 6e 64 20 2d 62 20  | build 2 end -b |
+00000d30  2e 2e 5c 61 70 5c 61 70  5f 75 64 69 73 6b 5c 61  |..\ap\ap_udisk\a|
+00000d40  70 5f 75 64 69 73 6b 2e  55 76 32 20 2d 74 20 22  |p_udisk.Uv2 -t "|
+00000d50  75 64 69 73 6b 2d 73 72  63 22 2a 2a 2a 2a 2a 2a  |udisk-src"******|
+00000d60  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 20 0d  |************** .|
+00000d70  0a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |.***************|
+00000d80  2a 20 62 75 69 6c 64 20  32 20 73 74 61 72 74 20  |* build 2 start |
+00000d90  2d 62 20 2e 2e 5c 61 70  5c 61 70 5f 75 73 6f 75  |-b ..\ap\ap_usou|
+00000da0  6e 64 5c 61 70 5f 73 6f  75 6e 64 2e 55 76 32 20  |nd\ap_sound.Uv2 |
+00000db0  2d 74 20 22 75 73 6f 75  6e 64 2d 73 72 63 22 2a  |-t "usound-src"*|
+00000dc0  2a 2a 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |****************|
+00000dd0  2a 2a 2a 20 0d 0a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |*** ..**********|
+00000de0  2a 2a 2a 2a 2a 2a 20 62  75 69 6c 64 20 32 20 65  |****** build 2 e|
+00000df0  6e 64 20 2d 62 20 2e 2e  5c 61 70 5c 61 70 5f 75  |nd -b ..\ap\ap_u|
+00000e00  73 6f 75 6e 64 5c 61 70  5f 73 6f 75 6e 64 2e 55  |sound\ap_sound.U|
+00000e10  76 32 20 2d 74 20 22 75  73 6f 75 6e 64 2d 73 72  |v2 -t "usound-sr|
+00000e20  63 22 2a 2a 2a 2a 2a 2a  2a 2a 2a 2a 2a 2a 2a 2a  |c"**************|
+00000e30  2a 2a 2a 2a 2a 2a 20 0d  0a 68 32 20 22 62 75 69  |****** ..h2 "bui|
+00000e40  6c 64 20 72 65 73 75 6c  74 20 3a 20 6f 6b 31 22  |ld result : ok1"|
+00000e50  20 20 0d 0a                                       |  ..|
+00000e54
