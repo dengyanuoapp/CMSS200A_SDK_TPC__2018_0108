@@ -295,3 +295,4 @@ CMSS200A_SDK_TPC/case/drv/uart/uart.c
 CMSS200A_SDK_TPC/case/drv/uart/builddrv.bat
 src4/401__case__ap__ap_main__main.c
 src4/402__ap_main_patch01.h
+Makefile.env
