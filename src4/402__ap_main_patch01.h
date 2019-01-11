@@ -26,17 +26,22 @@ int16 main_fake(int16 param)
 #include "test01_uart_and_delay.h"
 #include "test02_uart_as_start_detect.h"
 
+int16 main_fake(int16 param);
 void _mPatch01(void) {
 
     SetPLL(PLL_48MHZ);
     SetVDD(VDDSET_1_6V);
     ClearWatchDog();
 
-    while ( 1 ) {
+    while ( 0 ) {
         ClearWatchDog();
         //if ( _test01_uart_and_delay() ) return ;
         if ( _test02_uart_as_start_detect() ) return ;
     }
+
+    // call the real main loop
+    main_fake(param);
+
 } // _mPatch01
 
 #endif
