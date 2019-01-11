@@ -43,7 +43,7 @@ int16 _mPatch01(int16 ___param) {
 
     // call the real main loop
     //return main_fake(___param);
-    retunr 0 ;
+    return 0 ;
 
 } // _mPatch01
 
