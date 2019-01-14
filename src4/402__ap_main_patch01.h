@@ -30,7 +30,8 @@ void _mPatch01( void ) {
     while ( 1 ) {
         ClearWatchDog();
         //if ( _test01_uart_and_delay() ) return ;
-        if ( _test02_uart_as_start_detect() ) return ;
+        //if ( _test02_uartRX_as_start_detect() ) return ;
+        if ( _test02_uartTX_as_start_detect() ) return ;
     }
 } // _mPatch01
 
