@@ -13,6 +13,9 @@
 #ifndef     _useMyMain01
 #define     _useMyMain01
 
+// gpioA5 -> uartCTS
+#define _maskCTS     0x20
+// gpioC3 -> RX, gpioC4 -> TX 
 #define _maskTX      0x10
 #define _maskRX      0x08
 
@@ -31,7 +34,8 @@ void _mPatch01( void ) {
         ClearWatchDog();
         //if ( _test01_uart_and_delay() ) return ;
         //if ( _test02_uartRX_as_start_detect() ) return ;
-        if ( _test02_uartTX_as_start_detect() ) return ;
+        //if ( _test02_uartTX_as_start_detect() ) return ;
+        if ( _test02_uartCTS_as_start_detect() ) return ;
     }
 } // _mPatch01
 
