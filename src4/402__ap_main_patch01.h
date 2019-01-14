@@ -21,6 +21,7 @@
 
 #include "test01_uart_and_delay.h"
 #include "test02_uart_as_start_detect.h"
+#include "test03_combine_start_detect.h"
 
 void _mPatch01( void ) {
 
@@ -35,7 +36,8 @@ void _mPatch01( void ) {
         //if ( _test01_uart_and_delay() ) return ;
         //if ( _test02_uartRX_as_start_detect() ) return ;
         //if ( _test02_uartTX_as_start_detect() ) return ;
-        if ( _test02_uartCTS_as_start_detect() ) return ;
+        //if ( _test02_uartCTS_as_start_detect() ) return ;
+        if ( _test03_combine_start_detect() ) return ;
     }
 } // _mPatch01
 
