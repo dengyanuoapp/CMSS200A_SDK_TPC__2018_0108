@@ -5,23 +5,32 @@
 uint8 _test05_combine_start_detect(void)
 {
     uint8 __sfr_bak05;
-    uint8 __gpiocINen05;
-    uint8 __gpiocOUTen05;
     uint32 __tUartCnt05;
 
+    uint8 __gpioaINen05;
+    uint8 __gpioaOUTen05;
+    uint8 __gpioeINen05;
+    uint8 __gpioeOUTen05;
+
     __sfr_bak05    = SFR_BANK;
-    __gpiocINen05  = GPIOAINEN  ;
-    __gpiocOUTen05 = GPIOAOUTEN ;
+    __gpioaINen05  = GPIOAINEN  ;
+    __gpioaOUTen05 = GPIOAOUTEN ;
+    __gpioeINen05  = GPIOEINEN  ;
+    __gpioeOUTen05 = GPIOEOUTEN ;
 
     SFR_BANK = BANK_GPIO;
 
+    // CTS set to input
     GPIOAOUTEN &= (~_maskCTS) ;
     GPIOAINEN  |= _maskCTS ;
 
+    // RTS set to output
     GPIOAOUTEN |= _maskRTS ;
     GPIOAINEN  &= (~_maskRTS) ;
 
     _set_to_RTS_1 ;
+
+    // BCLK
 
     for ( __tUartCnt05 = 100 ; __tUartCnt05  ; __tUartCnt05 --   ) { 
     }
@@ -50,8 +59,10 @@ uint8 _test05_combine_start_detect(void)
         ClearWatchDog();
     }
 
-    GPIOAOUTEN = __gpiocOUTen05 ;
-    GPIOAINEN  = __gpiocINen05  ;
+    GPIOAOUTEN = __gpioaOUTen05 ;
+    GPIOAINEN  = __gpioaINen05  ;
+    GPIOEOUTEN = __gpioeOUTen05 ;
+    GPIOEINEN  = __gpioeINen05  ;
     SFR_BANK   = __sfr_bak05    ;
     return 1 ;
 } // _test05_combine_start_detect

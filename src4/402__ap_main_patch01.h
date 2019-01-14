@@ -27,6 +27,17 @@
 #define _set_to_TX_1       GPIOCDAT |=   _maskTX  ; // set to 1
 #define _maskRX      0x08
 
+// I2S0 : bclk E0 , lrclk E1 , mclk E2
+#define _maskI2Sbclk      0x01
+#define _maskI2Slrclk     0x02
+#define _maskI2Smclk      0x04
+#define _set_to_I2Sbclk_0       GPIOEDAT &= (~_maskI2Sbclk)  ; // set to 0
+#define _set_to_I2Sbclk_1       GPIOEDAT |=   _maskI2Sbclk   ; // set to 1
+#define _set_to_I2Slrclk_0      GPIOEDAT &= (~_maskI2Slrclk) ; // set to 0
+#define _set_to_I2Slrclk_1      GPIOEDAT |=   _maskI2Slrclk  ; // set to 1
+#define _set_to_I2Smclk_0       GPIOEDAT &= (~_maskI2Smclk)  ; // set to 0
+#define _set_to_I2Smclk_1       GPIOEDAT |=   _maskI2Smclk   ; // set to 1
+
 #include "test01_uart_and_delay.h"
 #include "test02_uart_as_start_detect.h"
 #include "test05_combine_start_detect.h"
