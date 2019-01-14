@@ -20,13 +20,14 @@ uint8 _test05_combine_start_detect(void)
 
     SFR_BANK = BANK_GPIO;
 
-    // CTS set to input
-    GPIOAOUTEN &= (~_maskCTS) ;
-    GPIOAINEN  |= _maskCTS ;
+    _set_dir_CTS_i      ;
+    _set_dir_RTS_o      ;
 
     // RTS set to output
-    GPIOAOUTEN |= _maskRTS ;
-    GPIOAINEN  &= (~_maskRTS) ;
+    _set_dir_I2Sbclk_o      ;
+    _set_dir_I2Slrclk_o     ;
+    _set_dir_I2Smclk_o      ;
+
 
     _set_to_RTS_1 ;
 

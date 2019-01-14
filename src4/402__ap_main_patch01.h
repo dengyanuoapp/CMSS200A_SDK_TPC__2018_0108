@@ -21,6 +21,11 @@
 #define _set_to_CTS_0       GPIOADAT &= (~_maskCTS) ; // set to 0
 #define _set_to_CTS_1       GPIOADAT |=   _maskCTS  ; // set to 1
 
+#define _set_dir_CTS_i      { GPIOAOUTEN &= (~_maskCTS) ; GPIOAINEN  |=   _maskCTS  ; }
+#define _set_dir_RTS_i      { GPIOAOUTEN &= (~_maskRTS) ; GPIOAINEN  |=   _maskRTS  ; }
+#define _set_dir_CTS_o      { GPIOAOUTEN |=   _maskCTS  ; GPIOAINEN  &= (~_maskCTS) ; }
+#define _set_dir_RTS_o      { GPIOAOUTEN |=   _maskRTS  ; GPIOAINEN  &= (~_maskRTS) ; }
+
 // gpioC3 -> RX, gpioC4 -> TX 
 #define _maskTX      0x10
 #define _set_to_TX_0       GPIOCDAT &= (~_maskTX) ; // set to 0
@@ -31,12 +36,19 @@
 #define _maskI2Sbclk      0x01
 #define _maskI2Slrclk     0x02
 #define _maskI2Smclk      0x04
-#define _set_to_I2Sbclk_0       GPIOEDAT &= (~_maskI2Sbclk)  ; // set to 0
-#define _set_to_I2Sbclk_1       GPIOEDAT |=   _maskI2Sbclk   ; // set to 1
-#define _set_to_I2Slrclk_0      GPIOEDAT &= (~_maskI2Slrclk) ; // set to 0
-#define _set_to_I2Slrclk_1      GPIOEDAT |=   _maskI2Slrclk  ; // set to 1
-#define _set_to_I2Smclk_0       GPIOEDAT &= (~_maskI2Smclk)  ; // set to 0
-#define _set_to_I2Smclk_1       GPIOEDAT |=   _maskI2Smclk   ; // set to 1
+#define _set_to_I2Sbclk_0       GPIOEDAT &= (~_maskI2Sbclk   )  ; // set to 0
+#define _set_to_I2Slrclk_0      GPIOEDAT &= (~_maskI2Slrclk   ) ; // set to 0
+#define _set_to_I2Smclk_0       GPIOEDAT &= (~_maskI2Smclk   )  ; // set to 0
+#define _set_to_I2Sbclk_1       GPIOEDAT |=   _maskI2Sbclk      ; // set to 1
+#define _set_to_I2Slrclk_1      GPIOEDAT |=   _maskI2Slrclk     ; // set to 1
+#define _set_to_I2Smclk_1       GPIOEDAT |=   _maskI2Smclk      ; // set to 1
+
+#define _set_dir_I2Sbclk_o      { GPIOAOUTEN |=   _maskI2Sbclk      ; GPIOAINEN  &= (~_maskI2Sbclk    ) ; }
+#define _set_dir_I2Slrclk_o     { GPIOAOUTEN |=   _maskI2Slrclk     ; GPIOAINEN  &= (~_maskI2Slrclk   ) ; }
+#define _set_dir_I2Smclk_o      { GPIOAOUTEN |=   _maskI2Smclk      ; GPIOAINEN  &= (~_maskI2Smclk    ) ; }
+#define _set_dir_I2Sbclk_i      { GPIOAOUTEN &= (~_maskI2Sbclk    ) ; GPIOAINEN  |=   _maskI2Sbclk      ; }
+#define _set_dir_I2Slrclk_i     { GPIOAOUTEN &= (~_maskI2Slrclk   ) ; GPIOAINEN  |=   _maskI2Slrclk     ; }
+#define _set_dir_I2Smclk_i      { GPIOAOUTEN &= (~_maskI2Smclk    ) ; GPIOAINEN  |=   _maskI2Smclk      ; }
 
 #include "test01_uart_and_delay.h"
 #include "test02_uart_as_start_detect.h"
