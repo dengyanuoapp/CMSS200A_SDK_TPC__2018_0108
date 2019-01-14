@@ -331,7 +331,7 @@ int16 main(int16 param)
 
     result = start_init(TRUE);
 
-#if 0
+#if 1
 	if (test_uart_flag && test_dpdm_flag)
 	{// drive earphone
 		while(1)
