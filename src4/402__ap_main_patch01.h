@@ -29,7 +29,7 @@
 
 #include "test01_uart_and_delay.h"
 #include "test02_uart_as_start_detect.h"
-#include "test03_combine_start_detect.h"
+#include "test05_combine_start_detect.h"
 
 void _mPatch01( void ) {
 

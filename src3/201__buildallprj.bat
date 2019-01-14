@@ -80,6 +80,8 @@ echo %username% "build result : ok1" >>%workDir%\buildlist2.log
 echo %username% "build result : ok1" 
 msg  %username% "build result : ok1"
 
+buildfw_snor.bat
+
 goto finish
 :builderr
 echo %username% "build result : err" >>%workDir%\buildlist.log 
