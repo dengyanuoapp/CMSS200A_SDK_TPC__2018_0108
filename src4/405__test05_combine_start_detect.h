@@ -23,7 +23,7 @@ uint8 _test05_combine_start_detect(void)
 
     _set_to_RTS_1 ;
 
-    for ( __tUartCnt05 = 10 ; __tUartCnt05  ; __tUartCnt05 --   ) { 
+    for ( __tUartCnt05 = 100 ; __tUartCnt05  ; __tUartCnt05 --   ) { 
     }
 
     if (GPIOADAT & _maskCTS ) {
@@ -36,7 +36,7 @@ uint8 _test05_combine_start_detect(void)
         if (GPIOADAT & _maskCTS )
         {
             // 1000 : 1.63 ms , 61349 : 100 ms
-            if ( __tUartCnt05 > 613 ) { 
+            if ( __tUartCnt05 > 813 ) { 
                 //__tUartCnt05 = 0 ;
                 _set_to_RTS_0 ;
                 _reset01();
