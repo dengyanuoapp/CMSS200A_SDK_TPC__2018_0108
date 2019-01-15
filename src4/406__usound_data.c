@@ -124,8 +124,24 @@ device_audio_configuration_t All_Descriptors_of_Configuration =
 #endif
         0x01, //configuration value
         0x00, //configuration string index
+
+        /*D7 Reserved, set to 1. (USB 1.0 Bus Powered)
+          D6 Self Powered
+          D5 Remote Wakeup
+          D4..0 Reserved, set to 0.
+          */
+#if 0 
         0x80,//0xC0, //attribute (bus powered, remote wakeup disable)
+        0xE0, //bus powered, self powered, remote wakeup enabled)
+#else
+        0x60, //self powered, remote wakeup enabled)
+#endif
+
+#if 0 
         0x32,//0x96, //max power (500mA),96h(300mA)
+#else
+        0xfa,//max power (500mA)
+#endif
     },
 
     /*usb_interface_descriptor_t Interface0_Descriptor =*/
