@@ -33,8 +33,7 @@ uint8 _test05_combine_start_detect(void)
 
     // BCLK
 
-    for ( __tUartCnt05 = 100 ; __tUartCnt05  ; __tUartCnt05 --   ) { 
-    }
+    for ( __tUartCnt05 = 10 ; __tUartCnt05  ; __tUartCnt05 --   ) { ClearWatchDog() ; }
 
     if (GPIOADAT & _maskCTS ) {
         _set_to_RTS_0 ;
@@ -42,10 +41,10 @@ uint8 _test05_combine_start_detect(void)
         _set_to_I2Sbclk_0       ;
         _set_to_I2Slrclk_0      ;
         _set_to_I2Smclk_0       ;
-        for ( __tUartCnt05 = 100 ; __tUartCnt05  ; __tUartCnt05 --   ) { }
+        for ( __tUartCnt05 = 3 ; __tUartCnt05  ; __tUartCnt05 --   ) { ClearWatchDog(); }
         _set_to_I2Sbclk_1       ;
-        _set_to_I2Slrclk_1      ;
-        _set_to_I2Smclk_1       ;
+        for ( __tUartCnt05 = 3 ; __tUartCnt05  ; __tUartCnt05 --   ) { ClearWatchDog(); }
+        _set_to_I2Sbclk_0       ;
 
         return 1 ; // skip , to run normal main.
     }
@@ -59,13 +58,12 @@ uint8 _test05_combine_start_detect(void)
                 //__tUartCnt05 = 0 ;
                 _set_to_RTS_0 ;
 
-                _set_to_I2Sbclk_0       ;
-                _set_to_I2Slrclk_0      ;
-                _set_to_I2Smclk_0       ;
-                for ( __tUartCnt05 = 100 ; __tUartCnt05  ; __tUartCnt05 --   ) { }
-                _set_to_I2Sbclk_1       ;
                 _set_to_I2Slrclk_1      ;
+                for ( __tUartCnt05 = 3 ; __tUartCnt05  ; __tUartCnt05 --   ) { ClearWatchDog() ; }
+                _set_to_I2Slrclk_0      ;
                 _set_to_I2Smclk_1       ;
+                for ( __tUartCnt05 = 3 ; __tUartCnt05  ; __tUartCnt05 --   ) { ClearWatchDog() ; }
+                _set_to_I2Smclk_0       ;
 
                 _reset01();
                 break ;
