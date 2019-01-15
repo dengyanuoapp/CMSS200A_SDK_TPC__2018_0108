@@ -62,6 +62,7 @@ void _mPatch01( void ) {
     ClearWatchDog();
     */
 
+#if 0
     while ( 1 ) {
         ClearWatchDog();
         //if ( _test01_uart_and_delay() ) return ;
@@ -70,6 +71,9 @@ void _mPatch01( void ) {
         //if ( _test02_uartCTS_as_start_detect() ) return ;
         if ( _test05_combine_start_detect() ) return ;
     }
+#else
+    ClearWatchDog();
+#endif
 } // _mPatch01
 
 #endif
