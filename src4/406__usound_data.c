@@ -139,8 +139,9 @@ device_audio_configuration_t All_Descriptors_of_Configuration =
 
 #if 0 
         0x32,//0x96, //max power (500mA),96h(300mA)
-#else
         0xfa,//max power (500mA)
+#else
+        0x00,//Not applicable.
 #endif
     },
 
